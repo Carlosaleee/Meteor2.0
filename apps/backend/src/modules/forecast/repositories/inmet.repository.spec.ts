@@ -1,4 +1,5 @@
 import { ConfigService } from "@nestjs/config";
+import type { Env } from "../../../common/config/env.schema";
 import { InmetRepository } from "./inmet.repository";
 import type { LocationRecord } from "../catalog/locations";
 
@@ -11,10 +12,10 @@ const loc: LocationRecord = {
   inmetStationId: "A712",
 };
 
-function cfg(token = "", base = "https://apitempo.inmet.gov.br"): ConfigService {
+function cfg(token = "", base = "https://apitempo.inmet.gov.br"): ConfigService<Env, true> {
   return {
-    get: (key: string) => (key === "INMET_API_TOKEN" ? token : key === "INMET_BASE_URL" ? base : ""),
-  } as unknown as ConfigService<any, true>;
+    get: ((key: string) => (key === "INMET_API_TOKEN" ? token : key === "INMET_BASE_URL" ? base : "")) as unknown as ConfigService<Env, true>["get"],
+  } as unknown as ConfigService<Env, true>;
 }
 
 describe("InmetRepository", () => {

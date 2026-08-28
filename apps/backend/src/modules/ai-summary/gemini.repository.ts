@@ -1,8 +1,8 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { GoogleGenAI } from "@google/genai";
-import type { Env } from "../../../common/config/env.schema";
-import type { AiSummaryBodyDto } from "../dto/ai-summary-body.dto";
+import type { Env } from "../../common/config/env.schema";
+import type { AiSummaryBodyDto } from "./dto/ai-summary-body.dto";
 
 @Injectable()
 export class GeminiRepository {
@@ -12,12 +12,16 @@ export class GeminiRepository {
 
   async generateSurfBrief(input: AiSummaryBodyDto): Promise<string> {
     const apiKey = this.config.get("GEMINI_API_KEY", { infer: true });
-    if (!apiKey) {
+    // A chave vem da variavel de ambiente GEMINI_API_KEY (Render) ou usa fallback local SUA_CHAVE_AQUI
+    if (!apiKey || apiKey === "SUA_CHAVE_AQUI") {
       return this.fallback(input);
     }
 
     try {
-      const client = new GoogleGenAI({ apiKey });
+      const model = this.config.get("GEMINI_MODEL", { infer: true }) as string;
+      const temperature = this.config.get("GEMINI_TEMPERATURE", { infer: true }) as number;
+      const apiKeyEnv = apiKey;
+      const client = new GoogleGenAI({ apiKey: apiKeyEnv });
       const prompt = [
         "Resumo tático de surf em 2 frases, PT-BR, sem emoji.",
         `Local: ${input.locationName}. Score: ${input.surfScore}.`,
@@ -26,9 +30,10 @@ export class GeminiRepository {
       ].join(" ");
 
       const response = await client.models.generateContent({
-        model: "gemini-2.0-flash",
+        model,
         contents: prompt,
-      });
+        config: { temperature, candidateCount: 1 },
+      } as never);
 
       const text = response.text;
       if (!text) {

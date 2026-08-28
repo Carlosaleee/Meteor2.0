@@ -1,6 +1,29 @@
 ---
 name: Meteor HUD
 description: Tactical surf telemetry dashboard for Ilha Comprida and Vale do Ribeira
+themes:
+  dark:
+    bg: "#0A0A0A"
+    graphite: "#141414"
+    surface: "#1C1C1C"
+    line: "#2A2A2A"
+    ink: "#E8E4DC"
+    muted: "#8A8478"
+    orange: "#FF6A1A"
+    gold: "#E0B429"
+    hazard: "#FF3B1A"
+    ok: "#C4A35A"
+  light:
+    bg: "#F8F6F0"
+    graphite: "#FFFFFF"
+    surface: "#EDEBE6"
+    line: "#D6D0C8"
+    ink: "#141414"
+    muted: "#6B6560"
+    orange: "#FF6A1A"
+    gold: "#C49A1A"
+    hazard: "#FF3B1A"
+    ok: "#8A6D2B"
 colors:
   bg: "#0A0A0A"
   graphite: "#141414"
@@ -68,6 +91,10 @@ Border-radius 0px default, 2px maximum.
 ## Components
 HUD frame, metric tiles, day/city selectors, wave sparkline, Surf Score numeral.
 
+## Theme Toggle
+
+Light `bg #F8F6F0` + Dark `bg #0A0A0A` via `data-theme` on `html`. Toggle `ThemeToggle.tsx` in `atoms/` with `localStorage` + `prefers-color-scheme`, `next-themes` compatible. `globals.css` `@theme` dark default, `[data-theme="light"]` override. `viewport` `colorScheme: "light dark"`. No purple, no blue trap in either theme.
+
 ## Do's and Don'ts
-- Do: sharp corners, mono telemetry, orange/gold accents.
+- Do: sharp corners, mono telemetry, orange/gold accents, `CapaMeteor.jpg` hero in portal.
 - Don't: purple, sky-blue SaaS palettes, 8px+ radius, Inter-on-slate.

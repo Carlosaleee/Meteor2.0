@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { forecastQueryLike } from "./forecast-query.schema.test-helper";
 import { forecastSchema } from "./schemas";
 
 describe("forecastSchema", () => {
@@ -33,5 +32,3 @@ describe("forecastSchema", () => {
     expect(parsed.success).toBe(true);
   });
 });
-
-void forecastQueryLike;

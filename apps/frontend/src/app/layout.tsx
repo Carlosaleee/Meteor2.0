@@ -22,13 +22,14 @@ export const metadata: Metadata = {
     description: "Tactical surf telemetry for Ilha Comprida and Vale do Ribeira",
     locale: "pt_BR",
     type: "website",
+    images: [{ url: "/CapaMeteor.jpg", width: 1200, height: 630, alt: "Meteor HUD — Capa" }],
   },
   robots: { index: true, follow: true },
 };
 
 export const viewport = {
   themeColor: "#0A0A0A",
-  colorScheme: "dark" as const,
+  colorScheme: "light dark" as const,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

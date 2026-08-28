@@ -5,6 +5,8 @@ import { HealthController } from "./health.controller";
 import { AiSummaryModule } from "./modules/ai-summary/ai-summary.module";
 import { CommonModule } from "./modules/common/common.module";
 import { ForecastModule } from "./modules/forecast/forecast.module";
+import { PortalModule } from "./modules/portal/portal.module";
+import { RagModule } from "./modules/rag/rag.module";
 
 // Throttler 30 req/min — optional, requires `pnpm install` of @nestjs/throttler; fallback no-op if missing
 let throttlerImports: unknown[] = [];
@@ -31,6 +33,8 @@ try {
     CommonModule,
     ForecastModule,
     AiSummaryModule,
+    PortalModule,
+    RagModule,
   ],
   controllers: [HealthController],
   providers: [...(throttlerProviders as never[])],

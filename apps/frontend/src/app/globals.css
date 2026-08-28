@@ -16,6 +16,18 @@
   --radius-hair: 2px;
 }
 
+[data-theme="light"] {
+  --color-bg: #f8f6f0;
+  --color-graphite: #ffffff;
+  --color-surface: #edebe6;
+  --color-line: #d6d0c8;
+  --color-ink: #141414;
+  --color-muted: #6b6560;
+  --color-orange: #ff6a1a;
+  --color-gold: #c49a1a;
+  --color-hazard: #ff3b1a;
+}
+
 html,
 body {
   background: var(--color-bg);

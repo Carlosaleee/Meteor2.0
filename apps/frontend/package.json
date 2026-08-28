@@ -10,10 +10,13 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "leaflet": "^1.9.4",
     "motion": "^12.23.12",
     "next": "^15.4.6",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-leaflet": "^4.2.1",
     "zod": "^3.25.76"
   },
   "devDependencies": {

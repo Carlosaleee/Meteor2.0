@@ -1,4 +1,5 @@
 import { ConfigService } from "@nestjs/config";
+import type { Env } from "../../../common/config/env.schema";
 import { StormglassRepository } from "./stormglass.repository";
 import type { LocationRecord } from "../catalog/locations";
 
@@ -11,8 +12,10 @@ const loc: LocationRecord = {
   inmetStationId: "A746",
 };
 
-function configWith(key: string): ConfigService {
-  return { get: () => key } as unknown as ConfigService<any, true>;
+function configWith(key: string): ConfigService<Env, true> {
+  return {
+    get: (() => key) as unknown as ConfigService<Env, true>["get"],
+  } as unknown as ConfigService<Env, true>;
 }
 
 describe("StormglassRepository", () => {
