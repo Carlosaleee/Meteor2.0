@@ -44,7 +44,7 @@ export class ForecastService {
     const [atmosphereRes, marineRes, stormglassRes, inmetRes] = await Promise.all([
       this.openMeteo.fetchAtmosphere(location, query.days),
       this.marine.fetchMarine(location, query.days),
-      this.stormglass.fetchMarine(location),
+      this.stormglass.fetchMarine(location, query.days),
       this.inmet.fetchStation(location),
     ]);
 

@@ -21,7 +21,7 @@ export class InmetRepository {
   async fetchStation(location: LocationRecord): Promise<ProviderResult<InmetSnapshot>> {
     const base = this.config.get("INMET_BASE_URL", { infer: true }).replace(/\/$/, "");
     const token = this.config.get("INMET_API_TOKEN", { infer: true });
-    const today = new Date().toISOString().slice(0, 10).replaceAll("-", "-");
+    const today = new Date().toISOString().slice(0, 10);
     const url = `${base}/estacao/${today}/${today}/${location.inmetStationId}`;
 
     const headers: Record<string, string> = { Accept: "application/json" };
@@ -30,7 +30,7 @@ export class InmetRepository {
     }
 
     try {
-      const response = await fetch(url, { headers });
+      const response = await fetch(url, { headers, signal: AbortSignal.timeout(5000) });
       if (!response.ok) {
         return {
           id: "inmet",

@@ -15,7 +15,7 @@ export class ForecastController {
 
   @Get("forecast")
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(120_000)
+  @CacheTTL(120 * 1000)
   getForecast(
     @Query(new ZodValidationPipe(forecastQuerySchema)) query: ForecastQueryDto,
   ) {

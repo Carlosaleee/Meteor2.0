@@ -26,7 +26,7 @@ export class StormglassRepository {
     return this.config.get("STORMGLASS_API_KEY", { infer: true }).length > 0;
   }
 
-  async fetchMarine(location: LocationRecord): Promise<ProviderResult<MarineSnapshot>> {
+  async fetchMarine(location: LocationRecord, days = 3): Promise<ProviderResult<MarineSnapshot>> {
     const key = this.config.get("STORMGLASS_API_KEY", { infer: true });
     if (!key) {
       return { id: "stormglass", status: "disabled", data: null, message: "STORMGLASS_API_KEY unset" };
@@ -41,6 +41,7 @@ export class StormglassRepository {
     try {
       const response = await fetch(`https://api.stormglass.io/v2/weather/point?${params.toString()}`, {
         headers: { Authorization: key },
+        signal: AbortSignal.timeout(5000),
       });
       if (!response.ok) {
         return {
@@ -53,7 +54,7 @@ export class StormglassRepository {
       const json = (await response.json()) as StormglassResponse;
       const hours = json.hours ?? [];
       const first = hours[0];
-      const hourly = hours.slice(0, 24).map((hour) => ({
+      const hourly = hours.slice(0, days * 24).map((hour) => ({
         time: hour.time ?? "",
         waveHeightM: hour.waveHeight?.sg ?? 0,
       }));

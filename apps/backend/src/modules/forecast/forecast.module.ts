@@ -8,7 +8,7 @@ import { OpenMeteoRepository } from "./repositories/open-meteo.repository";
 import { StormglassRepository } from "./repositories/stormglass.repository";
 
 @Module({
-  imports: [CacheModule.register({ ttl: 120_000 })],
+  imports: [CacheModule.register({ ttl: 120 * 1000 })],
   controllers: [ForecastController],
   providers: [
     ForecastService,

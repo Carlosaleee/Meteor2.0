@@ -31,7 +31,7 @@ export class OpenMeteoRepository {
     url.searchParams.set("timezone", "America/Sao_Paulo");
 
     try {
-      const response = await fetch(url);
+      const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
       if (!response.ok) {
         return {
           id: "open-meteo",
