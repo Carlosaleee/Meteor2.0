@@ -21,14 +21,22 @@ export function WaveChart({ points, dayIndex }: WaveChartProps) {
     })
     .join(" ");
 
+  const empty = series.length === 0 || series.every((p) => p.waveHeightM === 0);
+
   return (
-    <div className="border border-line bg-graphite p-3">
-      <div className="mb-2 font-mono text-[10px] tracking-[0.14em] text-muted uppercase">
+    <div className="border border-line bg-graphite p-3" role="region" aria-label="Wave height last 24 hours">
+      <div className="mb-2 font-mono text-[10px] tracking-[0.14em] text-muted uppercase" id="wave-title">
         Wave height / 24h
       </div>
-      <svg viewBox={`0 0 ${width} ${height}`} className="h-24 w-full overflow-visible">
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        className="h-24 w-full overflow-visible"
+        role="img"
+        aria-labelledby="wave-title"
+        aria-describedby={empty ? "wave-empty" : undefined}
+      >
         <motion.path
-          d={d || "M0 88 L320 88"}
+          d={empty ? "M0 44 L320 44" : d || "M0 88 L320 88"}
           fill="none"
           stroke="currentColor"
           className="text-gold"
@@ -37,6 +45,11 @@ export function WaveChart({ points, dayIndex }: WaveChartProps) {
           animate={{ pathLength: 1 }}
           transition={{ type: "spring", stiffness: 80, damping: 18 }}
         />
+        {empty && (
+          <text x="160" y="44" textAnchor="middle" className="fill-muted font-mono text-[10px]" id="wave-empty">
+            no data
+          </text>
+        )}
       </svg>
     </div>
   );

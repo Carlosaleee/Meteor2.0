@@ -15,7 +15,20 @@ const mono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "Meteor — Telemetry HUD",
-  description: "Weather, sea and swell for Ilha Comprida and Vale do Ribeira",
+  description: "Weather, sea and swell for Ilha Comprida and Vale do Ribeira — tactical surf telemetry",
+  metadataBase: new URL("https://meteor.local"),
+  openGraph: {
+    title: "Meteor — Telemetry HUD",
+    description: "Tactical surf telemetry for Ilha Comprida and Vale do Ribeira",
+    locale: "pt_BR",
+    type: "website",
+  },
+  robots: { index: true, follow: true },
+};
+
+export const viewport = {
+  themeColor: "#0A0A0A",
+  colorScheme: "dark" as const,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
