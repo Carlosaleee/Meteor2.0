@@ -11,7 +11,9 @@ async function bootstrap(): Promise<void> {
   // Security headers — helmet if installed, fallback manual
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
+    // @ts-ignore — require available at runtime via @types/node
     const helmet = require("helmet");
+    // @ts-ignore — helmet types optional
     app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
   } catch {
     app.use((_: unknown, res: { setHeader: (k: string, v: string) => void }, next: () => void) => {
