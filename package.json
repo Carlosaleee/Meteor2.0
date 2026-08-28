@@ -1,0 +1,20 @@
+{
+  "name": "meteor-2",
+  "private": true,
+  "packageManager": "pnpm@11",
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "build": "pnpm -r build",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "prettier": "^3.6.2"
+  },
+  "dependencies": {
+    "@octokit/rest": "^21.1.1"
+  }
+}
