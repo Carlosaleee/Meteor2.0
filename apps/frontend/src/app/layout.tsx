@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Archivo_Black, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 const display = Archivo_Black({
   weight: "400",
@@ -14,16 +16,8 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Meteor — Telemetry HUD",
-  description: "Weather, sea and swell for Ilha Comprida and Vale do Ribeira — tactical surf telemetry",
-  metadataBase: new URL("https://meteor.local"),
-  openGraph: {
-    title: "Meteor — Telemetry HUD",
-    description: "Tactical surf telemetry for Ilha Comprida and Vale do Ribeira",
-    locale: "pt_BR",
-    type: "website",
-    images: [{ url: "/CapaMeteor.jpg", width: 1200, height: 630, alt: "Meteor HUD — Capa" }],
-  },
+  title: "Meteor 2.0 — Estrutura Base",
+  description: "Estrutura base do projeto com Header e Footer globais",
   robots: { index: true, follow: true },
 };
 
@@ -35,7 +29,13 @@ export const viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR" className={`${display.variable} ${mono.variable}`}>
-      <body className="bg-bg font-mono text-ink antialiased">{children}</body>
+      <body className="bg-slate-950 font-mono text-slate-100 antialiased min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8">
+          {children}
+        </main>
+        <Footer />
+      </body>
     </html>
   );
 }
