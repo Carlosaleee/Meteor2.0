@@ -3,6 +3,8 @@ import { ConfigModule } from "@nestjs/config";
 import { parseEnv } from "./common/config/env.schema";
 import { HealthController } from "./health.controller";
 import { MeteorologyModule } from "./modules/meteorology/meteorology.module";
+import { OceanographyModule } from "./modules/oceanography/oceanography.module";
+import { TrafficModule } from "./modules/traffic/traffic.module";
 
 // Throttler 30 req/min — optional, requires `pnpm install` of @nestjs/throttler; fallback no-op if missing
 let throttlerImports: unknown[] = [];
@@ -27,6 +29,8 @@ try {
     }),
     ...(throttlerImports as never[]),
     MeteorologyModule,
+    OceanographyModule,
+    TrafficModule,
   ],
   controllers: [HealthController],
   providers: [...(throttlerProviders as never[])],
