@@ -1,17 +1,10 @@
 'client';
 
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
 
-const center: [number, number] = [-24.85, -47.72];
 
-const spotIcon = L.divIcon({
-  className: 'custom-spot',
-  html: `<div style="width: 32px; height: 32px; background: linear-gradient(135deg, #10b981, #059669); border: 3px solid white; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white;">🌊</div>`,
-  iconSize: [32, 32],
-  iconAnchor: [16, 16],
-});
+
+
+
 
 export function SwellMapClient() {
   return (
