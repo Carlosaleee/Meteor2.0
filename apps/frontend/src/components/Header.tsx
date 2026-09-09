@@ -51,61 +51,7 @@ export function Header() {
 
   return (
     <header className="w-full bg-[var(--color-header-bg)] shadow-md transition-colors duration-300" role="banner">
-      {/* Hero Area with Cover Image */}
-      <div className="relative w-full overflow-hidden">
-        <Image
-          src="/CapaMeteor.jpg"
-          alt="Capa Meteor 2.0"
-          width={3328}
-          height={1248}
-          className="w-full h-auto object-contain"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 via-[var(--color-header-bg)]/80 to-[var(--color-header-bg)]/90" />
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="text-left">
-              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-[var(--color-header-text)]">
-                Meteor 2.0
-              </h1>
-              <p className="mt-1 text-[var(--color-header-muted)] text-sm">
-                {lang === 'pt' ? 'Dashboard Tático — Ilha Comprida & Vale do Ribeira' : 'Dashboard Táctico — Ilha Comprida y Vale do Ribeira'}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={toggleLang}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-header-surface)] hover:bg-[var(--color-header-hover)] text-xs font-medium text-[var(--color-header-muted)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-header-bg)]"
-                aria-label={lang === 'pt' ? 'Mudar para espanhol' : 'Cambiar a portugués'}
-                aria-pressed={lang === 'es'}
-              >
-                <FaGlobe className="w-3.5 h-3.5 text-[var(--color-gold)]" aria-hidden="true" />
-                <span>{lang === 'pt' ? 'PT-BR' : 'ES'}</span>
-              </button>
-
-              <button
-                onClick={toggleTheme}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-header-surface)] hover:bg-[var(--color-header-hover)] text-xs font-medium text-[var(--color-header-muted)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-header-bg)]"
-                aria-label={theme === 'dark' ? 'Alternar para tema claro' : 'Alternar para tema escuro'}
-                aria-pressed={theme === 'light'}
-              >
-                {theme === 'dark' ? (
-                  <FaSun className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
-                ) : (
-                  <FaMoon className="w-3.5 h-3.5 text-[var(--color-gold)]" aria-hidden="true" />
-                )}
-                <span>{theme === 'dark' ? 'Claro' : 'Escuro'}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Gold Line */}
-      <div className="h-1 w-full bg-[var(--color-gold-line)]" aria-hidden="true" />
-
-      {/* Navigation Bar — Responsive */}
+      {/* Navigation Bar — Responsive (Top) */}
       <nav
         className="w-full bg-[var(--color-header-bg)] border-b border-[var(--color-header-border)]"
         role="navigation"
@@ -147,15 +93,41 @@ export function Header() {
             <span className="text-sm font-medium text-[var(--color-header-muted)]">
               {lang === 'pt' ? 'Menu' : 'Menú'}
             </span>
-            <button
-              onClick={() => setMenuOpen(prev => !prev)}
-              className="p-2 rounded-lg text-[var(--color-header-muted)] hover:bg-[var(--color-nav-hover-bg)] hover:text-[var(--color-nav-hover-text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)]"
-              aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
-              aria-expanded={menuOpen}
-              aria-controls="mobile-nav"
-            >
-              {menuOpen ? <FaTimes className="w-5 h-5" /> : <FaBars className="w-5 h-5" />}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleLang}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-header-surface)] hover:bg-[var(--color-header-hover)] text-xs font-medium text-[var(--color-header-muted)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-header-bg)]"
+                aria-label={lang === 'pt' ? 'Mudar para espanhol' : 'Cambiar a portugués'}
+                aria-pressed={lang === 'es'}
+              >
+                <FaGlobe className="w-3.5 h-3.5 text-[var(--color-gold)]" aria-hidden="true" />
+                <span>{lang === 'pt' ? 'PT-BR' : 'ES'}</span>
+              </button>
+
+              <button
+                onClick={toggleTheme}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-header-surface)] hover:bg-[var(--color-header-hover)] text-xs font-medium text-[var(--color-header-muted)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-header-bg)]"
+                aria-label={theme === 'dark' ? 'Alternar para tema claro' : 'Alternar para tema escuro'}
+                aria-pressed={theme === 'light'}
+              >
+                {theme === 'dark' ? (
+                  <FaSun className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
+                ) : (
+                  <FaMoon className="w-3.5 h-3.5 text-[var(--color-gold)]" aria-hidden="true" />
+                )}
+                <span>{theme === 'dark' ? 'Claro' : 'Escuro'}</span>
+              </button>
+
+              <button
+                onClick={() => setMenuOpen(prev => !prev)}
+                className="p-2 rounded-lg text-[var(--color-header-muted)] hover:bg-[var(--color-nav-hover-bg)] hover:text-[var(--color-nav-hover-text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)]"
+                aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
+                aria-expanded={menuOpen}
+                aria-controls="mobile-nav"
+              >
+                {menuOpen ? <FaTimes className="w-5 h-5" /> : <FaBars className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
 
           {/* Mobile Nav Dropdown */}
@@ -195,6 +167,63 @@ export function Header() {
           )}
         </div>
       </nav>
+
+      {/* Gold Line — Thin */}
+      <div className="h-px w-full bg-[var(--color-gold-line)]" aria-hidden="true" />
+
+      {/* Hero Area with Cover Image (Reduced) */}
+      <div className="relative w-full overflow-hidden max-h-[220px]">
+        <Image
+          src="/CapaMeteor.jpg"
+          alt="Capa Meteor 2.0"
+          width={3328}
+          height={1248}
+          className="w-full h-auto object-cover object-center"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 via-[var(--color-header-bg)]/80 to-[var(--color-header-bg)]/90" />
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="text-left">
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-[var(--color-header-text)]">
+                Meteor 2.0
+              </h1>
+              <p className="mt-1 text-[var(--color-header-muted)] text-sm">
+                {lang === 'pt' ? 'Dashboard Tático — Ilha Comprida & Vale do Ribeira' : 'Dashboard Táctico — Ilha Comprida y Vale do Ribeira'}
+              </p>
+            </div>
+
+            <div className="hidden md:flex items-center gap-3">
+              <button
+                onClick={toggleLang}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-header-surface)] hover:bg-[var(--color-header-hover)] text-xs font-medium text-[var(--color-header-muted)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-header-bg)]"
+                aria-label={lang === 'pt' ? 'Mudar para espanhol' : 'Cambiar a portugués'}
+                aria-pressed={lang === 'es'}
+              >
+                <FaGlobe className="w-3.5 h-3.5 text-[var(--color-gold)]" aria-hidden="true" />
+                <span>{lang === 'pt' ? 'PT-BR' : 'ES'}</span>
+              </button>
+
+              <button
+                onClick={toggleTheme}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-header-surface)] hover:bg-[var(--color-header-hover)] text-xs font-medium text-[var(--color-header-muted)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-header-bg)]"
+                aria-label={theme === 'dark' ? 'Alternar para tema claro' : 'Alternar para tema escuro'}
+                aria-pressed={theme === 'light'}
+              >
+                {theme === 'dark' ? (
+                  <FaSun className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
+                ) : (
+                  <FaMoon className="w-3.5 h-3.5 text-[var(--color-gold)]" aria-hidden="true" />
+                )}
+                <span>{theme === 'dark' ? 'Claro' : 'Escuro'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Gold Line — Thin (Bottom of Hero) */}
+      <div className="h-px w-full bg-[var(--color-gold-line)]" aria-hidden="true" />
     </header>
   );
 }

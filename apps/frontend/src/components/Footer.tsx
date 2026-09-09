@@ -20,8 +20,8 @@ export function Footer() {
 
   return (
     <footer className="w-full bg-[var(--color-footer-bg)] mt-auto transition-colors duration-300" role="contentinfo">
-      {/* Gold Line */}
-      <div className="h-1 w-full bg-[var(--color-gold-line)]" aria-hidden="true" />
+      {/* Gold Line — Thin */}
+      <div className="h-px w-full bg-[var(--color-gold-line)]" aria-hidden="true" />
 
       <div className="max-w-7xl mx-auto px-6 py-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-8">
