@@ -6,6 +6,7 @@ type SourceStripProps = {
 };
 
 export function SourceStrip({ sources }: SourceStripProps) {
+  if (!sources) return null;
   return (
     <ul className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] tracking-[0.1em] uppercase text-muted">
       {sources.map((source) => (
