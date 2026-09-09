@@ -1,4 +1,4 @@
-'client';
+'use client';
 
 import dynamic from 'next/dynamic';
 import { CloudSun, Wind, Droplets, Thermometer, Compass } from 'lucide-react';

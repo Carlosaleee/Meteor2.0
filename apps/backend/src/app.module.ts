@@ -2,11 +2,9 @@ import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { parseEnv } from "./common/config/env.schema";
 import { HealthController } from "./health.controller";
-import { AiSummaryModule } from "./modules/ai-summary/ai-summary.module";
-import { CommonModule } from "./modules/common/common.module";
-import { ForecastModule } from "./modules/forecast/forecast.module";
-import { PortalModule } from "./modules/portal/portal.module";
-import { RagModule } from "./modules/rag/rag.module";
+import { MeteorologyModule } from "./modules/meteorology/meteorology.module";
+import { OceanographyModule } from "./modules/oceanography/oceanography.module";
+import { TrafficModule } from "./modules/traffic/traffic.module";
 
 // Throttler 30 req/min — optional, requires `pnpm install` of @nestjs/throttler; fallback no-op if missing
 let throttlerImports: unknown[] = [];
@@ -30,11 +28,9 @@ try {
       validate: parseEnv,
     }),
     ...(throttlerImports as never[]),
-    CommonModule,
-    ForecastModule,
-    AiSummaryModule,
-    PortalModule,
-    RagModule,
+    MeteorologyModule,
+    OceanographyModule,
+    TrafficModule,
   ],
   controllers: [HealthController],
   providers: [...(throttlerProviders as never[])],

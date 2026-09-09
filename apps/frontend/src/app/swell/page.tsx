@@ -1,4 +1,4 @@
-'client';
+'use client';
 
 import dynamic from 'next/dynamic';
 import { Waves, ArrowUp, Clock, MapPin, Star } from 'lucide-react';
