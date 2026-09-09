@@ -1,6 +1,8 @@
+'use client';
+
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Search, Moon, Sun, Globe, Bot, X, Send, Sparkles, AlertTriangle, ShieldAlert } from 'lucide-react';
+import { Moon, Sun, Globe } from 'lucide-react';
 
 export function Header() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');

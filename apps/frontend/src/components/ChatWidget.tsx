@@ -1,5 +1,7 @@
+'use client';
+
 import { useState } from 'react';
-import { Bot, X, Send, Sparkles } from 'lucide-react';
+import { Bot, X, Send } from 'lucide-react';
 
 export function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);

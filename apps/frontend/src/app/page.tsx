@@ -1,8 +1,8 @@
-'client';
+'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Search, Sparkles, AlertTriangle, ShieldAlert, Compass, CloudSun, Waves, Car, Newspaper, BookOpen, Info, ArrowRight } from 'lucide-react';
+import { Search, Sparkles, ShieldAlert, CloudSun, Waves, Car, Newspaper, BookOpen, Info, ArrowRight } from 'lucide-react';
 import { ChatWidget } from '@/components/ChatWidget';
 
 const sections = [
