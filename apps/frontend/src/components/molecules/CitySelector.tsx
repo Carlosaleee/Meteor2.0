@@ -1,7 +1,12 @@
-"use client";
+'use client';
 
 import { SelectorChip } from "@/components/atoms/SelectorChip";
-import type { Location } from "@/lib/schemas";
+
+// Simple fallback type definition – replace with the proper schema when available.
+export type Location = {
+  id: string;
+  name: string;
+};
 
 type CitySelectorProps = {
   locations: Location[];
