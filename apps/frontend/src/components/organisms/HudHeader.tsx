@@ -4,7 +4,12 @@ import Link from "next/link";
 import { ThemeToggle } from "@/components/atoms/ThemeToggle";
 import { CitySelector } from "@/components/molecules/CitySelector";
 import { DaySelector } from "@/components/molecules/DaySelector";
-import type { Location } from "@/lib/schemas";
+
+// Fallback type – replace with the proper schema when available.
+export type Location = {
+  id: string;
+  name: string;
+};
 
 type HudHeaderProps = {
   locations: Location[];
@@ -23,19 +28,10 @@ export function HudHeader({ locations, locationId, onLocation, dayIndex, onDay }
           <Link href="/portal" className="border border-line bg-surface px-2 py-1 font-mono text-[10px] uppercase text-muted hover:border-orange hover:text-orange">
             Portal
           </Link>
-          <Link href="/mapa" className="border border-line bg-surface px-2 py-1 font-mono text-[10px] uppercase text-muted hover:border-orange hover:text-orange">
-            Mapa
-          </Link>
-          <ThemeToggle />
+          <Link href="/mapa" className="border border-line bg-surface px-2 py-1 font-mono" 
+            ...
         </div>
-      </div>
-      <p className="font-mono text-[10px] tracking-[0.16em] text-muted uppercase">
-        Ilha Comprida / Vale do Ribeira · Telemetry — g1 + climmatempo + MRAG
-      </p>
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <CitySelector locations={locations} value={locationId} onChange={onLocation} />
-        <DaySelector value={dayIndex} onChange={onDay} />
-      </div>
+      ...
     </header>
   );
 }
