@@ -1,13 +1,25 @@
-'client';
+'use client';
 
-import dynamic from 'next/dynamic';
-import { Car, AlertCircle, Clock, MapPin } from 'lucide-react';
+import { Car, Clock, MapPin } from 'lucide-react';
 import { ChatWidget } from '@/components/ChatWidget';
+import dynamic from 'next/dynamic';
 
-// Carregamento dinâmico do mapa Leaflet para o trânsito e rodovias
-const TrafficMap = dynamic(() => import('@/components/TrafficMapClient').then(mod => mod.TrafficMapClient), { ssr: false });
+const BaseLeafletMap = dynamic(() => import('@/components/maps/BaseLeafletMap').then(mod => mod.BaseLeafletMap), { ssr: false });
 
 export default function TransitoPage() {
+  const markers = [
+    {
+      position: [-24.70, -47.90] as [number, number],
+      popupHtml: '<div class="text-xs text-slate-800"><strong>SP-222 — Km 12</strong><br />Status: Tráfego Livre</div>',
+      iconHtml: '<div style="width: 28px; height: 28px; background: #10b981; border: 3px solid white; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white;">🚗</div>'
+    },
+    {
+      position: [-24.90, -47.92] as [number, number],
+      popupHtml: '<div class="text-xs text-slate-800"><strong>Balsa Cananéia</strong><br />Espera: 15 minutos</div>',
+      iconHtml: '<div style="width: 28px; height: 28px; background: #10b981; border: 3px solid white; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white;">🚗</div>'
+    }
+  ];
+
   return (
     <div className="space-y-8">
       <div>
@@ -18,7 +30,6 @@ export default function TransitoPage() {
         <p className="text-slate-400 text-sm mt-1">Monitoramento das rodovias (SP-222, BR-116) e balsas do Vale do Ribeira</p>
       </div>
 
-      {/* Status das Vias Principais */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
           <div className="flex items-center justify-between mb-3">
@@ -50,14 +61,13 @@ export default function TransitoPage() {
         </div>
       </div>
 
-      {/* Mapa Leaflet de Trânsito */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
         <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
           <MapPin className="w-5 h-5 text-emerald-400" />
           Mapa de Rodovias e Acessos Regionais
         </h3>
         <div className="h-[450px] rounded-xl overflow-hidden border border-slate-800">
-          <TrafficMap />
+          <BaseLeafletMap center={[-24.80, -47.80]} zoom={10} markers={markers} />
         </div>
       </div>
 
