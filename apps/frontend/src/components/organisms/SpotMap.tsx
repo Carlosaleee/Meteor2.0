@@ -4,10 +4,7 @@ import dynamic from "next/dynamic";
 // @ts-ignore — leaflet CSS has no types, needed for map tiles
 import "leaflet/dist/leaflet.css";
 
-const MapContainer = dynamic(() => import("react-leaflet").then((m) => m.MapContainer), { ssr: false });
-const TileLayer = dynamic(() => import("react-leaflet").then((m) => m.TileLayer), { ssr: false });
-const Marker = dynamic(() => import("react-leaflet").then((m) => m.Marker), { ssr: false });
-const Popup = dynamic(() => import("react-leaflet").then((m) => m.Popup), { ssr: false });
+
 
 type Spot = { id: string; name: string; lat: number; lon: number; region: string };
 
