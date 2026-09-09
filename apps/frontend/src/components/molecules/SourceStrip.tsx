@@ -1,5 +1,9 @@
 import { StatusDot } from "@/components/atoms/StatusDot";
-import type { Forecast } from "@/lib/schemas";
+
+// Fallback type – replace with the real schema when it becomes available.
+export type Forecast = {
+  sources: Array<{ id: string; status: string }>;
+};
 
 type SourceStripProps = {
   sources: Forecast["sources"];
