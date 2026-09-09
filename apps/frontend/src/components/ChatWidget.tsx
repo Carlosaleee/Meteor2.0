@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bot, X, Send, Sparkles } from 'lucide-react';
+import { FaRobot, FaTimes, FaPaperPlane } from 'react-icons/fa';
 
 export function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -40,7 +40,7 @@ export function ChatWidget() {
         className="fixed bottom-6 right-6 z-50 p-4 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-2xl flex items-center justify-center transition-all hover:scale-105"
         title="MeteorBot IA"
       >
-        <Bot className="w-6 h-6" />
+        <FaRobot className="w-6 h-6" />
       </button>
 
       {/* Janela de Chat Flutuante */}
@@ -49,7 +49,7 @@ export function ChatWidget() {
           <div className="p-4 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="p-1.5 rounded-lg bg-blue-600 text-white">
-                <Bot className="w-4 h-4" />
+                <FaRobot className="w-4 h-4" />
               </div>
               <div>
                 <h3 className="font-bold text-sm text-white">MeteorBot IA</h3>
@@ -57,7 +57,7 @@ export function ChatWidget() {
               </div>
             </div>
             <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-white">
-              <X className="w-5 h-5" />
+              <FaTimes className="w-5 h-5" />
             </button>
           </div>
 
@@ -80,7 +80,7 @@ export function ChatWidget() {
               className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
             <button type="submit" className="p-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white">
-              <Send className="w-4 h-4" />
+              <FaPaperPlane className="w-4 h-4" />
             </button>
           </form>
         </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { Car, Clock, MapPin } from 'lucide-react';
+import { FaCar, FaClock, FaMapMarkerAlt } from 'react-icons/fa';
 import { ChatWidget } from '@/components/ChatWidget';
 import dynamic from 'next/dynamic';
 
@@ -24,7 +24,7 @@ export default function TransitoPage() {
     <div className="space-y-8">
       <div>
         <h2 className="text-3xl font-extrabold text-white flex items-center gap-3">
-          <Car className="w-8 h-8 text-emerald-500" />
+          <FaCar className="w-8 h-8 text-emerald-500" />
           Trânsito & Mobilidade Regional
         </h2>
         <p className="text-slate-400 text-sm mt-1">Monitoramento das rodovias (SP-222, BR-116) e balsas do Vale do Ribeira</p>
@@ -56,14 +56,14 @@ export default function TransitoPage() {
           </div>
           <p className="text-xl font-bold text-white">Cananéia ⇄ Ilha Comprida</p>
           <p className="text-xs text-slate-400 mt-2 flex items-center gap-1">
-            <Clock className="w-3.5 h-3.5 text-blue-400" /> Tempo de espera estimado: 15 min
+            <FaClock className="w-3.5 h-3.5 text-blue-400" /> Tempo de espera estimado: 15 min
           </p>
         </div>
       </div>
 
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
         <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-          <MapPin className="w-5 h-5 text-emerald-400" />
+          <FaMapMarkerAlt className="w-5 h-5 text-emerald-400" />
           Mapa de Rodovias e Acessos Regionais
         </h3>
         <div className="h-[450px] rounded-xl overflow-hidden border border-slate-800">
