@@ -1,9 +1,23 @@
 import { MetricValue } from "@/components/atoms/MetricValue";
-import type { Forecast } from "@/lib/schemas";
+
+// Fallback type – replace with the real schema when it becomes available.
+export type Forecast = {
+  atmosphere?: {
+    windSpeedMs?: number;
+    windDirectionDeg?: number;
+    temperatureC?: number;
+  };
+  marine?: {
+    swellHeightM?: number;
+    wavePeriodS?: number;
+    waveHeightM?: number;
+  };
+};
 
 type WindSwellMetersProps = {
   forecast: Forecast;
 };
+
 
 function fmt(n: number | null | undefined, digits = 1): string {
   if (n === null || n === undefined) {
