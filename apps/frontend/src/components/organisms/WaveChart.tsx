@@ -21,7 +21,7 @@ export function WaveChart({ points, dayIndex }: WaveChartProps) {
     })
     .join(" ");
 
-  const empty = series.length === 0 || series.every((p) => p.waveHeightM === 0);
+  const empty = series.every((p) => p.waveHeightM === 0);
 
   return (
     <div className="border border-line bg-graphite p-3" role="region" aria-label="Wave height last 24 hours">
