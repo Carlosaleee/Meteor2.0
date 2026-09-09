@@ -1,8 +1,45 @@
-'client';
+'use client';
 
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
+import { useEffect, useRef } from 'react';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+const STATIONS = [
+  {
+    position: [-24.73, -47.55] as [number, number],
+    label: 'Estação INMET - Ilha Comprida',
+    detail: 'Temp: 26°C | Vento: 18 km/h SE',
+  },
+  {
+    position: [-24.49, -47.84] as [number, number],
+    label: 'Estação INMET - Iguape',
+    detail: 'Temp: 25°C | Vento: 15 km/h E',
+  },
+];
+
+export function WeatherMapClient() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<L.Map | null>(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const domEl = containerRef.current as HTMLElement & { _leaflet_id?: unknown };
+    if (domEl.__leaflet_id) domEl._leaflet_id = null;
+    if (mapRef.current) {
+      mapRef.current.remove();
+      mapRef.current = null;
+    }
+    const stationIcon = L.divIcon({
+      className: 'custom-station',
+      html: `<div style="..."`,
+      iconSize: [28, 28],
+      iconAnchor: [0];
+    })
+    // ... rest of implementation ...
+  }, []);
+
+  return 
+
 
 const center: [number, number] = [-24.73, -47.55];
 
