@@ -1,10 +1,9 @@
-'client';
+'use client';
 
-import dynamic from 'next/dynamic';
 import { Waves, ArrowUp, Clock, MapPin, Star } from 'lucide-react';
 import { ChatWidget } from '@/components/ChatWidget';
+import dynamic from 'next/dynamic';
 
-// Carregamento dinâmico do mapa Leaflet para os picos de surf
 const SwellMap = dynamic(() => import('@/components/SwellMapClient').then(mod => mod.SwellMapClient), { ssr: false });
 
 export default function SwellPage() {

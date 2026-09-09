@@ -1,10 +1,9 @@
-'client';
+'use client';
 
-import dynamic from 'next/dynamic';
 import { CloudSun, Wind, Droplets, Thermometer, Compass } from 'lucide-react';
 import { ChatWidget } from '@/components/ChatWidget';
+import dynamic from 'next/dynamic';
 
-// Carregamento dinâmico do mapa Leaflet para evitar erros de SSR no Next.js
 const WeatherMap = dynamic(() => import('@/components/WeatherMapClient').then(mod => mod.WeatherMapClient), { ssr: false });
 
 export default function MeteorologiaPage() {

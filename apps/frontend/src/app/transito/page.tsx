@@ -1,10 +1,9 @@
-'client';
+'use client';
 
-import dynamic from 'next/dynamic';
 import { Car, AlertCircle, Clock, MapPin } from 'lucide-react';
 import { ChatWidget } from '@/components/ChatWidget';
+import dynamic from 'next/dynamic';
 
-// Carregamento dinâmico do mapa Leaflet para o trânsito e rodovias
 const TrafficMap = dynamic(() => import('@/components/TrafficMapClient').then(mod => mod.TrafficMapClient), { ssr: false });
 
 export default function TransitoPage() {

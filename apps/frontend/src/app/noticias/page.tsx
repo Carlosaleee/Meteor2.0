@@ -1,4 +1,4 @@
-'client';
+'use client';
 
 import { Newspaper, ShieldAlert, Radio, Building2, ExternalLink } from 'lucide-react';
 import { ChatWidget } from '@/components/ChatWidget';

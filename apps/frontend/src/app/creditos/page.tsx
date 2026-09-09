@@ -1,4 +1,4 @@
-'client';
+'use client';
 
 import { Info, Code, Database, Sparkles } from 'lucide-react';
 import { ChatWidget } from '@/components/ChatWidget';

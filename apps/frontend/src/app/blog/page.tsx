@@ -1,4 +1,4 @@
-'client';
+'use client';
 
 import { BookOpen, Clock, User } from 'lucide-react';
 import { ChatWidget } from '@/components/ChatWidget';
