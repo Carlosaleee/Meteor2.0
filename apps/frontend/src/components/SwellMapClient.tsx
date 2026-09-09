@@ -1,4 +1,33 @@
-'client';
+'use client';
+
+import { useEffect, useRef } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+const SPOTS = [
+  {
+    position: [-24.75, -47.58] as [number, number],
+    label: 'Boqueirão Norte — Ilha Comprida',
+    detail: 'Nível: Intermediário<br>Melhor Vento: Terral (Oeste)',
+  },
+  {
+    position: [-24.95, -47.88] as [number, number],
+    label: 'Boqueirão Sul — Ilha Comprida',
+    detail: 'Nível: Avançado<br>Melhor Vento: Sudoeste',
+  },
+];
+
+export function SwellMapClient() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<L.Map | null>(null);
+
+  useEffect(() =>
+    {
+    if (!containerRef.current) return;
+
+    const domEl = containerRef.current as HTMLElement & { _leaflet_id?: unknown };
+    if (domId
+;
 
 
 
