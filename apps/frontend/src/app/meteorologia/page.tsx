@@ -1,13 +1,25 @@
-'client';
+'use client';
 
-import dynamic from 'next/dynamic';
-import { CloudSun, Wind, Droplets, Thermometer, Compass } from 'lucide-react';
+import { CloudSun, Wind, Droplets, Thermometer, Compass, Loader2 } from 'lucide-react';
 import { ChatWidget } from '@/components/ChatWidget';
+import dynamic from 'next/dynamic';
 
-// Carregamento dinâmico do mapa Leaflet para evitar erros de SSR no Next.js
-const WeatherMap = dynamic(() => import('@/components/WeatherMapClient').then(mod => mod.WeatherMapClient), { ssr: false });
+const BaseLeafletMap = dynamic(() => import('@/components/maps/BaseLeafletMap').then(mod => mod.BaseLeafletMap), { ssr: false });
 
 export default function MeteorologiaPage() {
+  const markers = [
+    {
+      position: [-24.73, -47.55] as [number, number],
+      popupHtml: '<div class="text-xs text-slate-800"><strong>Estação INMET - Ilha Comprida</strong><br />Temp: 26°C | Vento: 18 km/h SE</div>',
+      iconHtml: '<div style="width: 28px; height: 28px; background: #0284c7; border: 3px solid white; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 10px;">IN</div>'
+    },
+    {
+      position: [-24.49, -47.84] as [number, number],
+      popupHtml: '<div class="text-xs text-slate-800"><strong>Estação INMET - Iguape</strong><br />Temp: 25°C | Vento: 15 km/h E</div>',
+      iconHtml: '<div style="width: 28px; height: 28px; background: #0284c7; border: 3px solid white; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 10px;">IN</div>'
+    }
+  ];
+
   return (
     <div className="space-y-8">
       <div>
@@ -18,7 +30,6 @@ export default function MeteorologiaPage() {
         <p className="text-slate-400 text-sm mt-1">Previsão detalhada, estações INMET e mapa de ventos na região</p>
       </div>
 
-      {/* KPI Cards de Clima */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
           <div className="flex items-center justify-between mb-3">
@@ -57,14 +68,13 @@ export default function MeteorologiaPage() {
         </div>
       </div>
 
-      {/* Mapa Leaflet de Meteorologia */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
         <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
           <Compass className="w-5 h-5 text-blue-400" />
           Mapa de Estações e Ventos (Ilha Comprida & Vale do Ribeira)
         </h3>
         <div className="h-[450px] rounded-xl overflow-hidden border border-slate-800">
-          <WeatherMap />
+          <BaseLeafletMap center={[-24.73, -47.55]} zoom={10} markers={markers} />
         </div>
       </div>
 
