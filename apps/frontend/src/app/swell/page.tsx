@@ -1,16 +1,27 @@
-'client';
+'use client';
 
-import dynamic from 'next/dynamic';
-import { Waves, ArrowUp, Clock, MapPin, Star } from 'lucide-react';
+import { Waves, Clock, MapPin } from 'lucide-react';
 import { ChatWidget } from '@/components/ChatWidget';
+import dynamic from 'next/dynamic';
 
-// Carregamento dinâmico do mapa Leaflet para os picos de surf
-const SwellMap = dynamic(() => import('@/components/SwellMapClient').then(mod => mod.SwellMapClient), { ssr: false });
+const BaseLeafletMap = dynamic(() => import('@/components/maps/BaseLeafletMap').then(mod => mod.BaseLeafletMap), { ssr: false });
 
 export default function SwellPage() {
+  const markers = [
+    {
+      position: [-24.75, -47.58] as [number, number],
+      popupHtml: '<div class="text-xs text-slate-800"><strong>Boqueirão Norte — Ilha Comprida</strong><br />Nível: Intermediário<br />Melhor Vento: Terral (Oeste)</div>',
+      iconHtml: '<div style="width: 32px; height: 32px; background: linear-gradient(135deg, #10b981, #059669); border: 3px solid white; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white;">🌊</div>'
+    },
+    {
+      position: [-24.95, -47.88] as [number, number],
+      popupHtml: '<div class="text-xs text-slate-800"><strong>Boqueirão Sul — Ilha Comprida</strong><br />Nível: Avançado<br />Melhor Vento: Sudoeste</div>',
+      iconHtml: '<div style="width: 32px; height: 32px; background: linear-gradient(135deg, #10b981, #059669); border: 3px solid white; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white;">🌊</div>'
+    }
+  ];
+
   return (
     <div className="space-y-8">
-      {/* Hero Banner de Qualidade do Mar */}
       <div className="relative overflow-hidden bg-gradient-to-r from-blue-700 via-blue-800 to-slate-900 text-white rounded-3xl p-6 md:p-10 shadow-xl border border-blue-600/30">
         <div className="relative z-10 flex flex-wrap items-center justify-between gap-6">
           <div className="flex items-center gap-4">
@@ -42,7 +53,6 @@ export default function SwellPage() {
         </div>
       </div>
 
-      {/* KPI Cards Oceanográficos */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
           <span className="text-xs font-semibold text-slate-400">Altura da Onda</span>
@@ -69,7 +79,6 @@ export default function SwellPage() {
         </div>
       </div>
 
-      {/* Mapa Leaflet de Picos de Surf */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
         <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
           <MapPin className="w-5 h-5 text-blue-400" />
@@ -77,7 +86,7 @@ export default function SwellPage() {
         </h3>
         <p className="text-xs text-slate-400 mb-4">Clique nos marcadores para conferir o nível de dificuldade e dicas dos picos</p>
         <div className="h-[450px] rounded-xl overflow-hidden border border-slate-800">
-          <SwellMap />
+          <BaseLeafletMap center={[-24.85, -47.72]} zoom={11} markers={markers} />
         </div>
       </div>
 
