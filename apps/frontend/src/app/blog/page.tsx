@@ -2,6 +2,7 @@
 
 import { FaBookOpen, FaCalendar, FaArrowRight } from 'react-icons/fa';
 import { ChatWidget } from '@/components/ChatWidget';
+import { PageBanner } from '@/components/PageBanner';
 
 type BlogPost = {
   id: number;
@@ -55,6 +56,8 @@ const POSTS: BlogPost[] = [
 export default function BlogPage() {
   return (
     <div className="space-y-8">
+      <PageBanner title="Blog Técnico" subtitle="Artigos e guias especiais sobre o clima e litoral do Vale do Ribeira" />
+
       <div>
         <h2 className="text-3xl font-extrabold text-white flex items-center gap-3">
           <FaBookOpen className="w-8 h-8 text-blue-500" />

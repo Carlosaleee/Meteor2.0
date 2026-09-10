@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { FaNewspaper, FaExternalLinkAlt, FaFilter } from 'react-icons/fa';
 import { ChatWidget } from '@/components/ChatWidget';
+import { PageBanner } from '@/components/PageBanner';
 
 type NewsItem = {
   id: number;
@@ -100,6 +101,8 @@ export default function NoticiasPage() {
 
   return (
     <div className="space-y-8">
+      <PageBanner title="Notícias Regionais" subtitle="Feed unificado das principais fontes do Vale do Ribeira" />
+
       <div>
         <h2 className="text-3xl font-extrabold text-white flex items-center gap-3">
           <FaNewspaper className="w-8 h-8 text-blue-500" />

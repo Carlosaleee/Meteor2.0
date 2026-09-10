@@ -3,12 +3,15 @@
 import dynamic from 'next/dynamic';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 import { ChatWidget } from '@/components/ChatWidget';
+import { PageBanner } from '@/components/PageBanner';
 
 const SpotMap = dynamic(() => import('@/components/organisms/SpotMap').then(mod => mod.SpotMap), { ssr: false });
 
 export default function MapaPage() {
   return (
     <div className="space-y-8">
+      <PageBanner title="Mapa — Vale do Ribeira" subtitle="Leaflet OSM — 6 localidades monitoradas na região" />
+
       <div>
         <h2 className="text-3xl font-extrabold text-white flex items-center gap-3">
           <FaMapMarkerAlt className="w-8 h-8 text-blue-500" />

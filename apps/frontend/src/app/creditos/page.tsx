@@ -2,6 +2,7 @@
 
 import { FaInfoCircle, FaExternalLinkAlt, FaCloud, FaWater, FaShieldAlt, FaCode, FaDatabase, FaGlobe } from 'react-icons/fa';
 import { ChatWidget } from '@/components/ChatWidget';
+import { PageBanner } from '@/components/PageBanner';
 
 const DATA_SOURCES = [
   {
@@ -53,6 +54,8 @@ const LICENSES = [
 export default function CreditosPage() {
   return (
     <div className="space-y-8">
+      <PageBanner title="Créditos & Fontes" subtitle="Transparência de dados e stack tecnológica utilizada" />
+
       <div>
         <h2 className="text-3xl font-extrabold text-white flex items-center gap-3">
           <FaInfoCircle className="w-8 h-8 text-blue-500" />

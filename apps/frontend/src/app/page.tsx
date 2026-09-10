@@ -26,19 +26,19 @@ export default function PrincipalPage() {
   return (
     <div className="space-y-8">
       {/* Hero Image */}
-      <div className="relative w-full overflow-hidden max-h-[220px] rounded-2xl">
+      <div className="relative w-full overflow-hidden" style={{ height: '180px' }}>
         <Image
-          src="/CapaMeteor.jpg"
-          alt="Capa Meteor 2.0"
-          width={3328}
-          height={1248}
-          className="w-full h-auto object-cover object-center"
+          src="/banner-meteor.jpg"
+          alt="Banner Meteor 2.0 — Clima, ondas e trânsito do Vale do Ribeira"
+          fill
+          className="object-cover object-center"
           priority
+          sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 via-[var(--color-header-bg)]/80 to-[var(--color-header-bg)]/90" />
+        <div className="absolute inset-0 bg-gradient-to-r from-amber-950/90 via-[var(--color-header-bg)]/80 to-[var(--color-header-bg)]/85" />
         <div className="absolute inset-0 flex items-center">
           <div className="w-full max-w-7xl mx-auto px-6">
-            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white">
+            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-[var(--color-gold)]">
               Meteor 2.0
             </h1>
             <p className="mt-1 text-slate-300 text-sm">

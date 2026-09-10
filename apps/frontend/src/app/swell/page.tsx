@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { FaWater, FaClock, FaMapMarkerAlt } from 'react-icons/fa';
 import { ChatWidget } from '@/components/ChatWidget';
+import { PageBanner } from '@/components/PageBanner';
 import { useSwell } from '@/hooks/useSwell';
 
 const SwellMap = dynamic(() => import('@/components/SwellMapClient').then(mod => mod.SwellMapClient), { ssr: false });
@@ -17,6 +18,8 @@ export default function SwellPage() {
 
   return (
     <div className="space-y-8">
+      <PageBanner title="Swell & Picos" subtitle="Telemetria de ondas, marés e picos de surf em Ilha Comprida" />
+
       {error && (
         <div className="bg-red-950/40 border border-red-800/40 rounded-2xl p-4 text-red-300 text-sm">
           {error}

@@ -2,6 +2,7 @@
 
 import { FaCar, FaClock, FaMapMarkerAlt } from 'react-icons/fa';
 import { ChatWidget } from '@/components/ChatWidget';
+import { PageBanner } from '@/components/PageBanner';
 import dynamic from 'next/dynamic';
 
 const BaseLeafletMap = dynamic(() => import('@/components/maps/BaseLeafletMap').then(mod => mod.BaseLeafletMap), { ssr: false });
@@ -22,6 +23,8 @@ export default function TransitoPage() {
 
   return (
     <div className="space-y-8">
+      <PageBanner title="Trânsito & Mobilidade" subtitle="Monitoramento das rodovias SP-222, BR-116 e balsas do Vale do Ribeira" />
+
       <div>
         <h2 className="text-3xl font-extrabold text-white flex items-center gap-3">
           <FaCar className="w-8 h-8 text-emerald-500" />
