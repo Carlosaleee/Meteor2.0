@@ -1,15 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { OpenMeteoRepository } from './open-meteo.repository';
-import { FallbackService } from '../../common/fallback/fallback.service';
-
-const FALLBACK_FILE = 'fallback-meteorology.json';
 
 @Injectable()
 export class MeteorologyService {
-  constructor(
-    private readonly openMeteoRepo: OpenMeteoRepository,
-    private readonly fallback: FallbackService,
-  ) {}
+  constructor(private readonly openMeteoRepo: OpenMeteoRepository) {}
 
   async getCurrentWeather(locationId = 'ilha-comprida') {
     const coords: Record<string, { lat: number; lon: number; name: string }> = {
@@ -20,17 +14,30 @@ export class MeteorologyService {
     };
 
     const loc = coords[locationId] || coords['ilha-comprida'];
-    const current = await this.openMeteoRepo.getAtmosphereData(loc.lat, loc.lon, locationId);
+    const raw = await this.openMeteoRepo.getAtmosphereData(loc.lat, loc.lon, locationId);
 
-    const fallbackData = this.fallback.load<{
-      locations: Record<string, { forecast: { max: number; min: number } }>;
-    }>(FALLBACK_FILE);
-    const forecast = fallbackData?.locations?.[locationId]?.forecast ?? { max: 24, min: 17 };
+    const current = raw.current;
+    const hourly = raw.hourly;
+    const daily = raw.daily;
+
+    const now = new Date();
+
+    const hasHourly = hourly?.time?.length > 0;
+    const hasDaily = daily?.time?.length > 0;
+
+    let startIdx = 0;
+    if (hasHourly) {
+      const currentHourIndex = hourly.time.findIndex(t => {
+        const d = new Date(t);
+        return d.getHours() === now.getHours();
+      });
+      startIdx = Math.max(0, currentHourIndex >= 0 ? currentHourIndex : 0);
+    }
 
     return {
       location: loc.name,
       locationId,
-      timestamp: new Date().toISOString(),
+      timestamp: now.toISOString(),
       current: {
         temperature: current.temperature_2m,
         apparentTemperature: current.apparent_temperature,
@@ -41,8 +48,33 @@ export class MeteorologyService {
         precipitation: current.precipitation,
         weatherCode: current.weather_code,
       },
-      forecastMax: forecast.max,
-      forecastMin: forecast.min,
+      hourly: hasHourly
+        ? hourly.time.slice(startIdx, startIdx + 24).map((time, i) => ({
+            time,
+            temperature: hourly.temperature_2m[startIdx + i],
+            humidity: hourly.relative_humidity_2m[startIdx + i],
+            precipitationProbability: hourly.precipitation_probability[startIdx + i],
+            precipitation: hourly.precipitation[startIdx + i],
+            weatherCode: hourly.weather_code[startIdx + i],
+            windSpeed: hourly.wind_speed_10m[startIdx + i],
+            cloudCover: hourly.cloud_cover[startIdx + i],
+            visibility: hourly.visibility[startIdx + i],
+          }))
+        : [],
+      daily: hasDaily
+        ? daily.time.map((date, i) => ({
+            date,
+            tempMax: daily.temperature_2m_max[i],
+            tempMin: daily.temperature_2m_min[i],
+            precipitationSum: daily.precipitation_sum[i],
+            precipitationProbabilityMax: daily.precipitation_probability_max[i],
+            windSpeedMax: daily.wind_speed_10m_max[i],
+            weatherCode: daily.weather_code[i],
+            sunrise: daily.sunrise[i],
+            sunset: daily.sunset[i],
+            uvIndexMax: daily.uv_index_max[i],
+          }))
+        : [],
     };
   }
 }

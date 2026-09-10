@@ -17,6 +17,31 @@ export async function fetchAPI<T>(path: string): Promise<T> {
   return json.data ?? json;
 }
 
+export type HourlyForecast = {
+  time: string;
+  temperature: number;
+  humidity: number;
+  precipitationProbability: number;
+  precipitation: number;
+  weatherCode: number;
+  windSpeed: number;
+  cloudCover: number;
+  visibility: number;
+};
+
+export type DailyForecast = {
+  date: string;
+  tempMax: number;
+  tempMin: number;
+  precipitationSum: number;
+  precipitationProbabilityMax: number;
+  windSpeedMax: number;
+  weatherCode: number;
+  sunrise: string;
+  sunset: string;
+  uvIndexMax: number;
+};
+
 export type MeteorologyResponse = {
   location: string;
   locationId: string;
@@ -31,8 +56,8 @@ export type MeteorologyResponse = {
     precipitation: number;
     weatherCode: number;
   };
-  forecastMax: number;
-  forecastMin: number;
+  hourly: HourlyForecast[];
+  daily: DailyForecast[];
 };
 
 export type OceanographyResponse = {

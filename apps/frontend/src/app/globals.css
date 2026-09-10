@@ -25,11 +25,11 @@
   --color-footer-link: #94a3b8;
   --color-footer-link-hover: #60a5fa;
 
-  --color-nav-active-bg: rgba(37, 99, 235, 0.2);
-  --color-nav-active-text: #60a5fa;
+  --color-nav-active-bg: rgba(14, 165, 233, 0.15);
+  --color-nav-active-text: #38bdf8;
   --color-nav-text: #cbd5e1;
-  --color-nav-hover-bg: #1e293b;
-  --color-nav-hover-text: #e0b429;
+  --color-nav-hover-bg: rgba(14, 165, 233, 0.08);
+  --color-nav-hover-text: #38bdf8;
   --color-gold-line: #e0b429;
 
   --font-display: "Archivo Black", sans-serif;
@@ -63,11 +63,11 @@
   --color-footer-link: #475569;
   --color-footer-link-hover: #2563eb;
 
-  --color-nav-active-bg: rgba(37, 99, 235, 0.12);
-  --color-nav-active-text: #2563eb;
+  --color-nav-active-bg: rgba(14, 165, 233, 0.12);
+  --color-nav-active-text: #0ea5e9;
   --color-nav-text: #334155;
-  --color-nav-hover-bg: #fef3c7;
-  --color-nav-hover-text: #92400e;
+  --color-nav-hover-bg: rgba(14, 165, 233, 0.06);
+  --color-nav-hover-text: #0ea5e9;
   --color-gold-line: #c49a1a;
 }
 

@@ -1,7 +1,6 @@
 ﻿'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
 import { FaHome, FaCloudSun, FaWater, FaCar, FaNewspaper, FaBookOpen, FaInfoCircle, FaMapMarkedAlt, FaGlobe, FaSun, FaMoon, FaBars, FaTimes } from 'react-icons/fa';
@@ -50,77 +49,118 @@ export function Header() {
   const toggleLang = useCallback(() => setLang(prev => prev === 'pt' ? 'es' : 'pt'), []);
 
   return (
-    <header className="w-full bg-[var(--color-header-bg)] shadow-md transition-colors duration-300" role="banner">
-      {/* Navigation Bar — Responsive (Top) */}
+    <header className="w-full bg-[var(--color-header-bg)] transition-colors duration-300" role="banner">
+      {/* Gold Line — Top */}
+      <div className="h-px w-full bg-[var(--color-gold-line)]" aria-hidden="true" />
+
+      {/* Navigation Bar */}
       <nav
-        className="w-full bg-[var(--color-header-bg)] border-b border-[var(--color-header-border)]"
+        className="w-full bg-[var(--color-header-bg)]"
         role="navigation"
         aria-label={lang === 'pt' ? 'Menu principal' : 'Menú principal'}
       >
-        <div className="max-w-7xl mx-auto px-6">
-          {/* Desktop Nav */}
-          <ul className="hidden md:flex items-center justify-center gap-1 py-2 text-sm" role="menubar">
-            {NAV_ITEMS.map(item => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
-              const label = lang === 'pt' ? item.label : item.labelEs;
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          {/* Desktop: Logo + Nav + Theme Toggle */}
+          <div className="hidden md:flex items-center justify-between h-16">
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-2 shrink-0" aria-label="Meteor - Página inicial">
+              <FaWater className="w-6 h-6 text-cyan-400" aria-hidden="true" />
+              <span className="text-xl font-bold text-[var(--color-header-text)] tracking-tight">
+                Meteor
+              </span>
+            </Link>
 
-              return (
-                <li key={item.href} role="none">
-                  <Link
-                    href={item.href}
-                    role="menuitem"
-                    aria-current={isActive ? 'page' : undefined}
-                    className={`
-                      group flex items-center gap-1.5 px-3 py-2 rounded-lg font-medium transition-all duration-200
-                      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-header-bg)]
-                      ${isActive
-                        ? 'bg-[var(--color-nav-active-bg)] text-[var(--color-nav-active-text)] border-b-2 border-[var(--color-gold)]'
-                        : 'text-[var(--color-nav-text)] hover:bg-[var(--color-nav-hover-bg)] hover:text-[var(--color-nav-hover-text)]'
-                      }
-                    `}
-                  >
-                    <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-[var(--color-nav-active-text)]' : 'text-[var(--color-header-muted)] group-hover:text-[var(--color-nav-hover-text)]'}`} aria-hidden="true" />
-                    <span className="whitespace-nowrap">{label}</span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+            {/* Nav Items */}
+            <ul className="flex items-center gap-1" role="menubar">
+              {NAV_ITEMS.map(item => {
+                const Icon = item.icon;
+                const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+                const label = lang === 'pt' ? item.label : item.labelEs;
 
-          {/* Mobile Hamburger Button */}
-          <div className="md:hidden flex items-center justify-between py-2">
-            <span className="text-sm font-medium text-[var(--color-header-muted)]">
-              {lang === 'pt' ? 'Menu' : 'Menú'}
-            </span>
-            <div className="flex items-center gap-2">
+                return (
+                  <li key={item.href} role="none">
+                    <Link
+                      href={item.href}
+                      role="menuitem"
+                      aria-current={isActive ? 'page' : undefined}
+                      className={`
+                        group flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-header-bg)]
+                        ${isActive
+                          ? 'border border-cyan-400 text-cyan-400 bg-[var(--color-nav-active-bg)]'
+                          : 'border border-transparent text-[var(--color-nav-text)] hover:bg-[var(--color-nav-hover-bg)] hover:text-[var(--color-nav-hover-text)]'
+                        }
+                      `}
+                    >
+                      <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-cyan-400' : 'text-[var(--color-header-muted)] group-hover:text-[var(--color-nav-hover-text)]'}`} aria-hidden="true" />
+                      <span className="whitespace-nowrap">{label}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+
+            {/* Theme + Lang Toggle */}
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={toggleLang}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-header-surface)] hover:bg-[var(--color-header-hover)] text-xs font-medium text-[var(--color-header-muted)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-header-bg)]"
+                className="p-2 rounded-lg text-[var(--color-header-muted)] hover:bg-[var(--color-nav-hover-bg)] hover:text-[var(--color-nav-hover-text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
                 aria-label={lang === 'pt' ? 'Mudar para espanhol' : 'Cambiar a portugués'}
                 aria-pressed={lang === 'es'}
               >
-                <FaGlobe className="w-3.5 h-3.5 text-[var(--color-gold)]" aria-hidden="true" />
-                <span>{lang === 'pt' ? 'PT-BR' : 'ES'}</span>
+                <FaGlobe className="w-4 h-4" aria-hidden="true" />
               </button>
 
               <button
                 onClick={toggleTheme}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-header-surface)] hover:bg-[var(--color-header-hover)] text-xs font-medium text-[var(--color-header-muted)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-header-bg)]"
+                className="p-2 rounded-lg text-[var(--color-header-muted)] hover:bg-[var(--color-nav-hover-bg)] hover:text-[var(--color-nav-hover-text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
                 aria-label={theme === 'dark' ? 'Alternar para tema claro' : 'Alternar para tema escuro'}
                 aria-pressed={theme === 'light'}
               >
                 {theme === 'dark' ? (
-                  <FaSun className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
+                  <FaSun className="w-4 h-4 text-amber-400" aria-hidden="true" />
                 ) : (
-                  <FaMoon className="w-3.5 h-3.5 text-[var(--color-gold)]" aria-hidden="true" />
+                  <FaMoon className="w-4 h-4 text-cyan-400" aria-hidden="true" />
                 )}
-                <span>{theme === 'dark' ? 'Claro' : 'Escuro'}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile: Logo + Hamburger */}
+          <div className="md:hidden flex items-center justify-between h-14">
+            <Link href="/" className="flex items-center gap-2" aria-label="Meteor - Página inicial">
+              <FaWater className="w-5 h-5 text-cyan-400" aria-hidden="true" />
+              <span className="text-lg font-bold text-[var(--color-header-text)] tracking-tight">
+                Meteor
+              </span>
+            </Link>
+
+            <div className="flex items-center gap-1">
+              <button
+                onClick={toggleLang}
+                className="p-2 rounded-lg text-[var(--color-header-muted)] hover:bg-[var(--color-nav-hover-bg)] hover:text-[var(--color-nav-hover-text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+                aria-label={lang === 'pt' ? 'Mudar para espanhol' : 'Cambiar a portugués'}
+                aria-pressed={lang === 'es'}
+              >
+                <FaGlobe className="w-4 h-4" aria-hidden="true" />
+              </button>
+
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-lg text-[var(--color-header-muted)] hover:bg-[var(--color-nav-hover-bg)] hover:text-[var(--color-nav-hover-text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+                aria-label={theme === 'dark' ? 'Alternar para tema claro' : 'Alternar para tema escuro'}
+                aria-pressed={theme === 'light'}
+              >
+                {theme === 'dark' ? (
+                  <FaSun className="w-4 h-4 text-amber-400" aria-hidden="true" />
+                ) : (
+                  <FaMoon className="w-4 h-4 text-cyan-400" aria-hidden="true" />
+                )}
               </button>
 
               <button
                 onClick={() => setMenuOpen(prev => !prev)}
-                className="p-2 rounded-lg text-[var(--color-header-muted)] hover:bg-[var(--color-nav-hover-bg)] hover:text-[var(--color-nav-hover-text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)]"
+                className="p-2 rounded-lg text-[var(--color-header-muted)] hover:bg-[var(--color-nav-hover-bg)] hover:text-[var(--color-nav-hover-text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
                 aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
                 aria-expanded={menuOpen}
                 aria-controls="mobile-nav"
@@ -150,14 +190,14 @@ export function Header() {
                       aria-current={isActive ? 'page' : undefined}
                       className={`
                         group flex items-center gap-2 px-3 py-2.5 rounded-lg font-medium transition-all duration-200
-                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-header-bg)]
+                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-header-bg)]
                         ${isActive
-                          ? 'bg-[var(--color-nav-active-bg)] text-[var(--color-nav-active-text)] border-l-2 border-[var(--color-gold)]'
+                          ? 'border-l-2 border-cyan-400 text-cyan-400 bg-[var(--color-nav-active-bg)]'
                           : 'text-[var(--color-nav-text)] hover:bg-[var(--color-nav-hover-bg)] hover:text-[var(--color-nav-hover-text)]'
                         }
                       `}
                     >
-                      <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-[var(--color-nav-active-text)]' : 'text-[var(--color-header-muted)] group-hover:text-[var(--color-nav-hover-text)]'}`} aria-hidden="true" />
+                      <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-cyan-400' : 'text-[var(--color-header-muted)] group-hover:text-[var(--color-nav-hover-text)]'}`} aria-hidden="true" />
                       <span>{label}</span>
                     </Link>
                   </li>
@@ -168,61 +208,7 @@ export function Header() {
         </div>
       </nav>
 
-      {/* Gold Line — Thin */}
-      <div className="h-px w-full bg-[var(--color-gold-line)]" aria-hidden="true" />
-
-      {/* Hero Area with Cover Image (Reduced) */}
-      <div className="relative w-full overflow-hidden max-h-[220px]">
-        <Image
-          src="/CapaMeteor.jpg"
-          alt="Capa Meteor 2.0"
-          width={3328}
-          height={1248}
-          className="w-full h-auto object-cover object-center"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 via-[var(--color-header-bg)]/80 to-[var(--color-header-bg)]/90" />
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="text-left">
-              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-[var(--color-header-text)]">
-                Meteor 2.0
-              </h1>
-              <p className="mt-1 text-[var(--color-header-muted)] text-sm">
-                {lang === 'pt' ? 'Dashboard Tático — Ilha Comprida & Vale do Ribeira' : 'Dashboard Táctico — Ilha Comprida y Vale do Ribeira'}
-              </p>
-            </div>
-
-            <div className="hidden md:flex items-center gap-3">
-              <button
-                onClick={toggleLang}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-header-surface)] hover:bg-[var(--color-header-hover)] text-xs font-medium text-[var(--color-header-muted)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-header-bg)]"
-                aria-label={lang === 'pt' ? 'Mudar para espanhol' : 'Cambiar a portugués'}
-                aria-pressed={lang === 'es'}
-              >
-                <FaGlobe className="w-3.5 h-3.5 text-[var(--color-gold)]" aria-hidden="true" />
-                <span>{lang === 'pt' ? 'PT-BR' : 'ES'}</span>
-              </button>
-
-              <button
-                onClick={toggleTheme}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-header-surface)] hover:bg-[var(--color-header-hover)] text-xs font-medium text-[var(--color-header-muted)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-header-bg)]"
-                aria-label={theme === 'dark' ? 'Alternar para tema claro' : 'Alternar para tema escuro'}
-                aria-pressed={theme === 'light'}
-              >
-                {theme === 'dark' ? (
-                  <FaSun className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
-                ) : (
-                  <FaMoon className="w-3.5 h-3.5 text-[var(--color-gold)]" aria-hidden="true" />
-                )}
-                <span>{theme === 'dark' ? 'Claro' : 'Escuro'}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Gold Line — Thin (Bottom of Hero) */}
+      {/* Gold Line — Bottom */}
       <div className="h-px w-full bg-[var(--color-gold-line)]" aria-hidden="true" />
     </header>
   );

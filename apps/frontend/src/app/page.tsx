@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { FaSearch, FaMagic, FaExclamationTriangle, FaCloudSun, FaWater, FaCar, FaNewspaper, FaBookOpen, FaInfoCircle, FaArrowRight } from 'react-icons/fa';
 import { ChatWidget } from '@/components/ChatWidget';
 
@@ -24,6 +25,29 @@ export default function PrincipalPage() {
 
   return (
     <div className="space-y-8">
+      {/* Hero Image */}
+      <div className="relative w-full overflow-hidden max-h-[220px] rounded-2xl">
+        <Image
+          src="/CapaMeteor.jpg"
+          alt="Capa Meteor 2.0"
+          width={3328}
+          height={1248}
+          className="w-full h-auto object-cover object-center"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 via-[var(--color-header-bg)]/80 to-[var(--color-header-bg)]/90" />
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full max-w-7xl mx-auto px-6">
+            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white">
+              Meteor 2.0
+            </h1>
+            <p className="mt-1 text-slate-300 text-sm">
+              Dashboard Tático — Ilha Comprida & Vale do Ribeira
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Alerta / Above the Fold */}
       <div className="bg-gradient-to-r from-amber-950/40 to-slate-900 border border-amber-800/40 rounded-2xl p-4 md:p-6 flex items-start gap-4 shadow-lg">
         <div className="p-3 rounded-xl bg-amber-500/20 text-amber-400 shrink-0">
