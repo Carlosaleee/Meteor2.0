@@ -17,6 +17,7 @@ export function DailyForecastTable({ data }: DailyForecastProps) {
           <div
             key={i}
             role="listitem"
+            title={`${formatDay(day.date)} ${day.date.slice(5, 10)}: ${weatherDescription(day.weatherCode)}, máxima ${Math.round(day.tempMax)}°C, mínima ${Math.round(day.tempMin)}°C, ${Math.round(day.precipitationProbabilityMax)}% de chuva, vento até ${Math.round(day.windSpeedMax)}km/h`}
             aria-label={`${formatDay(day.date)} ${day.date.slice(5, 10)}: ${weatherDescription(day.weatherCode)}, máxima ${Math.round(day.tempMax)} graus, mínima ${Math.round(day.tempMin)} graus, ${Math.round(day.precipitationProbabilityMax)}% de chuva`}
             className="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800/40 hover:bg-slate-800/80 transition-colors border border-transparent hover:border-slate-700/50"
           >

@@ -52,6 +52,7 @@ export function CityGrid({ onSelectLocation }: CityGridProps) {
             <div
               key={cityId}
               role="listitem"
+              title={`Notícias meteorológicas de ${meta?.name ?? cityId} — ${meta?.region}`}
               className="group bg-slate-800/60 border border-slate-700/50 rounded-xl p-4 hover:border-cyan-500/30 hover:bg-slate-800/80 transition-all"
             >
               {/* Header do card */}
@@ -73,6 +74,7 @@ export function CityGrid({ onSelectLocation }: CityGridProps) {
                       href={item.url}
                       target="_blank"
                       rel="noopener noreferrer"
+                      title={`${item.title} — Clique para ler na fonte oficial (${item.source})`}
                       className={`block rounded-lg p-2.5 ${style.bg} border border-transparent hover:border-slate-700/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400`}
                       aria-label={`${item.title} — ${item.source}, ${item.date}`}
                     >
@@ -97,6 +99,7 @@ export function CityGrid({ onSelectLocation }: CityGridProps) {
               {/* Botão selecionar */}
               <button
                 onClick={() => onSelectLocation(cityId)}
+                title={`Clique para ver a previsão completa de ${meta?.name ?? cityId}`}
                 className="mt-3 w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium hover:bg-amber-500/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
                 aria-label={`Selecionar ${meta?.name ?? cityId} para ver previsão`}
               >
