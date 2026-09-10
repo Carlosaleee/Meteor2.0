@@ -19,7 +19,6 @@ export function ChatWidget() {
     setTimeout(() => {
       let reply = 'Análise tática simulada: Condições estáveis em Ilha Comprida e Vale do Ribeira. Ventos moderados e mar com ondas de 1.2m.';
       if (userMsg.toLowerCase().includes('vento')) {
-        printWindReply();
         reply = 'Ventos soprando de Sudeste a 15 km/h com rajadas leves. Boa visibilidade na região costeira.';
       } else if (userMsg.toLowerCase().includes('chuva') || userMsg.toLowerCase().includes('sol')) {
         reply = 'Previsão indica sol entre nuvens para hoje, sem probabilidade significativa de temporais na região.';
@@ -29,8 +28,6 @@ export function ChatWidget() {
       setMessages(prev => [...prev, { role: 'bot', text: reply }]);
     }, 800);
   };
-
-  const printWindReply = () => {};
 
   return (
     <>

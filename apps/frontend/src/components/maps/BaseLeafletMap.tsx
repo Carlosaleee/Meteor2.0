@@ -23,12 +23,8 @@ export function BaseLeafletMap({ center, zoom, markers }: Props) {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Limpeza de IDs anteriores do Leaflet no DOM para evitar duplicação
-    const domEl = containerRef.current as HTMLElement & { _leaflet_id?: any };
-    if (domEl._leaflet_id) {
-      domEl._leaflet_id = null;
-    }
-
+    const domEl = containerRef.current as HTMLElement & { _leaflet_id?: unknown };
+    if (domEl._leaflet_id) domEl._leaflet_id = null;
     if (mapRef.current) {
       mapRef.current.remove();
       mapRef.current = null;
@@ -72,9 +68,7 @@ export function BaseLeafletMap({ center, zoom, markers }: Props) {
         mapRef.current.remove();
         mapRef.current = null;
       }
-      if (domEl._leaflet_id) {
-        domEl._leaflet_id = null;
-      }
+      if (domEl._leaflet_id) domEl._leaflet_id = null;
     };
   }, [center, zoom, markers]);
 

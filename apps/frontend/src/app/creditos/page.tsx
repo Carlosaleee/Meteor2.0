@@ -47,7 +47,7 @@ const LICENSES = [
   { name: 'OpenStreetMap', usage: 'Dados cartográficos (ODbL)' },
   { name: 'Leaflet', usage: 'Biblioteca de mapas (BSD-2-Clause)' },
   { name: 'Next.js', usage: 'Framework frontend (MIT)' },
-  { name: 'NestJS', role: 'Backend Framework (MIT)' },
+  { name: 'NestJS', usage: 'Backend Framework (MIT)' },
 ];
 
 export default function CreditosPage() {
