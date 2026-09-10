@@ -10,6 +10,28 @@
   --color-orange: #ff6a1a;
   --color-gold: #e0b429;
   --color-hazard: #ff3b1a;
+
+  --color-header-bg: #0f172a;
+  --color-header-surface: #1e293b;
+  --color-header-text: #f1f5f9;
+  --color-header-muted: #94a3b8;
+  --color-header-border: #1e293b;
+  --color-header-hover: #334155;
+
+  --color-footer-bg: #0f172a;
+  --color-footer-text: #94a3b8;
+  --color-footer-border: #1e293b;
+  --color-footer-heading: #f1f5f9;
+  --color-footer-link: #94a3b8;
+  --color-footer-link-hover: #60a5fa;
+
+  --color-nav-active-bg: rgba(37, 99, 235, 0.2);
+  --color-nav-active-text: #60a5fa;
+  --color-nav-text: #cbd5e1;
+  --color-nav-hover-bg: #1e293b;
+  --color-nav-hover-text: #e0b429;
+  --color-gold-line: #e0b429;
+
   --font-display: "Archivo Black", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
   --radius-none: 0px;
@@ -26,6 +48,27 @@
   --color-orange: #ff6a1a;
   --color-gold: #c49a1a;
   --color-hazard: #ff3b1a;
+
+  --color-header-bg: #ffffff;
+  --color-header-surface: #f1f5f9;
+  --color-header-text: #0f172a;
+  --color-header-muted: #475569;
+  --color-header-border: #e2e8f0;
+  --color-header-hover: #e2e8f0;
+
+  --color-footer-bg: #f8f6f0;
+  --color-footer-text: #475569;
+  --color-footer-border: #d6d0c8;
+  --color-footer-heading: #0f172a;
+  --color-footer-link: #475569;
+  --color-footer-link-hover: #2563eb;
+
+  --color-nav-active-bg: rgba(37, 99, 235, 0.12);
+  --color-nav-active-text: #2563eb;
+  --color-nav-text: #334155;
+  --color-nav-hover-bg: #fef3c7;
+  --color-nav-hover-text: #92400e;
+  --color-gold-line: #c49a1a;
 }
 
 html,
@@ -36,4 +79,28 @@ body {
 
 * {
   border-radius: 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.skip-link:focus {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  padding: 12px 24px;
+  background: var(--color-nav-active-text);
+  color: #ffffff;
+  font-weight: bold;
+  text-decoration: none;
 }

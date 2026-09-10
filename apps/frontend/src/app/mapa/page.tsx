@@ -1,15 +1,33 @@
-import { SpotMap } from "@/components/organisms/SpotMap";
+'use client';
+
+import dynamic from 'next/dynamic';
+import { FaMapMarkerAlt } from 'react-icons/fa';
+import { ChatWidget } from '@/components/ChatWidget';
+
+const SpotMap = dynamic(() => import('@/components/organisms/SpotMap').then(mod => mod.SpotMap), { ssr: false });
 
 export default function MapaPage() {
   return (
-    <main className="mx-auto max-w-6xl px-4 py-6">
-      <div className="border border-line bg-graphite p-4">
-        <h1 className="font-display text-3xl uppercase text-ink">Mapa — Vale do Ribeira</h1>
-        <p className="mt-2 font-mono text-xs tracking-[0.12em] text-muted uppercase">Leaflet OSM • 6 spots • A712/A746 • climmatempo + g1 como base</p>
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-3xl font-extrabold text-white flex items-center gap-3">
+          <FaMapMarkerAlt className="w-8 h-8 text-blue-500" />
+          Mapa — Vale do Ribeira
+        </h2>
+        <p className="text-slate-400 text-sm mt-1">Leaflet OSM — 6 localidades monitoradas na região</p>
       </div>
-      <div className="mt-6">
-        <SpotMap />
+
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          <FaMapMarkerAlt className="w-5 h-5 text-blue-400" />
+          Mapa de Localizações — Ilha Comprida & Vale do Ribeira
+        </h3>
+        <div className="h-[450px] rounded-xl overflow-hidden border border-slate-800">
+          <SpotMap />
+        </div>
       </div>
-    </main>
+
+      <ChatWidget />
+    </div>
   );
 }

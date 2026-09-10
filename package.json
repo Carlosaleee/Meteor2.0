@@ -16,5 +16,12 @@
   },
   "dependencies": {
     "@octokit/rest": "^21.1.1"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@google/genai",
+      "esbuild",
+      "protobufjs"
+    ]
   }
 }

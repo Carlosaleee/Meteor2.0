@@ -16,8 +16,8 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Meteor 2.0 — Estrutura Base",
-  description: "Estrutura base do projeto com Header e Footer globais",
+  title: "Meteor 2.0 — Dashboard Tático",
+  description: "Dashboard tático de telemetria para Ilha Comprida e Vale do Ribeira",
   robots: { index: true, follow: true },
 };
 
@@ -29,9 +29,12 @@ export const viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR" className={`${display.variable} ${mono.variable}`}>
-      <body className="bg-slate-950 font-mono text-slate-100 antialiased min-h-screen flex flex-col">
+      <body className="bg-[var(--color-bg)] font-mono text-[var(--color-ink)] antialiased min-h-screen flex flex-col" style={{ background: 'var(--color-bg)', color: 'var(--color-ink)' }}>
+        <a href="#main-content" className="skip-link sr-only">
+          Pular para o conteúdo principal
+        </a>
         <Header />
-        <main className="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8">
+        <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8" role="main">
           {children}
         </main>
         <Footer />

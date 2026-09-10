@@ -27,5 +27,8 @@ Thumbs.db
 .vscode/
 .cursor/
 
+# fallback data (auto-generated)
+apps/backend/data/*.json
+
 # test
 .vitest/

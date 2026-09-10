@@ -2,16 +2,16 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Search, Sparkles, AlertTriangle, ShieldAlert, Compass, CloudSun, Waves, Car, Newspaper, BookOpen, Info, ArrowRight } from 'lucide-react';
+import { FaSearch, FaMagic, FaExclamationTriangle, FaCloudSun, FaWater, FaCar, FaNewspaper, FaBookOpen, FaInfoCircle, FaArrowRight } from 'react-icons/fa';
 import { ChatWidget } from '@/components/ChatWidget';
 
 const sections = [
-  { title: 'Meteorologia', href: '/meteorologia', desc: 'Previsão do tempo, temperaturas e vento nas estações locais.', icon: CloudSun },
-  { title: 'Swell & Picos', href: '/swell', desc: 'Telemetria de ondas, marés e picos de surf em Ilha Comprida.', icon: Waves },
-  { title: 'Trânsito & Vias', href: '/transito', desc: 'Condições de tráfego na SP-222, BR-116 e balsas regionais.', icon: Car },
-  { title: 'Notícias Regionais', href: '/noticias', desc: 'Feed unificado das principais fontes do Vale do Ribeira.', icon: Newspaper },
-  { title: 'Blog Técnico', href: '/blog', desc: 'Artigos e guias especiais sobre o clima e litoral.', icon: BookOpen },
-  { title: 'Créditos & Fontes', href: '/creditos', desc: 'Transparência de dados e APIs oficiais integradas.', icon: Info },
+  { title: 'Meteorologia', href: '/meteorologia', desc: 'Previsão do tempo, temperaturas e vento nas estações locais.', icon: FaCloudSun },
+  { title: 'Swell & Picos', href: '/swell', desc: 'Telemetria de ondas, marés e picos de surf em Ilha Comprida.', icon: FaWater },
+  { title: 'Trânsito & Vias', href: '/transito', desc: 'Condições de tráfego na SP-222, BR-116 e balsas regionais.', icon: FaCar },
+  { title: 'Notícias Regionais', href: '/noticias', desc: 'Feed unificado das principais fontes do Vale do Ribeira.', icon: FaNewspaper },
+  { title: 'Blog Técnico', href: '/blog', desc: 'Artigos e guias especiais sobre o clima e litoral.', icon: FaBookOpen },
+  { title: 'Créditos & Fontes', href: '/creditos', desc: 'Transparência de dados e APIs oficiais integradas.', icon: FaInfoCircle },
 ];
 
 export default function PrincipalPage() {
@@ -27,7 +27,7 @@ export default function PrincipalPage() {
       {/* Alerta / Above the Fold */}
       <div className="bg-gradient-to-r from-amber-950/40 to-slate-900 border border-amber-800/40 rounded-2xl p-4 md:p-6 flex items-start gap-4 shadow-lg">
         <div className="p-3 rounded-xl bg-amber-500/20 text-amber-400 shrink-0">
-          <ShieldAlert className="w-6 h-6" />
+          <FaExclamationTriangle className="w-6 h-6" />
         </div>
         <div>
           <h2 className="text-lg font-bold text-amber-200">Alerta Regional Ativo</h2>
@@ -42,7 +42,7 @@ export default function PrincipalPage() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 rounded-full blur-3xl pointer-events-none" />
         <div className="flex items-center gap-3 mb-4">
           <div className="p-2.5 rounded-xl bg-blue-600/20 text-blue-400">
-            <Sparkles className="w-5 h-5" />
+            <FaMagic className="w-5 h-5" />
           </div>
           <div>
             <h2 className="text-xl font-bold text-white">Briefing Executivo (IA)</h2>
@@ -62,7 +62,7 @@ export default function PrincipalPage() {
             <p className="text-xs text-slate-400">Encontre rapidamente seções e dados na aplicação</p>
           </div>
           <div className="relative w-full sm:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
               placeholder="Buscar seção (ex: vento, trânsito)..."
@@ -88,7 +88,7 @@ export default function PrincipalPage() {
                     <div className="p-3 rounded-xl bg-slate-800 text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                       <Icon className="w-5 h-5" />
                     </div>
-                    <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
+                    <FaArrowRight className="w-4 h-4 text-slate-600 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
                   </div>
                   <h3 className="text-lg font-bold text-white mb-1">{sec.title}</h3>
                   <p className="text-xs text-slate-400 leading-relaxed">{sec.desc}</p>

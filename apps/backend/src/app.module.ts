@@ -1,8 +1,14 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from "@nestjs/core";
 import { parseEnv } from "./common/config/env.schema";
+import { FallbackModule } from "./common/fallback/fallback.module";
+import { EnvelopeInterceptor } from "./common/http/envelope.interceptor";
+import { HttpExceptionFilter } from "./common/http/http-exception.filter";
 import { HealthController } from "./health.controller";
 import { MeteorologyModule } from "./modules/meteorology/meteorology.module";
+import { OceanographyModule } from "./modules/oceanography/oceanography.module";
+import { TrafficModule } from "./modules/traffic/traffic.module";
 
 // Throttler 30 req/min — optional, requires `pnpm install` of @nestjs/throttler; fallback no-op if missing
 let throttlerImports: unknown[] = [];
@@ -10,9 +16,8 @@ let throttlerProviders: unknown[] = [];
 try {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const throttler = require("@nestjs/throttler");
-  const throttlerCore = require("@nestjs/core");
   throttlerImports = [throttler.ThrottlerModule.forRoot([{ ttl: 60_000, limit: 30 }])];
-  throttlerProviders = [{ provide: throttlerCore.APP_GUARD, useClass: throttler.ThrottlerGuard }];
+  throttlerProviders = [{ provide: APP_GUARD, useClass: throttler.ThrottlerGuard }];
 } catch {
   throttlerImports = [];
   throttlerProviders = [];
@@ -26,9 +31,16 @@ try {
       validate: parseEnv,
     }),
     ...(throttlerImports as never[]),
+    FallbackModule,
     MeteorologyModule,
+    OceanographyModule,
+    TrafficModule,
   ],
   controllers: [HealthController],
-  providers: [...(throttlerProviders as never[])],
+  providers: [
+    { provide: APP_FILTER, useClass: HttpExceptionFilter },
+    { provide: APP_INTERCEPTOR, useClass: EnvelopeInterceptor },
+    ...(throttlerProviders as never[]),
+  ],
 })
 export class AppModule {}
