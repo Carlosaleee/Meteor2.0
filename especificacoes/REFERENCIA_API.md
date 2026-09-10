@@ -20,7 +20,7 @@ Verificacao de saude do servico.
 
 ## GET /v1/meteorology
 
-Dados meteorologicos em tempo real para uma localizacao.
+Dados meteorologicos em tempo real para uma localizacao, incluindo previsao horaria (24h) e diaria (7 dias).
 
 **Query Parameters:**
 | Parametro | Tipo | Obrigatorio | Descricao |
@@ -45,7 +45,7 @@ GET /v1/meteorology?locationId=ilha-comprida
 {
   "location": "Ilha Comprida",
   "locationId": "ilha-comprida",
-  "timestamp": "2026-09-08T14:00:00.000Z",
+  "timestamp": "2026-09-10T14:00:00.000Z",
   "current": {
     "temperature": 21.5,
     "apparentTemperature": 20.8,
@@ -56,12 +56,40 @@ GET /v1/meteorology?locationId=ilha-comprida
     "precipitation": 0,
     "weatherCode": 2
   },
+  "hourly": [
+    {
+      "time": "2026-09-10T14:00:00",
+      "temperature": 22,
+      "humidity": 80,
+      "windSpeed": 15,
+      "windDirection": 115,
+      "weatherCode": 2,
+      "precipitationProbability": 10,
+      "precipitation": 0,
+      "cloudCover": 35,
+      "visibility": 10000
+    }
+  ],
+  "daily": [
+    {
+      "date": "2026-09-10",
+      "tempMax": 24,
+      "tempMin": 17,
+      "weatherCode": 2,
+      "precipitationSum": 0,
+      "precipitationProbabilityMax": 15,
+      "windSpeedMax": 20,
+      "uvIndexMax": 6,
+      "sunrise": "2026-09-10T06:12:00",
+      "sunset": "2026-09-10T18:05:00"
+    }
+  ],
   "forecastMax": 24,
   "forecastMin": 17
 }
 ```
 
-**Campos do response:**
+**Campos do response — Current:**
 | Campo | Tipo | Descricao |
 |-------|------|-----------|
 | location | string | Nome da localizacao |
@@ -75,8 +103,34 @@ GET /v1/meteorology?locationId=ilha-comprida
 | current.pressure | number | Pressao atmosferica (hPa) |
 | current.precipitation | number | Precipitacao (mm) |
 | current.weatherCode | number | Codigo WMO do tempo |
-| forecastMax | number | Temperatura maxima prevista |
-| forecastMin | number | Temperatura minima prevista |
+
+**Campos do response — Hourly (array de 24h):**
+| Campo | Tipo | Descricao |
+|-------|------|-----------|
+| hourly[].time | string | Horario (ISO 8601) |
+| hourly[].temperature | number | Temperatura (Celsius) |
+| hourly[].humidity | number | Umidade (%) |
+| hourly[].windSpeed | number | Velocidade do vento (km/h) |
+| hourly[].windDirection | number | Direcao do vento (graus) |
+| hourly[].weatherCode | number | Codigo WMO do tempo |
+| hourly[].precipitationProbability | number | Probabilidade de chuva (%) |
+| hourly[].precipitation | number | Precipitacao (mm) |
+| hourly[].cloudCover | number | Cobertura de nuvens (%) |
+| hourly[].visibility | number | Visibilidade (metros) |
+
+**Campos do response — Daily (array de 7 dias):**
+| Campo | Tipo | Descricao |
+|-------|------|-----------|
+| daily[].date | string | Data (YYYY-MM-DD) |
+| daily[].tempMax | number | Temperatura maxima (Celsius) |
+| daily[].tempMin | number | Temperatura minima (Celsius) |
+| daily[].weatherCode | number | Codigo WMO do tempo |
+| daily[].precipitationSum | number | Precipitacao acumulada (mm) |
+| daily[].precipitationProbabilityMax | number | Probabilidade maxima de chuva (%) |
+| daily[].windSpeedMax | number | Velocidade maxima do vento (km/h) |
+| daily[].uvIndexMax | number | Indice UV maximo |
+| daily[].sunrise | string | Nascer do sol (ISO 8601) |
+| daily[].sunset | string | Por do sol (ISO 8601) |
 
 ---
 
@@ -95,7 +149,7 @@ GET /v1/oceanography
 ```json
 {
   "location": "Ilha Comprida & Costa",
-  "timestamp": "2026-09-08T14:00:00.000Z",
+  "timestamp": "2026-09-10T14:00:00.000Z",
   "current": {
     "waveHeight": 1.1,
     "wavePeriod": 9,
@@ -134,7 +188,7 @@ GET /v1/oceanography
 | qualityLabel | string | Classificacao: Flat, Pequenas, Boas, Classico! |
 | qualityEmoji | string | Emoji da qualidade |
 | bestTime | string | Melhor horario para surf |
-| nextTide | string | Proxima maré alta |
+| nextTide | string | Proxima mare alta |
 | tideCoefficient | number | Coeficiente de mare |
 | spots | array | Lista de spots de surf |
 
@@ -142,7 +196,7 @@ GET /v1/oceanography
 
 ## GET /v1/traffic
 
-Status de trânsito das rodovias regionais.
+Status de transito das rodovias regionais.
 
 **Query Parameters:** Nenhum
 
@@ -154,7 +208,7 @@ GET /v1/traffic
 **Response:**
 ```json
 {
-  "timestamp": "2026-09-08T14:00:00.000Z",
+  "timestamp": "2026-09-10T14:00:00.000Z",
   "location": "Vale do Ribeira",
   "routes": [
     {
@@ -243,3 +297,23 @@ O backend aceita requisicoes do frontend configurado em `FRONTEND_ORIGIN` (defau
 Quando uma API externa falha, o sistema retorna dados do fallback diario salvo em disco. O frontend mostra o horario da ultima atualizacao para transparencia.
 
 Para forcar atualizacao do fallback, basta aguardar 24h ou reiniciar o backend (que re-busca dados na proxima requisicao).
+
+---
+
+## Fontes de Dados Externas
+
+| Fonte | API | Custo | Uso |
+|-------|-----|-------|-----|
+| Open-Meteo | Forecast API | Gratuita | Previsao do tempo (current, hourly, daily) |
+| Open-Meteo | Marine API | Gratuita | Dados de ondas, swell, marees |
+| RainViewer | Weather Maps | Gratuita | Radar de precipitacao em tempo real |
+| INMET | Avisos | Gratuita | Alertas meteorologicos oficiais |
+| CPTEC/INPE | Previsao Numerica | Gratuita | Modelos GFS, ECMWF, COSMO-Brasil |
+| Defesa Civil SP | Alertas | Gratuita | Alertas de desastres e cheias |
+| Marinha do Brasil | Avisos Maritimos | Gratuita | Alertas costeiros e de mare |
+
+### RainViewer (Radar)
+- Endpoint: `https://api.rainviewer.com/public/weather-maps.json`
+- Tiles: `https://tilecache.rainviewer.com{path}/512/{z}/{x}/{y}/2/1_1.png`
+- Sem necessidade de API key
+- Atualizado a cada 10 minutos

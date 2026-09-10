@@ -31,10 +31,10 @@
 - Estilizacao: Tailwind CSS v4 (design tokens via CSS custom properties)
 - Tema: dark/light com `data-theme` + `localStorage` + `prefers-color-scheme`
 - Mapas: Leaflet nativo (useRef + cleanup pattern)
-- Hooks: useMeteorology, useSwell
+- Hooks: useMeteorology, useSwell, useAllCities
 - API Layer: lib/api.ts com fetch generico
 - Icones: React Icons (Font Awesome)
-- Acessibilidade: skip-link, aria-label, aria-current, aria-expanded, role, focus-visible
+- Acessibilidade: skip-link, aria-label, aria-current, aria-expanded, role, focus-visible, title tooltips
 
 ---
 
@@ -42,10 +42,10 @@
 
 | Rota | Descricao | Dados |
 |------|-----------|-------|
-| `/` | Portal principal - HUD Tatico | Estatico + ChatWidget |
-| `/meteorologia` | Meteorologia & Vento | **API real** (4 cidades) |
-| `/swell` | Swell & Picos | **API real** |
-| `/transito` | Transito & Mobilidade | Simulacao inteligente |
+| `/` | Portal principal - HUD Tatico | Estatico + ChatWidget + banner |
+| `/meteorologia` | Meteorologia & Vento | **API real** (4 cidades) + RainViewer radar |
+| `/swell` | Swell & Picos | **API real** + mapa Leaflet |
+| `/transito` | Transito & Mobilidade | Simulacao inteligente + mapa |
 | `/noticias` | Noticias Regionais | Estatico (8 noticias) |
 | `/blog` | Blog Tecnico | Estatico (4 artigos) |
 | `/creditos` | Creditos & Fontes | Estatico |
@@ -58,6 +58,7 @@
 ### 4.1 MeteorologyModule
 - Endpoint: GET /v1/meteorology?locationId=
 - API externa: Open-Meteo Forecast (gratuita, sem chave)
+- Dados expandidos: current + hourly (24h) + daily (7 dias)
 - Fallback: data/fallback-meteorology.json (atualizado a cada 24h)
 - Localizacoes: Ilha Comprida, Iguape, Cananeia, Registro
 
@@ -120,7 +121,7 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 ```
 
 **Arquivos de fallback:**
-- data/fallback-meteorology.json — Dados por localizacao
+- data/fallback-meteorology.json — Dados por localizacao (current + hourly + daily)
 - data/fallback-oceanography.json — Ondas, swell, marees, spots
 - data/fallback-traffic.json — Rodovias com simulacao por horario
 
@@ -161,6 +162,12 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 3. Merge na main apos validacao
 4. Proibido commit direto na main
 
+**Branches ativas:**
+| Branch | Descricao |
+|--------|-----------|
+| `main` | Producao, todas as features mergeadas |
+| `feature/swell-redesign` | Estilizacao da tela de Swell |
+
 ---
 
 ## 9. Estrutura de Diretorios
@@ -183,13 +190,31 @@ Meteor_2.0/
       data/ (fallback JSONs - gitignored)
     frontend/
       src/
-        app/ (8 paginas)
-        components/ (Header, Footer, ChatWidget, maps)
-        hooks/ (useMeteorology, useSwell)
+        app/
+          meteorologia/
+            page.tsx (card container principal)
+            components/ (13 componentes)
+          swell/page.tsx
+          transito/page.tsx
+          noticias/page.tsx
+          blog/page.tsx
+          creditos/page.tsx
+          mapa/page.tsx
+          page.tsx (portal principal)
+        components/
+          Header.tsx (nav responsiva)
+          Footer.tsx (4 colunas: Navegacao, Fontes, Stack, Chatbot)
+          PageBanner.tsx (hero reutilizavel)
+          ChatWidget.tsx (bot flutuante)
+        hooks/
+          useMeteorology.ts
+          useSwell.ts
+          useAllCities.ts (4 cidades paralelo)
         lib/api.ts
         app/globals.css (CSS custom properties + temas)
       public/
-        CapaMeteor.jpg (imagem de capa 3328x1248)
+        banner-meteor.jpg (imagem de banner)
+        CapaMeteor.jpg (imagem de capa original)
       .env.local
   especificacoes/ (documentacao)
   pnpm-workspace.yaml
@@ -203,11 +228,10 @@ Meteor_2.0/
 ## 10. UI/UX — Header, Footer, Nav
 
 ### Header
-- Imagem de capa `CapaMeteor.jpg` (3328x1248) com `object-contain` (tamanho real)
-- Overlay gradiente `from-blue-900/90 via-header-bg/80 to-header-bg/90`
-- Botoes de toggle: idioma (PT-BR/ES) e tema (Claro/Escuro)
+- Logo "Meteor" com icone FaWater
 - Linha dourada `bg-[var(--color-gold-line)]` entre hero e nav
-- Icones: React Icons (FaGlobe, FaSun, FaMoon)
+- Toggle tema: FaSun/FaMoon
+- Nav responsiva: horizontal desktop, hamburger mobile
 
 ### Nav Bar (Responsiva)
 - **Desktop (md+):** `hidden md:flex` — horizontal centrado com 8 itens
@@ -217,11 +241,13 @@ Meteor_2.0/
 - Fecha automaticamente ao navegar (`useEffect` com `pathname`)
 - Acessibilidade: `aria-expanded`, `aria-controls`, `aria-current="page"`
 
-### Footer (4 Colunas)
-- **Coluna 1 — Branding:** Nome do projeto, descricao, copyright, licenca MIT
-- **Coluna 2 — Desenvolvedor:** Carlos Alexandre (Full Stack Developer) + link GitHub
-- **Coluna 3 — Fontes de Dados:** Open-Meteo, INMET, OpenStreetMap, Leaflet
-- **Coluna 4 — Stack Tecnologica:** Next.js 15, NestJS, Tailwind CSS, Leaflet, TypeScript
+### Footer (4 Colunas — Layout Atualizado)
+- **Linha 1:** "METEOR 2.0" centralizado em dourado + descricao do projeto
+- **Coluna 1 — Navegacao:** 7 links internos (Meteorologia, Swell, Transito, Noticias, Blog, Mapa, Creditos)
+- **Coluna 2 — Fontes de Dados:** Open-Meteo, INMET, RainViewer, CPTEC/INPE, OpenStreetMap
+- **Coluna 3 — Stack Tecnologica:** Next.js 15, NestJS, Tailwind CSS, Leaflet, TypeScript
+- **Coluna 4 — Assistente IA:** Card MeteorBot IA com mini chat integrado
+- **Rodape:** "Meteor — Creditos de Desenvolvimento: Carlos Alexandre"
 - Linha dourada `bg-[var(--color-gold-line)]` no topo
 - Links externos com `FaExternalLinkAlt` no hover
 - Acessibilidade: `role="contentinfo"`, `aria-label`, `focus-visible` rings
@@ -242,3 +268,65 @@ Meteor_2.0/
 - `aria-hidden="true"` em icones decorativos
 - `focus-visible:ring-2 focus-visible:ring-[var(--color-gold)]` em todos os elementos interativos
 - `<main id="main-content" role="main">` para skip-link
+- **Title tooltips em todos os elementos interativos** (botoes, cards, links)
+- `aria-live="polite"` para atualizacoes de dados
+
+---
+
+## 11. Pagina de Meteorologia (Detalhes)
+
+### Estrutura Principal
+- **Container:** `<main>` com `bg-slate-950 border border-slate-800 rounded-2xl`
+- **Hero:** Gradient blue com titulo, subtitulo, botao Atualizar e mini-cards de temperatura
+- **LocationSelector:** 4 cidades com tooltips descritivos
+- **MeteorologyTabs:** 4 abas com tooltips (Avisos, Previsao, Satelite, Numerica)
+- **Conteudo:** Mapa, MetricCards, HourlyTimeline, DailyForecast, CityGrid
+
+### Hero Layout
+- Linha 1: Icone + Titulo (esquerda) + Cards temperatura (direita)
+- Linha 2: Subtítulo (esquerda)
+- Linha 3: Botao Atualizar (esquerda, abaixo do subtitulo)
+
+### Componentes (13 arquivos em meteorologia/components/)
+| Componente | Descricao |
+|------------|-----------|
+| LocationSelector.tsx | Selecao de cidade com tooltips |
+| MeteorologyTabs.tsx | 4 abas com tooltips |
+| PrevisaoTab.tsx | Layout principal: Mapa > Banner > Cards > Hourly > Daily > News |
+| WeatherMapDetail.tsx | Leaflet com radar RainViewer |
+| MetricCard.tsx | Card de metrica com tooltip explicativo |
+| HourlyTimeline.tsx | Grid responsivo 24h (auto-fill minmax(72px)) |
+| DailyForecast.tsx | Previsao 7 dias com tooltips |
+| CityGrid.tsx | Noticias meteorologicas com links reais |
+| AvisosTab.tsx | Alertas oficiais com links (INMET, Defesa Civil, Marinha) |
+| SatelliteTab.tsx | Imagens de satelite |
+| NumericaTab.tsx | Modelos numericos com radar RainViewer |
+| Skeletons.tsx | Loading states |
+| weather-utils.ts | Funcoes utilitarias (emoji, descricao, formatacao) |
+
+### Acessibilidade (Meteorologia)
+- `title` em todos os botooes e cards interativos
+- `aria-label` em todas as secoes
+- `aria-live="polite"` para atualizacoes
+- `role="radiogroup"` no LocationSelector
+- `role="tablist/tab/tabpanel"` nas abas
+- Tooltips descritivos: "Clique para ver previsao de Ilha Comprida — praia e litoral"
+- Tooltips de metricas: "Temperatura do ar em graus Celsius"
+- Grid responsivo HourlyTimeline: 4 colunas mobile, 8 tablet, 12 desktop
+
+### Fontes de Dados (Reais)
+- **Open-Meteo:** Previsao do tempo (gratuita)
+- **RainViewer:** Radar de precipitacao em tempo real (gratuita, sem API key)
+- **INMET:** Avisos meteorologicos oficiais
+- **CPTEC/INPE:** Previsao numerica brasileira
+- **Defesa Civil SP:** Alertas de desastres
+- **Marinha do Brasil:** Avisos maritimos
+
+---
+
+## 12. Imagens
+
+| Arquivo | Dimensoes | Uso |
+|---------|-----------|-----|
+| `banner-meteor.jpg` | Variavel | Banner em todas as paginas via PageBanner |
+| `CapaMeteor.jpg` | 3328x1248 | Imagem de capa original (backup) |
