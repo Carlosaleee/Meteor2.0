@@ -31,9 +31,10 @@
 - Estilizacao: Tailwind CSS v4 (design tokens via CSS custom properties)
 - Tema: dark/light com `data-theme` + `localStorage` + `prefers-color-scheme`
 - Mapas: Leaflet nativo (useRef + cleanup pattern)
-- Hooks: useMeteorology, useSwell, useAllCities
+- Hooks: useMeteorology, useSwell, useHourlyMarine, useAiSummary, useAllCities
 - API Layer: lib/api.ts com fetch generico
 - Icones: React Icons (Font Awesome)
+- Graficos: ApexCharts (react-apexcharts)
 - Acessibilidade: skip-link, aria-label, aria-current, aria-expanded, role, focus-visible, title tooltips
 
 ---
@@ -44,7 +45,7 @@
 |------|-----------|-------|
 | `/` | Portal principal - HUD Tatico | Estatico + ChatWidget + banner |
 | `/meteorologia` | Meteorologia & Vento | **API real** (4 cidades) + RainViewer radar |
-| `/swell` | Swell & Picos | **API real** + mapa Leaflet |
+| `/swell` | Swell & Picos | **API real** + Gemini AI + ApexCharts + Leaflet |
 | `/transito` | Transito & Mobilidade | Simulacao inteligente + mapa |
 | `/noticias` | Noticias Regionais | Estatico (8 noticias) |
 | `/blog` | Blog Tecnico | Estatico (4 artigos) |
@@ -63,10 +64,15 @@
 - Localizacoes: Ilha Comprida, Iguape, Cananeia, Registro
 
 ### 4.2 OceanographyModule
-- Endpoint: GET /v1/oceanography
+- Endpoints:
+  - GET /v1/oceanography — dados atuais (ondas, swell, qualidade, spots)
+  - GET /v1/oceanography/hourly — previsao hourly 12h (wave_height, period, direction)
+  - GET /v1/oceanography/summary — resumo tático gerado por Gemini AI
 - API externa: Open-Meteo Marine (gratuita, sem chave)
-- Fallback: data/fallback-oceanography.json
-- Dados: ondas, swell, marees, qualidade, spots de surf
+- IA: Gemini 2.5 Flash (`@google/genai`) — briefing tático de surf
+- Fallback: data/fallback-oceanography.json (inclui spots, tides, quality)
+- Dados: ondas, swell, marees, qualidade, spots de surf, resumo IA
+- Cache: resumo IA cacheado por 1h no backend
 
 ### 4.3 TrafficModule
 - Endpoint: GET /v1/traffic
@@ -94,11 +100,13 @@
 | FALLBACK_MAX_AGE_HOURS | 24 | Idade maxima do fallback |
 | NEXT_PUBLIC_API_URL | http://localhost:3001 | URL da API no frontend |
 
-### Definidas (para uso futuro)
-| Variavel | Default | Modulo futuro |
-|----------|---------|---------------|
-| GEMINI_API_KEY | (vazio) | AiSummaryModule |
-| GEMINI_MODEL | gemini-2.5-flash | AiSummaryModule |
+### Definidas (em uso)
+| Variavel | Default | Modulo |
+|----------|---------|--------|
+| GEMINI_API_KEY | (vazio) | OceanographyModule (resumo IA) |
+| GEMINI_MODEL | gemini-2.5-flash | OceanographyModule |
+| GEMINI_TEMPERATURE | 0.7 | OceanographyModule |
+| GEMINI_API_BASE_URL | generativelanguage.googleapis.com | OceanographyModule |
 | STORMGLASS_API_KEY | (vazio) | Oceanografia avancada |
 | INMET_API_TOKEN | (vazio) | Estacoes INMET |
 | DATABASE_URL | file:./data/meteor.db | Drizzle ORM |
@@ -135,6 +143,7 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 - TypeScript 5.9
 - Tailwind CSS v4
 - Leaflet 1.9 (mapas)
+- ApexCharts 7.x (graficos de ondas e marees)
 - React Icons 5.7 (icones Font Awesome)
 - Vitest (testes)
 
@@ -144,6 +153,7 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 - TypeScript 5.9
 - Zod (validacao)
 - Helmet (seguranca)
+- @google/genai (Gemini AI — resumo tatico)
 - Jest (testes)
 
 ### Infra
@@ -166,7 +176,7 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 | Branch | Descricao |
 |--------|-----------|
 | `main` | Producao, todas as features mergeadas |
-| `feature/swell-redesign` | Estilizacao da tela de Swell |
+| `feature/swell-styling` | Redesign completo da pagina Swell |
 
 ---
 
@@ -183,7 +193,7 @@ Meteor_2.0/
           http/ (envelope, filter, pipe)
         modules/
           meteorology/ (controller, service, repository)
-          oceanography/ (controller, service, repository)
+          oceanography/ (controller, service, marine.repository, gemini.repository)
           traffic/ (controller, service, repository)
         app.module.ts
         main.ts
@@ -194,7 +204,9 @@ Meteor_2.0/
           meteorologia/
             page.tsx (card container principal)
             components/ (13 componentes)
-          swell/page.tsx
+          swell/
+            page.tsx (5 abas: Noticias, Ondas, Picos, Marees, Visao Geral)
+            components/ (11 componentes)
           transito/page.tsx
           noticias/page.tsx
           blog/page.tsx
@@ -209,6 +221,8 @@ Meteor_2.0/
         hooks/
           useMeteorology.ts
           useSwell.ts
+          useHourlyMarine.ts (dados hourly 12h)
+          useAiSummary.ts (resumo Gemini)
           useAllCities.ts (4 cidades paralelo)
         lib/api.ts
         app/globals.css (CSS custom properties + temas)
@@ -324,7 +338,85 @@ Meteor_2.0/
 
 ---
 
-## 12. Imagens
+## 12. Pagina de Swell (Detalhes)
+
+### Estrutura Principal
+- **Container:** `<div className="space-y-8">` com PageBanner + Hero + Tabs + Conteudo
+- **Hero:** Gradient blue com qualidade, melhor horário, botão Atualizar
+- **KPI Cards:** 4 cards (Altura, Swell, Direção, Maré)
+- **SwellTabs:** 5 abas (Notícias → Ondas → Picos → Marés → Visão Geral)
+
+### Abas e Conteúdo
+
+#### Notícias (aba padrão)
+- 10 notícias com imagens reais (Unsplash)
+- Categorias: WSL, Paulista, Previsão, Alertas, ISA, Magazine, Global
+- Grid responsivo: 1 coluna mobile, 2 tablet, 3 desktop
+- Links externos para fontes oficiais
+
+#### Ondas
+- **WaveChart:** Gráfico ApexCharts área com 2 séries (Onda + Swell)
+  - Legendas explicativas ("Onda = altura na praia" / "Swell = onda de origem")
+  - Faixas de qualidade tracejadas (Clássico 1.5m, Boas 1.0m)
+  - Tooltip detalhado: hora, altura, qualidade, período, direção
+  - Altura: 350px
+- **HourlySwell:** Grid responsivo 12 horas com classificação de qualidade
+
+#### Picos
+- **SpotGrid:** Cards com filtros (Iniciante/Intermediário/Avançado) e busca
+- **SwellMap:** Leaflet com 6 marcadores coloridos
+
+#### Marés
+- **TideChart:** Gráfico ApexCharts linha com annotations
+  - Tabela de próximas 4 marés (Alta/Baixa)
+  - Gradiente preenchido abaixo da curva
+  - Tooltip com tipo e altura
+  - Altura: 320px
+
+#### Visão Geral
+- **ResumoIA:** Briefing Gemini com tópicos (Ondas, Vento, Horários, Picos, Alertas)
+- **ConditionCards:** 5 mini cards (Onda, Swell, Período, Direção, Qualidade)
+- **HourlySwell:** Grid 12 horas
+- **DailyTip:** Dica prática + prancha recomendada
+
+### Componentes (11 arquivos em swell/components/)
+| Componente | Descrição |
+|------------|-----------|
+| SwellTabs.tsx | 5 abas com aria pattern |
+| ResumoIA.tsx | Briefing Gemini com markdown |
+| WaveChart.tsx | Gráfico ApexCharts área (ondas) |
+| TideChart.tsx | Gráfico ApexCharts linha (marés) |
+| SpotGrid.tsx | Cards de spots com filtros e busca |
+| SurfNews.tsx | 10 notícias com imagens |
+| HourlySwell.tsx | Grid responsivo 12h |
+| ConditionCards.tsx | 5 mini cards de condições |
+| DailyTip.tsx | Dica prática do dia |
+| Skeletons.tsx | Loading states (6 tipos) |
+
+### Hooks (2 novos)
+| Hook | Descrição |
+|------|-----------|
+| useHourlyMarine.ts | Busca GET /v1/oceanography/hourly |
+| useAiSummary.ts | Busca GET /v1/oceanography/summary |
+
+### Acessibilidade (Swell)
+- `role="tablist/tab/tabpanel"` nas abas
+- `aria-selected`, `aria-controls`, `tabIndex` roving
+- `title` em todos os cards e botões
+- `aria-label` em todas as seções
+- `aria-live="polite"` para resumo IA
+- `focus-visible:ring-2 focus-visible:ring-blue-400`
+- Tooltips detalhados com todos os valores
+
+### Fontes de Dados (Reais)
+- **Open-Meteo Marine:** Dados de ondas, swell, período (current + hourly)
+- **Gemini 2.5 Flash:** Resumo tático de surf (briefing com 5 tópicos)
+- **Leaflet + OpenStreetMap:** Mapa de picos de surf
+- **Unsplash:** Imagens de notícias (thumbnails)
+
+---
+
+## 13. Imagens
 
 | Arquivo | Dimensoes | Uso |
 |---------|-----------|-----|

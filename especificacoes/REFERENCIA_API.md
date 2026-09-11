@@ -140,11 +140,6 @@ Dados oceanicos de ondas, swell e marees.
 
 **Query Parameters:** Nenhum
 
-**Exemplo de Request:**
-```
-GET /v1/oceanography
-```
-
 **Response:**
 ```json
 {
@@ -169,8 +164,10 @@ GET /v1/oceanography
       "name": "Boqueirao Norte",
       "lat": -24.75,
       "lon": -47.58,
-      "level": "Intermediario",
-      "bestWind": "Terral (Oeste)"
+      "level": "intermediate",
+      "bestWind": "Terral (Oeste)",
+      "exposure": "Sul/Sudeste",
+      "howToGetThere": "https://www.google.com/maps/dir/?api=1&destination=-24.75,-47.58"
     }
   ]
 }
@@ -191,6 +188,51 @@ GET /v1/oceanography
 | nextTide | string | Proxima mare alta |
 | tideCoefficient | number | Coeficiente de mare |
 | spots | array | Lista de spots de surf |
+| spots[].exposure | string | Exposicao do pico |
+| spots[].howToGetThere | string | Link Google Maps |
+
+---
+
+## GET /v1/oceanography/hourly
+
+Previsao hourly de ondas para as proximas 12 horas.
+
+**Response:** Array de objetos com os mesmos campos do current do /v1/oceanography, mas ao longo do tempo.
+
+```json
+[
+  {
+    "time": "2026-09-10T15:00",
+    "waveHeight": 1.2,
+    "wavePeriod": 9.5,
+    "waveDirection": 140,
+    "swellHeight": 0.8,
+    "swellPeriod": 10.2,
+    "swellDirection": 135
+  }
+]
+```
+
+---
+
+## GET /v1/oceanography/summary
+
+Resumo tatico de surf gerado por Gemini AI.
+
+**Response:**
+```json
+{
+  "summary": "🏄 **Condições das Ondas**\n- Altura: 1.1m...\n\n🌬️ **Vento**\n- Ventos favoráveis...",
+  "cached": false
+}
+```
+
+| Campo | Tipo | Descricao |
+|-------|------|-----------|
+| summary | string | Briefing tatico com 5 topicos (Ondas, Vento, Horarios, Picos, Alertas) |
+| cached | boolean | Se true, dados vieram do cache (1h TTL) |
+
+**Cache:** Resumo e cacheado por 1 hora no backend.
 
 ---
 

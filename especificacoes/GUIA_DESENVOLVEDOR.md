@@ -73,7 +73,9 @@ Meteor_2.0/
           meteorologia/
             page.tsx   # Card container principal
             components/ # 13 componentes
-          swell/       # Em estilizacao
+          swell/           # 5 abas + 11 componentes
+            page.tsx
+            components/
           transito/
           noticias/
           blog/
@@ -165,8 +167,6 @@ FALLBACK_MAX_AGE_HOURS=24
 ```
 NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
-
-## Debugging
 
 ### Backend
 - Logs aparecem no terminal do `npm run dev`
@@ -312,3 +312,104 @@ fetch('https://api.rainviewer.com/public/weather-maps.json')
     ).addTo(map);
   });
 ```
+
+---
+
+## Pagina de Swell (Guia Completo)
+
+### Estrutura
+```
+swell/
+  page.tsx                    # 5 abas: Noticias, Ondas, Picos, Marees, Visao Geral
+  components/
+    SwellTabs.tsx             # Navegacao por abas com aria pattern
+    ResumoIA.tsx              # Briefing Gemini com markdown
+    WaveChart.tsx             # Grafico ApexCharts area (ondas)
+    TideChart.tsx             # Grafico ApexCharts linha (mares)
+    SpotGrid.tsx              # Cards de spots com filtros e busca
+    SurfNews.tsx              # 10 noticias com imagens
+    HourlySwell.tsx           # Grid responsivo 12h
+    ConditionCards.tsx        # 5 mini cards de condicoes
+    DailyTip.tsx              # Dica pratica do dia
+    Skeletons.tsx             # Loading states (6 tipos)
+```
+
+### Hooks
+| Hook | Arquivo | Descricao |
+|------|---------|-----------|
+| useSwell.ts | src/hooks/ | Busca GET /v1/oceanography |
+| useHourlyMarine.ts | src/hooks/ | Busca GET /v1/oceanography/hourly |
+| useAiSummary.ts | src/hooks/ | Busca GET /v1/oceanography/summary |
+
+### Ordem das Abas
+```
+[Noticias] [Ondas] [Picos] [Marees] [Visao Geral]
+```
+
+### Graficos ApexCharts
+
+#### WaveChart (Ondas)
+```tsx
+import dynamic from 'next/dynamic';
+const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
+
+// Serie: waveHeight (area azul) + swellHeight (area cyan)
+// Altura: 350px
+// Faixas de qualidade: tracejadas em 1.0m (Boas) e 1.5m (Classico)
+```
+
+#### TideChart (Mares)
+```tsx
+// Serie: waveHeight como proxy de mare
+// Altura: 320px
+// Annotations: alta (amber) e baixa (blue)
+// Tabela de proximas 4 marees abaixo do grafico
+```
+
+### Padroes de UI (Swell)
+
+#### Tab Navigation (SwellTabs)
+```tsx
+<div role="tablist" aria-label="Secoes de swell">
+  <button role="tab" aria-selected={isActive} aria-controls={`panel-${id}`} tabIndex={isActive ? 0 : -1}>
+```
+
+#### ConditionCards
+```tsx
+// 5 mini cards: Onda, Swell, Periodo, Direcao, Qualidade
+// Cada um com icone, valor grande, e label
+<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+```
+
+#### ResumoIA (Markdown)
+```tsx
+// Renderiza **negrito** e listas com -
+// Topic emojis: 🏄 Ondas, 🌬️ Vento, ⏰ Horarios, 🏆 Picos, ⚠️ Alertas
+function renderMarkdown(text: string): React.ReactNode[]
+```
+
+#### DailyTip
+```tsx
+// Dica baseada na altura da onda:
+// <0.5m: flat, SUP
+// 0.5-1.0m: iniciante, longboard
+// 1.0-1.5m: intermediario, fish/hybrida
+// 1.5-2.0m: experiente, shortboard
+// >2.0m: avancado, gun
+```
+
+### Acessibilidade (Swell)
+- `role="tablist/tab/tabpanel"` nas abas
+- `aria-selected`, `aria-controls`, `tabIndex` roving
+- `title` em todos os cards e botoes
+- `aria-label` em todas as secoes
+- `aria-live="polite"` para resumo IA
+- `focus-visible:ring-2 focus-visible:ring-blue-400`
+- Tooltips detalhados com todos os valores
+
+### Gemini AI (Resumo)
+- Backend: `gemini.repository.ts` com `@google/genai`
+- Prompt: briefing completo com 5 topicos (Ondas, Vento, Horarios, Picos, Alertas)
+- Max tokens: 600
+- Cache: 1h no backend (`summaryCache`)
+- Fallback: resumo estatico baseado nos dados quando Gemini falha
