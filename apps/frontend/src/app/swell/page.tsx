@@ -20,6 +20,9 @@ import { ConditionCards } from './components/ConditionCards';
 import { DailyTip } from './components/DailyTip';
 import { WslRankings } from './components/WslRankings';
 import { UpcomingEvents } from './components/UpcomingEvents';
+import { WindConditionCards } from './components/WindConditionCards';
+import { WindChart } from './components/WindChart';
+import { HourlyWind } from './components/HourlyWind';
 import {
   SkeletonResumoIA,
   SkeletonWaveChart,
@@ -281,30 +284,26 @@ export default function SwellPage() {
                   <span aria-hidden="true">💨</span>
                   Condições do Vento
                 </h2>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-2">
-                    <span className="text-xs font-semibold text-slate-400">Velocidade</span>
-                    <p className="text-3xl font-extrabold text-white">
-                      {hourlyData?.[0]?.windSpeed ?? '—'} <span className="text-sm font-normal text-slate-400">km/h</span>
-                    </p>
+                {hourlyLoading ? (
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {[1, 2, 3, 4].map(i => (
+                      <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg animate-pulse">
+                        <div className="h-3 bg-slate-800 rounded w-20 mb-3" />
+                        <div className="h-8 bg-slate-800 rounded w-16" />
+                      </div>
+                    ))}
                   </div>
-                  <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-2">
-                    <span className="text-xs font-semibold text-slate-400">Rajada</span>
-                    <p className="text-3xl font-extrabold text-amber-400">
-                      {hourlyData?.[0]?.windGust ?? '—'} <span className="text-sm font-normal text-slate-400">km/h</span>
-                    </p>
+                ) : hourlyData && hourlyData.length > 0 ? (
+                  <WindConditionCards
+                    windSpeed={hourlyData[0].windSpeed}
+                    windDirection={hourlyData[0].windDirection}
+                    windGust={hourlyData[0].windGust}
+                  />
+                ) : (
+                  <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 text-center text-slate-500">
+                    Dados de vento indisponíveis no momento
                   </div>
-                  <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-2">
-                    <span className="text-xs font-semibold text-slate-400">Direção</span>
-                    <p className="text-3xl font-extrabold text-white">
-                      {hourlyData?.[0]?.windDirection ?? '—'}° <span className="text-sm font-normal text-slate-400">{waveDir(hourlyData?.[0]?.windDirection ?? 0)}</span>
-                    </p>
-                  </div>
-                  <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-2">
-                    <span className="text-xs font-semibold text-slate-400">Qualidade Surf</span>
-                    <p className="text-lg font-extrabold text-emerald-400">Em breve</p>
-                  </div>
-                </div>
+                )}
               </section>
 
               <section id="wind-grafico" aria-label="Gráfico horário de vento" className="scroll-mt-20">
@@ -312,9 +311,23 @@ export default function SwellPage() {
                   <span aria-hidden="true">📊</span>
                   Gráfico Horário — Ventos
                 </h2>
-                <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5">
-                  <p className="text-sm text-slate-400">Gráfico de ventos será implementado na branch <code className="text-cyan-400">feature/swell-ventos</code></p>
-                </div>
+                {hourlyLoading ? <SkeletonWaveChart /> : hourlyData && hourlyData.length > 0 ? <WindChart data={hourlyData} /> : (
+                  <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 text-center text-slate-500">
+                    Gráfico de ventos indisponível
+                  </div>
+                )}
+              </section>
+
+              <section id="wind-horas" aria-label="Próximas horas vento" className="scroll-mt-20">
+                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                  <span aria-hidden="true">⏱️</span>
+                  Próximas Horas — Ventos
+                </h2>
+                {hourlyLoading ? <SkeletonHourly /> : hourlyData && hourlyData.length > 0 ? <HourlyWind data={hourlyData} /> : (
+                  <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 text-center text-slate-500">
+                    Previsão horária de ventos indisponível
+                  </div>
+                )}
               </section>
 
               <section id="wind-mares" aria-label="Marés e vento" className="scroll-mt-20">
