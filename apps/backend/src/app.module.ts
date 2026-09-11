@@ -6,6 +6,7 @@ import { FallbackModule } from "./common/fallback/fallback.module";
 import { EnvelopeInterceptor } from "./common/http/envelope.interceptor";
 import { HttpExceptionFilter } from "./common/http/http-exception.filter";
 import { HealthController } from "./health.controller";
+import { LocalismoModule } from "./modules/localismo/localismo.module";
 import { MeteorologyModule } from "./modules/meteorology/meteorology.module";
 import { NewsModule } from "./modules/news/news.module";
 import { OceanographyModule } from "./modules/oceanography/oceanography.module";
@@ -33,6 +34,7 @@ try {
     }),
     ...(throttlerImports as never[]),
     FallbackModule,
+    LocalismoModule,
     MeteorologyModule,
     NewsModule,
     OceanographyModule,

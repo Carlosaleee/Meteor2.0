@@ -9,6 +9,7 @@ import { useSwell } from '@/hooks/useSwell';
 import { useHourlyMarine } from '@/hooks/useHourlyMarine';
 import { useAiSummary } from '@/hooks/useAiSummary';
 import { useNews } from '@/hooks/useNews';
+import { useLocalismo } from '@/hooks/useLocalismo';
 import { SwellTabs } from './components/SwellTabs';
 import { ResumoIA } from './components/ResumoIA';
 import { WaveChart } from './components/WaveChart';
@@ -24,6 +25,9 @@ import { WindConditionCards } from './components/WindConditionCards';
 import { WindChart } from './components/WindChart';
 import { HourlyWind } from './components/HourlyWind';
 import { ForecastSection } from './components/ForecastSection';
+import { LocalismoMap } from './components/LocalismoMap';
+import { CommerceGrid } from './components/CommerceGrid';
+import type { CommerceItem } from '@/lib/api';
 import {
   SkeletonResumoIA,
   SkeletonWaveChart,
@@ -43,10 +47,13 @@ function waveDir(deg: number): string {
 
 export default function SwellPage() {
   const [activeTab, setActiveTab] = useState('news');
+  const [selectedCommerce, setSelectedCommerce] = useState<CommerceItem | null>(null);
+  const [route, setRoute] = useState<{ from: [number, number]; to: [number, number]; label: string } | null>(null);
   const { data, loading, error, refetch } = useSwell();
   const { data: hourlyData, loading: hourlyLoading, refetch: refetchHourly } = useHourlyMarine();
   const { data: aiData, loading: aiLoading } = useAiSummary();
   const { data: newsData, loading: newsLoading, refetch: refetchNews } = useNews();
+  const { data: localismoData, loading: localismoLoading } = useLocalismo();
 
   useEffect(() => {
     refetch();
@@ -58,6 +65,20 @@ export default function SwellPage() {
     refetch();
     refetchHourly();
     refetchNews();
+  };
+
+  const handleGetDirections = (item: CommerceItem) => {
+    setSelectedCommerce(item);
+    setRoute({
+      from: [-24.7167, -47.5333],
+      to: [item.lat, item.lon],
+      label: `→ ${item.name}`,
+    });
+  };
+
+  const handleClearRoute = () => {
+    setSelectedCommerce(null);
+    setRoute(null);
   };
 
   return (
@@ -425,14 +446,49 @@ export default function SwellPage() {
           {/* Localismo — Aba local */}
           {activeTab === 'local' && (
             <div role="tabpanel" id="panel-local" aria-labelledby="tab-local" className="space-y-6">
-              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6">
-                <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
-                  <span aria-hidden="true">📍</span>
-                  Localismo — Ilha Comprida & Costa
-                </h3>
-                <p className="text-sm text-slate-400">Picos, comércio local e utilidades públicas</p>
-                <p className="text-sm text-cyan-400 mt-2">Será implementado na branch <code>feature/swell-localismo</code></p>
-              </div>
+              <ForecastSection
+                id="local-mapa"
+                title="Mapa de Comércios — Ilha Comprida"
+                icon={<span aria-hidden="true">🗺️</span>}
+                ariaLabel="Mapa interativo de comércios de Ilha Comprida"
+              >
+                {localismoLoading ? (
+                  <div className="h-[500px] bg-slate-900 border border-slate-800 rounded-xl animate-pulse" />
+                ) : localismoData?.commerce ? (
+                  <div className="h-[500px]">
+                    <LocalismoMap
+                      commerce={localismoData.commerce}
+                      selectedCommerce={selectedCommerce}
+                      route={route}
+                      onClearRoute={handleClearRoute}
+                    />
+                  </div>
+                ) : (
+                  <div className="h-[500px] bg-slate-900/80 border border-slate-800 rounded-xl flex items-center justify-center text-slate-500">
+                    Dados de comércios indisponíveis
+                  </div>
+                )}
+              </ForecastSection>
+
+              <ForecastSection
+                id="local-comercios"
+                title="Comércios Locais"
+                icon={<span aria-hidden="true">📍</span>}
+                ariaLabel="Lista de comércios de Ilha Comprida"
+              >
+                {localismoLoading ? (
+                  <SkeletonSpotGrid />
+                ) : localismoData?.commerce ? (
+                  <CommerceGrid
+                    commerce={localismoData.commerce}
+                    onGetDirections={handleGetDirections}
+                  />
+                ) : (
+                  <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 text-center text-slate-500">
+                    Dados de comércios indisponíveis
+                  </div>
+                )}
+              </ForecastSection>
             </div>
           )}
 

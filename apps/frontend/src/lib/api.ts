@@ -161,3 +161,21 @@ export type TrafficResponse = {
   location: string;
   routes: TrafficRoute[];
 };
+
+export type CommerceItem = {
+  id: string;
+  name: string;
+  sector: string;
+  subsector: string;
+  lat: number;
+  lon: number;
+  address: string;
+  description: string;
+  phone: string;
+  googleMapsUrl: string;
+};
+
+export type LocalismoResponse = {
+  commerce: CommerceItem[];
+  timestamp: string;
+};
