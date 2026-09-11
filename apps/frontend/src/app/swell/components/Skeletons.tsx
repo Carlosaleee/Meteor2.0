@@ -56,9 +56,35 @@ export function SkeletonSurfNews() {
   return (
     <section className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 animate-pulse" aria-hidden="true">
       <div className="h-4 bg-slate-800 rounded w-36 mb-4" />
-      <div className="grid sm:grid-cols-2 gap-3">
-        {[1, 2, 3, 4].map(i => (
-          <div key={i} className="h-24 bg-slate-800/50 rounded-xl" />
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <div key={i} className="h-64 bg-slate-800/50 rounded-xl" />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export function SkeletonRankings() {
+  return (
+    <section className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 animate-pulse" aria-hidden="true">
+      <div className="h-4 bg-slate-800 rounded w-32 mb-4" />
+      <div className="space-y-2">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="h-10 bg-slate-800/50 rounded-lg" />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export function SkeletonEvents() {
+  return (
+    <section className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 animate-pulse" aria-hidden="true">
+      <div className="h-4 bg-slate-800 rounded w-36 mb-4" />
+      <div className="space-y-2">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="h-16 bg-slate-800/50 rounded-xl" />
         ))}
       </div>
     </section>

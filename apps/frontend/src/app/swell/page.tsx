@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { FaWater, FaClock, FaSyncAlt } from 'react-icons/fa';
 import { ChatWidget } from '@/components/ChatWidget';
@@ -8,6 +8,7 @@ import { PageBanner } from '@/components/PageBanner';
 import { useSwell } from '@/hooks/useSwell';
 import { useHourlyMarine } from '@/hooks/useHourlyMarine';
 import { useAiSummary } from '@/hooks/useAiSummary';
+import { useNews } from '@/hooks/useNews';
 import { SwellTabs } from './components/SwellTabs';
 import { ResumoIA } from './components/ResumoIA';
 import { WaveChart } from './components/WaveChart';
@@ -17,13 +18,16 @@ import { SurfNews } from './components/SurfNews';
 import { HourlySwell } from './components/HourlySwell';
 import { ConditionCards } from './components/ConditionCards';
 import { DailyTip } from './components/DailyTip';
+import { WslRankings } from './components/WslRankings';
+import { UpcomingEvents } from './components/UpcomingEvents';
 import {
   SkeletonResumoIA,
   SkeletonWaveChart,
   SkeletonTideChart,
   SkeletonSpotGrid,
-  SkeletonSurfNews,
   SkeletonHourly,
+  SkeletonRankings,
+  SkeletonEvents,
 } from './components/Skeletons';
 
 const SwellMap = dynamic(() => import('@/components/SwellMapClient').then(mod => mod.SwellMapClient), { ssr: false });
@@ -36,11 +40,20 @@ function waveDir(deg: number): string {
 export default function SwellPage() {
   const [activeTab, setActiveTab] = useState('news');
   const { data, loading, error, refetch } = useSwell();
-  const { data: hourlyData, loading: hourlyLoading } = useHourlyMarine();
+  const { data: hourlyData, loading: hourlyLoading, refetch: refetchHourly } = useHourlyMarine();
   const { data: aiData, loading: aiLoading } = useAiSummary();
+  const { data: newsData, loading: newsLoading, refetch: refetchNews } = useNews();
+
+  useEffect(() => {
+    refetch();
+    refetchHourly();
+    refetchNews();
+  }, [refetch, refetchHourly, refetchNews]);
 
   const handleRefresh = () => {
     refetch();
+    refetchHourly();
+    refetchNews();
   };
 
   return (
@@ -113,7 +126,7 @@ export default function SwellPage() {
 
                 <button
                   onClick={handleRefresh}
-                  title="Atualizar dados de swell e ondas"
+                  title="Atualizar dados de swell, ondas e notícias"
                   aria-label="Atualizar dados"
                   className="px-4 py-3 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10 text-white/80 hover:text-white hover:bg-white/20 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                 >
@@ -177,65 +190,81 @@ export default function SwellPage() {
           {/* Tabs */}
           <SwellTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-          {/* Tab Panels */}
-          <div role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
-            {activeTab === 'news' && (
-              <SurfNews />
-            )}
+          {/* Notícias — Aba Noticias */}
+          {activeTab === 'news' && (
+            <div className="space-y-6">
+              <SurfNews news={newsData?.news ?? []} loading={newsLoading} category="WSL" title="World Surf League" />
+              {newsLoading && !newsData ? (
+                <SkeletonRankings />
+              ) : newsData?.rankings ? (
+                <WslRankings men={newsData.rankings.men} women={newsData.rankings.women} loading={newsLoading} />
+              ) : null}
+              <SurfNews news={newsData?.news ?? []} loading={newsLoading} category="Paulista" title="Circuito Paulista" />
+              {newsLoading && !newsData ? (
+                <SkeletonEvents />
+              ) : newsData?.events ? (
+                <UpcomingEvents events={newsData.events} loading={newsLoading} />
+              ) : null}
+            </div>
+          )}
 
-            {activeTab === 'waves' && (
-              <div className="space-y-6">
-                {hourlyLoading ? <SkeletonWaveChart /> : hourlyData && <WaveChart data={hourlyData} />}
-                {hourlyLoading ? <SkeletonHourly /> : hourlyData && <HourlySwell data={hourlyData} />}
-              </div>
-            )}
+          {/* Tab Panels — Ondas, Picos, Marés, Visão Geral */}
+          {activeTab !== 'news' && (
+            <div role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
+              {activeTab === 'waves' && (
+                <div className="space-y-6">
+                  {hourlyLoading ? <SkeletonWaveChart /> : hourlyData && <WaveChart data={hourlyData} />}
+                  {hourlyLoading ? <SkeletonHourly /> : hourlyData && <HourlySwell data={hourlyData} />}
+                </div>
+              )}
 
-            {activeTab === 'spots' && (
-              <div className="space-y-6">
-                {data.spots.length > 0 ? (
-                  <SpotGrid spots={data.spots} />
-                ) : (
-                  <SkeletonSpotGrid />
-                )}
-                <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
-                  <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
-                    Mapa de Picos de Surf — Ilha Comprida
-                  </h3>
-                  <p className="text-xs text-slate-400 mb-4">Clique nos marcadores para conferir o nível de dificuldade e dicas dos picos</p>
-                  <div className="h-[450px] rounded-xl overflow-hidden border border-slate-800">
-                    <SwellMap />
+              {activeTab === 'spots' && (
+                <div className="space-y-6">
+                  {data.spots.length > 0 ? (
+                    <SpotGrid spots={data.spots} />
+                  ) : (
+                    <SkeletonSpotGrid />
+                  )}
+                  <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                    <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                      Mapa de Picos de Surf — Ilha Comprida
+                    </h3>
+                    <p className="text-xs text-slate-400 mb-4">Clique nos marcadores para conferir o nível de dificuldade e dicas dos picos</p>
+                    <div className="h-[450px] rounded-xl overflow-hidden border border-slate-800">
+                      <SwellMap />
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {activeTab === 'tides' && (
-              <div className="space-y-6">
-                {hourlyLoading ? <SkeletonTideChart /> : hourlyData && <TideChart data={hourlyData} />}
-              </div>
-            )}
+              {activeTab === 'tides' && (
+                <div className="space-y-6">
+                  {hourlyLoading ? <SkeletonTideChart /> : hourlyData && <TideChart data={hourlyData} />}
+                </div>
+              )}
 
-            {activeTab === 'overview' && (
-              <div className="space-y-6">
-                {aiLoading ? <SkeletonResumoIA /> : <ResumoIA summary={aiData?.summary ?? null} loading={aiLoading} error={null} />}
-                <ConditionCards
-                  waveHeight={data.current.waveHeight}
-                  wavePeriod={data.current.wavePeriod}
-                  waveDirection={data.current.waveDirection}
-                  swellHeight={data.current.swellHeight}
-                  qualityLabel={data.qualityLabel}
-                  qualityEmoji={data.qualityEmoji}
-                />
-                {hourlyLoading ? <SkeletonHourly /> : hourlyData && <HourlySwell data={hourlyData} />}
-                <DailyTip
-                  waveHeight={data.current.waveHeight}
-                  wavePeriod={data.current.wavePeriod}
-                  qualityLabel={data.qualityLabel}
-                  bestTime={data.bestTime}
-                />
-              </div>
-            )}
-          </div>
+              {activeTab === 'overview' && (
+                <div className="space-y-6">
+                  {aiLoading ? <SkeletonResumoIA /> : <ResumoIA summary={aiData?.summary ?? null} loading={aiLoading} error={null} />}
+                  <ConditionCards
+                    waveHeight={data.current.waveHeight}
+                    wavePeriod={data.current.wavePeriod}
+                    waveDirection={data.current.waveDirection}
+                    swellHeight={data.current.swellHeight}
+                    qualityLabel={data.qualityLabel}
+                    qualityEmoji={data.qualityEmoji}
+                  />
+                  {hourlyLoading ? <SkeletonHourly /> : hourlyData && <HourlySwell data={hourlyData} />}
+                  <DailyTip
+                    waveHeight={data.current.waveHeight}
+                    wavePeriod={data.current.wavePeriod}
+                    qualityLabel={data.qualityLabel}
+                    bestTime={data.bestTime}
+                  />
+                </div>
+              )}
+            </div>
+          )}
 
           <p className="text-[11px] text-slate-600 text-right">
             Última atualização: {new Date(data.timestamp).toLocaleString('pt-BR')}

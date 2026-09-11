@@ -1,0 +1,259 @@
+{
+  "updatedAt": "2026-09-11T15:25:43.192Z",
+  "data": {
+    "news": [
+      {
+        "id": "wsl-ct-2026-ranking",
+        "title": "WSL Championship Tour 2026 — Ranking Atualizado após a Etapa 08",
+        "source": "World Surf League",
+        "sourceUrl": "https://www.worldsurfleague.com",
+        "url": "https://www.worldsurfleague.com/athletes/tour/mct",
+        "description": "Confira o ranking atualizado do Championship Tour. Brasileiros Italo Ferreira e Yago Dora disputam o topo com Leonardo Fioravanti.",
+        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67",
+        "category": "WSL",
+        "publishedAt": "2026-09-10T15:25:43.190Z"
+      },
+      {
+        "id": "wsl-ranking-feminino",
+        "title": "Ranking WSL Feminino — Carissa Moore lidera, Luana Silva em 5º",
+        "source": "World Surf League",
+        "sourceUrl": "https://www.worldsurfleague.com",
+        "url": "https://www.worldsurfleague.com/athletes/tour/wct",
+        "description": "Carissa Moore mantém a liderança do CT feminino. Luana Silva é a brasileira melhor posicionada em 5º lugar com 33.835 pontos.",
+        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/05d0c45992d04a5409e4f0752d17382f.png?&x=1440&y=513&icq=74&sig=b95e55f8d4a05ce4133bcc58ba78e486",
+        "category": "WSL",
+        "publishedAt": "2026-09-10T15:25:43.190Z"
+      },
+      {
+        "id": "wsl-trestles-pro",
+        "title": "Lexus Trestles Pro — CT Etapa 09 em Standby",
+        "source": "World Surf League",
+        "sourceUrl": "https://www.worldsurfleague.com",
+        "url": "https://www.worldsurfleague.com/events",
+        "description": "A 9ª etapa do Championship Tour aguarda melhores condições em Lower Trestles, Califórnia. Previsão para 11-20 de setembro.",
+        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67",
+        "category": "WSL",
+        "publishedAt": "2026-09-09T15:25:43.190Z"
+      },
+      {
+        "id": "wsl-saosebastiao-cs",
+        "title": "Banco do Brasil São Sebastião Pro — Challenger Series chega a SP",
+        "source": "World Surf League",
+        "sourceUrl": "https://www.worldsurfleague.com",
+        "url": "https://www.worldsurfleague.com/events",
+        "description": "Etapa do Challenger Series em São Sebastião, SP, de 26 de setembro a 3 de outubro. Atletas brasileiros em destaque.",
+        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/05d0c45992d04a5409e4f0752d17382f.png?&x=1440&y=513&icq=74&sig=b95e55f8d4a05ce4133bcc58ba78e486",
+        "category": "WSL",
+        "publishedAt": "2026-09-08T15:25:43.190Z"
+      },
+      {
+        "id": "wsl-medina-quedas",
+        "title": "Gabriel Medina — Análise das quedas e recuperação no CT 2026",
+        "source": "World Surf League",
+        "sourceUrl": "https://www.worldsurfleague.com",
+        "url": "https://www.worldsurfleague.com/athletes/tour/mct",
+        "description": "Gabriel Medina busca recuperar posições após quedas nas etapas iniciais. Com 35.410 pontos, ocupa a 4ª posição.",
+        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67",
+        "category": "WSL",
+        "publishedAt": "2026-09-07T15:25:43.190Z"
+      },
+      {
+        "id": "wsl-italo-lider",
+        "title": "Italo Ferreira — Três vitórias e na luta pelo título mundial",
+        "source": "World Surf League",
+        "sourceUrl": "https://www.worldsurfleague.com",
+        "url": "https://www.worldsurfleague.com/athletes/tour/mct",
+        "description": "Italo Ferreira soma 39.930 pontos com 3 vitórias no CT 2026. O campeão olímpico busca o bicampeonato mundial.",
+        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/05d0c45992d04a5409e4f0752d17382f.png?&x=1440&y=513&icq=74&sig=b95e55f8d4a05ce4133bcc58ba78e486",
+        "category": "WSL",
+        "publishedAt": "2026-09-06T15:25:43.190Z"
+      },
+      {
+        "id": "spsurf-1",
+        "title": "Longboard Paulista Pro 2026 será realizado em Peruíbe",
+        "source": "SPSurf",
+        "sourceUrl": "https://www.spsurf.com.br",
+        "url": "https://www.spsurf.com.br",
+        "description": "",
+        "image": "https://static.wixstatic.com/media/690598_cf6012b3a7aa4ffd8b88893077d96484~mv2.jpeg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/690598_cf6012b3a7aa4ffd8b88893077d96484~mv2.webp",
+        "category": "Paulista",
+        "publishedAt": "2026-09-11T15:25:42.902Z"
+      },
+      {
+        "id": "spsurf-2",
+        "title": "Ondas pesadas e novos talentos marcam o Hang Loose Surf Attack 2026 no Guarujá",
+        "source": "SPSurf",
+        "sourceUrl": "https://www.spsurf.com.br",
+        "url": "https://www.spsurf.com.br",
+        "description": "",
+        "image": "https://static.wixstatic.com/media/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.jpeg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.webp",
+        "category": "Paulista",
+        "publishedAt": "2026-09-11T15:25:42.902Z"
+      },
+      {
+        "id": "spsurf-3",
+        "title": "Vini Palma e Eduarda Stefani vencem e dominam as ondas da Praia da Baleia",
+        "source": "SPSurf",
+        "sourceUrl": "https://www.spsurf.com.br",
+        "url": "https://www.spsurf.com.br",
+        "description": "",
+        "image": "https://static.wixstatic.com/media/71b9f8_d53b9f235c844cb09ce5789c48052bf6~mv2.jpg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/71b9f8_d53b9f235c844cb09ce5789c48052bf6~mv2.jpg",
+        "category": "Paulista",
+        "publishedAt": "2026-09-11T15:25:42.902Z"
+      },
+      {
+        "id": "spsurf-4",
+        "title": "Melhores momentos!",
+        "source": "SPSurf",
+        "sourceUrl": "https://www.spsurf.com.br",
+        "url": "https://www.spsurf.com.br/vídeos",
+        "description": "",
+        "image": "https://static.wixstatic.com/media/71b9f8_d47f44af83e043a590507fe765bd2d32~mv2.jpg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/71b9f8_d47f44af83e043a590507fe765bd2d32~mv2.jpg",
+        "category": "Paulista",
+        "publishedAt": "2026-09-11T15:25:42.902Z"
+      },
+      {
+        "id": "spsurf-5",
+        "title": "Galeria de fotos",
+        "source": "SPSurf",
+        "sourceUrl": "https://www.spsurf.com.br",
+        "url": "https://www.spsurf.com.br/galeria-de-fotos",
+        "description": "",
+        "image": "https://static.wixstatic.com/media/71b9f8_1f4cfb108dfd43299fb87ae66da9782c~mv2.jpg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/71b9f8_1f4cfb108dfd43299fb87ae66da9782c~mv2.jpg",
+        "category": "Paulista",
+        "publishedAt": "2026-09-11T15:25:42.902Z"
+      },
+      {
+        "id": "spsurf-6",
+        "title": "Chegou a sua hora",
+        "source": "SPSurf",
+        "sourceUrl": "https://www.spsurf.com.br",
+        "url": "https://www.spsurf.com.br",
+        "description": "",
+        "image": "https://static.wixstatic.com/media/b7060dede1e849e483cc931023aec49f.jpg/v1/fill/w_118,h_78,al_c,q_80,usm_0.66_1.00_0.01,blur_2,enc_avif,quality_auto/b7060dede1e849e483cc931023aec49f.jpg",
+        "category": "Paulista",
+        "publishedAt": "2026-09-11T15:25:42.902Z"
+      }
+    ],
+    "rankings": {
+      "men": [
+        {
+          "rank": 1,
+          "name": "Leonardo Fioravanti",
+          "country": "Italy",
+          "points": 40015,
+          "trend": 0
+        },
+        {
+          "rank": 2,
+          "name": "Italo Ferreira",
+          "country": "Brazil",
+          "points": 39930,
+          "trend": 0
+        },
+        {
+          "rank": 3,
+          "name": "Yago Dora",
+          "country": "Brazil",
+          "points": 37695,
+          "trend": -1
+        },
+        {
+          "rank": 4,
+          "name": "Gabriel Medina",
+          "country": "Brazil",
+          "points": 35410,
+          "trend": 0
+        },
+        {
+          "rank": 5,
+          "name": "Miguel Pupo",
+          "country": "Brazil",
+          "points": 32770,
+          "trend": 0
+        },
+        {
+          "rank": 6,
+          "name": "Griffin Colapinto",
+          "country": "United States",
+          "points": 31375,
+          "trend": 1
+        }
+      ],
+      "women": [
+        {
+          "rank": 1,
+          "name": "Carissa Moore",
+          "country": "Hawaii",
+          "points": 39575,
+          "trend": 0
+        },
+        {
+          "rank": 2,
+          "name": "Gabriela Bryan",
+          "country": "Hawaii",
+          "points": 37065,
+          "trend": 0
+        },
+        {
+          "rank": 3,
+          "name": "Sawyer Lindblad",
+          "country": "United States",
+          "points": 35970,
+          "trend": -1
+        },
+        {
+          "rank": 4,
+          "name": "Molly Picklum",
+          "country": "Australia",
+          "points": 34865,
+          "trend": -1
+        },
+        {
+          "rank": 5,
+          "name": "Luana Silva",
+          "country": "Brazil",
+          "points": 33835,
+          "trend": -1
+        },
+        {
+          "rank": 6,
+          "name": "Caitlin Simmers",
+          "country": "United States",
+          "points": 31810,
+          "trend": -1
+        }
+      ]
+    },
+    "events": [
+      {
+        "name": "Lexus Trestles Pro",
+        "location": "Lower Trestles, California, EUA",
+        "dates": "11-20 Set 2026",
+        "status": "Standby",
+        "tour": "Championship Tour"
+      },
+      {
+        "name": "Banco do Brasil São Sebastião Pro",
+        "location": "São Sebastião, São Paulo",
+        "dates": "26 Set - 3 Out 2026",
+        "status": "Upcoming",
+        "tour": "Challenger Series"
+      },
+      {
+        "name": "Circuito Paulista de Base 2026",
+        "location": "Litoral Paulista",
+        "dates": "Set-Nov 2026",
+        "status": "Upcoming",
+        "tour": "Circuito Nacional"
+      },
+      {
+        "name": "Longboard Paulista Pro 2026",
+        "location": "Peruíbe, São Paulo",
+        "dates": "13 Jun 2026",
+        "status": "Completed",
+        "tour": "Circuito Nacional"
+      }
+    ]
+  }
+}

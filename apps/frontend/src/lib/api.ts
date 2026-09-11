@@ -105,6 +105,41 @@ export type AiSummaryResponse = {
   cached: boolean;
 };
 
+export type NewsItem = {
+  id: string;
+  title: string;
+  source: string;
+  sourceUrl: string;
+  url: string;
+  description: string;
+  image: string;
+  category: 'WSL' | 'Paulista';
+  publishedAt: string;
+};
+
+export type WslRankingEntry = {
+  rank: number;
+  name: string;
+  country: string;
+  points: number;
+  trend: number;
+};
+
+export type WslEvent = {
+  name: string;
+  location: string;
+  dates: string;
+  status: 'Completed' | 'Standby' | 'Upcoming';
+  tour: string;
+};
+
+export type NewsResponse = {
+  news: NewsItem[];
+  rankings: { men: WslRankingEntry[]; women: WslRankingEntry[] };
+  events: WslEvent[];
+  timestamp: string;
+};
+
 export type TrafficRoute = {
   id: string;
   name: string;
