@@ -70,6 +70,9 @@ export type OceanographyResponse = {
     swellHeight: number;
     swellPeriod: number;
     swellDirection: number;
+    windSpeed: number;
+    windDirection: number;
+    windGust: number;
   };
   qualityLabel: string;
   qualityEmoji: string;
@@ -96,6 +99,9 @@ export type HourlyMarinePoint = {
   swellHeight: number;
   swellPeriod: number;
   swellDirection: number;
+  windSpeed: number;
+  windDirection: number;
+  windGust: number;
 };
 
 export type HourlyMarineResponse = HourlyMarinePoint[];

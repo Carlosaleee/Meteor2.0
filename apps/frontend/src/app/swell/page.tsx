@@ -208,61 +208,177 @@ export default function SwellPage() {
             </div>
           )}
 
-          {/* Tab Panels — Ondas, Picos, Marés, Visão Geral */}
-          {activeTab !== 'news' && (
-            <div role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
-              {activeTab === 'waves' && (
-                <div className="space-y-6">
-                  {hourlyLoading ? <SkeletonWaveChart /> : hourlyData && <WaveChart data={hourlyData} />}
-                  {hourlyLoading ? <SkeletonHourly /> : hourlyData && <HourlySwell data={hourlyData} />}
-                </div>
-              )}
+          {/* Previsão de Ondas — Aba forecast */}
+          {activeTab === 'forecast' && (
+            <div role="tabpanel" id="panel-forecast" aria-labelledby="tab-forecast" className="space-y-6">
+              <section id="condicoes" aria-label="Condições atuais" className="scroll-mt-20">
+                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                  <FaWater className="w-5 h-5 text-cyan-400" aria-hidden="true" />
+                  Condições Atuais
+                </h2>
+                <ConditionCards
+                  waveHeight={data.current.waveHeight}
+                  wavePeriod={data.current.wavePeriod}
+                  waveDirection={data.current.waveDirection}
+                  swellHeight={data.current.swellHeight}
+                  qualityLabel={data.qualityLabel}
+                  qualityEmoji={data.qualityEmoji}
+                />
+              </section>
 
-              {activeTab === 'spots' && (
-                <div className="space-y-6">
-                  {data.spots.length > 0 ? (
-                    <SpotGrid spots={data.spots} />
-                  ) : (
-                    <SkeletonSpotGrid />
-                  )}
-                  <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
-                    <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
-                      Mapa de Picos de Surf — Ilha Comprida
-                    </h3>
-                    <p className="text-xs text-slate-400 mb-4">Clique nos marcadores para conferir o nível de dificuldade e dicas dos picos</p>
-                    <div className="h-[450px] rounded-xl overflow-hidden border border-slate-800">
-                      <SwellMap />
-                    </div>
+              <section id="grafico" aria-label="Gráfico horário de ondas" className="scroll-mt-20">
+                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                  <span aria-hidden="true">📊</span>
+                  Gráfico Horário — Ondas
+                </h2>
+                {hourlyLoading ? <SkeletonWaveChart /> : hourlyData && <WaveChart data={hourlyData} />}
+              </section>
+
+              <section id="horas" aria-label="Próximas horas" className="scroll-mt-20">
+                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                  <span aria-hidden="true">⏱️</span>
+                  Próximas Horas
+                </h2>
+                {hourlyLoading ? <SkeletonHourly /> : hourlyData && <HourlySwell data={hourlyData} />}
+              </section>
+
+              <section id="mares" aria-label="Previsão de marés" className="scroll-mt-20">
+                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                  <span aria-hidden="true">🌙</span>
+                  Marés
+                </h2>
+                {hourlyLoading ? <SkeletonTideChart /> : hourlyData && <TideChart data={hourlyData} />}
+              </section>
+
+              <section id="resumo" aria-label="Resumo IA" className="scroll-mt-20">
+                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                  <span aria-hidden="true">🤖</span>
+                  Resumo IA — Gemini Flash
+                </h2>
+                {aiLoading ? <SkeletonResumoIA /> : <ResumoIA summary={aiData?.summary ?? null} loading={aiLoading} error={null} />}
+              </section>
+
+              <section id="dica" aria-label="Dica do dia" className="scroll-mt-20">
+                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                  <span aria-hidden="true">💡</span>
+                  Dica do Dia
+                </h2>
+                <DailyTip
+                  waveHeight={data.current.waveHeight}
+                  wavePeriod={data.current.wavePeriod}
+                  qualityLabel={data.qualityLabel}
+                  bestTime={data.bestTime}
+                />
+              </section>
+            </div>
+          )}
+
+          {/* Previsão de Ventos — Aba wind */}
+          {activeTab === 'wind' && (
+            <div role="tabpanel" id="panel-wind" aria-labelledby="tab-wind" className="space-y-6">
+              <section id="wind-condicoes" aria-label="Condições do vento" className="scroll-mt-20">
+                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                  <span aria-hidden="true">💨</span>
+                  Condições do Vento
+                </h2>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-2">
+                    <span className="text-xs font-semibold text-slate-400">Velocidade</span>
+                    <p className="text-3xl font-extrabold text-white">
+                      {hourlyData?.[0]?.windSpeed ?? '—'} <span className="text-sm font-normal text-slate-400">km/h</span>
+                    </p>
+                  </div>
+                  <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-2">
+                    <span className="text-xs font-semibold text-slate-400">Rajada</span>
+                    <p className="text-3xl font-extrabold text-amber-400">
+                      {hourlyData?.[0]?.windGust ?? '—'} <span className="text-sm font-normal text-slate-400">km/h</span>
+                    </p>
+                  </div>
+                  <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-2">
+                    <span className="text-xs font-semibold text-slate-400">Direção</span>
+                    <p className="text-3xl font-extrabold text-white">
+                      {hourlyData?.[0]?.windDirection ?? '—'}° <span className="text-sm font-normal text-slate-400">{waveDir(hourlyData?.[0]?.windDirection ?? 0)}</span>
+                    </p>
+                  </div>
+                  <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-2">
+                    <span className="text-xs font-semibold text-slate-400">Qualidade Surf</span>
+                    <p className="text-lg font-extrabold text-emerald-400">Em breve</p>
                   </div>
                 </div>
-              )}
+              </section>
 
-              {activeTab === 'tides' && (
-                <div className="space-y-6">
-                  {hourlyLoading ? <SkeletonTideChart /> : hourlyData && <TideChart data={hourlyData} />}
+              <section id="wind-grafico" aria-label="Gráfico horário de vento" className="scroll-mt-20">
+                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                  <span aria-hidden="true">📊</span>
+                  Gráfico Horário — Ventos
+                </h2>
+                <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5">
+                  <p className="text-sm text-slate-400">Gráfico de ventos será implementado na branch <code className="text-cyan-400">feature/swell-ventos</code></p>
                 </div>
-              )}
+              </section>
 
-              {activeTab === 'overview' && (
-                <div className="space-y-6">
-                  {aiLoading ? <SkeletonResumoIA /> : <ResumoIA summary={aiData?.summary ?? null} loading={aiLoading} error={null} />}
-                  <ConditionCards
-                    waveHeight={data.current.waveHeight}
-                    wavePeriod={data.current.wavePeriod}
-                    waveDirection={data.current.waveDirection}
-                    swellHeight={data.current.swellHeight}
-                    qualityLabel={data.qualityLabel}
-                    qualityEmoji={data.qualityEmoji}
-                  />
-                  {hourlyLoading ? <SkeletonHourly /> : hourlyData && <HourlySwell data={hourlyData} />}
-                  <DailyTip
-                    waveHeight={data.current.waveHeight}
-                    wavePeriod={data.current.wavePeriod}
-                    qualityLabel={data.qualityLabel}
-                    bestTime={data.bestTime}
-                  />
-                </div>
+              <section id="wind-mares" aria-label="Marés e vento" className="scroll-mt-20">
+                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                  <span aria-hidden="true">🌙</span>
+                  Marés
+                </h2>
+                {hourlyLoading ? <SkeletonTideChart /> : hourlyData && <TideChart data={hourlyData} />}
+              </section>
+
+              <section id="wind-resumo" aria-label="Resumo IA vento" className="scroll-mt-20">
+                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                  <span aria-hidden="true">🤖</span>
+                  Resumo IA — Kitesurf & Windsurf
+                </h2>
+                {aiLoading ? <SkeletonResumoIA /> : <ResumoIA summary={aiData?.summary ?? null} loading={aiLoading} error={null} />}
+              </section>
+
+              <section id="wind-dica" aria-label="Dica do dia vento" className="scroll-mt-20">
+                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                  <span aria-hidden="true">💡</span>
+                  Dica do Dia
+                </h2>
+                <DailyTip
+                  waveHeight={data.current.waveHeight}
+                  wavePeriod={data.current.wavePeriod}
+                  qualityLabel={data.qualityLabel}
+                  bestTime={data.bestTime}
+                />
+              </section>
+            </div>
+          )}
+
+          {/* Picos — Aba spots */}
+          {activeTab === 'spots' && (
+            <div role="tabpanel" id="panel-spots" aria-labelledby="tab-spots" className="space-y-6">
+              {data.spots.length > 0 ? (
+                <SpotGrid spots={data.spots} />
+              ) : (
+                <SkeletonSpotGrid />
               )}
+              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                  Mapa de Picos de Surf — Ilha Comprida
+                </h3>
+                <p className="text-xs text-slate-400 mb-4">Clique nos marcadores para conferir o nível de dificuldade e dicas dos picos</p>
+                <div className="h-[450px] rounded-xl overflow-hidden border border-slate-800">
+                  <SwellMap />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Localismo — Aba local */}
+          {activeTab === 'local' && (
+            <div role="tabpanel" id="panel-local" aria-labelledby="tab-local" className="space-y-6">
+              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6">
+                <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                  <span aria-hidden="true">📍</span>
+                  Localismo — Ilha Comprida & Costa
+                </h3>
+                <p className="text-sm text-slate-400">Picos, comércio local e utilidades públicas</p>
+                <p className="text-sm text-cyan-400 mt-2">Será implementado na branch <code>feature/swell-localismo</code></p>
+              </div>
             </div>
           )}
 

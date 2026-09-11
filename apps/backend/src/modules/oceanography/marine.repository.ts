@@ -10,6 +10,9 @@ type MarineData = {
   swell_wave_height: number;
   swell_wave_period: number;
   swell_wave_direction: number;
+  wind_speed_10m: number;
+  wind_direction_10m: number;
+  wind_gusts_10m: number;
 };
 
 export type HourlyMarineData = {
@@ -20,6 +23,9 @@ export type HourlyMarineData = {
   swellHeight: number;
   swellPeriod: number;
   swellDirection: number;
+  windSpeed: number;
+  windDirection: number;
+  windGust: number;
 };
 
 @Injectable()
@@ -37,7 +43,7 @@ export class MarineRepository {
     }
 
     try {
-      const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&current=wave_height,wave_direction,wave_period,swell_wave_height,swell_wave_direction,swell_wave_period&timezone=America/Sao_Paulo`;
+      const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&current=wave_height,wave_direction,wave_period,swell_wave_height,swell_wave_direction,swell_wave_period,wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=America/Sao_Paulo`;
       const res = await fetch(url);
       if (!res.ok) throw new Error(`Open-Meteo Marine returned ${res.status}`);
       const data = await res.json();
@@ -61,7 +67,7 @@ export class MarineRepository {
 
   async getHourlyData(lat: number, lon: number): Promise<HourlyMarineData[]> {
     try {
-      const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&hourly=wave_height,wave_direction,wave_period,swell_wave_height,swell_wave_direction,swell_wave_period&timezone=America/Sao_Paulo&forecast_days=2`;
+      const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&hourly=wave_height,wave_direction,wave_period,swell_wave_height,swell_wave_direction,swell_wave_period,wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=America/Sao_Paulo&forecast_days=2`;
       const res = await fetch(url);
       if (!res.ok) throw new Error(`Open-Meteo Marine hourly returned ${res.status}`);
       const data = await res.json();
@@ -74,6 +80,9 @@ export class MarineRepository {
         swell_wave_height: number[];
         swell_wave_period: number[];
         swell_wave_direction: number[];
+        wind_speed_10m: number[];
+        wind_direction_10m: number[];
+        wind_gusts_10m: number[];
       } | undefined;
 
       if (!hourly?.time) return this.getDefaultHourly();
@@ -91,6 +100,9 @@ export class MarineRepository {
           swellHeight: hourly.swell_wave_height[i] ?? 0,
           swellPeriod: hourly.swell_wave_period[i] ?? 0,
           swellDirection: hourly.swell_wave_direction[i] ?? 0,
+          windSpeed: hourly.wind_speed_10m[i] ?? 0,
+          windDirection: hourly.wind_direction_10m[i] ?? 0,
+          windGust: hourly.wind_gusts_10m[i] ?? 0,
         });
       }
       return result;
@@ -112,6 +124,9 @@ export class MarineRepository {
       swell_wave_height: 0.9,
       swell_wave_period: 10,
       swell_wave_direction: 138,
+      wind_speed_10m: 12,
+      wind_direction_10m: 180,
+      wind_gusts_10m: 18,
     };
   }
 
@@ -127,6 +142,9 @@ export class MarineRepository {
         swellHeight: 0.6 + Math.sin(i / 4) * 0.3,
         swellPeriod: 9 + Math.sin(i / 3) * 1.5,
         swellDirection: 135 + Math.sin(i / 5) * 15,
+        windSpeed: 10 + Math.sin(i / 3) * 5,
+        windDirection: 170 + Math.sin(i / 4) * 30,
+        windGust: 15 + Math.sin(i / 3) * 8,
       };
     });
   }
