@@ -9,4 +9,14 @@ export class OceanographyController {
   async getSwell() {
     return await this.oceanographyService.getSwellConditions();
   }
+
+  @Get('hourly')
+  async getHourly() {
+    return await this.oceanographyService.getHourlyForecast();
+  }
+
+  @Get('summary')
+  async getSummary() {
+    return await this.oceanographyService.getAiSummary();
+  }
 }

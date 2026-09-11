@@ -12,6 +12,16 @@ type MarineData = {
   swell_wave_direction: number;
 };
 
+export type HourlyMarineData = {
+  time: string;
+  waveHeight: number;
+  wavePeriod: number;
+  waveDirection: number;
+  swellHeight: number;
+  swellPeriod: number;
+  swellDirection: number;
+};
+
 @Injectable()
 export class MarineRepository {
   private readonly logger = new Logger(MarineRepository.name);
@@ -49,6 +59,47 @@ export class MarineRepository {
     return this.getDefault();
   }
 
+  async getHourlyData(lat: number, lon: number): Promise<HourlyMarineData[]> {
+    try {
+      const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&hourly=wave_height,wave_direction,wave_period,swell_wave_height,swell_wave_direction,swell_wave_period&timezone=America/Sao_Paulo&forecast_days=2`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Open-Meteo Marine hourly returned ${res.status}`);
+      const data = await res.json();
+
+      const hourly = data.hourly as {
+        time: string[];
+        wave_height: number[];
+        wave_period: number[];
+        wave_direction: number[];
+        swell_wave_height: number[];
+        swell_wave_period: number[];
+        swell_wave_direction: number[];
+      } | undefined;
+
+      if (!hourly?.time) return this.getDefaultHourly();
+
+      const now = new Date();
+      const result: HourlyMarineData[] = [];
+      for (let i = 0; i < hourly.time.length && result.length < 12; i++) {
+        const t = new Date(hourly.time[i]);
+        if (t < now) continue;
+        result.push({
+          time: hourly.time[i],
+          waveHeight: hourly.wave_height[i] ?? 0,
+          wavePeriod: hourly.wave_period[i] ?? 0,
+          waveDirection: hourly.wave_direction[i] ?? 0,
+          swellHeight: hourly.swell_wave_height[i] ?? 0,
+          swellPeriod: hourly.swell_wave_period[i] ?? 0,
+          swellDirection: hourly.swell_wave_direction[i] ?? 0,
+        });
+      }
+      return result;
+    } catch (err) {
+      this.logger.warn(`Open-Meteo Marine hourly failed: ${err}`);
+      return this.getDefaultHourly();
+    }
+  }
+
   private saveFallback(current: MarineData): void {
     this.fallback.save(FALLBACK_FILE, { current });
   }
@@ -62,5 +113,21 @@ export class MarineRepository {
       swell_wave_period: 10,
       swell_wave_direction: 138,
     };
+  }
+
+  private getDefaultHourly(): HourlyMarineData[] {
+    const now = new Date();
+    return Array.from({ length: 12 }, (_, i) => {
+      const t = new Date(now.getTime() + (i + 1) * 3600_000);
+      return {
+        time: t.toISOString().slice(0, 16),
+        waveHeight: 0.8 + Math.sin(i / 4) * 0.4,
+        wavePeriod: 8 + Math.sin(i / 3) * 2,
+        waveDirection: 140 + Math.sin(i / 5) * 20,
+        swellHeight: 0.6 + Math.sin(i / 4) * 0.3,
+        swellPeriod: 9 + Math.sin(i / 3) * 1.5,
+        swellDirection: 135 + Math.sin(i / 5) * 15,
+      };
+    });
   }
 }

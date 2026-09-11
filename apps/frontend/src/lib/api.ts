@@ -83,7 +83,26 @@ export type OceanographyResponse = {
     lon: number;
     level: string;
     bestWind: string;
+    exposure: string;
+    howToGetThere: string;
   }>;
+};
+
+export type HourlyMarinePoint = {
+  time: string;
+  waveHeight: number;
+  wavePeriod: number;
+  waveDirection: number;
+  swellHeight: number;
+  swellPeriod: number;
+  swellDirection: number;
+};
+
+export type HourlyMarineResponse = HourlyMarinePoint[];
+
+export type AiSummaryResponse = {
+  summary: string;
+  cached: boolean;
 };
 
 export type TrafficRoute = {
