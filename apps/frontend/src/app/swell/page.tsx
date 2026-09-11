@@ -23,6 +23,7 @@ import { UpcomingEvents } from './components/UpcomingEvents';
 import { WindConditionCards } from './components/WindConditionCards';
 import { WindChart } from './components/WindChart';
 import { HourlyWind } from './components/HourlyWind';
+import { ForecastSection } from './components/ForecastSection';
 import {
   SkeletonResumoIA,
   SkeletonWaveChart,
@@ -62,6 +63,14 @@ export default function SwellPage() {
   return (
     <div className="space-y-8">
       <PageBanner title="Swell & Picos" subtitle="Telemetria de ondas, marés e picos de surf em Ilha Comprida" />
+
+      {/* Skip links for accessibility */}
+      <nav aria-label="Navegação rápida" className="sr-only focus-within:not-sr-only">
+        <a href="#condicoes" className="block p-2 bg-cyan-600 text-white rounded-lg">Pular para Condições</a>
+        <a href="#grafico" className="block p-2 bg-cyan-600 text-white rounded-lg">Pular para Gráfico</a>
+        <a href="#horas" className="block p-2 bg-cyan-600 text-white rounded-lg">Pular para Próximas Horas</a>
+        <a href="#mares" className="block p-2 bg-cyan-600 text-white rounded-lg">Pular para Marés</a>
+      </nav>
 
       {error && (
         <div className="bg-red-950/40 border border-red-800/40 rounded-2xl p-4 text-red-300 text-sm" role="alert">
@@ -214,11 +223,22 @@ export default function SwellPage() {
           {/* Previsão de Ondas — Aba forecast */}
           {activeTab === 'forecast' && (
             <div role="tabpanel" id="panel-forecast" aria-labelledby="tab-forecast" className="space-y-6">
-              <section id="condicoes" aria-label="Condições atuais" className="scroll-mt-20">
-                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <FaWater className="w-5 h-5 text-cyan-400" aria-hidden="true" />
-                  Condições Atuais
-                </h2>
+              {/* Section navigation */}
+              <nav aria-label="Seções da previsão de ondas" className="flex flex-wrap gap-2 text-xs">
+                <a href="#condicoes" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Condições</a>
+                <a href="#grafico" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Gráfico</a>
+                <a href="#horas" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Próximas Horas</a>
+                <a href="#mares" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Marés</a>
+                <a href="#resumo" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Resumo IA</a>
+                <a href="#dica" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Dica</a>
+              </nav>
+
+              <ForecastSection
+                id="condicoes"
+                title="Condições Atuais"
+                icon={<FaWater className="w-5 h-5 text-cyan-400" aria-hidden="true" />}
+                ariaLabel="Condições atuais de ondas"
+              >
                 <ConditionCards
                   waveHeight={data.current.waveHeight}
                   wavePeriod={data.current.wavePeriod}
@@ -227,63 +247,79 @@ export default function SwellPage() {
                   qualityLabel={data.qualityLabel}
                   qualityEmoji={data.qualityEmoji}
                 />
-              </section>
+              </ForecastSection>
 
-              <section id="grafico" aria-label="Gráfico horário de ondas" className="scroll-mt-20">
-                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <span aria-hidden="true">📊</span>
-                  Gráfico Horário — Ondas
-                </h2>
+              <ForecastSection
+                id="grafico"
+                title="Gráfico Horário — Ondas"
+                icon={<span aria-hidden="true">📊</span>}
+                ariaLabel="Gráfico horário de ondas"
+              >
                 {hourlyLoading ? <SkeletonWaveChart /> : hourlyData && <WaveChart data={hourlyData} />}
-              </section>
+              </ForecastSection>
 
-              <section id="horas" aria-label="Próximas horas" className="scroll-mt-20">
-                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <span aria-hidden="true">⏱️</span>
-                  Próximas Horas
-                </h2>
+              <ForecastSection
+                id="horas"
+                title="Próximas Horas"
+                icon={<span aria-hidden="true">⏱️</span>}
+                ariaLabel="Próximas horas de ondas"
+              >
                 {hourlyLoading ? <SkeletonHourly /> : hourlyData && <HourlySwell data={hourlyData} />}
-              </section>
+              </ForecastSection>
 
-              <section id="mares" aria-label="Previsão de marés" className="scroll-mt-20">
-                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <span aria-hidden="true">🌙</span>
-                  Marés
-                </h2>
+              <ForecastSection
+                id="mares"
+                title="Marés"
+                icon={<span aria-hidden="true">🌙</span>}
+                ariaLabel="Previsão de marés"
+              >
                 {hourlyLoading ? <SkeletonTideChart /> : hourlyData && <TideChart data={hourlyData} />}
-              </section>
+              </ForecastSection>
 
-              <section id="resumo" aria-label="Resumo IA" className="scroll-mt-20">
-                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <span aria-hidden="true">🤖</span>
-                  Resumo IA — Gemini Flash
-                </h2>
+              <ForecastSection
+                id="resumo"
+                title="Resumo IA — Gemini Flash"
+                icon={<span aria-hidden="true">🤖</span>}
+                ariaLabel="Resumo inteligente das condições"
+              >
                 {aiLoading ? <SkeletonResumoIA /> : <ResumoIA summary={aiData?.summary ?? null} loading={aiLoading} error={null} />}
-              </section>
+              </ForecastSection>
 
-              <section id="dica" aria-label="Dica do dia" className="scroll-mt-20">
-                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <span aria-hidden="true">💡</span>
-                  Dica do Dia
-                </h2>
+              <ForecastSection
+                id="dica"
+                title="Dica do Dia"
+                icon={<span aria-hidden="true">💡</span>}
+                ariaLabel="Dica do dia para surf"
+              >
                 <DailyTip
                   waveHeight={data.current.waveHeight}
                   wavePeriod={data.current.wavePeriod}
                   qualityLabel={data.qualityLabel}
                   bestTime={data.bestTime}
                 />
-              </section>
+              </ForecastSection>
             </div>
           )}
 
           {/* Previsão de Ventos — Aba wind */}
           {activeTab === 'wind' && (
             <div role="tabpanel" id="panel-wind" aria-labelledby="tab-wind" className="space-y-6">
-              <section id="wind-condicoes" aria-label="Condições do vento" className="scroll-mt-20">
-                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <span aria-hidden="true">💨</span>
-                  Condições do Vento
-                </h2>
+              {/* Section navigation */}
+              <nav aria-label="Seções da previsão de ventos" className="flex flex-wrap gap-2 text-xs">
+                <a href="#wind-condicoes" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Condições</a>
+                <a href="#wind-grafico" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Gráfico</a>
+                <a href="#wind-horas" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Próximas Horas</a>
+                <a href="#wind-mares" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Marés</a>
+                <a href="#wind-resumo" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Resumo IA</a>
+                <a href="#wind-dica" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Dica</a>
+              </nav>
+
+              <ForecastSection
+                id="wind-condicoes"
+                title="Condições do Vento"
+                icon={<span aria-hidden="true">💨</span>}
+                ariaLabel="Condições atuais do vento"
+              >
                 {hourlyLoading ? (
                   <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {[1, 2, 3, 4].map(i => (
@@ -304,60 +340,65 @@ export default function SwellPage() {
                     Dados de vento indisponíveis no momento
                   </div>
                 )}
-              </section>
+              </ForecastSection>
 
-              <section id="wind-grafico" aria-label="Gráfico horário de vento" className="scroll-mt-20">
-                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <span aria-hidden="true">📊</span>
-                  Gráfico Horário — Ventos
-                </h2>
+              <ForecastSection
+                id="wind-grafico"
+                title="Gráfico Horário — Ventos"
+                icon={<span aria-hidden="true">📊</span>}
+                ariaLabel="Gráfico horário de ventos"
+              >
                 {hourlyLoading ? <SkeletonWaveChart /> : hourlyData && hourlyData.length > 0 ? <WindChart data={hourlyData} /> : (
                   <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 text-center text-slate-500">
                     Gráfico de ventos indisponível
                   </div>
                 )}
-              </section>
+              </ForecastSection>
 
-              <section id="wind-horas" aria-label="Próximas horas vento" className="scroll-mt-20">
-                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <span aria-hidden="true">⏱️</span>
-                  Próximas Horas — Ventos
-                </h2>
+              <ForecastSection
+                id="wind-horas"
+                title="Próximas Horas — Ventos"
+                icon={<span aria-hidden="true">⏱️</span>}
+                ariaLabel="Próximas horas de ventos"
+              >
                 {hourlyLoading ? <SkeletonHourly /> : hourlyData && hourlyData.length > 0 ? <HourlyWind data={hourlyData} /> : (
                   <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 text-center text-slate-500">
                     Previsão horária de ventos indisponível
                   </div>
                 )}
-              </section>
+              </ForecastSection>
 
-              <section id="wind-mares" aria-label="Marés e vento" className="scroll-mt-20">
-                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <span aria-hidden="true">🌙</span>
-                  Marés
-                </h2>
+              <ForecastSection
+                id="wind-mares"
+                title="Marés"
+                icon={<span aria-hidden="true">🌙</span>}
+                ariaLabel="Previsão de marés"
+              >
                 {hourlyLoading ? <SkeletonTideChart /> : hourlyData && <TideChart data={hourlyData} />}
-              </section>
+              </ForecastSection>
 
-              <section id="wind-resumo" aria-label="Resumo IA vento" className="scroll-mt-20">
-                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <span aria-hidden="true">🤖</span>
-                  Resumo IA — Kitesurf & Windsurf
-                </h2>
+              <ForecastSection
+                id="wind-resumo"
+                title="Resumo IA — Kitesurf & Windsurf"
+                icon={<span aria-hidden="true">🤖</span>}
+                ariaLabel="Resumo inteligente para kitesurf e windsurf"
+              >
                 {aiLoading ? <SkeletonResumoIA /> : <ResumoIA summary={aiData?.summary ?? null} loading={aiLoading} error={null} />}
-              </section>
+              </ForecastSection>
 
-              <section id="wind-dica" aria-label="Dica do dia vento" className="scroll-mt-20">
-                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <span aria-hidden="true">💡</span>
-                  Dica do Dia
-                </h2>
+              <ForecastSection
+                id="wind-dica"
+                title="Dica do Dia"
+                icon={<span aria-hidden="true">💡</span>}
+                ariaLabel="Dica do dia para kitesurf e windsurf"
+              >
                 <DailyTip
                   waveHeight={data.current.waveHeight}
                   wavePeriod={data.current.wavePeriod}
                   qualityLabel={data.qualityLabel}
                   bestTime={data.bestTime}
                 />
-              </section>
+              </ForecastSection>
             </div>
           )}
 
