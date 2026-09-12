@@ -5,6 +5,7 @@ import { FaNewspaper, FaExternalLinkAlt, FaCar, FaExclamationTriangle, FaTree, F
 import { ChatWidget } from '@/components/ChatWidget';
 import { PageBanner } from '@/components/PageBanner';
 import { useRegionalNews, type RegionalNewsItem, type TrafficRoute } from '@/hooks/useRegionalNews';
+import { TrafficMap } from './components/TrafficMap';
 
 const CATEGORY_CONFIG: Record<string, { label: string; emoji: string; color: string; bg: string }> = {
   todas: { label: 'Todas', emoji: '📰', color: 'text-slate-300', bg: 'bg-slate-800/40' },
@@ -109,6 +110,19 @@ export default function NoticiasPage() {
               );
             })}
           </div>
+        )}
+      </section>
+
+      {/* Mapa de Status das Rodovias */}
+      <section aria-label="Mapa de status das rodovias">
+        <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+          <FaCar className="w-5 h-5 text-cyan-400" aria-hidden="true" />
+          Mapa de Rodovias
+        </h2>
+        {loading ? (
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl animate-pulse" style={{ height: 380 }} />
+        ) : (
+          <TrafficMap routes={routes} />
         )}
       </section>
 
