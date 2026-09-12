@@ -3,17 +3,16 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
-import { FaHome, FaCloudSun, FaWater, FaCar, FaNewspaper, FaBookOpen, FaInfoCircle, FaMapMarkedAlt, FaGlobe, FaSun, FaMoon, FaBars, FaTimes } from 'react-icons/fa';
+import { FaHome, FaCloudSun, FaWater, FaNewspaper, FaStore, FaBookOpen, FaInfoCircle, FaGlobe, FaSun, FaMoon, FaBars, FaTimes } from 'react-icons/fa';
 
 const NAV_ITEMS = [
   { href: '/', label: 'Principal', labelEs: 'Principal', icon: FaHome },
   { href: '/meteorologia', label: 'Meteorologia', labelEs: 'Meteorología', icon: FaCloudSun },
   { href: '/swell', label: 'Swell', labelEs: 'Swell', icon: FaWater },
-  { href: '/transito', label: 'Trânsito', labelEs: 'Tránsito', icon: FaCar },
   { href: '/noticias', label: 'Notícias', labelEs: 'Noticias', icon: FaNewspaper },
+  { href: '/comercio', label: 'Comércio', labelEs: 'Comercio', icon: FaStore },
   { href: '/blog', label: 'Blog', labelEs: 'Blog', icon: FaBookOpen },
   { href: '/creditos', label: 'Créditos', labelEs: 'Créditos', icon: FaInfoCircle },
-  { href: '/mapa', label: 'Mapa', labelEs: 'Mapa', icon: FaMapMarkedAlt },
 ];
 
 export function Header() {

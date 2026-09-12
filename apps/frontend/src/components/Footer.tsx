@@ -22,10 +22,9 @@ const TECH_STACK = [
 const PAGES = [
   { name: 'Meteorologia', href: '/meteorologia' },
   { name: 'Swell & Picos', href: '/swell' },
-  { name: 'Trânsito & Vias', href: '/transito' },
   { name: 'Notícias Regionais', href: '/noticias' },
+  { name: 'Comércio', href: '/comercio' },
   { name: 'Blog Técnico', href: '/blog' },
-  { name: 'Mapa', href: '/mapa' },
   { name: 'Créditos & Fontes', href: '/creditos' },
 ];
 
