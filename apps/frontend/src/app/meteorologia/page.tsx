@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
-import { FaCloudSun, FaSyncAlt } from 'react-icons/fa';
+import { FaSyncAlt } from 'react-icons/fa';
 import { ChatWidget } from '@/components/ChatWidget';
 import { PageBanner } from '@/components/PageBanner';
 import { useMeteorology } from '@/hooks/useMeteorology';
@@ -37,37 +37,9 @@ export default function MeteorologiaPage() {
         subtitle="Previsão de tempo, satélite e modelos numéricos"
       />
 
-      {/* Hero Banner */}
-      <div
-        className="relative overflow-hidden bg-gradient-to-r from-blue-700 via-blue-800 to-slate-900 text-white p-6 md:p-8"
-        role="banner"
-        aria-label="Cabeçalho da página de meteorologia"
-      >
-        <div className="relative z-10 flex flex-wrap items-start justify-between gap-4">
-          {/* Coluna esquerda: Título + Subtítulo + Atualizar */}
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-3">
-              <div className="p-3 rounded-xl bg-white/10 backdrop-blur-sm" aria-hidden="true">
-                <FaCloudSun className="w-8 h-8 text-white" />
-              </div>
-              <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">Meteorologia</h1>
-            </div>
-            <p className="text-blue-200 text-xs ml-[52px]">Previsão de tempo, satélite e modelos numéricos</p>
-            <div className="ml-[52px]">
-              <button
-                onClick={refetch}
-                disabled={loading}
-                title="Atualizar dados meteorológicos de todas as fontes"
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 text-white/80 hover:text-white hover:bg-white/20 transition-all disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                aria-label="Atualizar dados meteorológicos"
-              >
-                <FaSyncAlt className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} aria-hidden="true" />
-                <span className="text-xs font-medium">Atualizar</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Coluna direita: Cards de temperatura */}
+      {/* Cards de temperatura */}
+      <div className="px-6 pt-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2" role="list" aria-label="Temperatura atual das cidades">
             {CITY_ORDER.map(id => {
               const city = cities[id];
@@ -80,20 +52,20 @@ export default function MeteorologiaPage() {
                   title={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)}°C, ${weatherEmoji(city.weatherCode)}` : 'Carregando...'}`}
                   aria-label={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)} graus` : 'carregando'}`}
                   className={`
-                    px-3 py-2 rounded-lg backdrop-blur-sm transition-all duration-200 min-w-[90px]
+                    px-3 py-2 rounded-lg transition-all duration-200 min-w-[90px]
                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white
                     ${isActive
-                      ? 'bg-white/20 border border-white/30'
-                      : 'bg-white/5 border border-white/5 hover:bg-white/10'
+                      ? 'bg-amber-500/20 border border-amber-400/50 text-amber-300'
+                      : 'bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-800'
                     }
                   `}
                 >
-                  <p className="text-[9px] font-semibold text-blue-200 uppercase tracking-wider truncate">
+                  <p className="text-[9px] font-semibold uppercase tracking-wider truncate">
                     {city?.location ?? id.replace(/-/g, ' ')}
                   </p>
                   <div className="flex items-center gap-1 mt-0.5">
                     {city && <span className="text-sm" aria-hidden="true">{weatherEmoji(city.weatherCode)}</span>}
-                    <span className="text-lg font-extrabold text-white tabular-nums">
+                    <span className="text-lg font-extrabold tabular-nums">
                       {citiesLoading ? '--' : city ? `${Math.round(city.temperature)}°` : '--'}
                     </span>
                   </div>
@@ -101,6 +73,16 @@ export default function MeteorologiaPage() {
               );
             })}
           </div>
+          <button
+            onClick={refetch}
+            disabled={loading}
+            title="Atualizar dados meteorológicos"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:text-white hover:bg-slate-800 transition-all disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            aria-label="Atualizar dados meteorológicos"
+          >
+            <FaSyncAlt className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} aria-hidden="true" />
+            <span className="text-xs font-medium">Atualizar</span>
+          </button>
         </div>
       </div>
 

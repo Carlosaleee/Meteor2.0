@@ -64,8 +64,6 @@ export function TrafficMap({ routes }: TrafficMapProps) {
       maxZoom: 18,
     }).addTo(map);
 
-    map.attributionControl.setPosition('bottomleft');
-
     mapRef.current = map;
     layersRef.current = L.layerGroup().addTo(map);
 
