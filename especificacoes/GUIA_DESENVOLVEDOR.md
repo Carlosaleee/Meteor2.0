@@ -65,27 +65,32 @@ Meteor_2.0/
     backend/           # API NestJS
       src/
         common/        # Servicos compartilhados (fallback, http, config)
-        modules/       # Modulos de dominio (meteorology, oceanography, traffic)
-        data/          # JSONs de fallback (gitignored)
+        modules/       # Modulos de dominio (meteorology, oceanography, traffic, noticias-regionais, localismo)
+        data/          # JSONs de fallback
     frontend/          # App Next.js
       src/
-        app/           # Paginas (8 rotas)
+        app/           # Paginas (9 rotas)
           meteorologia/
-            page.tsx   # Card container principal
+            page.tsx   # PageBanner + cards temperatura + Tabs
             components/ # 13 componentes
           swell/           # 5 abas + 11 componentes
             page.tsx
             components/
+          noticias/        # Noticias regionais + TrafficMap + CityGrid
+            page.tsx
+            components/    # TrafficMap
+          comercio/        # Comercio de Ilha Comprida + CommerceMap
+            page.tsx
+            CommerceMap.tsx
           transito/
-          noticias/
           blog/
           creditos/
           mapa/
         components/    # Componentes reutilizaveis
-          Header.tsx   # Nav responsiva
+          Header.tsx   # Nav responsiva (7 itens)
           Footer.tsx   # 4 colunas com chatbot
-          PageBanner.tsx # Hero reutilizavel
-        hooks/         # Hooks customizados
+          PageBanner.tsx # Hero reutilizavel (banner-meteor.jpg)
+        hooks/         # Hooks customizados (8 hooks)
         lib/           # Utilitarios (api.ts)
   especificacoes/      # Documentacao do projeto
   DESIGN.md            # Design system tokens
@@ -204,8 +209,9 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 - Toggle tema: `FaSun`/`FaMoon`
 
 ### Nav Bar (Responsiva)
-- Desktop: `hidden md:flex` — horizontal centrado
+- Desktop: `hidden md:flex` — horizontal centrado (7 itens)
 - Mobile: Hamburger (`FaBars`/`FaTimes`) com dropdown
+- **Ordem:** Principal > Meteorologia > Swell > Noticias > Comercio > Blog > Creditos
 - Hover dourado: `hover:bg-[var(--color-nav-hover-bg)] hover:text-[var(--color-nav-hover-text)]`
 - Pagina ativa: `border-b-2 border-[var(--color-gold)]` (desktop) / `border-l-2` (mobile)
 - Auto-close: `useEffect(() => setMenuOpen(false), [pathname])`
@@ -221,9 +227,10 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 
 ### PageBanner (Hero Reutilizavel)
 - Componente: `components/PageBanner.tsx`
-- Uso: `<PageBanner title="Swell & Picos" subtitle="Descricao" />`
+- Uso: `<PageBanner title="Titulo" subtitle="Subtitulo" />`
 - Imagem: `banner-meteor.jpg` com gradient dourado
 - Altura: 160px
+- Usado em: `/meteorologia`, `/noticias`, `/comercio`, `/swell`
 
 ### Acessibilidade
 - Skip-link: `<a href="#main-content" className="skip-link sr-only">`
@@ -272,15 +279,12 @@ meteorologia/
 
 ### Hero Layout
 ```tsx
-<div className="flex flex-col gap-3">
-  <div className="flex items-center gap-3">
-    <FaCloudSun /> <h1>Meteorologia</h1>
+<PageBanner title="Meteorologia" subtitle="Previsao de tempo, satelite e modelos numericos" />
+<div className="flex flex-wrap items-center justify-between gap-3">
+  <div className="flex flex-wrap items-center gap-2">
+    {/* Cards de temperatura por cidade */}
   </div>
-  <p>Previsao de tempo, satelite e modelos numericos</p>
   <button onClick={refetch}>Atualizar</button>
-</div>
-<div className="flex gap-2">
-  {/* Cards de temperatura por cidade */}
 </div>
 ```
 
@@ -413,3 +417,66 @@ function renderMarkdown(text: string): React.ReactNode[]
 - Max tokens: 600
 - Cache: 1h no backend (`summaryCache`)
 - Fallback: resumo estatico baseado nos dados quando Gemini falha
+
+---
+
+## Pagina de Noticias (Guia Completo)
+
+### Estrutura
+```
+noticias/
+  page.tsx                    # PageBanner + TrafficMap + CityGrid + filtros + grid noticias
+  components/
+    TrafficMap.tsx             # Leaflet com rotas coloridas por condicao
+```
+
+### Secoes da Pagina
+1. **PageBanner** — Foto de capa com titulo "Noticias do Vale do Ribeira"
+2. **Status das Rodovias** — 4 cards (SP-222, SP-055, BR-116, Balsa) com condicao
+3. **Mapa de Rodovias** — TrafficMap com Leaflet + OpenStreetMap
+4. **CityGrid** — Noticias meteorologicas por cidade (reutilizado de meteorologia)
+5. **Filtros** — Filtros por categoria (todas, transito, noticias, policial, turismo, cotidiano)
+6. **Grid de Noticias** — Cards de noticias regionais com links externos
+
+### TrafficMap
+- Tiles: OpenStreetMap (gratuito, sem API key)
+- 4 rotas: SP-222, SP-055, BR-116, Balsa Cananeia
+- Cores por condicao: LIVRE (verde), MODERADO (amarelo), LENTO (laranja), BLOQUEADO (vermelho), OPERACIONAL (ciano)
+- Coordenadas reais da regiao
+
+### Hooks
+| Hook | Descricao |
+|------|-----------|
+| useRegionalNews.ts | Busca GET /v1/noticias-regionais |
+
+---
+
+## Pagina de Comercio (Guia Completo)
+
+### Estrutura
+```
+comercio/
+  page.tsx                    # PageBanner + CommerceMap + CommerceGrid
+  CommerceMap.tsx             # Leaflet com markers + OSRM routing
+```
+
+### Secoes da Pagina
+1. **PageBanner** — Foto de capa com titulo "Comercio de Ilha Comprida"
+2. **CommerceMap** — Mapa Leaflet com markers coloridos por setor + rotas OSRM
+3. **CommerceGrid** — Grid de cards com filtros por setor e busca
+
+### CommerceMap
+- Tiles: OpenStreetMap (gratuito, sem API key)
+- Markers: cores por setor (alimentacao=laranja, hospedagem=azul, comercio=verde, servicos=amarelo, lazer=roxo)
+- Routing: OSRM (gratuito, sem API key)
+- Marcador de localizacao do usuario
+
+### CommerceGrid
+- Filtros: Todos, Alimentacao, Hospedagem, Comercio, Servicos, Lazer
+- Busca por nome e subsector
+- Botoes: "Como Chegar" (OSRM) e "Maps" (link externo)
+
+### Hooks
+| Hook | Descricao |
+|------|-----------|
+| useLocalismo.ts | Busca GET /v1/localismo |

@@ -293,6 +293,121 @@ GET /v1/traffic
 
 ---
 
+## GET /v1/noticias-regionais
+
+Noticias regionais do Vale do Ribeira e status de rodovias.
+
+**Query Parameters:** Nenhum
+
+**Exemplo de Request:**
+```
+GET /v1/noticias-regionais
+```
+
+**Response:**
+```json
+{
+  "news": [
+    {
+      "id": "reg-001",
+      "title": "Defesa Civil emite alerta preventivo para rajadas de vento na costa sul",
+      "source": "Defesa Civil SP",
+      "sourceUrl": "https://www.defesacivil.sp.gov.br",
+      "url": "https://www.defesacivil.sp.gov.br",
+      "description": "Alerta preventivo vale para todo o litoral sul de SP com rajadas de ate 60 km/h.",
+      "image": "",
+      "category": "noticia",
+      "publishedAt": "2026-09-12T08:00:00.000Z"
+    }
+  ],
+  "routes": [
+    {
+      "id": "sp-222",
+      "name": "SP-222",
+      "condition": "LIVRE",
+      "description": "Trafego fluindo normalmente",
+      "updatedAt": "2026-09-12T12:00:00.000Z"
+    }
+  ],
+  "timestamp": "2026-09-12T12:00:00.000Z"
+}
+```
+
+**Campos do response:**
+| Campo | Tipo | Descricao |
+|-------|------|-----------|
+| news[].id | string | ID unico da noticia |
+| news[].title | string | Titulo da noticia |
+| news[].source | string | Fonte da noticia |
+| news[].sourceUrl | string | URL da fonte |
+| news[].url | string | URL da noticia |
+| news[].description | string | Descricao resumida |
+| news[].category | string | Categoria: noticia, transito, policial, turismo, cotidiano |
+| news[].publishedAt | string | Data de publicacao (ISO 8601) |
+| routes[].id | string | ID da rodovia |
+| routes[].name | string | Nome da rodovia |
+| routes[].condition | string | Condicao: LIVRE, MODERADO, LENTO, BLOQUEADO, OPERACIONAL |
+| routes[].description | string | Descricao da condicao |
+
+---
+
+## GET /v1/localismo
+
+Diretorio comercial de Ilha Comprida com 50 estabelecimentos geolocalizados.
+
+**Query Parameters:** Nenhum
+
+**Exemplo de Request:**
+```
+GET /v1/localismo
+```
+
+**Response:**
+```json
+{
+  "commerce": [
+    {
+      "id": "parada-do-surf",
+      "name": "Parada do Surf",
+      "sector": "alimentacao",
+      "subsector": "Lanchonete",
+      "lat": -24.7400,
+      "lon": -47.5600,
+      "address": "Av. Beira Mar, 20.000 - Aragarças",
+      "description": "Lanchonete tematica voltada para surfistas.",
+      "phone": "(13) 99770-0927",
+      "googleMapsUrl": "https://maps.google.com/?q=-24.7400,-47.5600"
+    }
+  ],
+  "timestamp": "2026-09-11T00:00:00.000Z"
+}
+```
+
+**Campos do response:**
+| Campo | Tipo | Descricao |
+|-------|------|-----------|
+| commerce[].id | string | ID unico do comercio |
+| commerce[].name | string | Nome do estabelecimento |
+| commerce[].sector | string | Setor: alimentacao, hospedagem, comercio, servicos, lazer |
+| commerce[].subsector | string | Subsetor (ex: Lanchonete, Pousada, Supermercado) |
+| commerce[].lat | number | Latitude |
+| commerce[].lon | number | Longitude |
+| commerce[].address | string | Endereco de referencia |
+| commerce[].description | string | Descricao do estabelecimento |
+| commerce[].phone | string | Telefone (ou "Nao informado") |
+| commerce[].googleMapsUrl | string | Link para Google Maps |
+
+**Setores disponiveis:**
+| Setor | Quantidade | Descricao |
+|-------|-----------|-----------|
+| alimentacao | 15 | Restaurantes, lanchonetes, padarias, bares |
+| hospedagem | 13 | Pousadas, hotels, camping, hostels |
+| comercio | 12 | Supermercados, lojas, mercados |
+| servicos | 6 | Postos, oficinas, lavanderias |
+| lazer | 4 | Escolas de surf, ecoturismo, locacao |
+
+---
+
 ## Formato de Erro (ApiEnvelope)
 
 Todos os erros retornam no formato padronizado:
@@ -353,6 +468,8 @@ Para forcar atualizacao do fallback, basta aguardar 24h ou reiniciar o backend (
 | CPTEC/INPE | Previsao Numerica | Gratuita | Modelos GFS, ECMWF, COSMO-Brasil |
 | Defesa Civil SP | Alertas | Gratuita | Alertas de desastres e cheias |
 | Marinha do Brasil | Avisos Maritimos | Gratuita | Alertas costeiros e de mare |
+| OpenStreetMap | Tiles | Gratuita | Mapas base (sem API key) |
+| OSRM | Routing | Gratuita | Rotas "Como Chegar" (demo server) |
 
 ### RainViewer (Radar)
 - Endpoint: `https://api.rainviewer.com/public/weather-maps.json`

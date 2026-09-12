@@ -30,8 +30,8 @@
 - App Router com React 19
 - Estilizacao: Tailwind CSS v4 (design tokens via CSS custom properties)
 - Tema: dark/light com `data-theme` + `localStorage` + `prefers-color-scheme`
-- Mapas: Leaflet nativo (useRef + cleanup pattern)
-- Hooks: useMeteorology, useSwell, useHourlyMarine, useAiSummary, useAllCities
+- Mapas: Leaflet nativo (useRef + cleanup pattern) — tiles OpenStreetMap (gratuitos, sem API key)
+- Hooks: useMeteorology, useSwell, useHourlyMarine, useAiSummary, useAllCities, useRegionalNews, useLocalismo
 - API Layer: lib/api.ts com fetch generico
 - Icones: React Icons (Font Awesome)
 - Graficos: ApexCharts (react-apexcharts)
@@ -39,15 +39,15 @@
 
 ---
 
-## 3. Paginas Implementadas (8 rotas)
+## 3. Paginas Implementadas (9 rotas)
 
 | Rota | Descricao | Dados |
 |------|-----------|-------|
 | `/` | Portal principal - HUD Tatico | Estatico + ChatWidget + banner |
-| `/meteorologia` | Meteorologia & Vento | **API real** (4 cidades) + RainViewer radar |
+| `/meteorologia` | Meteorologia & Vento | **API real** (4 cidades) + RainViewer radar + PageBanner |
 | `/swell` | Swell & Picos | **API real** + Gemini AI + ApexCharts + Leaflet |
-| `/transito` | Transito & Mobilidade | Simulacao inteligente + mapa |
-| `/noticias` | Noticias Regionais | Estatico (8 noticias) |
+| `/noticias` | Noticias Regionais + Transito | **API real** (fallback-noticias-regionais) + TrafficMap Leaflet + CityGrid |
+| `/comercio` | Comercio de Ilha Comprida | **API real** (fallback-localismo) + CommerceMap Leaflet + OSRM routing |
 | `/blog` | Blog Tecnico | Estatico (4 artigos) |
 | `/creditos` | Creditos & Fontes | Estatico |
 | `/mapa` | Mapa de Localizacoes | Leaflet (6 marcadores) |
@@ -80,7 +80,19 @@
 - Fallback: data/fallback-traffic.json
 - Rodovias: SP-222, BR-116, Balsa Cananeia
 
-### 4.4 FallbackService (Global)
+### 4.4 NoticiasRegionaisModule
+- Endpoint: GET /v1/noticias-regionais
+- API externa: Nenhuma (dados estaticos)
+- Fallback: data/fallback-noticias-regionais.json (12 noticias + 4 rotas)
+- Dados: noticias regionais do Vale do Ribeira + status de rodovias
+
+### 4.5 LocalismoModule
+- Endpoint: GET /v1/localismo
+- API externa: Nenhuma (dados estaticos)
+- Fallback: data/fallback-localismo.json (50 comercios de Ilha Comprida)
+- Dados: diretorio comercial com geolocalizacao (5 setores: alimentacao, hospedagem, comercio, servicos, lazer)
+
+### 4.6 FallbackService (Global)
 - Servico compartilhado entre todos os modulos
 - Carrega fallback do disco na inicializacao
 - Salva dados frescos quando API responde
@@ -132,6 +144,8 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 - data/fallback-meteorology.json — Dados por localizacao (current + hourly + daily)
 - data/fallback-oceanography.json — Ondas, swell, marees, spots
 - data/fallback-traffic.json — Rodovias com simulacao por horario
+- data/fallback-noticias-regionais.json — 12 noticias regionais + 4 rotas de transito
+- data/fallback-localismo.json — 50 comercios de Ilha Comprida (formato FallbackData envelope)
 
 ---
 
@@ -195,20 +209,27 @@ Meteor_2.0/
           meteorology/ (controller, service, repository)
           oceanography/ (controller, service, marine.repository, gemini.repository)
           traffic/ (controller, service, repository)
+          noticias-regionais/ (controller, service, repository)
+          localismo/ (controller, service, repository)
         app.module.ts
         main.ts
-      data/ (fallback JSONs - gitignored)
+      data/ (fallback JSONs)
     frontend/
       src/
         app/
           meteorologia/
-            page.tsx (card container principal)
+            page.tsx (PageBanner + cards temperatura + LocationSelector + Tabs)
             components/ (13 componentes)
           swell/
             page.tsx (5 abas: Noticias, Ondas, Picos, Marees, Visao Geral)
-            components/ (11 componentes)
+            components/ (11 componentes + CommerceGrid compartilhado)
+          noticias/
+            page.tsx (PageBanner + TrafficMap + CityGrid + filtros + grid noticias)
+            components/ (TrafficMap)
+          comercio/
+            page.tsx (PageBanner + CommerceMap + CommerceGrid)
+            CommerceMap.tsx (Leaflet + OSRM routing)
           transito/page.tsx
-          noticias/page.tsx
           blog/page.tsx
           creditos/page.tsx
           mapa/page.tsx
@@ -216,7 +237,7 @@ Meteor_2.0/
         components/
           Header.tsx (nav responsiva)
           Footer.tsx (4 colunas: Navegacao, Fontes, Stack, Chatbot)
-          PageBanner.tsx (hero reutilizavel)
+          PageBanner.tsx (hero reutilizavel — banner-meteor.jpg)
           ChatWidget.tsx (bot flutuante)
         hooks/
           useMeteorology.ts
@@ -224,6 +245,8 @@ Meteor_2.0/
           useHourlyMarine.ts (dados hourly 12h)
           useAiSummary.ts (resumo Gemini)
           useAllCities.ts (4 cidades paralelo)
+          useRegionalNews.ts (noticias regionais + rotas)
+          useLocalismo.ts (diretorio comercial)
         lib/api.ts
         app/globals.css (CSS custom properties + temas)
       public/
@@ -248,8 +271,9 @@ Meteor_2.0/
 - Nav responsiva: horizontal desktop, hamburger mobile
 
 ### Nav Bar (Responsiva)
-- **Desktop (md+):** `hidden md:flex` — horizontal centrado com 8 itens
+- **Desktop (md+):** `hidden md:flex` — horizontal centrado com 7 itens
 - **Mobile:** Hamburger (`FaBars`/`FaTimes`) com dropdown vertical
+- **Ordem:** Principal > Meteorologia > Swell > Noticias > Comercio > Blog > Creditos
 - Pagina ativa: borda dourada `border-b-2` (desktop) / `border-l-2` (mobile)
 - Hover dourado: `hover:bg-nav-hover-bg hover:text-nav-hover-text`
 - Fecha automaticamente ao navegar (`useEffect` com `pathname`)
@@ -291,15 +315,17 @@ Meteor_2.0/
 
 ### Estrutura Principal
 - **Container:** `<main>` com `bg-slate-950 border border-slate-800 rounded-2xl`
-- **Hero:** Gradient blue com titulo, subtitulo, botao Atualizar e mini-cards de temperatura
+- **PageBanner:** Foto de capa (banner-meteor.jpg) com titulo e subtitulo
+- **Cards Temperatura:** 4 cards de temperatura por cidade (estilo dark, amber no ativo)
+- **Botao Atualizar:** Atualiza dados meteorologicos
 - **LocationSelector:** 4 cidades com tooltips descritivos
 - **MeteorologyTabs:** 4 abas com tooltips (Avisos, Previsao, Satelite, Numerica)
 - **Conteudo:** Mapa, MetricCards, HourlyTimeline, DailyForecast, CityGrid
 
 ### Hero Layout
-- Linha 1: Icone + Titulo (esquerda) + Cards temperatura (direita)
-- Linha 2: Subtítulo (esquerda)
-- Linha 3: Botao Atualizar (esquerda, abaixo do subtitulo)
+- PageBanner (foto de capa) como primeiro elemento
+- Cards de temperatura em linha abaixo do banner
+- Botao Atualizar ao lado dos cards
 
 ### Componentes (13 arquivos em meteorologia/components/)
 | Componente | Descricao |
@@ -393,11 +419,17 @@ Meteor_2.0/
 | DailyTip.tsx | Dica prática do dia |
 | Skeletons.tsx | Loading states (6 tipos) |
 
-### Hooks (2 novos)
-| Hook | Descrição |
+### Hooks (8 hooks)
+| Hook | Descricao |
 |------|-----------|
+| useMeteorology.ts | Busca GET /v1/meteorology |
+| useSwell.ts | Busca GET /v1/oceanography |
 | useHourlyMarine.ts | Busca GET /v1/oceanography/hourly |
 | useAiSummary.ts | Busca GET /v1/oceanography/summary |
+| useAllCities.ts | Busca 4 cidades em paralelo |
+| useNews.ts | Busca noticias de surf |
+| useRegionalNews.ts | Busca GET /v1/noticias-regionais |
+| useLocalismo.ts | Busca GET /v1/localismo |
 
 ### Acessibilidade (Swell)
 - `role="tablist/tab/tabpanel"` nas abas
