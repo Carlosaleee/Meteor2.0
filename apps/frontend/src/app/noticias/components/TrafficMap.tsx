@@ -140,7 +140,7 @@ export function TrafficMap({ routes }: TrafficMapProps) {
       />
       <div className="absolute top-3 left-3 z-[1000] bg-slate-900/90 backdrop-blur-sm border border-slate-700/50 rounded-xl px-3 py-2 flex flex-wrap gap-2">
         {Object.entries(CONDITION_COLORS).map(([condition, color]) => {
-          const count = conditionCounts[condition] ?? 0;
+          const count = conditionSummary[condition] ?? 0;
           if (count === 0) return null;
           return (
             <div key={condition} className="flex items-center gap-1.5 text-[11px]">
