@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { FaNewspaper, FaExternalLinkAlt, FaCar, FaExclamationTriangle, FaTree, FaSwimmer, FaUsers, FaFilter } from 'react-icons/fa';
 import { ChatWidget } from '@/components/ChatWidget';
 import { PageBanner } from '@/components/PageBanner';
 import { useRegionalNews, type RegionalNewsItem, type TrafficRoute } from '@/hooks/useRegionalNews';
 import { TrafficMap } from './components/TrafficMap';
+import { CityGrid } from '../meteorologia/components/CityGrid';
 
 const CATEGORY_CONFIG: Record<string, { label: string; emoji: string; color: string; bg: string }> = {
   todas: { label: 'Todas', emoji: '📰', color: 'text-slate-300', bg: 'bg-slate-800/40' },
@@ -42,6 +44,7 @@ function timeAgo(dateStr: string): string {
 }
 
 export default function NoticiasPage() {
+  const router = useRouter();
   const { data, loading, error } = useRegionalNews();
   const [activeCategory, setActiveCategory] = useState('todas');
 
@@ -203,6 +206,9 @@ export default function NoticiasPage() {
           </div>
         )}
       </section>
+
+      {/* Notícias Meteorológicas */}
+      <CityGrid onSelectLocation={(cityId) => router.push(`/meteorologia?city=${cityId}`)} />
 
       <ChatWidget />
     </div>
