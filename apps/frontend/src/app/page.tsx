@@ -5,15 +5,12 @@ import Link from 'next/link';
 import {
   FaCloudSun,
   FaWater,
-  FaWind,
   FaCar,
   FaNewspaper,
   FaStore,
   FaBookOpen,
   FaExclamationTriangle,
   FaExternalLinkAlt,
-  FaSyncAlt,
-  FaClock,
   FaArrowRight,
 } from 'react-icons/fa';
 import { HeroCarousel } from '@/components/HeroCarousel';
@@ -21,14 +18,13 @@ import { ChatWidget } from '@/components/ChatWidget';
 import { ForecastSection } from '@/app/swell/components/ForecastSection';
 import { ResumoIA } from '@/app/swell/components/ResumoIA';
 import { ConditionCards } from '@/app/swell/components/ConditionCards';
-import { WindConditionCards } from '@/app/swell/components/WindConditionCards';
-import { HourlySwell } from '@/app/swell/components/HourlySwell';
+import { SurfNews } from '@/app/swell/components/SurfNews';
 import { useAllCities } from '@/hooks/useAllCities';
 import { useSwell } from '@/hooks/useSwell';
-import { useHourlyMarine } from '@/hooks/useHourlyMarine';
 import { useAiSummary } from '@/hooks/useAiSummary';
 import { useRegionalNews } from '@/hooks/useRegionalNews';
 import { useLocalismo } from '@/hooks/useLocalismo';
+import { useNews } from '@/hooks/useNews';
 import { weatherEmoji } from '@/app/meteorologia/components/weather-utils';
 
 const ROUTE_CONDITION_COLORS: Record<string, { text: string; bg: string; border: string }> = {
@@ -78,9 +74,9 @@ function timeAgo(dateStr: string): string {
 export default function HomePage() {
   const { cities, loading: citiesLoading } = useAllCities();
   const { data: swellData, loading: swellLoading } = useSwell();
-  const { data: hourlyData, loading: hourlyLoading } = useHourlyMarine();
   const { data: aiData, loading: aiLoading } = useAiSummary();
   const { data: newsData, loading: newsLoading } = useRegionalNews();
+  const { data: surfNewsData, loading: surfNewsLoading } = useNews();
   const { data: localismoData, loading: localismoLoading } = useLocalismo();
 
   const [newsCategory, setNewsCategory] = useState('todas');
@@ -96,14 +92,13 @@ export default function HomePage() {
   return (
     <main className="space-y-8" role="main" aria-label="Painel principal do Meteor 2.0">
       <nav aria-label="Navegação rápida" className="sr-only focus-within:not-sr-only">
-        <a href="#alerta" className="block p-2 bg-amber-600 text-white rounded-lg">Pular para Alerta</a>
+        <a href="#alerta" className="block p-2 bg-amber-600 text-white rounded-lg">Pular para Alerta Regional</a>
+        <a href="#noticias" className="block p-2 bg-blue-600 text-white rounded-lg">Pular para Notícias Regionais</a>
         <a href="#briefing" className="block p-2 bg-cyan-600 text-white rounded-lg">Pular para Briefing IA</a>
         <a href="#tempo" className="block p-2 bg-blue-600 text-white rounded-lg">Pular para Tempo Agora</a>
         <a href="#mar" className="block p-2 bg-cyan-600 text-white rounded-lg">Pular para Condições do Mar</a>
-        <a href="#vento" className="block p-2 bg-sky-600 text-white rounded-lg">Pular para Vento</a>
-        <a href="#horas" className="block p-2 bg-indigo-600 text-white rounded-lg">Pular para Próximas Horas</a>
+        <a href="#surf-news" className="block p-2 bg-amber-600 text-white rounded-lg">Pular para Notícias de Surf</a>
         <a href="#rodovias" className="block p-2 bg-amber-600 text-white rounded-lg">Pular para Rodovias</a>
-        <a href="#noticias" className="block p-2 bg-blue-600 text-white rounded-lg">Pular para Notícias</a>
         <a href="#comercio" className="block p-2 bg-orange-600 text-white rounded-lg">Pular para Comércio</a>
         <a href="#blog" className="block p-2 bg-emerald-600 text-white rounded-lg">Pular para Blog</a>
       </nav>
@@ -155,203 +150,10 @@ export default function HomePage() {
         )}
       </ForecastSection>
 
-      {/* 3. Briefing Executivo IA */}
-      <ForecastSection
-        id="briefing"
-        title="Briefing Executivo (IA)"
-        icon={<span aria-hidden="true">🤖</span>}
-        ariaLabel="Resumo inteligente das condições"
-      >
-        {aiLoading ? (
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 animate-pulse">
-            <div className="h-4 bg-slate-800 rounded w-48 mb-4" />
-            <div className="space-y-2">
-              <div className="h-3 bg-slate-800 rounded w-full" />
-              <div className="h-3 bg-slate-800 rounded w-5/6" />
-              <div className="h-3 bg-slate-800 rounded w-4/6" />
-            </div>
-          </div>
-        ) : (
-          <ResumoIA summary={aiData?.summary ?? null} loading={aiLoading} error={null} />
-        )}
-      </ForecastSection>
-
-      {/* 4. Tempo Agora — 4 cidades */}
-      <ForecastSection
-        id="tempo"
-        title="Tempo Agora"
-        icon={<FaCloudSun className="w-5 h-5 text-amber-400" aria-hidden="true" />}
-        ariaLabel="Condições meteorológicas das 4 cidades"
-      >
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" role="list" aria-label="Temperatura atual das cidades">
-          {(['ilha-comprida', 'iguape', 'cananeia', 'registro'] as const).map(id => {
-            const city = cities[id];
-            return (
-              <Link
-                key={id}
-                href={`/meteorologia?city=${id}`}
-                className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 hover:border-amber-500/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
-                role="listitem"
-                title={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)}°C` : 'Carregando...'}`}
-                aria-label={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)} graus, ${weatherEmoji(city.weatherCode)}` : 'carregando'}`}
-              >
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1 truncate">
-                  {city?.location ?? id.replace(/-/g, ' ')}
-                </p>
-                <div className="flex items-center gap-2">
-                  {city && <span className="text-2xl" aria-hidden="true">{weatherEmoji(city.weatherCode)}</span>}
-                  <span className="text-3xl font-extrabold text-white tabular-nums">
-                    {citiesLoading ? '--' : city ? `${Math.round(city.temperature)}°` : '--'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 mt-2 text-[10px] text-slate-500">
-                  {city && (
-                    <>
-                      <span>💧 {city.humidity}%</span>
-                      <span>💨 {Math.round(city.windSpeed)} km/h</span>
-                    </>
-                  )}
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </ForecastSection>
-
-      {/* 5. Condições do Mar */}
-      <ForecastSection
-        id="mar"
-        title="Condições do Mar"
-        icon={<FaWater className="w-5 h-5 text-cyan-400" aria-hidden="true" />}
-        ariaLabel="Condições atuais de ondas e mar"
-      >
-        {swellLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-            {[1, 2, 3, 4, 5].map(i => (
-              <div key={i} className="flex flex-col items-center gap-2 p-3 rounded-xl bg-slate-800/60 border border-slate-700/50 animate-pulse">
-                <div className="w-8 h-8 rounded-lg bg-slate-700" />
-                <div className="h-5 bg-slate-700 rounded w-12" />
-                <div className="h-3 bg-slate-700 rounded w-16" />
-              </div>
-            ))}
-          </div>
-        ) : swellData ? (
-          <ConditionCards
-            waveHeight={swellData.current.waveHeight}
-            wavePeriod={swellData.current.wavePeriod}
-            waveDirection={swellData.current.waveDirection}
-            swellHeight={swellData.current.swellHeight}
-            qualityLabel={swellData.qualityLabel}
-            qualityEmoji={swellData.qualityEmoji}
-          />
-        ) : (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 text-center text-slate-500">
-            Dados oceânicos indisponíveis
-          </div>
-        )}
-      </ForecastSection>
-
-      {/* 6. Vento */}
-      <ForecastSection
-        id="vento"
-        title="Condições de Vento"
-        icon={<FaWind className="w-5 h-5 text-blue-400" aria-hidden="true" />}
-        ariaLabel="Condições atuais do vento"
-      >
-        {hourlyLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-            {[1, 2, 3, 4, 5].map(i => (
-              <div key={i} className="flex flex-col items-center gap-2 p-3 rounded-xl bg-slate-800/60 border border-slate-700/50 animate-pulse">
-                <div className="w-8 h-8 rounded-lg bg-slate-700" />
-                <div className="h-5 bg-slate-700 rounded w-12" />
-                <div className="h-3 bg-slate-700 rounded w-16" />
-              </div>
-            ))}
-          </div>
-        ) : hourlyData && hourlyData.length > 0 ? (
-          <WindConditionCards
-            windSpeed={hourlyData[0].windSpeed}
-            windDirection={hourlyData[0].windDirection}
-            windGust={hourlyData[0].windGust}
-          />
-        ) : (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 text-center text-slate-500">
-            Dados de vento indisponíveis
-          </div>
-        )}
-      </ForecastSection>
-
-      {/* 7. Próximas Horas */}
-      <ForecastSection
-        id="horas"
-        title="Próximas Horas — Ondas"
-        icon={<FaClock className="w-5 h-5 text-indigo-400" aria-hidden="true" />}
-        ariaLabel="Previsão horária de ondas"
-      >
-        {hourlyLoading ? (
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 animate-pulse">
-            <div className="flex gap-3">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                <div key={i} className="flex-1 h-24 bg-slate-800 rounded-xl" />
-              ))}
-            </div>
-          </div>
-        ) : hourlyData ? (
-          <HourlySwell data={hourlyData} />
-        ) : (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 text-center text-slate-500">
-            Dados horários indisponíveis
-          </div>
-        )}
-      </ForecastSection>
-
-      {/* 8. Status Rodovias */}
-      <ForecastSection
-        id="rodovias"
-        title="Status das Rodovias"
-        icon={<FaCar className="w-5 h-5 text-amber-400" aria-hidden="true" />}
-        ariaLabel="Condições de tráfego das rodovias"
-      >
-        {newsLoading ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 animate-pulse">
-                <div className="h-4 bg-slate-800 rounded w-24 mb-3" />
-                <div className="h-6 bg-slate-800 rounded w-20" />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {routes.map(route => {
-              const colors = ROUTE_CONDITION_COLORS[route.condition] ?? ROUTE_CONDITION_COLORS.LIVRE;
-              const emoji = ROUTE_ICONS[route.id] ?? '🚗';
-              return (
-                <Link
-                  key={route.id}
-                  href="/noticias"
-                  className={`bg-slate-900/80 border ${colors.border} rounded-2xl p-5 hover:scale-[1.02] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white`}
-                  title={`${route.name}: ${route.condition}`}
-                  aria-label={`${route.name}: ${route.condition} — clique para ver detalhes`}
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg" aria-hidden="true">{emoji}</span>
-                    <span className="text-sm font-bold text-white">{route.name}</span>
-                  </div>
-                  <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${colors.bg} ${colors.text} border ${colors.border}`}>
-                    {route.condition}
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        )}
-      </ForecastSection>
-
-      {/* 9. Últimas Notícias */}
+      {/* 3. Últimas Notícias Regionais (reposicionado) */}
       <ForecastSection
         id="noticias"
-        title="Últimas Notícias"
+        title="Últimas Notícias Regionais"
         icon={<FaNewspaper className="w-5 h-5 text-blue-400" aria-hidden="true" />}
         ariaLabel="Notícias regionais do Vale do Ribeira"
       >
@@ -436,7 +238,172 @@ export default function HomePage() {
         </div>
       </ForecastSection>
 
-      {/* 10. Comércio em Destaque */}
+      {/* 4. Briefing Executivo IA */}
+      <ForecastSection
+        id="briefing"
+        title="Briefing Executivo (IA)"
+        icon={<span aria-hidden="true">🤖</span>}
+        ariaLabel="Resumo inteligente das condições"
+      >
+        {aiLoading ? (
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 animate-pulse">
+            <div className="h-4 bg-slate-800 rounded w-48 mb-4" />
+            <div className="space-y-2">
+              <div className="h-3 bg-slate-800 rounded w-full" />
+              <div className="h-3 bg-slate-800 rounded w-5/6" />
+              <div className="h-3 bg-slate-800 rounded w-4/6" />
+            </div>
+          </div>
+        ) : (
+          <ResumoIA summary={aiData?.summary ?? null} loading={aiLoading} error={null} />
+        )}
+      </ForecastSection>
+
+      {/* 5. Tempo Agora — 4 cidades */}
+      <ForecastSection
+        id="tempo"
+        title="Tempo Agora"
+        icon={<FaCloudSun className="w-5 h-5 text-amber-400" aria-hidden="true" />}
+        ariaLabel="Condições meteorológicas das 4 cidades"
+      >
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" role="list" aria-label="Temperatura atual das cidades">
+          {(['ilha-comprida', 'iguape', 'cananeia', 'registro'] as const).map(id => {
+            const city = cities[id];
+            return (
+              <Link
+                key={id}
+                href={`/meteorologia?city=${id}`}
+                className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 hover:border-amber-500/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                role="listitem"
+                title={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)}°C` : 'Carregando...'}`}
+                aria-label={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)} graus, ${weatherEmoji(city.weatherCode)}` : 'carregando'}`}
+              >
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1 truncate">
+                  {city?.location ?? id.replace(/-/g, ' ')}
+                </p>
+                <div className="flex items-center gap-2">
+                  {city && <span className="text-2xl" aria-hidden="true">{weatherEmoji(city.weatherCode)}</span>}
+                  <span className="text-3xl font-extrabold text-white tabular-nums">
+                    {citiesLoading ? '--' : city ? `${Math.round(city.temperature)}°` : '--'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 mt-2 text-[10px] text-slate-500">
+                  {city && (
+                    <>
+                      <span>💧 {city.humidity}%</span>
+                      <span>💨 {Math.round(city.windSpeed)} km/h</span>
+                    </>
+                  )}
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </ForecastSection>
+
+      {/* 6. Condições do Mar */}
+      <ForecastSection
+        id="mar"
+        title="Condições do Mar"
+        icon={<FaWater className="w-5 h-5 text-cyan-400" aria-hidden="true" />}
+        ariaLabel="Condições atuais de ondas e mar"
+      >
+        {swellLoading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            {[1, 2, 3, 4, 5].map(i => (
+              <div key={i} className="flex flex-col items-center gap-2 p-3 rounded-xl bg-slate-800/60 border border-slate-700/50 animate-pulse">
+                <div className="w-8 h-8 rounded-lg bg-slate-700" />
+                <div className="h-5 bg-slate-700 rounded w-12" />
+                <div className="h-3 bg-slate-700 rounded w-16" />
+              </div>
+            ))}
+          </div>
+        ) : swellData ? (
+          <ConditionCards
+            waveHeight={swellData.current.waveHeight}
+            wavePeriod={swellData.current.wavePeriod}
+            waveDirection={swellData.current.waveDirection}
+            swellHeight={swellData.current.swellHeight}
+            qualityLabel={swellData.qualityLabel}
+            qualityEmoji={swellData.qualityEmoji}
+          />
+        ) : (
+          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 text-center text-slate-500">
+            Dados oceânicos indisponíveis
+          </div>
+        )}
+      </ForecastSection>
+
+      {/* 7. Notícias de Surf (novo) */}
+      <ForecastSection
+        id="surf-news"
+        title="Notícias de Surf"
+        icon={<FaWater className="w-5 h-5 text-amber-400" aria-hidden="true" />}
+        ariaLabel="Notícias e competições de surf WSL e Circuito Paulista"
+      >
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {surfNewsData?.news?.map((item, index) => (
+            <div key={item.id} className="group">
+              <SurfNews
+                news={[item]}
+                loading={surfNewsLoading}
+                category={item.category as 'WSL' | 'Paulista'}
+                title={index === 0 ? undefined : ''}
+              />
+            </div>
+          ))}
+          {(!surfNewsData?.news?.length && !surfNewsLoading) && (
+            <div className="col-span-full text-center py-8 text-slate-500">
+              Nenhuma notícia de surf disponível no momento.
+            </div>
+          )}
+        </div>
+      </ForecastSection>
+
+      {/* 8. Status das Rodovias */}
+      <ForecastSection
+        id="rodovias"
+        title="Status das Rodovias"
+        icon={<FaCar className="w-5 h-5 text-amber-400" aria-hidden="true" />}
+        ariaLabel="Condições de tráfego das rodovias"
+      >
+        {newsLoading ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 animate-pulse">
+                <div className="h-4 bg-slate-800 rounded w-24 mb-3" />
+                <div className="h-6 bg-slate-800 rounded w-20" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {routes.map(route => {
+              const colors = ROUTE_CONDITION_COLORS[route.condition] ?? ROUTE_CONDITION_COLORS.LIVRE;
+              const emoji = ROUTE_ICONS[route.id] ?? '🚗';
+              return (
+                <Link
+                  key={route.id}
+                  href="/noticias"
+                  className={`bg-slate-900/80 border ${colors.border} rounded-2xl p-5 hover:scale-[1.02] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white`}
+                  title={`${route.name}: ${route.condition}`}
+                  aria-label={`${route.name}: ${route.condition} — clique para ver detalhes`}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-lg" aria-hidden="true">{emoji}</span>
+                    <span className="text-sm font-bold text-white">{route.name}</span>
+                  </div>
+                  <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${colors.bg} ${colors.text} border ${colors.border}`}>
+                    {route.condition}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </ForecastSection>
+
+      {/* 9. Comércio em Destaque */}
       <ForecastSection
         id="comercio"
         title="Comércio em Destaque"
@@ -494,7 +461,7 @@ export default function HomePage() {
         </div>
       </ForecastSection>
 
-      {/* 11. Blog & Navegação */}
+      {/* 10. Blog & Navegação */}
       <ForecastSection
         id="blog"
         title="Blog & Navegação"
