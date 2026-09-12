@@ -1,175 +1,194 @@
 'use client';
 
 import { useState } from 'react';
-import { FaNewspaper, FaExternalLinkAlt, FaFilter } from 'react-icons/fa';
+import { FaNewspaper, FaExternalLinkAlt, FaCar, FaExclamationTriangle, FaTree, FaSwimmer, FaUsers, FaFilter } from 'react-icons/fa';
 import { ChatWidget } from '@/components/ChatWidget';
 import { PageBanner } from '@/components/PageBanner';
+import { useRegionalNews, type RegionalNewsItem, type TrafficRoute } from '@/hooks/useRegionalNews';
 
-type NewsItem = {
-  id: number;
-  source: string;
-  sourceColor: string;
-  title: string;
-  summary: string;
-  date: string;
-  url: string;
+const CATEGORY_CONFIG: Record<string, { label: string; emoji: string; color: string; bg: string }> = {
+  todas: { label: 'Todas', emoji: '📰', color: 'text-slate-300', bg: 'bg-slate-800/40' },
+  transito: { label: 'Transito', emoji: '🚗', color: 'text-amber-400', bg: 'bg-amber-500/10' },
+  noticia: { label: 'Noticias', emoji: '📰', color: 'text-blue-400', bg: 'bg-blue-500/10' },
+  policial: { label: 'Policial', emoji: '🚨', color: 'text-red-400', bg: 'bg-red-500/10' },
+  turismo: { label: 'Turismo', emoji: '🏖️', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+  cotidiano: { label: 'Cotidiano', emoji: '🏠', color: 'text-purple-400', bg: 'bg-purple-500/10' },
 };
 
-const NEWS_DATA: NewsItem[] = [
-  {
-    id: 1,
-    source: 'G1 Santos',
-    sourceColor: 'bg-green-500/20 text-green-400',
-    title: 'Defesa Civil emite alerta preventivo para rajadas de vento na costa',
-    summary: 'Alerta vale para litoral sul de SP, incluindo Ilha Comprida e Iguape. Moradores de áreas costeiras devem redobrar atenção.',
-    date: '08/09/2026',
-    url: 'https://g1.globo.com/sp/santos-regiao/',
-  },
-  {
-    id: 2,
-    source: 'Portal da Cidade',
-    sourceColor: 'bg-blue-500/20 text-blue-400',
-    title: 'Balsa Cananéia opera com fila de 20 minutos neste sábado',
-    summary: 'Travessia entre Cananéia e Ilha Comprida registra movimento intenso de veículos no início do feriado prolongado.',
-    date: '08/09/2026',
-    url: 'https://www.portaldacidade.com',
-  },
-  {
-    id: 3,
-    source: 'Diário do Ribeira',
-    sourceColor: 'bg-amber-500/20 text-amber-400',
-    title: 'Obras de pavimentação na SP-222 avançam no trecho Iguape-Cananéia',
-    summary: 'Concessão da Via Sul prevê conclusão do asfaltamento até dezembro. Rodovia terá sinalização inteligente.',
-    date: '07/09/2026',
-    url: 'https://www.diariodribeira.com.br',
-  },
-  {
-    id: 4,
-    source: 'Defesa Civil',
-    sourceColor: 'bg-red-500/20 text-red-400',
-    title: 'Boletim preventivo: maré alta pode atingir áreas baixas de Ilha Comprida',
-    summary: 'Previsão de maré de sizigia nas próximas 48h. Moradores de vicinais baixas devem tomar precauções.',
-    date: '07/09/2026',
-    url: '#',
-  },
-  {
-    id: 5,
-    source: 'G1 Santos',
-    sourceColor: 'bg-green-500/20 text-green-400',
-    title: 'Turismo em alta: Ilha Comprida recebe recorde de visitantes no feriado',
-    summary: 'Praias da ilha registram fluxo 40% superior ao esperado. Hotéis e campings atingiram 95% de ocupação.',
-    date: '06/09/2026',
-    url: 'https://g1.globo.com/sp/santos-regiao/',
-  },
-  {
-    id: 6,
-    source: 'Rádio Eldorado',
-    sourceColor: 'bg-purple-500/20 text-purple-400',
-    title: 'BR-116: Caminhões formam fila de 3km na serra do Regis Bittencourt',
-    summary: 'Tráfego de veículos pesados retorna ao normal apenas após as 20h. Motoristas devem evitar o trecho no horário de pico.',
-    date: '06/09/2026',
-    url: '#',
-  },
-  {
-    id: 7,
-    source: 'Prefeitura de Cananéia',
-    sourceColor: 'bg-teal-500/20 text-teal-400',
-    title: 'Novo posto de saúde será inaugurado no bairro do Castelo',
-    summary: 'Unidade vai atender demanda da população ribeirinha. Investimento de R$ 2,3 milhões pela administração municipal.',
-    date: '05/09/2026',
-    url: '#',
-  },
-  {
-    id: 8,
-    source: 'Portal da Cidade',
-    sourceColor: 'bg-blue-500/20 text-blue-400',
-    title: 'Pescadores artesanais denunciam pesca ilegal na Baía de Cananéia',
-    summary: 'Comunidade de-caça-renda pede intervenção da IBAMA. Área é reserva de proteção ambiental.',
-    date: '05/09/2026',
-    url: 'https://www.portaldacidade.com',
-  },
-];
+const ROUTE_CONDITION_COLORS: Record<string, { text: string; bg: string; border: string }> = {
+  LIVRE: { text: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30' },
+  MODERADO: { text: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/30' },
+  LENTO: { text: 'text-orange-400', bg: 'bg-orange-500/10', border: 'border-orange-500/30' },
+  BLOQUEADO: { text: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/30' },
+  OPERACIONAL: { text: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/30' },
+};
 
-const SOURCES = [...new Set(NEWS_DATA.map(n => n.source))];
+const ROUTE_ICONS: Record<string, string> = {
+  'sp-222': '🛣️',
+  'sp-055': '🛣️',
+  'br-116': '🚛',
+  'balsa-cananeia': '⛴️',
+};
+
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins}min atras`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h atras`;
+  const days = Math.floor(hours / 24);
+  return `${days}d atras`;
+}
 
 export default function NoticiasPage() {
-  const [activeFilter, setActiveFilter] = useState<string>('Todos');
+  const { data, loading, error } = useRegionalNews();
+  const [activeCategory, setActiveCategory] = useState('todas');
 
-  const filtered = activeFilter === 'Todos'
-    ? NEWS_DATA
-    : NEWS_DATA.filter(n => n.source === activeFilter);
+  const news = data?.news ?? [];
+  const routes = data?.routes ?? [];
+
+  const filtered = activeCategory === 'todas'
+    ? news
+    : news.filter(n => n.category === activeCategory);
+
+  const categoryCounts = news.reduce((acc, n) => {
+    acc[n.category] = (acc[n.category] ?? 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
 
   return (
     <div className="space-y-8">
-      <PageBanner title="Notícias Regionais" subtitle="Feed unificado das principais fontes do Vale do Ribeira" />
+      <PageBanner
+        title="Noticias do Vale do Ribeira"
+        subtitle="Feed unificado de noticias, transito e turismo da regiao"
+      />
 
-      <div>
-        <h2 className="text-3xl font-extrabold text-white flex items-center gap-3">
-          <FaNewspaper className="w-8 h-8 text-blue-500" />
-          Notícias Regionais
+      {error && (
+        <div className="bg-red-950/40 border border-red-800/40 rounded-2xl p-4 text-red-300 text-sm" role="alert">
+          {error}
+        </div>
+      )}
+
+      {/* Status das Rodovias */}
+      <section aria-label="Status das rodovias">
+        <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+          <FaCar className="w-5 h-5 text-amber-400" aria-hidden="true" />
+          Status das Rodovias
         </h2>
-        <p className="text-slate-400 text-sm mt-1">Feed unificado das principais fontes do Vale do Ribeira</p>
-      </div>
-
-      {/* Filtros */}
-      <div className="flex flex-wrap items-center gap-2">
-        <FaFilter className="w-4 h-4 text-slate-500 mr-1" />
-        <button
-          onClick={() => setActiveFilter('Todos')}
-          className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
-            activeFilter === 'Todos'
-              ? 'bg-blue-600 text-white'
-              : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
-          }`}
-        >
-          Todos
-        </button>
-        {SOURCES.map(source => (
-          <button
-            key={source}
-            onClick={() => setActiveFilter(source)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
-              activeFilter === source
-                ? 'bg-blue-600 text-white'
-                : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
-            }`}
-          >
-            {source}
-          </button>
-        ))}
-      </div>
-
-      {/* Grid de Notícias */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filtered.map(item => (
-          <a
-            key={item.id}
-            href={item.url}
-            target={item.url !== '#' ? '_blank' : undefined}
-            rel={item.url !== '#' ? 'noopener noreferrer' : undefined}
-            className="group p-5 bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-blue-500/50 rounded-2xl transition-all duration-300 flex flex-col justify-between shadow-lg hover:shadow-blue-500/10"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${item.sourceColor}`}>
-                  {item.source}
-                </span>
-                <span className="text-[10px] text-slate-600">{item.date}</span>
+        {loading ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 animate-pulse">
+                <div className="h-4 bg-slate-800 rounded w-24 mb-3" />
+                <div className="h-6 bg-slate-800 rounded w-20" />
               </div>
-              <h3 className="text-sm font-bold text-white mb-2 group-hover:text-blue-300 transition-colors">
-                {item.title}
-              </h3>
-              <p className="text-xs text-slate-400 leading-relaxed line-clamp-3">
-                {item.summary}
+            ))}
+          </div>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {routes.map(route => {
+              const colors = ROUTE_CONDITION_COLORS[route.condition] ?? ROUTE_CONDITION_COLORS.LIVRE;
+              const emoji = ROUTE_ICONS[route.id] ?? '🚗';
+              return (
+                <div
+                  key={route.id}
+                  className={`bg-slate-900/80 border ${colors.border} rounded-2xl p-5`}
+                  title={`${route.name}: ${route.condition} — ${route.description}`}
+                  aria-label={`${route.name}: ${route.condition}`}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-lg" aria-hidden="true">{emoji}</span>
+                    <span className="text-sm font-bold text-white">{route.name}</span>
+                  </div>
+                  <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${colors.bg} ${colors.text} border ${colors.border}`}>
+                    {route.condition === 'BLOQUEADO' && <FaExclamationTriangle className="w-3 h-3" aria-hidden="true" />}
+                    {route.condition}
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-2">{route.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      {/* Filtros de Categoria */}
+      <section aria-label="Filtros de noticias">
+        <div className="flex flex-wrap items-center gap-2">
+          <FaFilter className="w-4 h-4 text-slate-500" aria-hidden="true" />
+          {Object.entries(CATEGORY_CONFIG).map(([key, cfg]) => (
+            <button
+              key={key}
+              onClick={() => setActiveCategory(key)}
+              className={`px-3 py-1.5 text-xs rounded-lg border transition-all ${
+                activeCategory === key
+                  ? `${cfg.bg} ${cfg.color} border-current`
+                  : 'bg-slate-800/40 text-slate-400 border-slate-700/50 hover:bg-slate-800'
+              }`}
+            >
+              {cfg.emoji} {cfg.label}
+              {key !== 'todas' && categoryCounts[key] ? (
+                <span className="ml-1 text-[10px] opacity-60">({categoryCounts[key]})</span>
+              ) : null}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* Grid de Noticias */}
+      <section aria-label="Noticias regionais">
+        {loading ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 animate-pulse">
+                <div className="h-4 bg-slate-800 rounded w-20 mb-3" />
+                <div className="h-5 bg-slate-800 rounded w-3/4 mb-2" />
+                <div className="h-3 bg-slate-800 rounded w-full mb-1" />
+                <div className="h-3 bg-slate-800 rounded w-2/3" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filtered.map(item => {
+              const catCfg = CATEGORY_CONFIG[item.category] ?? CATEGORY_CONFIG.noticia;
+              return (
+                <a
+                  key={item.id}
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={`${item.title} — ${item.source}`}
+                  aria-label={`${item.title}, fonte: ${item.source}`}
+                  className="group bg-slate-900/80 border border-slate-800 rounded-2xl p-5 hover:border-blue-500/30 hover:bg-slate-800/60 transition-all"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border ${catCfg.bg} ${catCfg.color} border-current`}>
+                      {catCfg.emoji} {catCfg.label}
+                    </span>
+                    <FaExternalLinkAlt className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors" aria-hidden="true" />
+                  </div>
+                  <h3 className="text-sm font-bold text-white group-hover:text-blue-300 transition-colors mb-2 line-clamp-2">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs text-slate-400 leading-relaxed mb-3 line-clamp-3">
+                    {item.description}
+                  </p>
+                  <div className="flex items-center justify-between text-[10px] text-slate-500">
+                    <span className="font-medium">{item.source}</span>
+                    <span>{timeAgo(item.publishedAt)}</span>
+                  </div>
+                </a>
+              );
+            })}
+            {filtered.length === 0 && !loading && (
+              <p className="text-sm text-slate-500 col-span-full text-center py-8">
+                Nenhuma noticia encontrada nesta categoria.
               </p>
-            </div>
-            <div className="mt-4 flex items-center gap-1 text-[10px] text-slate-500 group-hover:text-blue-400 transition-colors">
-              <span>Ler mais</span>
-              <FaExternalLinkAlt className="w-3 h-3" />
-            </div>
-          </a>
-        ))}
-      </div>
+            )}
+          </div>
+        )}
+      </section>
 
       <ChatWidget />
     </div>

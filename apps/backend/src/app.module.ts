@@ -9,6 +9,7 @@ import { HealthController } from "./health.controller";
 import { LocalismoModule } from "./modules/localismo/localismo.module";
 import { MeteorologyModule } from "./modules/meteorology/meteorology.module";
 import { NewsModule } from "./modules/news/news.module";
+import { NoticiasRegionaisModule } from "./modules/noticias-regionais/noticias-regionais.module";
 import { OceanographyModule } from "./modules/oceanography/oceanography.module";
 import { TrafficModule } from "./modules/traffic/traffic.module";
 
@@ -37,6 +38,7 @@ try {
     LocalismoModule,
     MeteorologyModule,
     NewsModule,
+    NoticiasRegionaisModule,
     OceanographyModule,
     TrafficModule,
   ],
