@@ -4,6 +4,7 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { FaCloudSun, FaSyncAlt } from 'react-icons/fa';
 import { ChatWidget } from '@/components/ChatWidget';
+import { PageBanner } from '@/components/PageBanner';
 import { useMeteorology } from '@/hooks/useMeteorology';
 import { useAllCities } from '@/hooks/useAllCities';
 import { LocationSelector } from './components/LocationSelector';
@@ -31,6 +32,11 @@ export default function MeteorologiaPage() {
 
   return (
     <main className="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden" role="main" aria-label="Painel de meteorologia">
+      <PageBanner
+        title="Meteorologia"
+        subtitle="Previsão de tempo, satélite e modelos numéricos"
+      />
+
       {/* Hero Banner */}
       <div
         className="relative overflow-hidden bg-gradient-to-r from-blue-700 via-blue-800 to-slate-900 text-white p-6 md:p-8"
