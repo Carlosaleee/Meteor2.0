@@ -342,7 +342,7 @@ export default function HomePage() {
         ariaLabel="Notícias e competições de surf WSL e Circuito Paulista"
       >
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {surfNewsData?.news?.map((item, index) => (
+          {surfNewsData?.news?.slice(0, 3).map((item, index) => (
             <div key={item.id} className="group">
               <SurfNews
                 news={[item]}
@@ -357,6 +357,14 @@ export default function HomePage() {
               Nenhuma notícia de surf disponível no momento.
             </div>
           )}
+        </div>
+        <div className="mt-4 text-center">
+          <Link
+            href="/noticias"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-sm font-semibold hover:bg-blue-500/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+          >
+            Ver todas as notícias <FaArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
       </ForecastSection>
 
