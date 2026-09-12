@@ -39,6 +39,14 @@ function renderMarkdown(text: string): React.ReactNode[] {
   });
 }
 
+function splitIntoColumns(text: string): [string[], string[]] {
+  const sections = text.split(/(?=^[\u{1F3BF}\u{1F32C}\u{23F0}\u{1F3C6}\u{26A0}])/mu);
+  const mid = Math.ceil(sections.length / 2);
+  const left = sections.slice(0, mid).filter(s => s.trim());
+  const right = sections.slice(mid).filter(s => s.trim());
+  return [left, right];
+}
+
 export function ResumoIA({ summary, loading, error }: ResumoIAProps) {
   if (loading) {
     return (
@@ -47,12 +55,17 @@ export function ResumoIA({ summary, loading, error }: ResumoIAProps) {
           <div className="w-10 h-10 rounded-lg bg-slate-800" />
           <div className="h-5 bg-slate-800 rounded w-48" />
         </div>
-        <div className="space-y-3">
-          <div className="h-3 bg-slate-800 rounded w-full" />
-          <div className="h-3 bg-slate-800 rounded w-4/5" />
-          <div className="h-3 bg-slate-800 rounded w-3/5" />
-          <div className="h-3 bg-slate-800 rounded w-full" />
-          <div className="h-3 bg-slate-800 rounded w-2/3" />
+        <div className="grid lg:grid-cols-2 gap-6">
+          <div className="space-y-3">
+            <div className="h-3 bg-slate-800 rounded w-full" />
+            <div className="h-3 bg-slate-800 rounded w-4/5" />
+            <div className="h-3 bg-slate-800 rounded w-3/5" />
+          </div>
+          <div className="space-y-3">
+            <div className="h-3 bg-slate-800 rounded w-full" />
+            <div className="h-3 bg-slate-800 rounded w-2/3" />
+            <div className="h-3 bg-slate-800 rounded w-4/5" />
+          </div>
         </div>
       </section>
     );
@@ -72,6 +85,8 @@ export function ResumoIA({ summary, loading, error }: ResumoIAProps) {
     );
   }
 
+  const [leftSections, rightSections] = splitIntoColumns(summary);
+
   return (
     <section
       className="bg-gradient-to-br from-blue-900/40 via-slate-900/80 to-slate-900/80 border border-blue-800/40 rounded-2xl p-6"
@@ -86,12 +101,18 @@ export function ResumoIA({ summary, loading, error }: ResumoIAProps) {
           <p className="text-[10px] text-slate-500">Análise detalhada de condições de surf</p>
         </div>
       </div>
+
       <div
-        className="space-y-0.5"
+        className="grid lg:grid-cols-2 gap-x-8 gap-y-1"
         title="Briefing tático gerado por inteligência artificial com base nos dados oceanográficos atuais"
         aria-live="polite"
       >
-        {renderMarkdown(summary)}
+        <div className="space-y-0.5">
+          {leftSections.map((section) => renderMarkdown(section))}
+        </div>
+        <div className="space-y-0.5">
+          {rightSections.map((section) => renderMarkdown(section))}
+        </div>
       </div>
     </section>
   );

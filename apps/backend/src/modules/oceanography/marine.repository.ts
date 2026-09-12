@@ -113,7 +113,13 @@ export class MarineRepository {
   }
 
   private saveFallback(current: MarineData): void {
-    this.fallback.save(FALLBACK_FILE, { current });
+    const existing = this.fallback.load<{ current?: MarineData; quality?: unknown; tides?: unknown; spots?: unknown }>(FALLBACK_FILE);
+    this.fallback.save(FALLBACK_FILE, {
+      current,
+      quality: existing?.quality,
+      tides: existing?.tides,
+      spots: existing?.spots,
+    });
   }
 
   private getDefault(): MarineData {

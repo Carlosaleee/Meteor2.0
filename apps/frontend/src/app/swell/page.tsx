@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
 import { FaWater, FaClock, FaSyncAlt } from 'react-icons/fa';
 import { ChatWidget } from '@/components/ChatWidget';
 import { PageBanner } from '@/components/PageBanner';
@@ -9,13 +8,15 @@ import { useSwell } from '@/hooks/useSwell';
 import { useHourlyMarine } from '@/hooks/useHourlyMarine';
 import { useAiSummary } from '@/hooks/useAiSummary';
 import { useNews } from '@/hooks/useNews';
-import { useLocalismo } from '@/hooks/useLocalismo';
 import { SwellTabs } from './components/SwellTabs';
+import { OverviewTab } from './components/OverviewTab';
 import { ResumoIA } from './components/ResumoIA';
 import { WaveChart } from './components/WaveChart';
 import { TideChart } from './components/TideChart';
 import { SpotGrid } from './components/SpotGrid';
+import { SpotsMap } from './components/SpotsMap';
 import { SurfNews } from './components/SurfNews';
+import { SPOTS, type Spot } from '@/lib/spots-data';
 import { HourlySwell } from './components/HourlySwell';
 import { ConditionCards } from './components/ConditionCards';
 import { DailyTip } from './components/DailyTip';
@@ -25,20 +26,14 @@ import { WindConditionCards } from './components/WindConditionCards';
 import { WindChart } from './components/WindChart';
 import { HourlyWind } from './components/HourlyWind';
 import { ForecastSection } from './components/ForecastSection';
-import { LocalismoMap } from './components/LocalismoMap';
-import { CommerceGrid } from './components/CommerceGrid';
-import type { CommerceItem } from '@/lib/api';
 import {
   SkeletonResumoIA,
   SkeletonWaveChart,
   SkeletonTideChart,
-  SkeletonSpotGrid,
   SkeletonHourly,
   SkeletonRankings,
   SkeletonEvents,
 } from './components/Skeletons';
-
-const SwellMap = dynamic(() => import('@/components/SwellMapClient').then(mod => mod.SwellMapClient), { ssr: false });
 
 function waveDir(deg: number): string {
   const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
@@ -46,14 +41,13 @@ function waveDir(deg: number): string {
 }
 
 export default function SwellPage() {
-  const [activeTab, setActiveTab] = useState('news');
-  const [selectedCommerce, setSelectedCommerce] = useState<CommerceItem | null>(null);
-  const [route, setRoute] = useState<{ from: [number, number]; to: [number, number]; label: string } | null>(null);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [selectedSpot, setSelectedSpot] = useState<Spot | null>(null);
+  const [userPosition, setUserPosition] = useState<[number, number] | null>(null);
   const { data, loading, error, refetch } = useSwell();
   const { data: hourlyData, loading: hourlyLoading, refetch: refetchHourly } = useHourlyMarine();
   const { data: aiData, loading: aiLoading } = useAiSummary();
   const { data: newsData, loading: newsLoading, refetch: refetchNews } = useNews();
-  const { data: localismoData, loading: localismoLoading } = useLocalismo();
 
   useEffect(() => {
     refetch();
@@ -61,24 +55,28 @@ export default function SwellPage() {
     refetchNews();
   }, [refetch, refetchHourly, refetchNews]);
 
+  useEffect(() => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        pos => setUserPosition([pos.coords.latitude, pos.coords.longitude]),
+        () => setUserPosition(null),
+        { enableHighAccuracy: false, timeout: 10000 }
+      );
+    }
+  }, []);
+
   const handleRefresh = () => {
     refetch();
     refetchHourly();
     refetchNews();
   };
 
-  const handleGetDirections = (item: CommerceItem) => {
-    setSelectedCommerce(item);
-    setRoute({
-      from: [-24.7167, -47.5333],
-      to: [item.lat, item.lon],
-      label: `→ ${item.name}`,
-    });
+  const handleSelectSpot = (spot: Spot) => {
+    setSelectedSpot(prev => prev?.id === spot.id ? null : spot);
   };
 
-  const handleClearRoute = () => {
-    setSelectedCommerce(null);
-    setRoute(null);
+  const handleClearSpotRoute = () => {
+    setSelectedSpot(null);
   };
 
   return (
@@ -222,6 +220,19 @@ export default function SwellPage() {
 
           {/* Tabs */}
           <SwellTabs activeTab={activeTab} onTabChange={setActiveTab} />
+
+          {/* Visão Geral — Aba overview */}
+          {activeTab === 'overview' && (
+            <OverviewTab
+              data={data}
+              hourlyData={hourlyData}
+              aiData={aiData}
+              newsData={newsData}
+              hourlyLoading={hourlyLoading}
+              aiLoading={aiLoading}
+              newsLoading={newsLoading}
+            />
+          )}
 
           {/* Notícias — Aba Noticias */}
           {activeTab === 'news' && (
@@ -426,69 +437,18 @@ export default function SwellPage() {
           {/* Picos — Aba spots */}
           {activeTab === 'spots' && (
             <div role="tabpanel" id="panel-spots" aria-labelledby="tab-spots" className="space-y-6">
-              {data.spots.length > 0 ? (
-                <SpotGrid spots={data.spots} />
-              ) : (
-                <SkeletonSpotGrid />
-              )}
-              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
-                <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
-                  Mapa de Picos de Surf — Ilha Comprida
-                </h3>
-                <p className="text-xs text-slate-400 mb-4">Clique nos marcadores para conferir o nível de dificuldade e dicas dos picos</p>
-                <div className="h-[450px] rounded-xl overflow-hidden border border-slate-800">
-                  <SwellMap />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Localismo — Aba local */}
-          {activeTab === 'local' && (
-            <div role="tabpanel" id="panel-local" aria-labelledby="tab-local" className="space-y-6">
-              <ForecastSection
-                id="local-mapa"
-                title="Mapa de Comércios — Ilha Comprida"
-                icon={<span aria-hidden="true">🗺️</span>}
-                ariaLabel="Mapa interativo de comércios de Ilha Comprida"
-              >
-                {localismoLoading ? (
-                  <div className="h-[500px] bg-slate-900 border border-slate-800 rounded-xl animate-pulse" />
-                ) : localismoData?.commerce ? (
-                  <div className="h-[500px]">
-                    <LocalismoMap
-                      commerce={localismoData.commerce}
-                      selectedCommerce={selectedCommerce}
-                      route={route}
-                      onClearRoute={handleClearRoute}
-                    />
-                  </div>
-                ) : (
-                  <div className="h-[500px] bg-slate-900/80 border border-slate-800 rounded-xl flex items-center justify-center text-slate-500">
-                    Dados de comércios indisponíveis
-                  </div>
-                )}
-              </ForecastSection>
-
-              <ForecastSection
-                id="local-comercios"
-                title="Comércios Locais"
-                icon={<span aria-hidden="true">📍</span>}
-                ariaLabel="Lista de comércios de Ilha Comprida"
-              >
-                {localismoLoading ? (
-                  <SkeletonSpotGrid />
-                ) : localismoData?.commerce ? (
-                  <CommerceGrid
-                    commerce={localismoData.commerce}
-                    onGetDirections={handleGetDirections}
-                  />
-                ) : (
-                  <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 text-center text-slate-500">
-                    Dados de comércios indisponíveis
-                  </div>
-                )}
-              </ForecastSection>
+              <SpotsMap
+                spots={SPOTS}
+                selectedSpot={selectedSpot}
+                userPosition={userPosition}
+                onSelectSpot={handleSelectSpot}
+                onClearRoute={handleClearSpotRoute}
+              />
+              <SpotGrid
+                spots={SPOTS}
+                selectedSpot={selectedSpot}
+                onSelectSpot={handleSelectSpot}
+              />
             </div>
           )}
 

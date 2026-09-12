@@ -1,6 +1,6 @@
 'use client';
 
-import { FaWater, FaWind, FaMapMarkerAlt, FaNewspaper, FaMapPin } from 'react-icons/fa';
+import { FaWater, FaWind, FaMapMarkerAlt, FaNewspaper, FaThLarge } from 'react-icons/fa';
 
 type Tab = {
   id: string;
@@ -10,11 +10,11 @@ type Tab = {
 };
 
 const TABS: Tab[] = [
+  { id: 'overview', label: 'Visão Geral', icon: FaThLarge, tip: 'Resumo de condições, notícias, picos e ventos' },
   { id: 'news', label: 'Notícias', icon: FaNewspaper, tip: 'Notícias de surf WSL, SPSurf e fontes locais' },
   { id: 'forecast', label: 'Previsão de Ondas', icon: FaWater, tip: 'Condições, gráfico, marés e resumo IA' },
   { id: 'wind', label: 'Previsão de Ventos', icon: FaWind, tip: 'Velocidade, rajada e direção do vento para kitesurf e windsurf' },
   { id: 'spots', label: 'Picos', icon: FaMapMarkerAlt, tip: 'Mapa e cards dos picos de surf' },
-  { id: 'local', label: 'Localismo', icon: FaMapPin, tip: 'Picos, comércio local e utilidades de Ilha Comprida' },
 ];
 
 type SwellTabsProps = {
