@@ -351,7 +351,7 @@ GET /v1/noticias-regionais
 
 ---
 
-## GET /v1/localismo
+## GET /v1/comercio
 
 Diretorio comercial de Ilha Comprida com 50 estabelecimentos geolocalizados.
 
@@ -359,7 +359,7 @@ Diretorio comercial de Ilha Comprida com 50 estabelecimentos geolocalizados.
 
 **Exemplo de Request:**
 ```
-GET /v1/localismo
+GET /v1/comercio
 ```
 
 **Response:**

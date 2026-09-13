@@ -65,7 +65,7 @@ Meteor_2.0/
     backend/           # API NestJS
       src/
         common/        # Servicos compartilhados (fallback, http, config)
-        modules/       # Modulos de dominio (meteorology, oceanography, traffic, noticias-regionais, localismo)
+        modules/       # Modulos de dominio (meteorology, oceanography, traffic, noticias-regionais, comercio, iron)
         data/          # JSONs de fallback
     frontend/          # App Next.js
       src/
@@ -479,4 +479,4 @@ comercio/
 ### Hooks
 | Hook | Descricao |
 |------|-----------|
-| useLocalismo.ts | Busca GET /v1/localismo |
+| useComercio.ts | Busca GET /v1/comercio |

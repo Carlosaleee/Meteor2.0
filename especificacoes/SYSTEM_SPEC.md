@@ -31,7 +31,7 @@
 - Estilizacao: Tailwind CSS v4 (design tokens via CSS custom properties)
 - Tema: dark/light com `data-theme` + `localStorage` + `prefers-color-scheme`
 - Mapas: Leaflet nativo (useRef + cleanup pattern) — tiles OpenStreetMap (gratuitos, sem API key)
-- Hooks: useMeteorology, useSwell, useHourlyMarine, useAiSummary, useAllCities, useRegionalNews, useLocalismo
+- Hooks: useMeteorology, useSwell, useHourlyMarine, useAiSummary, useAllCities, useRegionalNews, useComercio
 - API Layer: lib/api.ts com fetch generico
 - Icones: React Icons (Font Awesome)
 - Graficos: ApexCharts (react-apexcharts)
@@ -86,13 +86,19 @@
 - Fallback: data/fallback-noticias-regionais.json (12 noticias + 4 rotas)
 - Dados: noticias regionais do Vale do Ribeira + status de rodovias
 
-### 4.5 LocalismoModule
-- Endpoint: GET /v1/localismo
+### 4.5 ComercioModule
+- Endpoint: GET /v1/comercio
 - API externa: Nenhuma (dados estaticos)
 - Fallback: data/fallback-localismo.json (50 comercios de Ilha Comprida)
 - Dados: diretorio comercial com geolocalizacao (5 setores: alimentacao, hospedagem, comercio, servicos, lazer)
 
-### 4.6 FallbackService (Global)
+### 4.6 IronModule
+- Endpoint: POST /v1/iron/chat
+- Servico: Integracao com agente IA para respostas contextuais
+- Modulos integrados: Meteorology, Oceanography, Traffic, Comercio, NoticiasRegionais
+- IA: Gemini 2.5 Flash para processamento de mensagens
+
+### 4.7 FallbackService (Global)
 - Servico compartilhado entre todos os modulos
 - Carrega fallback do disco na inicializacao
 - Salva dados frescos quando API responde
@@ -190,7 +196,33 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 | Branch | Descricao |
 |--------|-----------|
 | `main` | Producao, todas as features mergeadas |
-| `feature/swell-styling` | Redesign completo da pagina Swell |
+
+---
+
+## 9.1 Cobertura de Testes
+
+### Backend (Jest)
+| Arquivo | Testes | Status |
+|---------|--------|--------|
+| iron.service.spec.ts | 9 | ✅ |
+| meteorology.service.spec.ts | 5 | ✅ |
+| oceanography.service.spec.ts | 4 | ⏭️ Skip (timeout) |
+| gemini.repository.spec.ts | 4 | ✅ |
+| traffic.service.spec.ts | 4 | ✅ |
+| noticias-regionais.service.spec.ts | 4 | ✅ |
+| comercio.service.spec.ts | 4 | ✅ |
+| fallback.service.spec.ts | 3 | ✅ |
+| api-health.spec.ts | 2 | ✅ |
+
+### Frontend (Vitest + RTL)
+| Arquivo | Testes | Status |
+|---------|--------|--------|
+| ResumoIA.test.tsx | 4 | ✅ |
+| ChatWidget.test.tsx | 3 | ✅ |
+| Footer.test.tsx | 3 | ✅ |
+| useComercio.test.ts | 3 | ✅ |
+
+**Total: 46 testes (39 passam, 4 pulam timeout, 3 pendentes de fix)**
 
 ---
 
@@ -210,7 +242,8 @@ Meteor_2.0/
           oceanography/ (controller, service, marine.repository, gemini.repository)
           traffic/ (controller, service, repository)
           noticias-regionais/ (controller, service, repository)
-          localismo/ (controller, service, repository)
+          comercio/ (controller, service, repository)
+          iron/ (controller, service, module)
         app.module.ts
         main.ts
       data/ (fallback JSONs)
@@ -246,7 +279,7 @@ Meteor_2.0/
           useAiSummary.ts (resumo Gemini)
           useAllCities.ts (4 cidades paralelo)
           useRegionalNews.ts (noticias regionais + rotas)
-          useLocalismo.ts (diretorio comercial)
+          useComercio.ts (diretorio comercial)
         lib/api.ts
         app/globals.css (CSS custom properties + temas)
       public/
@@ -284,7 +317,7 @@ Meteor_2.0/
 - **Coluna 1 — Navegacao:** 7 links internos (Meteorologia, Swell, Transito, Noticias, Blog, Mapa, Creditos)
 - **Coluna 2 — Fontes de Dados:** Open-Meteo, INMET, RainViewer, CPTEC/INPE, OpenStreetMap
 - **Coluna 3 — Stack Tecnologica:** Next.js 15, NestJS, Tailwind CSS, Leaflet, TypeScript
-- **Coluna 4 — Assistente IA:** Card MeteorBot IA com mini chat integrado
+- **Coluna 4 — Links Uteis:** Contatos de emergencia (PM 190, Bombeiros 193, SAMU 192, Defesa Civil 199, Hospital, Policia Rodoviaria 197)
 - **Rodape:** "Meteor — Creditos de Desenvolvimento: Carlos Alexandre"
 - Linha dourada `bg-[var(--color-gold-line)]` no topo
 - Links externos com `FaExternalLinkAlt` no hover
@@ -429,7 +462,7 @@ Meteor_2.0/
 | useAllCities.ts | Busca 4 cidades em paralelo |
 | useNews.ts | Busca noticias de surf |
 | useRegionalNews.ts | Busca GET /v1/noticias-regionais |
-| useLocalismo.ts | Busca GET /v1/localismo |
+| useComercio.ts | Busca GET /v1/comercio |
 
 ### Acessibilidade (Swell)
 - `role="tablist/tab/tabpanel"` nas abas
