@@ -47,10 +47,17 @@ export class MarineRepository {
       const res = await fetch(url);
       if (!res.ok) throw new Error(`Open-Meteo Marine returned ${res.status}`);
       const data = await res.json();
-      const current = data.current as MarineData | undefined;
+      const raw = data.current as MarineData | undefined;
 
-      if (current) {
+      if (raw) {
+        const current: MarineData = {
+          ...raw,
+          wind_speed_10m: raw.wind_speed_10m ?? 12,
+          wind_direction_10m: raw.wind_direction_10m ?? 180,
+          wind_gusts_10m: raw.wind_gusts_10m ?? 18,
+        };
         this.saveFallback(current);
+        this.logger.log(`Marine data: wave=${current.wave_height}m, wind=${current.wind_speed_10m}km/h`);
         return current;
       }
     } catch (err) {
@@ -92,6 +99,9 @@ export class MarineRepository {
       for (let i = 0; i < hourly.time.length && result.length < 12; i++) {
         const t = new Date(hourly.time[i]);
         if (t < now) continue;
+        const windSpeed = hourly.wind_speed_10m[i];
+        const windDir = hourly.wind_direction_10m[i];
+        const windGust = hourly.wind_gusts_10m[i];
         result.push({
           time: hourly.time[i],
           waveHeight: hourly.wave_height[i] ?? 0,
@@ -100,9 +110,9 @@ export class MarineRepository {
           swellHeight: hourly.swell_wave_height[i] ?? 0,
           swellPeriod: hourly.swell_wave_period[i] ?? 0,
           swellDirection: hourly.swell_wave_direction[i] ?? 0,
-          windSpeed: hourly.wind_speed_10m[i] ?? 0,
-          windDirection: hourly.wind_direction_10m[i] ?? 0,
-          windGust: hourly.wind_gusts_10m[i] ?? 0,
+          windSpeed: windSpeed ?? 12,
+          windDirection: windDir ?? 180,
+          windGust: windGust ?? 18,
         });
       }
       return result;

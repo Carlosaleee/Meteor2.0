@@ -71,6 +71,10 @@ export class OpenMeteoRepository {
       if (!res.ok) throw new Error(`Open-Meteo returned ${res.status}`);
       const data = await res.json();
 
+      if (!data.current || typeof data.current.temperature_2m !== 'number') {
+        throw new Error('Open-Meteo returned invalid current data');
+      }
+
       const result: AtmosphereData = {
         current: data.current as CurrentData,
         hourly: data.hourly as HourlyData,
@@ -78,6 +82,7 @@ export class OpenMeteoRepository {
       };
 
       this.saveFallback(locationId, result);
+      this.logger.log(`Fresh data for ${locationId}: temp=${data.current.temperature_2m}°C, precip=${data.current.precipitation}mm`);
       return result;
     } catch (err) {
       this.logger.warn(`Open-Meteo API failed for ${locationId}: ${err}`);
@@ -88,6 +93,7 @@ export class OpenMeteoRepository {
       return cached.locations[locationId];
     }
 
+    this.logger.warn(`No cached data for ${locationId}, using defaults`);
     return this.getDefault(locationId);
   }
 
