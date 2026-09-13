@@ -3,6 +3,7 @@
   "private": true,
   "packageManager": "pnpm@11",
   "scripts": {
+    "predev": "pnpm -r test",
     "dev": "pnpm -r --parallel dev",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",

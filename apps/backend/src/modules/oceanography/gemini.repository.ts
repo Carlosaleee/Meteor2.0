@@ -59,7 +59,7 @@ export class GeminiRepository {
         contents: prompt,
         config: {
           temperature: this.config.get('GEMINI_TEMPERATURE') ?? 0.7,
-          maxOutputTokens: 1200,
+          maxOutputTokens: 2500,
         },
       });
 

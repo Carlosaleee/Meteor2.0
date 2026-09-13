@@ -11,7 +11,7 @@ type ResumoIAProps = {
 function renderMarkdown(text: string): React.ReactNode[] {
   const lines = text.split('\n');
   return lines.map((line, i) => {
-    if (line.startsWith('🏄') || line.startsWith('🌬️') || line.startsWith('⏰') || line.startsWith('🏆') || line.startsWith('⚠️')) {
+    if (line.startsWith('🏄') || line.startsWith('🌬️') || line.startsWith('🪁') || line.startsWith('⏰') || line.startsWith('🏆') || line.startsWith('⚠️')) {
       return (
         <p key={i} className="text-sm font-bold text-white mt-3 mb-1">
           {line.replace(/\*\*(.*?)\*\*/g, '$1')}
@@ -40,7 +40,7 @@ function renderMarkdown(text: string): React.ReactNode[] {
 }
 
 function splitIntoColumns(text: string): [string[], string[]] {
-  const sections = text.split(/(?=^[\u{1F3BF}\u{1F32C}\u{23F0}\u{1F3C6}\u{26A0}])/mu);
+  const sections = text.split(/(?=^[\u{1F3BF}\u{1F32C}\u{1FA81}\u{23F0}\u{1F3C6}\u{26A0}])/mu);
   const mid = Math.ceil(sections.length / 2);
   const left = sections.slice(0, mid).filter(s => s.trim());
   const right = sections.slice(mid).filter(s => s.trim());
