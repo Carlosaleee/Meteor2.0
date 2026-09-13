@@ -18,7 +18,6 @@ import { ChatWidget } from '@/components/ChatWidget';
 import { ForecastSection } from '@/app/swell/components/ForecastSection';
 import { ResumoIA } from '@/app/swell/components/ResumoIA';
 import { ConditionCards } from '@/app/swell/components/ConditionCards';
-import { SurfNews } from '@/app/swell/components/SurfNews';
 import { useAllCities } from '@/hooks/useAllCities';
 import { useSwell } from '@/hooks/useSwell';
 import { useAiSummary } from '@/hooks/useAiSummary';
@@ -342,15 +341,43 @@ export default function HomePage() {
         ariaLabel="Notícias e competições de surf WSL e Circuito Paulista"
       >
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {surfNewsData?.news?.slice(0, 3).map((item, index) => (
-            <div key={item.id} className="group">
-              <SurfNews
-                news={[item]}
-                loading={surfNewsLoading}
-                category={item.category as 'WSL' | 'Paulista'}
-                title={index === 0 ? undefined : ''}
-              />
-            </div>
+          {surfNewsData?.news?.slice(0, 3).map((item) => (
+            <a
+              key={item.id}
+              href={item.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={`${item.title} — ${item.source} (abrir em nova aba)`}
+              aria-label={`${item.title}, fonte: ${item.source}`}
+              className="group rounded-xl overflow-hidden bg-slate-800/40 border border-slate-700/50 hover:bg-slate-800/80 hover:border-blue-500/30 transition-all"
+            >
+              <div className="h-40 bg-slate-800 overflow-hidden relative">
+                <img
+                  src={item.image || (item.category === 'WSL' ? 'https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67' : 'https://static.wixstatic.com/media/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.jpeg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.webp')}
+                  alt=""
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = item.category === 'WSL' ? 'https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67' : 'https://static.wixstatic.com/media/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.jpeg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.webp';
+                  }}
+                />
+                <span className={`absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] font-medium border ${item.category === 'WSL' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'}`}>
+                  {item.category}
+                </span>
+              </div>
+              <div className="p-4">
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <h4 className="text-sm font-bold text-white group-hover:text-blue-300 transition-colors line-clamp-2">{item.title}</h4>
+                  <FaExternalLinkAlt className="w-3 h-3 text-slate-500 group-hover:text-blue-400 shrink-0 mt-0.5" aria-hidden="true" />
+                </div>
+                <p className="text-[10px] text-blue-400 font-medium mb-1">{item.source}</p>
+                <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">{item.description}</p>
+                <p className="text-[9px] text-slate-600 mt-2 font-mono">
+                  {new Date(item.publishedAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                </p>
+              </div>
+            </a>
           ))}
           {(!surfNewsData?.news?.length && !surfNewsLoading) && (
             <div className="col-span-full text-center py-8 text-slate-500">
@@ -360,7 +387,7 @@ export default function HomePage() {
         </div>
         <div className="mt-4 text-center">
           <Link
-            href="/noticias"
+            href="/swell"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-sm font-semibold hover:bg-blue-500/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
           >
             Ver todas as notícias <FaArrowRight className="w-3.5 h-3.5" />
