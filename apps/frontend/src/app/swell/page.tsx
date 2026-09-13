@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { FaWater, FaClock, FaSyncAlt } from 'react-icons/fa';
-import { ChatWidget } from '@/components/ChatWidget';
 import { PageBanner } from '@/components/PageBanner';
 import { useSwell } from '@/hooks/useSwell';
 import { useHourlyMarine } from '@/hooks/useHourlyMarine';
@@ -458,7 +457,6 @@ export default function SwellPage() {
         </>
       )}
 
-      <ChatWidget />
     </div>
   );
 }

@@ -1,7 +1,6 @@
 'use client';
 
 import { FaBookOpen, FaCalendar, FaArrowRight } from 'react-icons/fa';
-import { ChatWidget } from '@/components/ChatWidget';
 import { PageBanner } from '@/components/PageBanner';
 
 type BlogPost = {
@@ -106,7 +105,6 @@ export default function BlogPage() {
         ))}
       </div>
 
-      <ChatWidget />
     </div>
   );
 }

@@ -1,7 +1,6 @@
 'use client';
 
 import { FaInfoCircle, FaExternalLinkAlt, FaCloud, FaWater, FaShieldAlt, FaCode, FaDatabase, FaGlobe } from 'react-icons/fa';
-import { ChatWidget } from '@/components/ChatWidget';
 import { PageBanner } from '@/components/PageBanner';
 
 const DATA_SOURCES = [
@@ -183,7 +182,6 @@ export default function CreditosPage() {
         </div>
       </section>
 
-      <ChatWidget />
     </div>
   );
 }

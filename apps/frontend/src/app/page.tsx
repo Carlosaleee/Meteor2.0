@@ -14,7 +14,6 @@ import {
   FaArrowRight,
 } from 'react-icons/fa';
 import { HeroCarousel } from '@/components/HeroCarousel';
-import { ChatWidget } from '@/components/ChatWidget';
 import { ForecastSection } from '@/app/swell/components/ForecastSection';
 import { ResumoIA } from '@/app/swell/components/ResumoIA';
 import { ConditionCards } from '@/app/swell/components/ConditionCards';
@@ -22,7 +21,7 @@ import { useAllCities } from '@/hooks/useAllCities';
 import { useSwell } from '@/hooks/useSwell';
 import { useAiSummary } from '@/hooks/useAiSummary';
 import { useRegionalNews } from '@/hooks/useRegionalNews';
-import { useLocalismo } from '@/hooks/useLocalismo';
+import { useComercio } from '@/hooks/useComercio';
 import { useNews } from '@/hooks/useNews';
 import { weatherEmoji } from '@/app/meteorologia/components/weather-utils';
 
@@ -76,13 +75,13 @@ export default function HomePage() {
   const { data: aiData, loading: aiLoading } = useAiSummary();
   const { data: newsData, loading: newsLoading } = useRegionalNews();
   const { data: surfNewsData, loading: surfNewsLoading } = useNews();
-  const { data: localismoData, loading: localismoLoading } = useLocalismo();
+  const { data: comercioData, loading: comercioLoading } = useComercio();
 
   const [newsCategory, setNewsCategory] = useState('todas');
 
   const latestNews = newsData?.news?.slice(0, 6) ?? [];
   const routes = newsData?.routes ?? [];
-  const commerce = localismoData?.commerce?.slice(0, 6) ?? [];
+  const commerce = comercioData?.commerce?.slice(0, 6) ?? [];
 
   const filteredNews = newsCategory === 'todas'
     ? latestNews
@@ -445,7 +444,7 @@ export default function HomePage() {
         icon={<FaStore className="w-5 h-5 text-orange-400" aria-hidden="true" />}
         ariaLabel="Estabelecimentos comerciais de Ilha Comprida"
       >
-        {localismoLoading ? (
+        {comercioLoading ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5, 6].map(i => (
               <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 animate-pulse">
@@ -538,7 +537,6 @@ export default function HomePage() {
         </div>
       </ForecastSection>
 
-      <ChatWidget />
     </main>
   );
 }

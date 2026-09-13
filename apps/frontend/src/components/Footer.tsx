@@ -1,7 +1,6 @@
 ﻿'use client';
 
-import { FaDatabase, FaCode, FaExternalLinkAlt, FaGithub, FaMap, FaRobot, FaPaperPlane } from 'react-icons/fa';
-import { useState } from 'react';
+import { FaDatabase, FaCode, FaExternalLinkAlt, FaGithub, FaMap, FaPhone, FaWater } from 'react-icons/fa';
 
 const DATA_SOURCES = [
   { name: 'Open-Meteo', url: 'https://open-meteo.com' },
@@ -28,27 +27,17 @@ const PAGES = [
   { name: 'Créditos & Fontes', href: '/creditos' },
 ];
 
+const EMERGENCY_CONTACTS = [
+  { name: 'Polícia Civil', phone: '190', icon: '🚔' },
+  { name: 'Bombeiros', phone: '193', icon: '🚒' },
+  { name: 'SAMU', phone: '192', icon: '🚑' },
+  { name: 'Defesa Civil', phone: '199', icon: '🛡️' },
+  { name: 'Polícia Militar', phone: '197', icon: '👮' },
+  { name: 'Hospital Regional', phone: '(13) 3851-1515', icon: '🏥' },
+];
+
 export function Footer() {
   const year = new Date().getFullYear();
-  const [chatInput, setChatInput] = useState('');
-  const [chatMessages, setChatMessages] = useState<Array<{ role: 'user' | 'bot'; text: string }>>([
-    { role: 'bot', text: 'Olá! Sou o MeteorBot. Como posso ajudar?' }
-  ]);
-
-  const handleChat = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!chatInput.trim()) return;
-    const msg = chatInput;
-    setChatMessages(prev => [...prev, { role: 'user', text: msg }]);
-    setChatInput('');
-    setTimeout(() => {
-      let reply = 'Condições estáveis em Ilha Comprida e Vale do Ribeira.';
-      if (msg.toLowerCase().includes('vento')) reply = 'Ventos de SE a 15 km/h.';
-      else if (msg.toLowerCase().includes('chuva')) reply = 'Sem chuva prevista para hoje.';
-      else if (msg.toLowerCase().includes('balsa')) reply = 'Balsa operando com 15 min de espera.';
-      setChatMessages(prev => [...prev, { role: 'bot', text: reply }]);
-    }, 600);
-  };
 
   return (
     <footer className="w-full bg-[var(--color-footer-bg)] mt-auto transition-colors duration-300" role="contentinfo">
@@ -58,7 +47,8 @@ export function Footer() {
       <div className="max-w-6xl mx-auto px-6 py-10">
         {/* Row 1 — Project Description (centered, gold) */}
         <div className="text-center mb-10">
-          <h2 className="text-xl md:text-2xl font-bold text-[var(--color-gold)] tracking-wide uppercase">
+          <h2 className="text-xl md:text-2xl font-bold text-[var(--color-gold)] tracking-wide uppercase flex items-center justify-center gap-3">
+            <FaWater className="w-6 h-6" aria-hidden="true" />
             Meteor 2.0
           </h2>
           <p className="mt-2 text-sm text-[var(--color-footer-text)] max-w-2xl mx-auto leading-relaxed">
@@ -140,50 +130,27 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Col 4: Chatbot Card */}
+          {/* Col 4: Links Úteis — Emergência */}
           <div className="text-center">
             <h3 className="text-xs font-bold text-[var(--color-gold)] uppercase tracking-widest mb-4 flex items-center justify-center gap-2">
-              <FaRobot className="w-3 h-3" aria-hidden="true" />
-              Assistente IA
+              <FaPhone className="w-3 h-3" aria-hidden="true" />
+              Links Úteis
             </h3>
-            <div className="bg-[var(--color-surface)] border border-[var(--color-line)] rounded-lg p-4">
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <div className="p-2 rounded-lg bg-[var(--color-gold)]/10">
-                  <FaRobot className="w-5 h-5 text-[var(--color-gold)]" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-[var(--color-footer-heading)]">MeteorBot</p>
-                  <p className="text-[10px] text-[var(--color-footer-text)]">Assistente Tático</p>
-                </div>
-              </div>
-
-              {/* Mini chat */}
-              <div className="space-y-2 mb-3 max-h-24 overflow-y-auto">
-                {chatMessages.slice(-3).map((m, i) => (
-                  <div key={i} className={`text-[10px] p-2 rounded ${m.role === 'user' ? 'bg-[var(--color-gold)]/10 text-[var(--color-footer-heading)] ml-4' : 'bg-[var(--color-line)] text-[var(--color-footer-text)] mr-4'}`}>
-                    {m.text}
-                  </div>
-                ))}
-              </div>
-
-              <form onSubmit={handleChat} className="flex gap-1.5">
-                <input
-                  type="text"
-                  value={chatInput}
-                  onChange={e => setChatInput(e.target.value)}
-                  placeholder="Pergunte..."
-                  className="flex-1 bg-[var(--color-bg)] border border-[var(--color-line)] rounded px-2 py-1.5 text-[10px] text-[var(--color-footer-heading)] placeholder-[var(--color-muted)] focus:outline-none focus:ring-1 focus:ring-[var(--color-gold)]"
-                  aria-label="Digite sua pergunta para o MeteorBot"
-                />
-                <button
-                  type="submit"
-                  className="p-1.5 rounded bg-[var(--color-gold)]/20 text-[var(--color-gold)] hover:bg-[var(--color-gold)]/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)]"
-                  aria-label="Enviar mensagem"
-                >
-                  <FaPaperPlane className="w-3 h-3" />
-                </button>
-              </form>
-            </div>
+            <ul className="space-y-2" role="list">
+              {EMERGENCY_CONTACTS.map(contact => (
+                <li key={contact.name}>
+                  <a
+                    href={`tel:${contact.phone.replace(/\D/g, '')}`}
+                    className="group inline-flex items-center gap-2 text-xs text-[var(--color-footer-link)] hover:text-[var(--color-gold)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)] rounded"
+                    aria-label={`${contact.name}: ${contact.phone}`}
+                  >
+                    <span className="text-sm" aria-hidden="true">{contact.icon}</span>
+                    <span className="flex-1 text-left">{contact.name}</span>
+                    <span className="font-mono text-[10px] text-[var(--color-muted)] group-hover:text-[var(--color-gold)]">{contact.phone}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 

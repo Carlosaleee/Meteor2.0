@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { FaSyncAlt } from 'react-icons/fa';
-import { ChatWidget } from '@/components/ChatWidget';
 import { PageBanner } from '@/components/PageBanner';
 import { useMeteorology } from '@/hooks/useMeteorology';
 import { useAllCities } from '@/hooks/useAllCities';
@@ -125,7 +124,6 @@ export default function MeteorologiaPage() {
         </p>
       </div>
 
-      <ChatWidget />
     </main>
   );
 }

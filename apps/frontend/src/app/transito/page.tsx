@@ -1,7 +1,6 @@
 'use client';
 
 import { FaCar, FaClock, FaMapMarkerAlt } from 'react-icons/fa';
-import { ChatWidget } from '@/components/ChatWidget';
 import { PageBanner } from '@/components/PageBanner';
 import dynamic from 'next/dynamic';
 
@@ -74,7 +73,6 @@ export default function TransitoPage() {
         </div>
       </div>
 
-      <ChatWidget />
     </div>
   );
 }

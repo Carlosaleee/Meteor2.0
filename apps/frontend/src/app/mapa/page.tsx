@@ -2,7 +2,6 @@
 
 import dynamic from 'next/dynamic';
 import { FaMapMarkerAlt } from 'react-icons/fa';
-import { ChatWidget } from '@/components/ChatWidget';
 import { PageBanner } from '@/components/PageBanner';
 
 const SpotMap = dynamic(() => import('@/components/organisms/SpotMap').then(mod => mod.SpotMap), { ssr: false });
@@ -30,7 +29,6 @@ export default function MapaPage() {
         </div>
       </div>
 
-      <ChatWidget />
     </div>
   );
 }

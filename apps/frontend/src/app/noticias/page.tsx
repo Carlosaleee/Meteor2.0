@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaNewspaper, FaExternalLinkAlt, FaCar, FaExclamationTriangle, FaTree, FaSwimmer, FaUsers, FaFilter } from 'react-icons/fa';
-import { ChatWidget } from '@/components/ChatWidget';
 import { PageBanner } from '@/components/PageBanner';
 import { useRegionalNews, type RegionalNewsItem, type TrafficRoute } from '@/hooks/useRegionalNews';
 import { TrafficMap } from './components/TrafficMap';
@@ -210,7 +209,6 @@ export default function NoticiasPage() {
       {/* Notícias Meteorológicas */}
       <CityGrid onSelectLocation={(cityId) => router.push(`/meteorologia?city=${cityId}`)} />
 
-      <ChatWidget />
     </div>
   );
 }

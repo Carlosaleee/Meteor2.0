@@ -8,5 +8,6 @@ import { FallbackModule } from '../../common/fallback/fallback.module';
   imports: [FallbackModule],
   controllers: [NoticiasRegionaisController],
   providers: [NoticiasRegionaisService, NoticiasRegionaisRepository],
+  exports: [NoticiasRegionaisService],
 })
 export class NoticiasRegionaisModule {}

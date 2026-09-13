@@ -6,7 +6,8 @@ import { FallbackModule } from "./common/fallback/fallback.module";
 import { EnvelopeInterceptor } from "./common/http/envelope.interceptor";
 import { HttpExceptionFilter } from "./common/http/http-exception.filter";
 import { HealthController } from "./health.controller";
-import { LocalismoModule } from "./modules/localismo/localismo.module";
+import { ComercioModule } from "./modules/comercio/comercio.module";
+import { IronModule } from "./modules/iron/iron.module";
 import { MeteorologyModule } from "./modules/meteorology/meteorology.module";
 import { NewsModule } from "./modules/news/news.module";
 import { NoticiasRegionaisModule } from "./modules/noticias-regionais/noticias-regionais.module";
@@ -35,7 +36,8 @@ try {
     }),
     ...(throttlerImports as never[]),
     FallbackModule,
-    LocalismoModule,
+    ComercioModule,
+    IronModule,
     MeteorologyModule,
     NewsModule,
     NoticiasRegionaisModule,

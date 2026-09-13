@@ -2,15 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { FaStore } from 'react-icons/fa';
-import { ChatWidget } from '@/components/ChatWidget';
 import { PageBanner } from '@/components/PageBanner';
-import { useLocalismo } from '@/hooks/useLocalismo';
+import { useComercio } from '@/hooks/useComercio';
 import { CommerceGrid } from '@/app/swell/components/CommerceGrid';
 import { CommerceMap } from './CommerceMap';
 import type { CommerceItem } from '@/lib/api';
 
 export default function ComercioPage() {
-  const { data, loading, error } = useLocalismo();
+  const { data, loading, error } = useComercio();
   const [selectedCommerce, setSelectedCommerce] = useState<CommerceItem | null>(null);
   const [userPosition, setUserPosition] = useState<[number, number] | null>(null);
 
@@ -82,7 +81,6 @@ export default function ComercioPage() {
         </>
       )}
 
-      <ChatWidget />
     </div>
   );
 }
