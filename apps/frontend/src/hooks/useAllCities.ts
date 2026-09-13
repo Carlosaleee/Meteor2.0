@@ -20,6 +20,7 @@ type UseAllCitiesResult = {
   cities: Record<CityId, CitySummary | null>;
   loading: boolean;
   error: string | null;
+  refetch: () => void;
 };
 
 const EMPTY: Record<CityId, CitySummary | null> = {
@@ -69,5 +70,5 @@ export function useAllCities(): UseAllCitiesResult {
     fetchAll();
   }, [fetchAll]);
 
-  return { cities, loading, error };
+  return { cities, loading, error, refetch: fetchAll };
 }

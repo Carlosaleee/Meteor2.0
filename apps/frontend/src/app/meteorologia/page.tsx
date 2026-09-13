@@ -28,7 +28,7 @@ const CITY_ORDER = ['ilha-comprida', 'iguape', 'cananeia', 'registro'] as const;
 export default function MeteorologiaPage() {
   const [locationId, setLocationId] = useState('ilha-comprida');
   const { data, loading, error, refetch } = useMeteorology(locationId);
-  const { cities, loading: citiesLoading } = useAllCities();
+  const { cities, loading: citiesLoading, refetch: refetchCities } = useAllCities();
 
   return (
     <main className="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden" role="main" aria-label="Painel de meteorologia">
@@ -74,7 +74,7 @@ export default function MeteorologiaPage() {
             })}
           </div>
           <button
-            onClick={refetch}
+            onClick={() => { refetch(); refetchCities(); }}
             disabled={loading}
             title="Atualizar dados meteorológicos"
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:text-white hover:bg-slate-800 transition-all disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
