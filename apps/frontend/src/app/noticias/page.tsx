@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { FaNewspaper, FaExternalLinkAlt, FaCar, FaExclamationTriangle, FaTree, FaSwimmer, FaUsers, FaFilter } from 'react-icons/fa';
 import { PageBanner } from '@/components/PageBanner';
 import { useRegionalNews, type RegionalNewsItem, type TrafficRoute } from '@/hooks/useRegionalNews';
-import { TrafficMap } from './components/TrafficMap';
+import dynamic from 'next/dynamic';
+const TrafficMap = dynamic(() => import('./components/TrafficMap').then(mod => mod.TrafficMap), { ssr: false });
 import { CityGrid } from '../meteorologia/components/CityGrid';
 
 const CATEGORY_CONFIG: Record<string, { label: string; emoji: string; color: string; bg: string }> = {

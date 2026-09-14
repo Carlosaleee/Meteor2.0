@@ -5,7 +5,8 @@ import { FaStore } from 'react-icons/fa';
 import { PageBanner } from '@/components/PageBanner';
 import { useComercio } from '@/hooks/useComercio';
 import { CommerceGrid } from '@/app/swell/components/CommerceGrid';
-import { CommerceMap } from './CommerceMap';
+import dynamic from 'next/dynamic';
+const CommerceMap = dynamic(() => import('./CommerceMap').then(mod => mod.CommerceMap), { ssr: false });
 import type { CommerceItem } from '@/lib/api';
 
 export default function ComercioPage() {
