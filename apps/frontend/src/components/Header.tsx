@@ -6,13 +6,13 @@ import { useState, useEffect, useCallback } from 'react';
 import { FaHome, FaCloudSun, FaWater, FaNewspaper, FaStore, FaBookOpen, FaInfoCircle, FaGlobe, FaSun, FaMoon, FaBars, FaTimes } from 'react-icons/fa';
 
 const NAV_ITEMS = [
-  { href: '/', label: 'Principal', labelEs: 'Principal', icon: FaHome },
-  { href: '/meteorologia', label: 'Meteorologia', labelEs: 'Meteorología', icon: FaCloudSun },
-  { href: '/swell', label: 'Swell', labelEs: 'Swell', icon: FaWater },
-  { href: '/noticias', label: 'Notícias', labelEs: 'Noticias', icon: FaNewspaper },
-  { href: '/comercio', label: 'Comércio', labelEs: 'Comercio', icon: FaStore },
-  { href: '/blog', label: 'Blog', labelEs: 'Blog', icon: FaBookOpen },
-  { href: '/creditos', label: 'Créditos', labelEs: 'Créditos', icon: FaInfoCircle },
+  { href: '/', label: 'Principal', labelEs: 'Principal', icon: FaHome, description: 'Tela Principal do Dashboard' },
+  { href: '/meteorologia', label: 'Meteorologia', labelEs: 'Meteorología', icon: FaCloudSun, description: 'Previsão do Tempo e Vento' },
+  { href: '/swell', label: 'Swell', labelEs: 'Swell', icon: FaWater, description: 'Ondas, Picos e Marés' },
+  { href: '/noticias', label: 'Notícias', labelEs: 'Noticias', icon: FaNewspaper, description: 'Notícias Regionais e Trânsito' },
+  { href: '/comercio', label: 'Comércio', labelEs: 'Comercio', icon: FaStore, description: 'Diretório Comercial de Ilha Comprida' },
+  { href: '/blog', label: 'Blog', labelEs: 'Blog', icon: FaBookOpen, description: 'Artigos Técnicos' },
+  { href: '/creditos', label: 'Créditos', labelEs: 'Créditos', icon: FaInfoCircle, description: 'Fontes e Agradecimentos' },
 ];
 
 export function Header() {
@@ -48,7 +48,7 @@ export function Header() {
   const toggleLang = useCallback(() => setLang(prev => prev === 'pt' ? 'es' : 'pt'), []);
 
   return (
-    <header className="w-full bg-[var(--color-header-bg)] transition-colors duration-300" role="banner">
+    <header className="w-full bg-[var(--color-header-bg)] sticky top-0 z-50 transition-colors duration-300" role="banner">
       {/* Gold Line — Top */}
       <div className="h-px w-full bg-[var(--color-gold-line)]" aria-hidden="true" />
 
@@ -82,6 +82,7 @@ export function Header() {
                       href={item.href}
                       role="menuitem"
                       aria-current={isActive ? 'page' : undefined}
+                      title={item.description}
                       className={`
                         group flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-header-bg)]
@@ -106,6 +107,7 @@ export function Header() {
                 className="p-2 rounded-lg text-[var(--color-header-muted)] hover:bg-[var(--color-nav-hover-bg)] hover:text-[var(--color-nav-hover-text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
                 aria-label={lang === 'pt' ? 'Mudar para espanhol' : 'Cambiar a portugués'}
                 aria-pressed={lang === 'es'}
+                title="Mudar idioma"
               >
                 <FaGlobe className="w-4 h-4" aria-hidden="true" />
               </button>
@@ -115,6 +117,7 @@ export function Header() {
                 className="p-2 rounded-lg text-[var(--color-header-muted)] hover:bg-[var(--color-nav-hover-bg)] hover:text-[var(--color-nav-hover-text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
                 aria-label={theme === 'dark' ? 'Alternar para tema claro' : 'Alternar para tema escuro'}
                 aria-pressed={theme === 'light'}
+                title="Alternar tema"
               >
                 {theme === 'dark' ? (
                   <FaSun className="w-4 h-4 text-amber-400" aria-hidden="true" />
@@ -140,6 +143,7 @@ export function Header() {
                 className="p-2 rounded-lg text-[var(--color-header-muted)] hover:bg-[var(--color-nav-hover-bg)] hover:text-[var(--color-nav-hover-text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
                 aria-label={lang === 'pt' ? 'Mudar para espanhol' : 'Cambiar a portugués'}
                 aria-pressed={lang === 'es'}
+                title="Mudar idioma"
               >
                 <FaGlobe className="w-4 h-4" aria-hidden="true" />
               </button>
@@ -149,6 +153,7 @@ export function Header() {
                 className="p-2 rounded-lg text-[var(--color-header-muted)] hover:bg-[var(--color-nav-hover-bg)] hover:text-[var(--color-nav-hover-text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
                 aria-label={theme === 'dark' ? 'Alternar para tema claro' : 'Alternar para tema escuro'}
                 aria-pressed={theme === 'light'}
+                title="Alternar tema"
               >
                 {theme === 'dark' ? (
                   <FaSun className="w-4 h-4 text-amber-400" aria-hidden="true" />
@@ -175,6 +180,7 @@ export function Header() {
               id="mobile-nav"
               className="md:hidden flex flex-col gap-1 pb-4 text-sm"
               role="menubar"
+              aria-live="polite"
             >
               {NAV_ITEMS.map(item => {
                 const Icon = item.icon;
@@ -187,6 +193,7 @@ export function Header() {
                       href={item.href}
                       role="menuitem"
                       aria-current={isActive ? 'page' : undefined}
+                      title={item.description}
                       className={`
                         group flex items-center gap-2 px-3 py-2.5 rounded-lg font-medium transition-all duration-200
                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-header-bg)]

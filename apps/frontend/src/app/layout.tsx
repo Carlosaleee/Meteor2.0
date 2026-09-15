@@ -4,6 +4,8 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ChatWidget } from "@/components/ChatWidget";
+import { ScrollToTopButton } from "@/components/ScrollToTopButton";
+import { ChatProvider } from "@/components/ChatContext";
 
 const display = Archivo_Black({
   weight: "400",
@@ -39,7 +41,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </main>
         <Footer />
-        <ChatWidget />
+        <ChatProvider>
+          <ChatWidget />
+          <ScrollToTopButton />
+        </ChatProvider>
       </body>
     </html>
   );

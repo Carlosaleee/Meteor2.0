@@ -90,12 +90,12 @@ export default function HomePage() {
   return (
     <main className="space-y-8" role="main" aria-label="Painel principal do Meteor 2.0">
       <nav aria-label="Navegação rápida" className="sr-only focus-within:not-sr-only">
+        <a href="#tempo" className="block p-2 bg-amber-600 text-white rounded-lg">Pular para Tempo Agora</a>
         <a href="#alerta" className="block p-2 bg-amber-600 text-white rounded-lg">Pular para Alerta Regional</a>
         <a href="#noticias" className="block p-2 bg-blue-600 text-white rounded-lg">Pular para Notícias Regionais</a>
-        <a href="#briefing" className="block p-2 bg-cyan-600 text-white rounded-lg">Pular para Briefing IA</a>
-        <a href="#tempo" className="block p-2 bg-blue-600 text-white rounded-lg">Pular para Tempo Agora</a>
         <a href="#mar" className="block p-2 bg-cyan-600 text-white rounded-lg">Pular para Condições do Mar</a>
         <a href="#surf-news" className="block p-2 bg-amber-600 text-white rounded-lg">Pular para Notícias de Surf</a>
+        <a href="#briefing" className="block p-2 bg-cyan-600 text-white rounded-lg">Pular para Briefing IA</a>
         <a href="#rodovias" className="block p-2 bg-amber-600 text-white rounded-lg">Pular para Rodovias</a>
         <a href="#comercio" className="block p-2 bg-orange-600 text-white rounded-lg">Pular para Comércio</a>
         <a href="#blog" className="block p-2 bg-emerald-600 text-white rounded-lg">Pular para Blog</a>
@@ -104,7 +104,49 @@ export default function HomePage() {
       {/* 1. Hero Carousel */}
       <HeroCarousel />
 
-      {/* 2. Alerta Regional */}
+      {/* 2. Tempo Agora — 4 cidades */}
+      <ForecastSection
+        id="tempo"
+        title="Tempo Agora"
+        icon={<FaCloudSun className="w-5 h-5 text-amber-400" aria-hidden="true" />}
+        ariaLabel="Condições meteorológicas das 4 cidades"
+      >
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" role="list" aria-label="Temperatura atual das cidades">
+          {(['ilha-comprida', 'iguape', 'cananeia', 'registro'] as const).map(id => {
+            const city = cities[id];
+            return (
+              <Link
+                key={id}
+                href={`/meteorologia?city=${id}`}
+                className="bg-slate-900/80 border border-slate-800 rounded-2xl p-3 hover:border-amber-500/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                role="listitem"
+                title={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)}°C` : 'Carregando...'}`}
+                aria-label={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)} graus, ${weatherEmoji(city.weatherCode)}` : 'carregando'}`}
+              >
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1 truncate">
+                  {city?.location ?? id.replace(/-/g, ' ')}
+                </p>
+                <div className="flex items-center gap-2">
+                  {city && <span className="text-xl" aria-hidden="true">{weatherEmoji(city.weatherCode)}</span>}
+                  <span className="text-2xl font-extrabold text-white tabular-nums">
+                    {citiesLoading ? '--' : city ? `${Math.round(city.temperature)}°` : '--'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 mt-2 text-[10px] text-slate-500">
+                  {city && (
+                    <>
+                      <span>💧 {city.humidity}%</span>
+                      <span>💨 {Math.round(city.windSpeed)} km/h</span>
+                    </>
+                  )}
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </ForecastSection>
+
+      {/* 3. Alerta Regional */}
       <ForecastSection
         id="alerta"
         title="Alerta Regional"
@@ -112,23 +154,23 @@ export default function HomePage() {
         ariaLabel="Alertas regionais de trânsito e condições"
       >
         {newsLoading ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[1, 2, 3, 4].map(i => (
-              <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 animate-pulse">
+              <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-3 animate-pulse">
                 <div className="h-4 bg-slate-800 rounded w-24 mb-3" />
                 <div className="h-6 bg-slate-800 rounded w-20" />
               </div>
             ))}
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {routes.map(route => {
               const colors = ROUTE_CONDITION_COLORS[route.condition] ?? ROUTE_CONDITION_COLORS.LIVRE;
               const emoji = ROUTE_ICONS[route.id] ?? '🚗';
               return (
                 <div
                   key={route.id}
-                  className={`bg-slate-900/80 border ${colors.border} rounded-2xl p-5`}
+                  className={`bg-slate-900/80 border ${colors.border} rounded-2xl p-3`}
                   title={`${route.name}: ${route.condition} — ${route.description}`}
                   aria-label={`${route.name}: ${route.condition}`}
                 >
@@ -148,7 +190,7 @@ export default function HomePage() {
         )}
       </ForecastSection>
 
-      {/* 3. Últimas Notícias Regionais (reposicionado) */}
+      {/* 4. Últimas Notícias Regionais */}
       <ForecastSection
         id="noticias"
         title="Últimas Notícias Regionais"
@@ -175,9 +217,9 @@ export default function HomePage() {
         </div>
 
         {newsLoading ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 animate-pulse">
+              <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-4 animate-pulse">
                 <div className="h-4 bg-slate-800 rounded w-20 mb-3" />
                 <div className="h-5 bg-slate-800 rounded w-3/4 mb-2" />
                 <div className="h-3 bg-slate-800 rounded w-full mb-1" />
@@ -186,7 +228,7 @@ export default function HomePage() {
             ))}
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {filteredNews.map(item => {
               const catCfg = CATEGORY_CONFIG[item.category] ?? CATEGORY_CONFIG.noticia;
               return (
@@ -197,7 +239,7 @@ export default function HomePage() {
                   rel="noopener noreferrer"
                   title={`${item.title} — ${item.source}`}
                   aria-label={`${item.title}, fonte: ${item.source}`}
-                  className="group bg-slate-900/80 border border-slate-800 rounded-2xl p-5 hover:border-blue-500/30 hover:bg-slate-800/60 transition-all"
+                  className="group bg-slate-900/80 border border-slate-800 rounded-2xl p-4 hover:border-blue-500/30 hover:bg-slate-800/60 transition-all overflow-hidden"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border ${catCfg.bg} ${catCfg.color} border-current`}>
@@ -208,7 +250,7 @@ export default function HomePage() {
                   <h3 className="text-sm font-bold text-white group-hover:text-blue-300 transition-colors mb-2 line-clamp-2">
                     {item.title}
                   </h3>
-                  <p className="text-xs text-slate-400 leading-relaxed mb-3 line-clamp-3">
+                  <p className="text-xs text-slate-400 leading-relaxed mb-3 max-h-8 group-hover:max-h-40 overflow-hidden transition-all duration-300 ease-in-out">
                     {item.description}
                   </p>
                   <div className="flex items-center justify-between text-[10px] text-slate-500">
@@ -236,70 +278,7 @@ export default function HomePage() {
         </div>
       </ForecastSection>
 
-      {/* 4. Briefing Executivo IA */}
-      <ForecastSection
-        id="briefing"
-        title="Briefing Executivo (IA)"
-        icon={<span aria-hidden="true">🤖</span>}
-        ariaLabel="Resumo inteligente das condições"
-      >
-        {aiLoading ? (
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 animate-pulse">
-            <div className="h-4 bg-slate-800 rounded w-48 mb-4" />
-            <div className="space-y-2">
-              <div className="h-3 bg-slate-800 rounded w-full" />
-              <div className="h-3 bg-slate-800 rounded w-5/6" />
-              <div className="h-3 bg-slate-800 rounded w-4/6" />
-            </div>
-          </div>
-        ) : (
-          <ResumoIA summary={aiData?.summary ?? null} loading={aiLoading} error={null} />
-        )}
-      </ForecastSection>
-
-      {/* 5. Tempo Agora — 4 cidades */}
-      <ForecastSection
-        id="tempo"
-        title="Tempo Agora"
-        icon={<FaCloudSun className="w-5 h-5 text-amber-400" aria-hidden="true" />}
-        ariaLabel="Condições meteorológicas das 4 cidades"
-      >
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" role="list" aria-label="Temperatura atual das cidades">
-          {(['ilha-comprida', 'iguape', 'cananeia', 'registro'] as const).map(id => {
-            const city = cities[id];
-            return (
-              <Link
-                key={id}
-                href={`/meteorologia?city=${id}`}
-                className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 hover:border-amber-500/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
-                role="listitem"
-                title={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)}°C` : 'Carregando...'}`}
-                aria-label={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)} graus, ${weatherEmoji(city.weatherCode)}` : 'carregando'}`}
-              >
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1 truncate">
-                  {city?.location ?? id.replace(/-/g, ' ')}
-                </p>
-                <div className="flex items-center gap-2">
-                  {city && <span className="text-2xl" aria-hidden="true">{weatherEmoji(city.weatherCode)}</span>}
-                  <span className="text-3xl font-extrabold text-white tabular-nums">
-                    {citiesLoading ? '--' : city ? `${Math.round(city.temperature)}°` : '--'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 mt-2 text-[10px] text-slate-500">
-                  {city && (
-                    <>
-                      <span>💧 {city.humidity}%</span>
-                      <span>💨 {Math.round(city.windSpeed)} km/h</span>
-                    </>
-                  )}
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </ForecastSection>
-
-      {/* 6. Condições do Mar */}
+      {/* 5. Condições do Mar */}
       <ForecastSection
         id="mar"
         title="Condições do Mar"
@@ -307,7 +286,7 @@ export default function HomePage() {
         ariaLabel="Condições atuais de ondas e mar"
       >
         {swellLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
             {[1, 2, 3, 4, 5].map(i => (
               <div key={i} className="flex flex-col items-center gap-2 p-3 rounded-xl bg-slate-800/60 border border-slate-700/50 animate-pulse">
                 <div className="w-8 h-8 rounded-lg bg-slate-700" />
@@ -326,20 +305,20 @@ export default function HomePage() {
             qualityEmoji={swellData.qualityEmoji}
           />
         ) : (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 text-center text-slate-500">
+          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 text-center text-slate-500">
             Dados oceânicos indisponíveis
           </div>
         )}
       </ForecastSection>
 
-      {/* 7. Notícias de Surf (novo) */}
+      {/* 6. Notícias de Surf */}
       <ForecastSection
         id="surf-news"
         title="Notícias de Surf"
         icon={<FaWater className="w-5 h-5 text-amber-400" aria-hidden="true" />}
         ariaLabel="Notícias e competições de surf WSL e Circuito Paulista"
       >
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {surfNewsData?.news?.slice(0, 3).map((item) => (
             <a
               key={item.id}
@@ -350,7 +329,7 @@ export default function HomePage() {
               aria-label={`${item.title}, fonte: ${item.source}`}
               className="group rounded-xl overflow-hidden bg-slate-800/40 border border-slate-700/50 hover:bg-slate-800/80 hover:border-blue-500/30 transition-all"
             >
-              <div className="h-40 bg-slate-800 overflow-hidden relative">
+              <div className="h-36 bg-slate-800 overflow-hidden relative">
                 <img
                   src={item.image || (item.category === 'WSL' ? 'https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67' : 'https://static.wixstatic.com/media/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.jpeg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.webp')}
                   alt=""
@@ -365,13 +344,13 @@ export default function HomePage() {
                   {item.category}
                 </span>
               </div>
-              <div className="p-4">
+              <div className="p-3">
                 <div className="flex items-start justify-between gap-2 mb-1">
                   <h4 className="text-sm font-bold text-white group-hover:text-blue-300 transition-colors line-clamp-2">{item.title}</h4>
                   <FaExternalLinkAlt className="w-3 h-3 text-slate-500 group-hover:text-blue-400 shrink-0 mt-0.5" aria-hidden="true" />
                 </div>
                 <p className="text-[10px] text-blue-400 font-medium mb-1">{item.source}</p>
-                <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">{item.description}</p>
+                <p className="text-xs text-slate-400 leading-relaxed max-h-8 group-hover:max-h-40 overflow-hidden transition-all duration-300 ease-in-out">{item.description}</p>
                 <p className="text-[9px] text-slate-600 mt-2 font-mono">
                   {new Date(item.publishedAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
                 </p>
@@ -394,6 +373,27 @@ export default function HomePage() {
         </div>
       </ForecastSection>
 
+      {/* 7. Briefing Executivo IA */}
+      <ForecastSection
+        id="briefing"
+        title="Briefing Executivo (IA)"
+        icon={<span aria-hidden="true">🤖</span>}
+        ariaLabel="Resumo inteligente das condições"
+      >
+        {aiLoading ? (
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 animate-pulse">
+            <div className="h-4 bg-slate-800 rounded w-48 mb-4" />
+            <div className="space-y-2">
+              <div className="h-3 bg-slate-800 rounded w-full" />
+              <div className="h-3 bg-slate-800 rounded w-5/6" />
+              <div className="h-3 bg-slate-800 rounded w-4/6" />
+            </div>
+          </div>
+        ) : (
+          <ResumoIA summary={aiData?.summary ?? null} loading={aiLoading} error={null} />
+        )}
+      </ForecastSection>
+
       {/* 8. Status das Rodovias */}
       <ForecastSection
         id="rodovias"
@@ -402,16 +402,16 @@ export default function HomePage() {
         ariaLabel="Condições de tráfego das rodovias"
       >
         {newsLoading ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[1, 2, 3, 4].map(i => (
-              <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 animate-pulse">
+              <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-3 animate-pulse">
                 <div className="h-4 bg-slate-800 rounded w-24 mb-3" />
                 <div className="h-6 bg-slate-800 rounded w-20" />
               </div>
             ))}
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {routes.map(route => {
               const colors = ROUTE_CONDITION_COLORS[route.condition] ?? ROUTE_CONDITION_COLORS.LIVRE;
               const emoji = ROUTE_ICONS[route.id] ?? '🚗';
@@ -419,7 +419,7 @@ export default function HomePage() {
                 <Link
                   key={route.id}
                   href="/noticias"
-                  className={`bg-slate-900/80 border ${colors.border} rounded-2xl p-5 hover:scale-[1.02] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white`}
+                  className={`bg-slate-900/80 border ${colors.border} rounded-2xl p-3 hover:scale-[1.02] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white`}
                   title={`${route.name}: ${route.condition}`}
                   aria-label={`${route.name}: ${route.condition} — clique para ver detalhes`}
                 >
@@ -445,9 +445,9 @@ export default function HomePage() {
         ariaLabel="Estabelecimentos comerciais de Ilha Comprida"
       >
         {comercioLoading ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 animate-pulse">
+              <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-3 animate-pulse">
                 <div className="h-4 bg-slate-800 rounded w-20 mb-3" />
                 <div className="h-5 bg-slate-800 rounded w-3/4 mb-2" />
                 <div className="h-3 bg-slate-800 rounded w-full" />
@@ -455,7 +455,7 @@ export default function HomePage() {
             ))}
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {commerce.map(item => (
               <a
                 key={item.id}
@@ -464,7 +464,7 @@ export default function HomePage() {
                 rel="noopener noreferrer"
                 title={`${item.name} — ${item.sector}`}
                 aria-label={`${item.name}, setor: ${item.sector}`}
-                className="group bg-slate-900/80 border border-slate-800 rounded-2xl p-5 hover:border-orange-500/30 hover:bg-slate-800/60 transition-all"
+                className="group bg-slate-900/80 border border-slate-800 rounded-2xl p-3 hover:border-orange-500/30 hover:bg-slate-800/60 transition-all overflow-hidden"
               >
                 <div className="flex items-center gap-3 mb-3">
                   <span className="text-2xl" aria-hidden="true">{SECTOR_ICONS[item.sector] ?? '🏪'}</span>
@@ -475,7 +475,7 @@ export default function HomePage() {
                     <span className="text-[10px] text-orange-400 font-medium">{item.sector}</span>
                   </div>
                 </div>
-                <p className="text-xs text-slate-400 line-clamp-2 mb-2">{item.description}</p>
+                <p className="text-xs text-slate-400 max-h-8 group-hover:max-h-40 overflow-hidden transition-all duration-300 ease-in-out mb-2">{item.description}</p>
                 <div className="flex items-center justify-between text-[10px] text-slate-500">
                   <span className="truncate">{item.address}</span>
                   <FaExternalLinkAlt className="w-3 h-3 text-slate-600 group-hover:text-orange-400 transition-colors flex-shrink-0" aria-hidden="true" />
@@ -502,7 +502,7 @@ export default function HomePage() {
         icon={<FaBookOpen className="w-5 h-5 text-emerald-400" aria-hidden="true" />}
         ariaLabel="Artigos do blog e navegação do portal"
       >
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {[
             { title: 'Guia de Marés', category: 'Maré', gradient: 'from-blue-600 to-cyan-600', href: '/blog' },
             { title: 'Ventos de Inverno', category: 'Clima', gradient: 'from-amber-600 to-orange-600', href: '/blog' },
@@ -514,10 +514,10 @@ export default function HomePage() {
               href={post.href}
               className="group bg-slate-900 border border-slate-800 hover:border-emerald-500/50 rounded-2xl overflow-hidden transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
             >
-              <div className={`h-24 bg-gradient-to-br ${post.gradient} flex items-center justify-center`}>
+              <div className={`h-20 bg-gradient-to-br ${post.gradient} flex items-center justify-center`}>
                 <FaBookOpen className="w-8 h-8 text-white/30" aria-hidden="true" />
               </div>
-              <div className="p-4">
+              <div className="p-3">
                 <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">{post.category}</span>
                 <h3 className="text-sm font-bold text-white mt-1 group-hover:text-emerald-300 transition-colors">
                   {post.title}

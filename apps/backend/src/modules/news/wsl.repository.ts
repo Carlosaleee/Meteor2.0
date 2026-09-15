@@ -189,10 +189,12 @@ export class WslRepository {
     return [
       { rank: 1, name: 'Leonardo Fioravanti', country: 'Italy', points: 40015, trend: 0 },
       { rank: 2, name: 'Italo Ferreira', country: 'Brazil', points: 39930, trend: 0 },
-      { rank: 3, name: 'Yago Dora', country: 'Brazil', points: 37695, trend: -1 },
+      { rank: 3, name: 'Yago Dora', country: 'Brazil', points: 37695, trend: 0 },
       { rank: 4, name: 'Gabriel Medina', country: 'Brazil', points: 35410, trend: 0 },
       { rank: 5, name: 'Miguel Pupo', country: 'Brazil', points: 32770, trend: 0 },
-      { rank: 6, name: 'Griffin Colapinto', country: 'United States', points: 31375, trend: 1 },
+      { rank: 6, name: 'Griffin Colapinto', country: 'United States', points: 31375, trend: 0 },
+      { rank: 7, name: 'Ethan Ewing', country: 'Australia', points: 28575, trend: 0 },
+      { rank: 8, name: 'Samuel Pupo', country: 'Brazil', points: 27960, trend: 0 },
     ];
   }
 
@@ -200,19 +202,22 @@ export class WslRepository {
     return [
       { rank: 1, name: 'Carissa Moore', country: 'Hawaii', points: 39575, trend: 0 },
       { rank: 2, name: 'Gabriela Bryan', country: 'Hawaii', points: 37065, trend: 0 },
-      { rank: 3, name: 'Sawyer Lindblad', country: 'United States', points: 35970, trend: -1 },
-      { rank: 4, name: 'Molly Picklum', country: 'Australia', points: 34865, trend: -1 },
-      { rank: 5, name: 'Luana Silva', country: 'Brazil', points: 33835, trend: -1 },
-      { rank: 6, name: 'Caitlin Simmers', country: 'United States', points: 31810, trend: -1 },
+      { rank: 3, name: 'Sawyer Lindblad', country: 'United States', points: 35970, trend: 0 },
+      { rank: 4, name: 'Molly Picklum', country: 'Australia', points: 34865, trend: 0 },
+      { rank: 5, name: 'Luana Silva', country: 'Brazil', points: 33835, trend: 0 },
+      { rank: 6, name: 'Caitlin Simmers', country: 'United States', points: 31810, trend: 0 },
+      { rank: 7, name: 'Lakey Peterson', country: 'United States', points: 30235, trend: 0 },
+      { rank: 8, name: 'Erin Brooks', country: 'Canada', points: 29000, trend: 0 },
     ];
   }
 
   private getDefaultEvents(): WslEvent[] {
     return [
       { name: 'Lexus Trestles Pro', location: 'Lower Trestles, California, EUA', dates: '11-20 Set 2026', status: 'Standby', tour: 'Championship Tour' },
-      { name: 'Banco do Brasil São Sebastião Pro', location: 'São Sebastião, São Paulo', dates: '26 Set - 3 Out 2026', status: 'Upcoming', tour: 'Challenger Series' },
-      { name: 'Circuito Paulista de Base 2026', location: 'Litoral Paulista', dates: 'Set-Nov 2026', status: 'Upcoming', tour: 'Circuito Nacional' },
-      { name: 'Longboard Paulista Pro 2026', location: 'Peruíbe, São Paulo', dates: '13 Jun 2026', status: 'Completed', tour: 'Circuito Nacional' },
+      { name: 'Banco do Brasil Sao Sebastiao Pro', location: 'Sao Sebastiao, Sao Paulo', dates: '26 Set - 3 Out 2026', status: 'Upcoming', tour: 'Challenger Series' },
+      { name: 'MEO Rip Curl Pro Portugal', location: 'Supertubos, Peniche, Portugal', dates: '16-25 Out 2026', status: 'Upcoming', tour: 'Championship Tour' },
+      { name: 'Philippines Pro', location: 'Filipinas', dates: '31 Out - 10 Nov 2026', status: 'Upcoming', tour: 'Championship Tour' },
+      { name: 'Lexus Pipe Masters', location: 'Pipeline, Oahu, Hawaii', dates: '8-20 Dez 2026', status: 'Upcoming', tour: 'Championship Tour' },
     ];
   }
 }

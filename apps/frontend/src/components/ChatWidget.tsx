@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { FaTimes, FaPaperPlane, FaWater } from 'react-icons/fa';
+import { useChat } from './ChatContext';
 
 type Message = { role: 'user' | 'bot'; text: string };
 
@@ -70,7 +71,7 @@ function getReply(userMsg: string): string {
 }
 
 export function ChatWidget() {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isChatOpen, toggleChat, setChatOpen } = useChat();
   const [messages, setMessages] = useState<Message[]>([WELCOME]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -87,10 +88,10 @@ export function ChatWidget() {
   }, [messages]);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isChatOpen) {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
-  }, [isOpen]);
+  }, [isChatOpen]);
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,17 +113,17 @@ export function ChatWidget() {
     <>
       {/* Botão Flutuante */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggleChat}
         className="fixed bottom-6 right-6 z-50 p-4 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white shadow-lg shadow-amber-500/20 flex items-center justify-center transition-all hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
         title="Irons — Assistente Tático"
-        aria-label={isOpen ? 'Fechar chat Irons' : 'Abrir chat Irons'}
-        aria-expanded={isOpen}
+        aria-label={isChatOpen ? 'Fechar chat Irons' : 'Abrir chat Irons'}
+        aria-expanded={isChatOpen}
       >
         <FaWater className="w-6 h-6" />
       </button>
 
       {/* Janela de Chat */}
-      {isOpen && (
+      {isChatOpen && (
         <div
           className="fixed bottom-24 right-6 z-50 w-80 sm:w-96 bg-slate-900 border border-slate-700/50 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden flex flex-col h-[500px] animate-in slide-in-from-bottom-4 fade-in duration-200"
           role="dialog"
@@ -140,7 +141,7 @@ export function ChatWidget() {
               </div>
             </div>
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={() => setChatOpen(false)}
               className="text-slate-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-slate-700/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
               aria-label="Fechar chat"
             >
