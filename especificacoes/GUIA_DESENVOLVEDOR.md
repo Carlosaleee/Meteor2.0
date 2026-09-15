@@ -120,6 +120,35 @@ Meteor_2.0/
 - Tema: dark/light com `localStorage` + `prefers-color-scheme`
 - Linha dourada: `var(--color-gold-line)` #E0B429 (dark) / #C49A1A (light)
 
+## Vercel MCP (Integracao com IA)
+
+### Configuracao
+O Vercel MCP permite que ferramentas de IA acessem dados do Vercel (deploys, logs, projetos).
+
+Arquivo de configuracao: `~/.config/opencode/opencode.jsonc`
+
+```json
+{
+  "mcpServers": {
+    "vercel": {
+      "url": "https://mcp.vercel.com"
+    }
+  }
+}
+```
+
+### Uso
+1. Reinicie o opencode apos configurar
+2. Na primeira uso, autentique via OAuth (link aparece no terminal)
+3. Pode perguntar sobre deploys, logs, projetos do Vercel
+
+### Exemplos de comandos
+- "Quais sao os ultimos deploys do projeto?"
+- "Mostre os logs do deploy que falhou"
+- "Quais projetos tenho no Vercel?"
+
+---
+
 ## Convencoes de Commit
 
 Padrao Conventional Commits:
@@ -196,6 +225,40 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 ### Fallbacks sempre retornando dados antigos
 - Verificar se `apps/backend/data/` existe
 - Os JSONs sao criados automaticamente na primeira requisicao bem-sucedida
+
+### Erro "ReferenceError: window is not defined" no build
+**Causa:** Componente Leaflet importado diretamente sem protecao SSR.
+
+**Correcao:** Usar `next/dynamic` com `{ ssr: false }`:
+
+```tsx
+// INCORRETO
+import { CommerceMap } from './CommerceMap';
+
+// CORRETO
+import dynamic from 'next/dynamic';
+const CommerceMap = dynamic(() => import('./CommerceMap').then(mod => mod.CommerceMap), { ssr: false });
+```
+
+**Componentes que precisam dessa protecao:**
+- Qualquer componente que importa `leaflet` ou `leaflet/dist/leaflet.css`
+- Qualquer componente que usa `window`, `document`, `navigator` diretamente
+- Graficos ApexCharts (react-apexcharts)
+
+### Erro "Unable to find element with text" nos testes
+**Causa:** Componente usa Context (ex: `useChat()`) mas o teste nao fornece o Provider.
+
+**Correcao:** Envolver o componente no Provider durante o teste:
+
+```tsx
+import { ChatProvider } from './ChatContext';
+
+render(
+  <ChatProvider>
+    <ChatWidget />
+  </ChatProvider>
+);
+```
 
 ## Padroes de UI
 

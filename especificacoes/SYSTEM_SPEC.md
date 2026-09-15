@@ -31,6 +31,7 @@
 - Estilizacao: Tailwind CSS v4 (design tokens via CSS custom properties)
 - Tema: dark/light com `data-theme` + `localStorage` + `prefers-color-scheme`
 - Mapas: Leaflet nativo (useRef + cleanup pattern) — tiles OpenStreetMap (gratuitos, sem API key)
+- **SSR Protection:** Componentes Leaflet importados via `next/dynamic` com `{ ssr: false }` para evitar `ReferenceError: window is not defined` durante build estatico
 - Hooks: useMeteorology, useSwell, useHourlyMarine, useAiSummary, useAllCities, useRegionalNews, useComercio
 - API Layer: lib/api.ts com fetch generico
 - Icones: React Icons (Font Awesome)
@@ -199,6 +200,71 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 
 ---
 
+## 8.1 Correcao de Erros de Build (SSR)
+
+### Problema
+Componentes que usam Leaflet (mapas) causam `ReferenceError: window is not defined` durante `next build` porque o Leaflet depende de APIs do navegador que nao existem no servidor Node.js.
+
+### Solucao
+Usar `next/dynamic` com `{ ssr: false }` para importar componentes que dependem de APIs do navegador:
+
+```tsx
+// ANTES (causa erro no build)
+import { CommerceMap } from './CommerceMap';
+
+// DEPOIS (correto)
+import dynamic from 'next/dynamic';
+const CommerceMap = dynamic(() => import('./CommerceMap').then(mod => mod.CommerceMap), { ssr: false });
+```
+
+### Componentes Protegidos
+| Pagina | Componente | Arquivo |
+|--------|------------|---------|
+| `/comercio` | CommerceMap | `comercio/page.tsx` |
+| `/swell` | SpotsMap | `swell/page.tsx` |
+| `/noticias` | TrafficMap | `noticias/page.tsx` |
+| `/meteorologia` | NumericaTab | `meteorologia/page.tsx` |
+| `/meteorologia` | WeatherMapDetail | `meteorologia/components/PrevisaoTab.tsx` |
+| `/mapa` | SpotMap | `mapa/page.tsx` |
+| `/transito` | BaseLeafletMap | `transito/page.tsx` |
+
+### Regra
+**TODO** componente que importa `leaflet` ou usa `window` deve ser importado via `next/dynamic` com `{ ssr: false }`.
+
+---
+
+## 8.2 Configuracao Vercel MCP
+
+### O que e
+O Vercel MCP (Model Context Protocol) e um servidor remoto que permite a ferramentas de IA (Claude, Cursor, VS Code) interagir com projetos no Vercel.
+
+### Configuracao
+Arquivo: `~/.config/opencode/opencode.jsonc`
+
+```json
+{
+  "mcpServers": {
+    "vercel": {
+      "url": "https://mcp.vercel.com"
+    }
+  }
+}
+```
+
+### Tools Disponiveis
+| Tool | Descricao |
+|------|-----------|
+| `search_docs` | Busca na documentacao oficial do Vercel |
+| `get_deployment_logs` | Logs de deploys que falharam |
+| `fetch_teams` | Lista times vinculados a conta |
+| `fetch_projects` | Lista projetos do Vercel |
+
+### Autenticacao
+- OAuth: na primeira uso, segue o link para autenticar a conta do Vercel
+- Clientes suportados: Claude, Cursor, VS Code
+
+---
+
 ## 9.1 Cobertura de Testes
 
 ### Backend (Jest)
@@ -218,11 +284,11 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 | Arquivo | Testes | Status |
 |---------|--------|--------|
 | ResumoIA.test.tsx | 4 | ✅ |
-| ChatWidget.test.tsx | 3 | ✅ |
+| ChatWidget.test.tsx | 3 | ✅ (corrigido: ChatProvider wrapper) |
 | Footer.test.tsx | 3 | ✅ |
 | useComercio.test.ts | 3 | ✅ |
 
-**Total: 46 testes (39 passam, 4 pulam timeout, 3 pendentes de fix)**
+**Total: 46 testes (43 passam, 4 pulam timeout)**
 
 ---
 
