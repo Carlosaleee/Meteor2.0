@@ -30,7 +30,7 @@ export const IRONS_KNOWLEDGE = {
         'Condições de Ondas — 5 cards com altura, período, direção, swell, qualidade',
         'Condições de Vento — 5 cards com velocidade, rajada, direção, Beaufort, qualidade surf',
         'Próximas Horas — grid 12h com previsão de ondas',
-        'Todos os Picos — 6 spots de surf mapeados',
+        'Todos os Points — 6 spots de surf mapeados',
         'Notícias de Surf — 3 cards de notícias WSL/Circuito Paulista',
         'Status das Rodovias — SP-222, BR-116, Balsa Cananeia',
         'Notícias Regionais — 12 notícias do Vale do Ribeira',
@@ -68,15 +68,15 @@ export const IRONS_KNOWLEDGE = {
     },
 
     swell: {
-      name: 'Swell & Picos',
+      name: 'Swell & Points',
       route: '/swell',
       description: 'Condições oceânicas completas para surf, kite e windsurf.',
       tabs: [
-        { id: 'overview', name: 'Visão Geral', description: 'Resumo IA + condições + vento + picos + notícias' },
+        { id: 'overview', name: 'Visão Geral', description: 'Resumo IA + condições + vento + points + notícias' },
         { id: 'news', name: 'Notícias', description: 'WSL Rankings + Circuito Paulista + Eventos' },
         { id: 'forecast', name: 'Previsão de Ondas', description: 'Gráfico hourly + conditions + marés' },
         { id: 'wind', name: 'Previsão de Ventos', description: 'Gráfico vento + hourly wind + marés' },
-        { id: 'spots', name: 'Picos', description: 'Mapa + grid de spots com filtros' },
+        { id: 'spots', name: 'Points', description: 'Mapa + grid de spots com filtros' },
       ],
       metrics: [
         'Altura da onda (waveHeight)',
@@ -199,7 +199,7 @@ export const IRONS_KNOWLEDGE = {
         name: 'ComercioModule',
         endpoint: 'GET /v1/comercio',
         description: '50 comércios de Ilha Comprida (5 setores)',
-        fallback: 'fallback-localismo.json',
+        fallback: 'fallback-comercio.json',
       },
     },
 

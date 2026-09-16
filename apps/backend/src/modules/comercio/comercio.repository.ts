@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { FallbackService } from '../../common/fallback/fallback.service';
 
-const FALLBACK_FILE = 'fallback-localismo.json';
+const FALLBACK_FILE = 'fallback-comercio.json';
 
 export type CommerceItem = {
   id: string;
@@ -25,16 +25,16 @@ export type ComercioResponse = {
 export class ComercioRepository {
   constructor(private readonly fallback: FallbackService) {}
 
-  getComercioData(): ComercioResponse {
-    const data = this.fallback.load<{ commerce: CommerceItem[]; timestamp: string }>(FALLBACK_FILE);
+  async getComercioData(): Promise<ComercioResponse> {
+    const data = await this.fallback.load<{ commerce: CommerceItem[]; timestamp: string }>(FALLBACK_FILE);
     return {
       commerce: data?.commerce ?? [],
       timestamp: data?.timestamp ?? new Date().toISOString(),
     };
   }
 
-  getCommerceBySector(sector: string): CommerceItem[] {
-    const data = this.getComercioData();
+  async getCommerceBySector(sector: string): Promise<CommerceItem[]> {
+    const data = await this.getComercioData();
     return data.commerce.filter(c => c.sector === sector);
   }
 }

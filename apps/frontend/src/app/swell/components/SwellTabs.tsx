@@ -10,11 +10,11 @@ type Tab = {
 };
 
 const TABS: Tab[] = [
-  { id: 'overview', label: 'Visão Geral', icon: FaThLarge, tip: 'Resumo de condições, notícias, picos e ventos' },
+  { id: 'overview', label: 'Visão Geral', icon: FaThLarge, tip: 'Resumo de condições, notícias, points e ventos' },
   { id: 'news', label: 'Notícias', icon: FaNewspaper, tip: 'Notícias de surf WSL, SPSurf e fontes locais' },
   { id: 'forecast', label: 'Previsão de Ondas', icon: FaWater, tip: 'Condições, gráfico, marés e resumo IA' },
   { id: 'wind', label: 'Previsão de Ventos', icon: FaWind, tip: 'Velocidade, rajada e direção do vento para kitesurf e windsurf' },
-  { id: 'spots', label: 'Picos', icon: FaMapMarkerAlt, tip: 'Mapa e cards dos picos de surf' },
+  { id: 'spots', label: 'Points', icon: FaMapMarkerAlt, tip: 'Mapa e cards dos points de surf' },
 ];
 
 type SwellTabsProps = {

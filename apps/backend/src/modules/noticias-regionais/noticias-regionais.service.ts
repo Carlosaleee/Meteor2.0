@@ -5,15 +5,15 @@ import { NoticiasRegionaisRepository, RegionalNewsItem, TrafficRoute } from './n
 export class NoticiasRegionaisService {
   constructor(private readonly repo: NoticiasRegionaisRepository) {}
 
-  getData() {
+  async getData() {
     return this.repo.getData();
   }
 
-  getNewsByCategory(category: string): RegionalNewsItem[] {
+  async getNewsByCategory(category: string): Promise<RegionalNewsItem[]> {
     return this.repo.getNewsByCategory(category);
   }
 
-  getRoutes(): TrafficRoute[] {
+  async getRoutes(): Promise<TrafficRoute[]> {
     return this.repo.getRoutes();
   }
 }

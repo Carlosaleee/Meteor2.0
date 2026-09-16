@@ -52,7 +52,7 @@ export class OpenMeteoRepository {
   constructor(private readonly fallback: FallbackService) {}
 
   async getAtmosphereData(lat: number, lon: number, locationId: string): Promise<AtmosphereData> {
-    const { data: cached, isStale } = this.fallback.loadWithTimestamp<{
+    const { data: cached, isStale } = await this.fallback.loadWithTimestamp<{
       locations: Record<string, AtmosphereData>;
     }>(FALLBACK_FILE);
 
@@ -97,11 +97,11 @@ export class OpenMeteoRepository {
     return this.getDefault(locationId);
   }
 
-  private saveFallback(locationId: string, data: AtmosphereData): void {
-    const existing = this.fallback.load<{ locations: Record<string, AtmosphereData> }>(FALLBACK_FILE);
+  private async saveFallback(locationId: string, data: AtmosphereData): Promise<void> {
+    const existing = await this.fallback.load<{ locations: Record<string, AtmosphereData> }>(FALLBACK_FILE);
     const locations = existing?.locations ?? {};
     locations[locationId] = data;
-    this.fallback.save(FALLBACK_FILE, { locations });
+    await this.fallback.save(FALLBACK_FILE, { locations });
   }
 
   private getDefault(locationId: string): AtmosphereData {

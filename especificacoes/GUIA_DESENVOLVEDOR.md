@@ -274,7 +274,7 @@ render(
 ### Nav Bar (Responsiva)
 - Desktop: `hidden md:flex` — horizontal centrado (7 itens)
 - Mobile: Hamburger (`FaBars`/`FaTimes`) com dropdown
-- **Ordem:** Principal > Meteorologia > Swell > Noticias > Comercio > Blog > Creditos
+- **Ordem:** Principal > Previsão do Tempo > Swell > Noticias > Comercio > Blog > Creditos
 - Hover dourado: `hover:bg-[var(--color-nav-hover-bg)] hover:text-[var(--color-nav-hover-text)]`
 - Pagina ativa: `border-b-2 border-[var(--color-gold)]` (desktop) / `border-l-2` (mobile)
 - Auto-close: `useEffect(() => setMenuOpen(false), [pathname])`
@@ -318,7 +318,7 @@ render(
 
 ---
 
-## Pagina de Meteorologia (Guia Completo)
+## Pagina de Previsão do Tempo (Guia Completo)
 
 ### Estrutura
 ```
@@ -342,7 +342,7 @@ meteorologia/
 
 ### Hero Layout
 ```tsx
-<PageBanner title="Meteorologia" subtitle="Previsao de tempo, satelite e modelos numericos" />
+<PageBanner title="Previsão do Tempo" subtitle="Previsao de tempo, satelite e modelos numericos" />
 <div className="flex flex-wrap items-center justify-between gap-3">
   <div className="flex flex-wrap items-center gap-2">
     {/* Cards de temperatura por cidade */}
@@ -387,7 +387,7 @@ fetch('https://api.rainviewer.com/public/weather-maps.json')
 ### Estrutura
 ```
 swell/
-  page.tsx                    # 5 abas: Noticias, Ondas, Picos, Marees, Visao Geral
+  page.tsx                    # 5 abas: Noticias, Ondas, Points, Marees, Visao Geral
   components/
     SwellTabs.tsx             # Navegacao por abas com aria pattern
     ResumoIA.tsx              # Briefing Gemini com markdown
@@ -410,7 +410,7 @@ swell/
 
 ### Ordem das Abas
 ```
-[Noticias] [Ondas] [Picos] [Marees] [Visao Geral]
+[Noticias] [Ondas] [Points] [Marees] [Visao Geral]
 ```
 
 ### Graficos ApexCharts
@@ -451,7 +451,7 @@ const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 #### ResumoIA (Markdown)
 ```tsx
 // Renderiza **negrito** e listas com -
-// Topic emojis: 🏄 Ondas, 🌬️ Vento, ⏰ Horarios, 🏆 Picos, ⚠️ Alertas
+// Topic emojis: 🏄 Ondas, 🌬️ Vento, ⏰ Horarios, 🏆 Points, ⚠️ Alertas
 function renderMarkdown(text: string): React.ReactNode[]
 ```
 
@@ -476,7 +476,7 @@ function renderMarkdown(text: string): React.ReactNode[]
 
 ### Gemini AI (Resumo)
 - Backend: `gemini.repository.ts` com `@google/genai`
-- Prompt: briefing completo com 5 topicos (Ondas, Vento, Horarios, Picos, Alertas)
+- Prompt: briefing completo com 5 topicos (Ondas, Vento, Horarios, Points, Alertas)
 - Max tokens: 600
 - Cache: 1h no backend (`summaryCache`)
 - Fallback: resumo estatico baseado nos dados quando Gemini falha

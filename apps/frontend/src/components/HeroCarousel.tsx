@@ -18,7 +18,7 @@ type Slide = {
 const SLIDES: Slide[] = [
   {
     id: 0,
-    title: 'Meteorologia',
+    title: 'Previsão do Tempo',
     subtitle: 'Previsão do tempo, satélite e modelos numéricos para 4 cidades',
     href: '/meteorologia',
     image: '/banner-meteor.jpg',
@@ -27,8 +27,8 @@ const SLIDES: Slide[] = [
   },
   {
     id: 1,
-    title: 'Swell & Picos',
-    subtitle: 'Telemetria de ondas, marés e 12 picos de surf em Ilha Comprida',
+    title: 'Swell & Points',
+    subtitle: 'Telemetria de ondas, marés e 12 points de surf em Ilha Comprida',
     href: '/swell',
     image: '/CapaMeteor.jpg',
     gradient: 'from-blue-900/90 via-blue-800/70 to-slate-900/80',

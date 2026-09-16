@@ -58,7 +58,7 @@ function getReply(userMsg: string): string {
     return '📰 **Notícias regionais:** 12 notícias do Vale do Ribeira com status de trânsito e rotas. Acesse a tela de Notícias para mais detalhes.';
   }
   if (q.includes('picos') || q.includes('spot') || q.includes('prancha')) {
-    return '📍 **Spots de surf:** 6 picos mapeados — Juréia, Ponta da Praia Norte, Boqueirão Norte/Sul, Costão do Sul e Parada do Surf. Filtre por nível (iniciante/intermediário/avançado) na aba "Picos".';
+    return '📍 **Spots de surf:** 6 points mapeados — Juréia, Ponta da Praia Norte, Boqueirão Norte/Sul, Costão do Sul e Parada do Surf. Filtre por nível (iniciante/intermediário/avançado) na aba "Points".';
   }
   if (q.includes('oi') || q.includes('olá') || q.includes('ola') || q.includes('hello')) {
     return 'Olá! Sou o Irons. Como posso ajudar? Pergunte sobre o tempo, ondas, vento, trânsito ou comércio.';
@@ -67,7 +67,7 @@ function getReply(userMsg: string): string {
     return 'Sou o Irons, assistente tático do Meteor 2.0. Fui criado em homenagem ao surfista Andy Irons. Meu objetivo é te ajudar com informações sobre clima, surf, trânsito e comércio de Ilha Comprida e Vale do Ribeira.';
   }
 
-  return '📊 **Consulte os dados em tempo real:** Use as telas do Meteor 2.0 para previsões precisas de meteorologia, ondas, vento, trânsito e comércio. Para dúvidas específicas, pergunte sobre um desses tópicos!';
+  return '📊 **Consulte os dados em tempo real:** Use as telas do Meteor 2.0 para previsões precisas de Previsão do Tempo, ondas, vento, trânsito e comércio. Para dúvidas específicas, pergunte sobre um desses tópicos!';
 }
 
 export function ChatWidget() {

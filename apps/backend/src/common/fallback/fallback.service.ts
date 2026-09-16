@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as fs from 'fs';
+import * as fs from 'fs/promises';
 import * as path from 'path';
 import type { Env } from '../config/env.schema';
 
@@ -24,50 +24,40 @@ export class FallbackService {
       (this.config.get('FALLBACK_MAX_AGE_HOURS', { infer: true }) ?? 24) * 3600 * 1000;
   }
 
-  load<T>(filename: string): T | null {
+  async load<T>(filename: string): Promise<T | null> {
     const filePath = path.join(this.fallbackDir, filename);
     try {
-      if (!fs.existsSync(filePath)) {
-        this.logger.warn(`Fallback file not found: ${filePath}`);
-        return null;
-      }
-      const raw = fs.readFileSync(filePath, 'utf-8');
+      const raw = await fs.readFile(filePath, 'utf-8');
       const parsed = JSON.parse(raw) as FallbackData<T>;
       return parsed.data;
-    } catch (err) {
-      this.logger.error(`Failed to load fallback ${filename}`, err);
+    } catch {
+      this.logger.warn(`Fallback file not found or unreadable: ${filePath}`);
       return null;
     }
   }
 
-  loadWithTimestamp<T>(filename: string): { data: T | null; updatedAt: string | null; isStale: boolean } {
+  async loadWithTimestamp<T>(filename: string): Promise<{ data: T | null; updatedAt: string | null; isStale: boolean }> {
     const filePath = path.join(this.fallbackDir, filename);
     try {
-      if (!fs.existsSync(filePath)) {
-        return { data: null, updatedAt: null, isStale: true };
-      }
-      const raw = fs.readFileSync(filePath, 'utf-8');
+      const raw = await fs.readFile(filePath, 'utf-8');
       const parsed = JSON.parse(raw) as FallbackData<T>;
       const updatedAt = parsed.updatedAt ?? null;
       const isStale = this.isStale(updatedAt);
       return { data: parsed.data, updatedAt, isStale };
-    } catch (err) {
-      this.logger.error(`Failed to load fallback ${filename}`, err);
+    } catch {
       return { data: null, updatedAt: null, isStale: true };
     }
   }
 
-  save<T>(filename: string, data: T): void {
+  async save<T>(filename: string, data: T): Promise<void> {
     const filePath = path.join(this.fallbackDir, filename);
     try {
-      if (!fs.existsSync(this.fallbackDir)) {
-        fs.mkdirSync(this.fallbackDir, { recursive: true });
-      }
+      await fs.mkdir(this.fallbackDir, { recursive: true });
       const payload: FallbackData<T> = {
         updatedAt: new Date().toISOString(),
         data,
       };
-      fs.writeFileSync(filePath, JSON.stringify(payload, null, 2), 'utf-8');
+      await fs.writeFile(filePath, JSON.stringify(payload, null, 2), 'utf-8');
       this.logger.log(`Fallback saved: ${filename}`);
     } catch (err) {
       this.logger.error(`Failed to save fallback ${filename}`, err);

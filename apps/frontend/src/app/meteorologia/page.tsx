@@ -30,7 +30,7 @@ export default function MeteorologiaPage() {
   const { cities, loading: citiesLoading, refetch: refetchCities } = useAllCities();
 
   return (
-    <main className="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden" role="main" aria-label="Painel de meteorologia">
+    <main className="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden" role="main" aria-label="Painel de Previsão do Tempo">
       <PageBanner
         title="Meteorologia"
         subtitle="Previsão de tempo, satélite e modelos numéricos"

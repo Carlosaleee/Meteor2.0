@@ -66,7 +66,7 @@ export class NewsRepository {
       };
 
       this.cache = result;
-      this.fallback.save(FALLBACK_FILE, {
+      await this.fallback.save(FALLBACK_FILE, {
         news: finalNews,
         rankings: { men: wslRankings.men, women: wslRankings.women },
         events: wslRankings.events,
@@ -268,8 +268,8 @@ export class NewsRepository {
     ];
   }
 
-  private getFallbackData(): NewsResponse {
-    const cached = this.fallback.load<FallbackNewsData>(FALLBACK_FILE);
+  private async getFallbackData(): Promise<NewsResponse> {
+    const cached = await this.fallback.load<FallbackNewsData>(FALLBACK_FILE);
     if (cached) {
       return { ...cached, timestamp: new Date().toISOString() };
     }

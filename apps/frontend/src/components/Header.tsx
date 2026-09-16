@@ -7,8 +7,8 @@ import { FaHome, FaCloudSun, FaWater, FaNewspaper, FaStore, FaBookOpen, FaInfoCi
 
 const NAV_ITEMS = [
   { href: '/', label: 'Principal', labelEs: 'Principal', icon: FaHome, description: 'Tela Principal do Dashboard' },
-  { href: '/meteorologia', label: 'Meteorologia', labelEs: 'Meteorología', icon: FaCloudSun, description: 'Previsão do Tempo e Vento' },
-  { href: '/swell', label: 'Swell', labelEs: 'Swell', icon: FaWater, description: 'Ondas, Picos e Marés' },
+  { href: '/meteorologia', label: 'Previsão do Tempo', labelEs: 'Meteorología', icon: FaCloudSun, description: 'Previsão do Tempo e Vento' },
+  { href: '/swell', label: 'Swell', labelEs: 'Swell', icon: FaWater, description: 'Ondas, Points e Marés' },
   { href: '/noticias', label: 'Notícias', labelEs: 'Noticias', icon: FaNewspaper, description: 'Notícias Regionais e Trânsito' },
   { href: '/comercio', label: 'Comércio', labelEs: 'Comercio', icon: FaStore, description: 'Diretório Comercial de Ilha Comprida' },
   { href: '/blog', label: 'Blog', labelEs: 'Blog', icon: FaBookOpen, description: 'Artigos Técnicos' },

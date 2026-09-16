@@ -1,9 +1,10 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, BadRequestException } from '@nestjs/common';
+import { z } from 'zod';
 import { IronService } from './iron.service';
 
-type ChatRequest = {
-  message: string;
-};
+const ChatRequestSchema = z.object({
+  message: z.string().min(1, 'Message is required').max(500, 'Message too long'),
+});
 
 type ChatResponse = {
   reply: string;
@@ -16,8 +17,11 @@ export class IronController {
 
   @Post('chat')
   @HttpCode(HttpStatus.OK)
-  async chat(@Body() body: ChatRequest): Promise<ChatResponse> {
-    const { message } = body;
-    return this.ironService.processMessage(message);
+  async chat(@Body() body: unknown): Promise<ChatResponse> {
+    const parsed = ChatRequestSchema.safeParse(body);
+    if (!parsed.success) {
+      throw new BadRequestException(parsed.error.issues[0]?.message ?? 'Invalid request');
+    }
+    return this.ironService.processMessage(parsed.data.message);
   }
 }

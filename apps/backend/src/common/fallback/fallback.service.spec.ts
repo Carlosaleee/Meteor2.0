@@ -2,12 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { FallbackService } from './fallback.service';
 import { ConfigService } from '@nestjs/config';
 
-jest.mock('fs', () => ({
-  existsSync: jest.fn().mockReturnValue(true),
-  readFileSync: jest.fn().mockReturnValue(JSON.stringify({
+jest.mock('fs/promises', () => ({
+  readFile: jest.fn().mockResolvedValue(JSON.stringify({
     data: { test: 'value' },
     updatedAt: new Date().toISOString(),
   })),
+  writeFile: jest.fn().mockResolvedValue(undefined),
+  mkdir: jest.fn().mockResolvedValue(undefined),
 }));
 
 describe('FallbackService', () => {
@@ -39,8 +40,8 @@ describe('FallbackService', () => {
   });
 
   describe('load', () => {
-    it('should load JSON file', () => {
-      const result = service.load('test.json');
+    it('should load JSON file', async () => {
+      const result = await service.load('test.json');
       expect(result).toEqual({ test: 'value' });
     });
   });

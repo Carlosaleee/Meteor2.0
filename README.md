@@ -30,7 +30,7 @@ Dashboard tático e central de inteligência regional focado na região de **Ilh
 ### Frontend (Interface & Visualização)
 * **Framework:** Next.js 15 (App Router) + React 19
 * **Hooks:** useMeteorology, useSwell, useHourlyMarine, useAiSummary, useAllCities, useRegionalNews, **useComercio**
-* **Mapas:** Leaflet (picos, trânsito, comércio, radar RainViewer)
+* **Mapas:** Leaflet (points, trânsito, comércio, radar RainViewer)
 * **Gráficos:** ApexCharts (ondas, marés)
 * **Ícones:** React Icons (Font Awesome)
 * **Estilização:** Tailwind CSS v4 (dark/light theme)

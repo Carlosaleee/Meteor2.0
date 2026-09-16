@@ -40,12 +40,12 @@ export function beaufortScale(speed: number): number {
 
 export function beaufortDescription(force: number): string {
   const descriptions = [
-    'Calm', 'Light air', 'Light breeze', 'Gentle breeze',
-    'Moderate breeze', 'Fresh breeze', 'Strong breeze',
-    'Near gale', 'Gale', 'Strong gale', 'Storm',
-    'Violent storm', 'Hurricane',
+    'Calmo', 'Brisa leve', 'Brisa fraca', 'Brisa moderada',
+    'Brisa fresca', 'Vento fresco', 'Vento forte',
+    'Vento muito forte', 'Tempestade', 'Tempestade forte', 'Tempestade violenta',
+    'Tempestade violenta', 'Furacão',
   ];
-  return descriptions[force] ?? 'Unknown';
+  return descriptions[force] ?? 'Desconhecido';
 }
 
 export function windDir(deg: number): string {

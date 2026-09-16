@@ -23,7 +23,7 @@ export function MeteorologyTabs({ children }: MeteorologyTabsProps) {
       <div
         className="grid grid-cols-2 lg:grid-cols-4 gap-2"
         role="tablist"
-        aria-label="Seções de meteorologia"
+        aria-label="Seções de Previsão do Tempo"
       >
         {TABS.map(tab => {
           const Icon = tab.icon;

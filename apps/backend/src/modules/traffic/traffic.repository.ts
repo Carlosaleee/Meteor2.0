@@ -31,7 +31,7 @@ export class TrafficRepository {
   constructor(private readonly fallback: FallbackService) {}
 
   async getTrafficStatus() {
-    const fallbackData = this.fallback.load<{ routes: TrafficRoute[] }>(FALLBACK_FILE);
+    const fallbackData = await this.fallback.load<{ routes: TrafficRoute[] }>(FALLBACK_FILE);
     const routes = fallbackData?.routes ?? this.getDefaultRoutes();
 
     const now = new Date();

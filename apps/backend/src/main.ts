@@ -23,7 +23,7 @@ async function bootstrap(): Promise<void> {
     });
   }
 
-  app.enableCors({ origin, credentials: false });
+  app.enableCors({ origin, credentials: true });
   const port = config.get("PORT", { infer: true });
   await app.listen(port);
 }
