@@ -67,7 +67,7 @@ export function NumericaTab() {
         // Radar unavailable
       });
 
-    Object.entries(COORDS).forEach(([id, city]) => {
+    Object.entries(COORDS).forEach(([_id, city]) => {
       const icon = L.divIcon({
         className: 'city-marker',
         html: `<div style="width:24px;height:24px;background:#0ea5e9;border:2px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(14,165,233,0.4);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:8px;">${city.name.charAt(0)}</div>`,

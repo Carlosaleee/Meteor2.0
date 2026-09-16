@@ -66,7 +66,7 @@ export function WaveChart({ data }: WaveChartProps) {
     tooltip: {
       theme: 'dark',
       shared: true,
-      custom: ({ series, seriesIndex, dataPointIndex, w }) => {
+      custom: ({ series, dataPointIndex }) => {
         const wave = series[0]?.[dataPointIndex] ?? 0;
         const swell = series[1]?.[dataPointIndex] ?? 0;
         const q = qualityBand(wave);

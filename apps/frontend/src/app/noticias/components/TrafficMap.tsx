@@ -89,7 +89,7 @@ export function TrafficMap({ routes }: TrafficMapProps) {
       if (!path) return;
 
       const color = CONDITION_COLORS[route.condition] ?? '#94a3b8';
-      const polyline = L.polyline(path.waypoints, {
+      L.polyline(path.waypoints, {
         color,
         weight: 5,
         opacity: 0.85,

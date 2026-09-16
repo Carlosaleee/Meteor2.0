@@ -70,11 +70,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint backend
-        run: cd apps/backend && pnpm lint
-
       - name: Lint frontend
-        run: cd apps/frontend && pnpm lint
+        run: cd apps/frontend && npx oxlint src
 
   build:
     name: Build

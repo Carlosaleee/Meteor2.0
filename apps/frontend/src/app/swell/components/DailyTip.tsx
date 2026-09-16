@@ -9,7 +9,7 @@ type DailyTipProps = {
   bestTime: string;
 };
 
-export function DailyTip({ waveHeight, wavePeriod, qualityLabel, bestTime }: DailyTipProps) {
+export function DailyTip({ waveHeight, wavePeriod, bestTime }: DailyTipProps) {
   let tip = '';
   let board = '';
 
