@@ -33,8 +33,8 @@ export type RegionalNewsResponse = {
 export class NoticiasRegionaisRepository {
   constructor(private readonly fallback: FallbackService) {}
 
-  getData(): RegionalNewsResponse {
-    const data = this.fallback.load<{ news: RegionalNewsItem[]; routes: TrafficRoute[] }>(FALLBACK_FILE);
+  async getData(): Promise<RegionalNewsResponse> {
+    const data = await this.fallback.load<{ news: RegionalNewsItem[]; routes: TrafficRoute[] }>(FALLBACK_FILE);
     return {
       news: data?.news ?? [],
       routes: data?.routes ?? [],
@@ -42,14 +42,14 @@ export class NoticiasRegionaisRepository {
     };
   }
 
-  getNewsByCategory(category: string): RegionalNewsItem[] {
-    const data = this.getData();
+  async getNewsByCategory(category: string): Promise<RegionalNewsItem[]> {
+    const data = await this.getData();
     if (category === 'todas') return data.news;
     return data.news.filter(n => n.category === category);
   }
 
-  getRoutes(): TrafficRoute[] {
-    const data = this.getData();
+  async getRoutes(): Promise<TrafficRoute[]> {
+    const data = await this.getData();
     return data.routes;
   }
 }

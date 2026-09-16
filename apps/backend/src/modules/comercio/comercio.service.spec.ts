@@ -6,7 +6,7 @@ describe('ComercioService', () => {
   let service: ComercioService;
 
   const mockComercioRepository = {
-    getComercioData: jest.fn().mockReturnValue({
+    getComercioData: jest.fn().mockResolvedValue({
       commerce: [
         { id: '1', name: 'Restaurante Teste', sector: 'Alimentação', address: 'Rua A' },
         { id: '2', name: 'Hotel Teste', sector: 'Hospedagem', address: 'Rua B' },
@@ -14,7 +14,7 @@ describe('ComercioService', () => {
       ],
       timestamp: new Date().toISOString(),
     }),
-    getCommerceBySector: jest.fn().mockReturnValue([
+    getCommerceBySector: jest.fn().mockResolvedValue([
       { id: '1', name: 'Restaurante Teste', sector: 'Alimentação', address: 'Rua A' },
     ]),
   };
@@ -35,23 +35,23 @@ describe('ComercioService', () => {
   });
 
   describe('getComercioData', () => {
-    it('should return commerce data', () => {
-      const result = service.getComercioData();
+    it('should return commerce data', async () => {
+      const result = await service.getComercioData();
       expect(result.commerce).toHaveLength(3);
       expect(result.timestamp).toBeDefined();
     });
   });
 
   describe('getAllCommerce', () => {
-    it('should return all commerce items', () => {
-      const result = service.getAllCommerce();
+    it('should return all commerce items', async () => {
+      const result = await service.getAllCommerce();
       expect(result).toHaveLength(3);
     });
   });
 
   describe('getCommerceBySector', () => {
-    it('should filter by sector', () => {
-      const result = service.getCommerceBySector('Alimentação');
+    it('should filter by sector', async () => {
+      const result = await service.getCommerceBySector('Alimentação');
       expect(result).toHaveLength(1);
       expect(result[0].sector).toBe('Alimentação');
     });

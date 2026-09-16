@@ -229,7 +229,7 @@ Resumo tatico de surf gerado por Gemini AI.
 
 | Campo | Tipo | Descricao |
 |-------|------|-----------|
-| summary | string | Briefing tatico com 5 topicos (Ondas, Vento, Horarios, Picos, Alertas) |
+| summary | string | Briefing tatico com 5 topicos (Ondas, Vento, Horarios, Points, Alertas) |
 | cached | boolean | Se true, dados vieram do cache (1h TTL) |
 
 **Cache:** Resumo e cacheado por 1 hora no backend.

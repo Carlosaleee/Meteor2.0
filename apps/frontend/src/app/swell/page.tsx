@@ -81,7 +81,7 @@ export default function SwellPage() {
 
   return (
     <div className="space-y-8">
-      <PageBanner title="Swell & Picos" subtitle="Telemetria de ondas, marés e picos de surf em Ilha Comprida" />
+      <PageBanner title="Swell & Points" subtitle="Telemetria de ondas, marés e points de surf em Ilha Comprida" />
 
       {/* Skip links for accessibility */}
       <nav aria-label="Navegação rápida" className="sr-only focus-within:not-sr-only">

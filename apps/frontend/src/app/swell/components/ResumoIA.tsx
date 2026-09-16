@@ -8,32 +8,37 @@ type ResumoIAProps = {
   error: string | null;
 };
 
+function renderBold(text: string): React.ReactNode[] {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i} className="text-white font-semibold">{part.slice(2, -2)}</strong>;
+    }
+    return <span key={i}>{part}</span>;
+  });
+}
+
 function renderMarkdown(text: string): React.ReactNode[] {
   const lines = text.split('\n');
   return lines.map((line, i) => {
     if (line.startsWith('🏄') || line.startsWith('🌬️') || line.startsWith('🪁') || line.startsWith('⏰') || line.startsWith('🏆') || line.startsWith('⚠️')) {
       return (
         <p key={i} className="text-sm font-bold text-white mt-3 mb-1">
-          {line.replace(/\*\*(.*?)\*\*/g, '$1')}
+          {renderBold(line)}
         </p>
       );
     }
     if (line.startsWith('- ')) {
       return (
         <p key={i} className="text-sm text-slate-300 leading-relaxed ml-3">
-          • {line.slice(2).replace(/\*\*(.*?)\*\*/g, (_, m) => `<strong class="text-white">${m}</strong>`).split(/(<strong.*?<\/strong>)/).map((part, j) => {
-            if (part.startsWith('<strong')) {
-              return <span key={j} className="text-white font-semibold" dangerouslySetInnerHTML={{ __html: part }} />;
-            }
-            return <span key={j}>{part}</span>;
-          })}
+          • {renderBold(line.slice(2))}
         </p>
       );
     }
     if (line.trim() === '') return <div key={i} className="h-1" />;
     return (
       <p key={i} className="text-sm text-slate-300 leading-relaxed">
-        {line.replace(/\*\*(.*?)\*\*/g, '$1')}
+        {renderBold(line)}
       </p>
     );
   });

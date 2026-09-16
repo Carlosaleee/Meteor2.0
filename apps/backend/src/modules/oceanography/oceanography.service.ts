@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { MarineRepository } from './marine.repository';
 import { GeminiRepository } from './gemini.repository';
 import { FallbackService } from '../../common/fallback/fallback.service';
+import { SURF_CENTER } from '../../common/config/locations';
 
 const FALLBACK_FILE = 'fallback-oceanography.json';
 
@@ -17,7 +18,7 @@ export class OceanographyService {
   ) {}
 
   async getSwellConditions() {
-    const marine = await this.marineRepo.getMarineData(-24.73, -47.55);
+    const marine = await this.marineRepo.getMarineData(SURF_CENTER.lat, SURF_CENTER.lon);
 
     const height = marine.wave_height ?? 1.1;
     let qualityLabel = 'Boas';
@@ -27,7 +28,7 @@ export class OceanographyService {
     else if (height < 1.5) { qualityLabel = 'Boas'; qualityEmoji = '🏄'; }
     else { qualityLabel = 'Clássico!'; qualityEmoji = '🏆'; }
 
-    const fallbackData = this.fallback.load<{
+    const fallbackData = await this.fallback.load<{
       quality: { bestTime: string };
       tides: { nextHigh: string; nextLow: string; coefficient: number };
       spots: Array<{ id: string; name: string; lat: number; lon: number; level: string; bestWind: string; exposure: string; howToGetThere: string }>;
@@ -57,7 +58,7 @@ export class OceanographyService {
   }
 
   async getHourlyForecast() {
-    return this.marineRepo.getHourlyData(-24.73, -47.55);
+    return this.marineRepo.getHourlyData(SURF_CENTER.lat, SURF_CENTER.lon);
   }
 
   async getAiSummary() {
@@ -65,8 +66,8 @@ export class OceanographyService {
       return { summary: this.summaryCache.text, cached: true };
     }
 
-    const marine = await this.marineRepo.getMarineData(-24.73, -47.55);
-    const fallbackData = this.fallback.load<{
+    const marine = await this.marineRepo.getMarineData(SURF_CENTER.lat, SURF_CENTER.lon);
+    const fallbackData = await this.fallback.load<{
       quality: { bestTime: string };
       tides: { nextHigh: string; nextLow: string; coefficient: number };
     }>(FALLBACK_FILE);

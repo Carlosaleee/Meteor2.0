@@ -5,6 +5,7 @@ import { OceanographyService } from '../oceanography/oceanography.service';
 import { TrafficService } from '../traffic/traffic.service';
 import { ComercioService } from '../comercio/comercio.service';
 import { NoticiasRegionaisService } from '../noticias-regionais/noticias-regionais.service';
+import { GeminiChatRepository } from './gemini-chat.repository';
 
 describe('IronService', () => {
   let service: IronService;
@@ -39,10 +40,6 @@ describe('IronService', () => {
       nextTide: '14:30',
       tideCoefficient: 0.78,
     }),
-    getHourlyForecast: jest.fn().mockResolvedValue([
-      { windSpeed: 12, windGust: 18, windDirection: 180 },
-      { windSpeed: 14, windGust: 20, windDirection: 175 },
-    ]),
   };
 
   const mockTrafficService = {
@@ -55,18 +52,22 @@ describe('IronService', () => {
   };
 
   const mockComercioService = {
-    getAllCommerce: jest.fn().mockReturnValue([
+    getAllCommerce: jest.fn().mockResolvedValue([
       { id: '1', name: 'Restaurante Teste', sector: 'Alimentação', address: 'Rua A' },
       { id: '2', name: 'Hotel Teste', sector: 'Hospedagem', address: 'Rua B' },
     ]),
   };
 
   const mockNoticiasService = {
-    getData: jest.fn().mockReturnValue({
+    getData: jest.fn().mockResolvedValue({
       news: [
         { id: '1', title: 'Notícia Teste', category: 'noticia' },
       ],
     }),
+  };
+
+  const mockGeminiChat = {
+    chat: jest.fn().mockResolvedValue('Resposta do Irons via Gemini'),
   };
 
   beforeEach(async () => {
@@ -78,6 +79,7 @@ describe('IronService', () => {
         { provide: TrafficService, useValue: mockTrafficService },
         { provide: ComercioService, useValue: mockComercioService },
         { provide: NoticiasRegionaisService, useValue: mockNoticiasService },
+        { provide: GeminiChatRepository, useValue: mockGeminiChat },
       ],
     }).compile();
 
@@ -89,46 +91,23 @@ describe('IronService', () => {
   });
 
   describe('processMessage', () => {
-    it('should respond to weather queries', async () => {
+    it('should respond using Gemini chat', async () => {
       const result = await service.processMessage('como está o tempo?');
-      expect(result.reply).toContain('Temperatura');
-      expect(result.reply).toContain('25°C');
+      expect(result.reply).toBe('Resposta do Irons via Gemini');
+      expect(mockGeminiChat.chat).toHaveBeenCalled();
     });
 
-    it('should respond to wave queries', async () => {
-      const result = await service.processMessage('como estão as ondas?');
-      expect(result.reply).toContain('Onda');
-      expect(result.reply).toContain('1.2m');
-    });
-
-    it('should respond to wind queries', async () => {
-      const result = await service.processMessage('qual a velocidade do vento?');
-      expect(result.reply).toContain('Vento');
-      expect(result.reply).toContain('12 km/h');
-    });
-
-    it('should respond to traffic queries', async () => {
-      const result = await service.processMessage('como está o trânsito?');
-      expect(result.reply).toContain('Trânsito');
-    });
-
-    it('should respond to commerce queries', async () => {
-      const result = await service.processMessage('tem restaurante por aqui?');
-      expect(result.reply).toContain('Comércio');
-    });
-
-    it('should respond to news queries', async () => {
-      const result = await service.processMessage('quais as notícias?');
-      expect(result.reply).toContain('Notícias');
-    });
-
-    it('should respond to greeting', async () => {
-      const result = await service.processMessage('oi');
-      expect(result.reply).toContain('Irons');
+    it('should collect context from all services', async () => {
+      await service.processMessage('qual a situação geral?');
+      expect(mockMeteorologyService.getCurrentWeather).toHaveBeenCalledWith('ilha-comprida');
+      expect(mockOceanographyService.getSwellConditions).toHaveBeenCalled();
+      expect(mockTrafficService.getTraffic).toHaveBeenCalled();
+      expect(mockComercioService.getAllCommerce).toHaveBeenCalled();
+      expect(mockNoticiasService.getData).toHaveBeenCalled();
     });
 
     it('should handle errors gracefully', async () => {
-      mockMeteorologyService.getCurrentWeather.mockRejectedValueOnce(new Error('API Error'));
+      mockGeminiChat.chat.mockRejectedValueOnce(new Error('Gemini Error'));
       const result = await service.processMessage('tempo');
       expect(result.reply).toContain('⚠️');
     });

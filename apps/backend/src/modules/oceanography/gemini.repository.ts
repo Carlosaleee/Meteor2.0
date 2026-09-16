@@ -105,7 +105,7 @@ Estrutura OBRIGATÓRIA do briefing (use tópicos com emoji):
 - Horários a evitar: tarde após 14h (vento terrestre)
 - Manhã cedo (06h-09h): vento offshore, mar liso
 
-🏆 **Melhores Picos**
+🏆 **Melhores Points**
 - Recomendação principal baseada na direção atual
 - Alternativas para diferentes níveis (iniciante/avançado)
 
@@ -180,8 +180,8 @@ Condições: ${kiteCondition}. Velocidade atual: ${data.windSpeed} km/h. ${data.
 ⏰ **Melhores Horários**
 Janela ideal: ${data.bestTime}. Evite o período da tarde (após 14h) quando o vento terrestre costuma aumentar. Manhã cedo (06h-09h) oferece as melhores condições com vento offshore e mar mais liso.
 
-🏆 **Melhores Picos**
-${bestSpot} é o pico recomendado para hoje — ${spotReason}. Com a direção atual de ${dir}, este pico apresenta melhor quebra e condições mais consistentes. Para iniciantes, prefira a Prancha do Leste ou Balneário Adriana.
+🏆 **Melhores Points**
+${bestSpot} é o point recomendado para hoje — ${spotReason}. Com a direção atual de ${dir}, este point apresenta melhor quebra e condições mais consistentes. Para iniciantes, prefira a Prancha do Leste ou Balneário Adriana.
 
 ⚠️ **Alertas**
 Próxima maré alta: ${data.nextTide}. Coeficiente: ${data.tideCoefficient}. ${data.tideCoefficient > 0.7 ? 'Maré com coeficiente alto — cuidado com correntes de retorno.' : 'Maré com coeficiente moderado — condições seguras para banhistas.'} Verifique sempre os avisos da Defesa Civil antes de entrar na água.`;

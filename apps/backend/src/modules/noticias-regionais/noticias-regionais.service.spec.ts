@@ -6,7 +6,7 @@ describe('NoticiasRegionaisService', () => {
   let service: NoticiasRegionaisService;
 
   const mockNoticiasRegionaisRepository = {
-    getData: jest.fn().mockReturnValue({
+    getData: jest.fn().mockResolvedValue({
       news: [
         { id: '1', title: 'Notícia Teste', category: 'noticia', source: 'Fonte Teste' },
         { id: '2', title: 'Trânsito Teste', category: 'transito', source: 'Fonte Teste' },
@@ -16,10 +16,10 @@ describe('NoticiasRegionaisService', () => {
       ],
       timestamp: new Date().toISOString(),
     }),
-    getNewsByCategory: jest.fn().mockReturnValue([
+    getNewsByCategory: jest.fn().mockResolvedValue([
       { id: '1', title: 'Notícia Teste', category: 'noticia' },
     ]),
-    getRoutes: jest.fn().mockReturnValue([
+    getRoutes: jest.fn().mockResolvedValue([
       { id: 'sp-222', name: 'SP-222', condition: 'LIVRE' },
     ]),
   };
@@ -40,24 +40,24 @@ describe('NoticiasRegionaisService', () => {
   });
 
   describe('getData', () => {
-    it('should return news and routes', () => {
-      const result = service.getData();
+    it('should return news and routes', async () => {
+      const result = await service.getData();
       expect(result.news).toHaveLength(2);
       expect(result.routes).toHaveLength(1);
     });
   });
 
   describe('getNewsByCategory', () => {
-    it('should filter by category', () => {
-      const result = service.getNewsByCategory('noticia');
+    it('should filter by category', async () => {
+      const result = await service.getNewsByCategory('noticia');
       expect(result).toHaveLength(1);
       expect(result[0].category).toBe('noticia');
     });
   });
 
   describe('getRoutes', () => {
-    it('should return traffic routes', () => {
-      const result = service.getRoutes();
+    it('should return traffic routes', async () => {
+      const result = await service.getRoutes();
       expect(result).toHaveLength(1);
     });
   });

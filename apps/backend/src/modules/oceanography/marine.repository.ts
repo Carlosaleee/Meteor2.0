@@ -35,7 +35,7 @@ export class MarineRepository {
   constructor(private readonly fallback: FallbackService) {}
 
   async getMarineData(lat: number, lon: number): Promise<MarineData> {
-    const { data: cached, isStale } = this.fallback.loadWithTimestamp<{ current: MarineData }>(FALLBACK_FILE);
+    const { data: cached, isStale } = await this.fallback.loadWithTimestamp<{ current: MarineData }>(FALLBACK_FILE);
 
     if (!isStale && cached?.current) {
       this.logger.debug('Using fresh fallback for oceanography');
@@ -122,9 +122,9 @@ export class MarineRepository {
     }
   }
 
-  private saveFallback(current: MarineData): void {
-    const existing = this.fallback.load<{ current?: MarineData; quality?: unknown; tides?: unknown; spots?: unknown }>(FALLBACK_FILE);
-    this.fallback.save(FALLBACK_FILE, {
+  private async saveFallback(current: MarineData): Promise<void> {
+    const existing = await this.fallback.load<{ current?: MarineData; quality?: unknown; tides?: unknown; spots?: unknown }>(FALLBACK_FILE);
+    await this.fallback.save(FALLBACK_FILE, {
       current,
       quality: existing?.quality,
       tides: existing?.tides,

@@ -21,7 +21,7 @@ describe('ResumoIA', () => {
   });
 
   it('should split into two columns', () => {
-    const summary = '🏄 **Ondas**\n- Dados\n\n🌬️ **Vento**\n- Dados\n\n⏰ **Horários**\n- Dados\n\n🏆 **Picos**\n- Dados';
+    const summary = '🏄 **Ondas**\n- Dados\n\n🌬️ **Vento**\n- Dados\n\n⏰ **Horários**\n- Dados\n\n🏆 **Points**\n- Dados';
     render(<ResumoIA summary={summary} loading={false} error={null} />);
     const columns = screen.getAllByText(/Dados/);
     expect(columns.length).toBeGreaterThan(0);

@@ -45,10 +45,10 @@
 | Rota | Descricao | Dados |
 |------|-----------|-------|
 | `/` | Portal principal - HUD Tatico | Estatico + ChatWidget + banner |
-| `/meteorologia` | Meteorologia & Vento | **API real** (4 cidades) + RainViewer radar + PageBanner |
-| `/swell` | Swell & Picos | **API real** + Gemini AI + ApexCharts + Leaflet |
+| `/meteorologia` | Previsão do Tempo & Vento | **API real** (4 cidades) + RainViewer radar + PageBanner |
+| `/swell` | Swell & Points | **API real** + Gemini AI + ApexCharts + Leaflet |
 | `/noticias` | Noticias Regionais + Transito | **API real** (fallback-noticias-regionais) + TrafficMap Leaflet + CityGrid |
-| `/comercio` | Comercio de Ilha Comprida | **API real** (fallback-localismo) + CommerceMap Leaflet + OSRM routing |
+| `/comercio` | Comercio de Ilha Comprida | **API real** (fallback-comercio) + CommerceMap Leaflet + OSRM routing |
 | `/blog` | Blog Tecnico | Estatico (4 artigos) |
 | `/creditos` | Creditos & Fontes | Estatico |
 | `/mapa` | Mapa de Localizacoes | Leaflet (6 marcadores) |
@@ -98,10 +98,12 @@
 - Servico: Integracao com agente IA para respostas contextuais
 - Modulos integrados: Meteorology, Oceanography, Traffic, Comercio, NoticiasRegionais
 - IA: Gemini 2.5 Flash para processamento de mensagens
+- Validacao: Zod schema para input do usuario
+- Contexto: Coleta dados de todos os modulos e envia como contexto para Gemini
 
 ### 4.7 FallbackService (Global)
 - Servico compartilhado entre todos os modulos
-- Carrega fallback do disco na inicializacao
+- Carrega fallback do disco de forma assincrona (fs.promises)
 - Salva dados frescos quando API responde
 - Verifica staleness (> 24h = stale)
 - Fallback final: medias sazonais da regiao
@@ -372,7 +374,7 @@ Meteor_2.0/
 ### Nav Bar (Responsiva)
 - **Desktop (md+):** `hidden md:flex` — horizontal centrado com 7 itens
 - **Mobile:** Hamburger (`FaBars`/`FaTimes`) com dropdown vertical
-- **Ordem:** Principal > Meteorologia > Swell > Noticias > Comercio > Blog > Creditos
+- **Ordem:** Principal > Previsão do Tempo > Swell > Noticias > Comercio > Blog > Creditos
 - Pagina ativa: borda dourada `border-b-2` (desktop) / `border-l-2` (mobile)
 - Hover dourado: `hover:bg-nav-hover-bg hover:text-nav-hover-text`
 - Fecha automaticamente ao navegar (`useEffect` com `pathname`)
@@ -380,7 +382,7 @@ Meteor_2.0/
 
 ### Footer (4 Colunas — Layout Atualizado)
 - **Linha 1:** "METEOR 2.0" centralizado em dourado + descricao do projeto
-- **Coluna 1 — Navegacao:** 7 links internos (Meteorologia, Swell, Transito, Noticias, Blog, Mapa, Creditos)
+- **Coluna 1 — Navegacao:** 7 links internos (Previsão do Tempo, Swell, Transito, Noticias, Blog, Mapa, Creditos)
 - **Coluna 2 — Fontes de Dados:** Open-Meteo, INMET, RainViewer, CPTEC/INPE, OpenStreetMap
 - **Coluna 3 — Stack Tecnologica:** Next.js 15, NestJS, Tailwind CSS, Leaflet, TypeScript
 - **Coluna 4 — Links Uteis:** Contatos de emergencia (PM 190, Bombeiros 193, SAMU 192, Defesa Civil 199, Hospital, Policia Rodoviaria 197)
@@ -410,7 +412,7 @@ Meteor_2.0/
 
 ---
 
-## 11. Pagina de Meteorologia (Detalhes)
+## 11. Pagina de Previsão do Tempo (Detalhes)
 
 ### Estrutura Principal
 - **Container:** `<main>` com `bg-slate-950 border border-slate-800 rounded-2xl`
@@ -443,7 +445,7 @@ Meteor_2.0/
 | Skeletons.tsx | Loading states |
 | weather-utils.ts | Funcoes utilitarias (emoji, descricao, formatacao) |
 
-### Acessibilidade (Meteorologia)
+### Acessibilidade (Previsão do Tempo)
 - `title` em todos os botooes e cards interativos
 - `aria-label` em todas as secoes
 - `aria-live="polite"` para atualizacoes
@@ -469,7 +471,7 @@ Meteor_2.0/
 - **Container:** `<div className="space-y-8">` com PageBanner + Hero + Tabs + Conteudo
 - **Hero:** Gradient blue com qualidade, melhor horário, botão Atualizar
 - **KPI Cards:** 4 cards (Altura, Swell, Direção, Maré)
-- **SwellTabs:** 5 abas (Notícias → Ondas → Picos → Marés → Visão Geral)
+- **SwellTabs:** 5 abas (Notícias → Ondas → Points → Marés → Visão Geral)
 
 ### Abas e Conteúdo
 
@@ -487,7 +489,7 @@ Meteor_2.0/
   - Altura: 350px
 - **HourlySwell:** Grid responsivo 12 horas com classificação de qualidade
 
-#### Picos
+#### Points
 - **SpotGrid:** Cards com filtros (Iniciante/Intermediário/Avançado) e busca
 - **SwellMap:** Leaflet com 6 marcadores coloridos
 
@@ -499,7 +501,7 @@ Meteor_2.0/
   - Altura: 320px
 
 #### Visão Geral
-- **ResumoIA:** Briefing Gemini com tópicos (Ondas, Vento, Horários, Picos, Alertas)
+- **ResumoIA:** Briefing Gemini com tópicos (Ondas, Vento, Horários, Points, Alertas)
 - **ConditionCards:** 5 mini cards (Onda, Swell, Período, Direção, Qualidade)
 - **HourlySwell:** Grid 12 horas
 - **DailyTip:** Dica prática + prancha recomendada

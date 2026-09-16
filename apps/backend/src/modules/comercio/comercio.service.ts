@@ -5,16 +5,16 @@ import { ComercioRepository } from './comercio.repository';
 export class ComercioService {
   constructor(private readonly comercioRepo: ComercioRepository) {}
 
-  getComercioData() {
+  async getComercioData() {
     return this.comercioRepo.getComercioData();
   }
 
-  getAllCommerce() {
-    const data = this.comercioRepo.getComercioData();
+  async getAllCommerce() {
+    const data = await this.comercioRepo.getComercioData();
     return data.commerce;
   }
 
-  getCommerceBySector(sector: string) {
+  async getCommerceBySector(sector: string) {
     return this.comercioRepo.getCommerceBySector(sector);
   }
 }

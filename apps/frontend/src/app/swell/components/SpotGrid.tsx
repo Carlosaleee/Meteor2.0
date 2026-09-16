@@ -29,11 +29,11 @@ export function SpotGrid({ spots, selectedSpot, onSelectSpot }: SpotGridProps) {
   });
 
   return (
-    <section className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5" aria-label="Picos de surf">
+    <section className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5" aria-label="Points de surf">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
           <FaMapMarkerAlt className="w-4 h-4 text-blue-400" aria-hidden="true" />
-          Picos de Surf — Ilha Comprida
+          Points de Surf — Ilha Comprida
         </h3>
         <div className="relative">
           <FaSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-500" aria-hidden="true" />
@@ -55,7 +55,7 @@ export function SpotGrid({ spots, selectedSpot, onSelectSpot }: SpotGridProps) {
             key={f.id}
             role="radio"
             aria-checked={filter === f.id}
-            title={`Filtrar picos: ${f.label}`}
+            title={`Filtrar points: ${f.label}`}
             onClick={() => setFilter(f.id)}
             className={`px-3 py-1.5 text-xs rounded-lg border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${
               filter === f.id

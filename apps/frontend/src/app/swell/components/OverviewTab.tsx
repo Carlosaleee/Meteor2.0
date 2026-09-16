@@ -105,12 +105,12 @@ export function OverviewTab({
         {hourlyLoading ? <SkeletonHourly /> : hourlyData && <HourlySwell data={hourlyData} />}
       </ForecastSection>
 
-      {/* 5. Todos os Picos — full width, 2 linhas de 5 */}
+      {/* 5. Todos os Points — full width, 2 linhas de 5 */}
       <ForecastSection
-        id="overview-picos"
-        title="Todos os Picos"
+        id="overview-points"
+        title="Todos os Points"
         icon={<FaMapMarkerAlt className="w-4 h-4 text-blue-400" aria-hidden="true" />}
-        ariaLabel="Todos os picos de surf"
+        ariaLabel="Todos os points de surf"
       >
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
           {SPOTS.map(spot => {
