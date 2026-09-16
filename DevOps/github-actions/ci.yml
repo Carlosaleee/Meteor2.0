@@ -10,9 +10,6 @@ jobs:
   backend-test:
     name: Backend Tests (Jest)
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/backend
 
     steps:
       - uses: actions/checkout@v4
@@ -30,14 +27,11 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run tests
-        run: npx jest --forceExit --detectOpenHandles
+        run: cd apps/backend && npx jest --forceExit --detectOpenHandles
 
   frontend-test:
     name: Frontend Tests (Vitest)
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/frontend
 
     steps:
       - uses: actions/checkout@v4
@@ -55,7 +49,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run tests
-        run: npx vitest run
+        run: cd apps/frontend && npx vitest run
 
   lint:
     name: Lint
