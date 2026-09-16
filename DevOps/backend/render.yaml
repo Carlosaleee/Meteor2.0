@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: meteor2-0-backend
+    env: node
+    region: oregon
+    rootDir: .
+    buildCommand: pnpm install && cd apps/backend && pnpm build
+    startCommand: cd apps/backend && node dist/main.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: FRONTEND_ORIGIN
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: GEMINI_TEMPERATURE
+        value: "0.7"
+      - key: GEMINI_API_BASE_URL
+        value: https://generativelanguage.googleapis.com/v1beta/models
+      - key: FALLBACK_DIR
+        value: data
+      - key: FALLBACK_MAX_AGE_HOURS
+        value: "24"

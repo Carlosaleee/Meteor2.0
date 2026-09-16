@@ -1,0 +1,17 @@
+apps/backend/
+apps/backend/**
+node_modules/
+.git/
+.agents/
+.opencode/
+DevOps/
+.github/
+*.md
+!README.md
+.env
+.env.*
+!.env.example
+coverage/
+dist/
+.next/
+out/

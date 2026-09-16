@@ -543,3 +543,82 @@ comercio/
 | Hook | Descricao |
 |------|-----------|
 | useComercio.ts | Busca GET /v1/comercio |
+
+---
+
+## Deploy em Produção
+
+### Visão Geral
+
+O Meteor 2.0 é um monorepo com dois apps separados para deploy:
+
+| App | Plataforma | URL |
+|-----|-----------|-----|
+| Frontend (Next.js) | Vercel | `https://meteor2-0-frontend.vercel.app` |
+| Backend (NestJS) | Railway/Render | `https://meteor2-0-backend.vercel.app` |
+
+### Deploy do Frontend (Vercel)
+
+1. Importar repositório no Vercel
+2. Configurar variável de ambiente:
+   ```
+   NEXT_PUBLIC_API_URL=https://meteor2-0-backend.vercel.app
+   ```
+3. Configurações de build:
+   - Root Directory: `apps/frontend`
+   - Build Command: `pnpm build`
+   - Output Directory: `.next`
+
+### Deploy do Backend (Railway — Recomendado)
+
+O backend usa filesystem para fallback, por isso Railway é recomendado (stateful).
+
+1. Criar projeto no Railway
+2. Conectar ao GitHub
+3. Configurar variáveis de ambiente (ver `DevOps/env/.env.backend.example`)
+4. Railway detecta `railway.json` automaticamente
+
+**Variáveis essenciais:**
+```
+PORT=3001
+FRONTEND_ORIGIN=https://meteor2-0-frontend.vercel.app
+GEMINI_API_KEY=sua_chave
+GEMINI_MODEL=gemini-2.5-flash
+```
+
+### CI/CD (GitHub Actions)
+
+Pipeline automático de testes e build:
+
+```bash
+# Ativar CI/CD
+mkdir -p .github/workflows
+cp DevOps/github-actions/ci.yml .github/workflows/ci.yml
+```
+
+**Jobs:**
+- `backend-test`: Roda Jest
+- `frontend-test`: Roda Vitest
+- `lint`: Verifica código
+- `build`: Valida compilação
+
+### Variáveis de Ambiente (Produção)
+
+#### Frontend
+| Variável | Valor |
+|----------|-------|
+| `NEXT_PUBLIC_API_URL` | URL do backend em produção |
+
+#### Backend
+| Variável | Valor |
+|----------|-------|
+| `PORT` | `3001` |
+| `FRONTEND_ORIGIN` | URL do frontend em produção |
+| `GEMINI_API_KEY` | Chave da API Gemini |
+| `GEMINI_MODEL` | `gemini-2.5-flash` |
+| `FALLBACK_DIR` | `data` |
+| `FALLBACK_MAX_AGE_HOURS` | `24` |
+
+### Documentação Completa
+
+Consulte `DevOps/README.md` para guia detalhado de deploy.
