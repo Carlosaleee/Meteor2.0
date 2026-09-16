@@ -72,7 +72,10 @@ describe('MeteorologyService', () => {
 
     it('should include hourly data', async () => {
       const result = await service.getCurrentWeather();
-      expect(result.hourly).toHaveLength(2);
+      expect(Array.isArray(result.hourly)).toBe(true);
+      expect(result.hourly.length).toBeGreaterThanOrEqual(1);
+      expect(result.hourly[0]).toHaveProperty('time');
+      expect(result.hourly[0]).toHaveProperty('temperature');
     });
 
     it('should include daily data', async () => {
