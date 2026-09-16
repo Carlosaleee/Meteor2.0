@@ -548,76 +548,74 @@ comercio/
 
 ## Deploy em Produção
 
-### Visão Geral
+### URLs de Produção
 
-O Meteor 2.0 é um monorepo com dois apps separados para deploy:
+| Serviço | URL |
+|---------|-----|
+| Frontend | `https://meteor2-0-frontend.vercel.app` |
+| Backend | `https://meteor2-0-backend.vercel.app` |
+| Health Check | `https://meteor2-0-backend.vercel.app/health` |
 
-| App | Plataforma | URL |
-|-----|-----------|-----|
-| Frontend (Next.js) | Vercel | `https://meteor2-0-frontend.vercel.app` |
-| Backend (NestJS) | Railway/Render | `https://meteor2-0-backend.vercel.app` |
+### Configuração de Variáveis de Ambiente
 
-### Deploy do Frontend (Vercel)
+#### Frontend (Vercel)
 
-1. Importar repositório no Vercel
-2. Configurar variável de ambiente:
-   ```
-   NEXT_PUBLIC_API_URL=https://meteor2-0-backend.vercel.app
-   ```
-3. Configurações de build:
-   - Root Directory: `apps/frontend`
-   - Build Command: `pnpm build`
-   - Output Directory: `.next`
+A variável `NEXT_PUBLIC_API_URL` está configurada no arquivo `apps/frontend/.env.production`:
 
-### Deploy do Backend (Railway — Recomendado)
-
-O backend usa filesystem para fallback, por isso Railway é recomendado (stateful).
-
-1. Criar projeto no Railway
-2. Conectar ao GitHub
-3. Configurar variáveis de ambiente (ver `DevOps/env/.env.backend.example`)
-4. Railway detecta `railway.json` automaticamente
-
-**Variáveis essenciais:**
 ```
-PORT=3001
-FRONTEND_ORIGIN=https://meteor2-0-frontend.vercel.app
-GEMINI_API_KEY=sua_chave
-GEMINI_MODEL=gemini-2.5-flash
+NEXT_PUBLIC_API_URL=https://meteor2-0-backend.vercel.app
 ```
+
+**Não é necessário configurar no Vercel Dashboard** — o Next.js usa automaticamente `.env.production` em builds de produção.
+
+#### Backend (Vercel)
+
+Variáveis configuradas no Vercel Dashboard (Settings → Environment Variables):
+
+| Variável | Valor | Descrição |
+|----------|-------|-----------|
+| `FRONTEND_ORIGIN` | `https://meteor2-0-frontend.vercel.app` | CORS origin |
+| `GEMINI_API_KEY` | *(chave secreta)* | API Gemini |
+| `GEMINI_MODEL` | `gemini-2.5-flash` | Modelo Gemini |
+| `GEMINI_TEMPERATURE` | `0.7` | Temperatura |
+| `FALLBACK_DIR` | `data` | Diretório fallback |
 
 ### CI/CD (GitHub Actions)
 
-Pipeline automático de testes e build:
-
-```bash
-# Ativar CI/CD
-mkdir -p .github/workflows
-cp DevOps/github-actions/ci.yml .github/workflows/ci.yml
-```
+Pipeline ativo em `.github/workflows/ci.yml`:
 
 **Jobs:**
-- `backend-test`: Roda Jest
-- `frontend-test`: Roda Vitest
-- `lint`: Verifica código
-- `build`: Valida compilação
+- `backend-test`: Roda Jest (41 testes)
+- `frontend-test`: Roda Vitest (13 testes)
+- `lint`: oxlint (frontend)
+- `build`: Valida compilação (após testes)
 
-### Variáveis de Ambiente (Produção)
+### Fluxo de Deploy
 
-#### Frontend
-| Variável | Valor |
-|----------|-------|
-| `NEXT_PUBLIC_API_URL` | URL do backend em produção |
+1. Push para `main` dispara CI/CD automaticamente
+2. Testes rodam em paralelo (backend + frontend + lint)
+3. Build valida compilação
+4. Vercel detecta mudanças e faz redeploy automático
+5. Frontend e backend são redeployados independentemente
 
-#### Backend
-| Variável | Valor |
-|----------|-------|
-| `PORT` | `3001` |
-| `FRONTEND_ORIGIN` | URL do frontend em produção |
-| `GEMINI_API_KEY` | Chave da API Gemini |
-| `GEMINI_MODEL` | `gemini-2.5-flash` |
-| `FALLBACK_DIR` | `data` |
-| `FALLBACK_MAX_AGE_HOURS` | `24` |
+### Estrutura DevOps
+
+```
+DevOps/
+├── README.md                    # Guia completo de deploy
+├── frontend/
+│   ├── vercel.json              # Config Vercel (monorepo)
+│   └── .vercelignore            # Arquivos ignorados
+├── backend/
+│   ├── Dockerfile               # Container (alternativa Railway/Render)
+│   ├── railway.json             # Deploy Railway (alternativa)
+│   └── render.yaml              # Deploy Render (alternativa)
+├── github-actions/
+│   └── ci.yml                   # Pipeline CI/CD
+└── env/
+    ├── .env.frontend.example    # Vars frontend
+    └── .env.backend.example     # Vars backend
+```
 
 ### Documentação Completa
 

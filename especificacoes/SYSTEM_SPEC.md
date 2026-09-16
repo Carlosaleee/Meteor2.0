@@ -547,7 +547,74 @@ Meteor_2.0/
 
 ---
 
-## 13. Imagens
+## 13. Deploy em Produção
+
+### URLs de Produção
+
+| Serviço | URL |
+|---------|-----|
+| Frontend | `https://meteor2-0-frontend.vercel.app` |
+| Backend | `https://meteor2-0-backend.vercel.app` |
+| Health Check | `https://meteor2-0-backend.vercel.app/health` |
+
+### Plataformas
+
+| App | Plataforma | Tipo |
+|-----|-----------|------|
+| Frontend (Next.js) | Vercel | Serverless (static + ISR) |
+| Backend (NestJS) | Vercel | Serverless (API routes) |
+
+### Variáveis de Ambiente (Produção)
+
+#### Frontend (Vercel)
+| Variável | Valor | Descrição |
+|----------|-------|-----------|
+| `NEXT_PUBLIC_API_URL` | `https://meteor2-0-backend.vercel.app` | URL da API backend (bundled no JS) |
+
+Configurado em: `apps/frontend/.env.production`
+
+#### Backend (Vercel)
+| Variável | Valor | Descrição |
+|----------|-------|-----------|
+| `FRONTEND_ORIGIN` | `https://meteor2-0-frontend.vercel.app` | CORS origin |
+| `GEMINI_API_KEY` | *(chave secreta)* | API Gemini para resumo IA |
+| `GEMINI_MODEL` | `gemini-2.5-flash` | Modelo Gemini |
+| `GEMINI_TEMPERATURE` | `0.7` | Temperatura Gemini |
+| `FALLBACK_DIR` | `data` | Diretório de fallback |
+
+### CI/CD (GitHub Actions)
+
+Pipeline em `.github/workflows/ci.yml`:
+
+| Job | Descrição | Trigger |
+|-----|-----------|---------|
+| `backend-test` | Jest (41 testes) | push/PR |
+| `frontend-test` | Vitest (13 testes) | push/PR |
+| `lint` | oxlint (frontend) | push/PR |
+| `build` | Valida compilação | Após testes |
+
+### Estrutura DevOps
+
+```
+DevOps/
+├── README.md                    # Guia completo de deploy
+├── frontend/
+│   ├── vercel.json              # Config Vercel (monorepo)
+│   └── .vercelignore            # Arquivos ignorados
+├── backend/
+│   ├── Dockerfile               # Container (alternativa)
+│   ├── railway.json             # Deploy Railway (alternativa)
+│   └── render.yaml              # Deploy Render (alternativa)
+├── github-actions/
+│   └── ci.yml                   # Pipeline CI/CD
+└── env/
+    ├── .env.frontend.example    # Vars frontend
+    └── .env.backend.example     # Vars backend
+```
+
+---
+
+## 14. Imagens
 
 | Arquivo | Dimensoes | Uso |
 |---------|-----------|-----|
