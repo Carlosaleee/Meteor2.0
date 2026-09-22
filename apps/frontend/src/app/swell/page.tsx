@@ -310,7 +310,7 @@ export default function SwellPage() {
 
               <ForecastSection
                 id="resumo"
-                title="Resumo IA — Gemini Flash"
+                title="Resumo IA"
                 icon={<span aria-hidden="true">🤖</span>}
                 ariaLabel="Resumo inteligente das condições"
               >
