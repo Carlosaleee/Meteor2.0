@@ -7,6 +7,7 @@ import { OceanographyModule } from '../oceanography/oceanography.module';
 import { TrafficModule } from '../traffic/traffic.module';
 import { ComercioModule } from '../comercio/comercio.module';
 import { NoticiasRegionaisModule } from '../noticias-regionais/noticias-regionais.module';
+import { NewsModule } from '../news/news.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { NoticiasRegionaisModule } from '../noticias-regionais/noticias-regionai
     TrafficModule,
     ComercioModule,
     NoticiasRegionaisModule,
+    NewsModule,
   ],
   controllers: [IronController],
   providers: [IronService, GeminiChatRepository],

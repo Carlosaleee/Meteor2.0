@@ -4,6 +4,8 @@ import { OceanographyService } from '../oceanography/oceanography.service';
 import { TrafficService } from '../traffic/traffic.service';
 import { ComercioService } from '../comercio/comercio.service';
 import { NoticiasRegionaisService } from '../noticias-regionais/noticias-regionais.service';
+import { NewsRepository } from '../news/news.repository';
+import { WeatherNewsRepository } from '../meteorology/weather-news.repository';
 import { GeminiChatRepository } from './gemini-chat.repository';
 
 type ChatResponse = {
@@ -21,12 +23,12 @@ export class IronService {
     private readonly trafficService: TrafficService,
     private readonly comercioService: ComercioService,
     private readonly noticiasService: NoticiasRegionaisService,
+    private readonly newsRepo: NewsRepository,
+    private readonly weatherNewsRepo: WeatherNewsRepository,
     private readonly geminiChat: GeminiChatRepository,
   ) {}
 
   async processMessage(message: string): Promise<ChatResponse> {
-    const q = message.toLowerCase().trim();
-
     try {
       const context = await this.collectContext();
       const reply = await this.geminiChat.chat(message, context);
@@ -38,12 +40,15 @@ export class IronService {
   }
 
   private async collectContext() {
-    const [weatherResult, oceanResult, trafficResult, commerceResult, newsResult] = await Promise.allSettled([
+    const [weatherResult, oceanResult, trafficResult, commerceResult, newsResult, rankingsResult, hourlyResult, weatherNewsResult] = await Promise.allSettled([
       this.meteorologyService.getCurrentWeather('ilha-comprida'),
       this.oceanographyService.getSwellConditions(),
       this.trafficService.getTraffic(),
       this.comercioService.getAllCommerce(),
       this.noticiasService.getData(),
+      this.newsRepo.getNewsData(),
+      this.getHourlyForecast(),
+      this.getWeatherNewsAlerts(),
     ]);
 
     return {
@@ -72,7 +77,47 @@ export class IronService {
       news: newsResult.status === 'fulfilled' ? {
         headlines: newsResult.value.news.slice(0, 3).map(n => n.title),
       } : undefined,
+      rankings: rankingsResult.status === 'fulfilled' ? {
+        men: rankingsResult.value.rankings.men.slice(0, 5),
+        women: rankingsResult.value.rankings.women.slice(0, 5),
+        events: rankingsResult.value.events.slice(0, 3),
+      } : undefined,
+      hourly: hourlyResult.status === 'fulfilled' ? hourlyResult.value : undefined,
+      weatherNews: weatherNewsResult.status === 'fulfilled' ? weatherNewsResult.value : undefined,
     };
+  }
+
+  private async getHourlyForecast() {
+    try {
+      const data = await this.meteorologyService.getCurrentWeather('ilha-comprida');
+      const now = new Date();
+      const next6h = (data.hourly || [])
+        .filter(h => new Date(h.time) >= now)
+        .slice(0, 6)
+        .map(h => ({
+          time: h.time,
+          temperature: h.temperature,
+          windSpeed: h.windSpeed,
+          precipitationProbability: h.precipitationProbability,
+        }));
+      return { next6h };
+    } catch {
+      return undefined;
+    }
+  }
+
+  private async getWeatherNewsAlerts() {
+    try {
+      const result = await this.weatherNewsRepo.getWeatherNews();
+      return {
+        alerts: result.news
+          .filter(n => n.type === 'alerta')
+          .slice(0, 3)
+          .map(n => ({ title: n.title, source: n.source, type: n.type })),
+      };
+    } catch {
+      return undefined;
+    }
   }
 
   private getWeatherDescription(code: number): string {

@@ -5,6 +5,8 @@ import { OceanographyService } from '../oceanography/oceanography.service';
 import { TrafficService } from '../traffic/traffic.service';
 import { ComercioService } from '../comercio/comercio.service';
 import { NoticiasRegionaisService } from '../noticias-regionais/noticias-regionais.service';
+import { NewsRepository } from '../news/news.repository';
+import { WeatherNewsRepository } from '../meteorology/weather-news.repository';
 import { GeminiChatRepository } from './gemini-chat.repository';
 
 describe('IronService', () => {
@@ -23,6 +25,9 @@ describe('IronService', () => {
         precipitation: 0,
         weatherCode: 1,
       },
+      hourly: [
+        { time: new Date().toISOString(), temperature: 25, windSpeed: 12, precipitationProbability: 10 },
+      ],
     }),
   };
 
@@ -66,6 +71,27 @@ describe('IronService', () => {
     }),
   };
 
+  const mockNewsRepo = {
+    getNewsData: jest.fn().mockResolvedValue({
+      news: [
+        { id: '1', title: 'WSL News', category: 'WSL' },
+      ],
+      rankings: {
+        men: [{ rank: 1, name: 'Teste', country: 'Brazil', points: 40000 }],
+        women: [{ rank: 1, name: 'Teste', country: 'Brazil', points: 35000 }],
+      },
+      events: [{ name: 'Teste Pro', location: 'SP', dates: '20-25 Set', status: 'Upcoming' }],
+    }),
+  };
+
+  const mockWeatherNewsRepo = {
+    getWeatherNews: jest.fn().mockResolvedValue({
+      news: [
+        { id: '1', title: 'Alerta Teste', source: 'INMET', type: 'alerta' },
+      ],
+    }),
+  };
+
   const mockGeminiChat = {
     chat: jest.fn().mockResolvedValue('Resposta do Irons via Gemini'),
   };
@@ -79,6 +105,8 @@ describe('IronService', () => {
         { provide: TrafficService, useValue: mockTrafficService },
         { provide: ComercioService, useValue: mockComercioService },
         { provide: NoticiasRegionaisService, useValue: mockNoticiasService },
+        { provide: NewsRepository, useValue: mockNewsRepo },
+        { provide: WeatherNewsRepository, useValue: mockWeatherNewsRepo },
         { provide: GeminiChatRepository, useValue: mockGeminiChat },
       ],
     }).compile();
@@ -104,6 +132,16 @@ describe('IronService', () => {
       expect(mockTrafficService.getTraffic).toHaveBeenCalled();
       expect(mockComercioService.getAllCommerce).toHaveBeenCalled();
       expect(mockNoticiasService.getData).toHaveBeenCalled();
+    });
+
+    it('should collect rankings context from WSL', async () => {
+      await service.processMessage('quem está liderando o ranking?');
+      expect(mockNewsRepo.getNewsData).toHaveBeenCalled();
+    });
+
+    it('should collect weather news alerts', async () => {
+      await service.processMessage('tem algum alerta?');
+      expect(mockWeatherNewsRepo.getWeatherNews).toHaveBeenCalled();
     });
 
     it('should handle errors gracefully', async () => {

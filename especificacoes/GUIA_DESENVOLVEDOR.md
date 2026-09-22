@@ -597,8 +597,8 @@ Variáveis configuradas no Vercel Dashboard (Settings → Environment Variables)
 Pipeline ativo em `.github/workflows/ci.yml`:
 
 **Jobs:**
-- `backend-test`: Roda Jest (50 testes)
-- `frontend-test`: Roda Vitest (13 testes)
+- `backend-test`: Roda Jest (80 testes)
+- `frontend-test`: Roda Vitest (41 testes)
 - `lint`: oxlint (frontend)
 - `build`: Valida compilação (após testes)
 

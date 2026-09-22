@@ -134,6 +134,47 @@ GET /v1/meteorology?locationId=ilha-comprida
 
 ---
 
+## GET /v1/meteorology/news
+
+Noticias meteorologicas e alertas em tempo real, coletados do INMET, CPTEC/INPE e Defesa Civil.
+
+**Query Parameters:**
+| Parametro | Tipo | Obrigatorio | Descricao |
+|-----------|------|-------------|-----------|
+| cityId | string | Nao | Filtrar por cidade (ilha-comprida, iguape, cananeia, registro) |
+
+**Response:**
+```json
+{
+  "news": [
+    {
+      "id": "string",
+      "cityId": "ilha-comprida",
+      "title": "Alerta de tempestade para o litoral sul",
+      "source": "INMET",
+      "type": "alerta",
+      "url": "https://apitempo.inmet.gov.br/...",
+      "publishedAt": "2026-09-21T12:00:00.000Z"
+    }
+  ],
+  "timestamp": "2026-09-21T12:00:00.000Z"
+}
+```
+
+**Tipos de noticia:**
+| Tipo | Descricao |
+|------|-----------|
+| alerta | Alerta meteorologico ativo (INMET, Defesa Civil) |
+| informe | Informe meteorologico (CPTEC) |
+| boletim | Boletim meteorologico geral |
+
+**Fontes de dados:**
+- INMET (apitempo.inmet.gov.br) — Estacoes automaticas SP
+- CPTEC/INPE (cptec.inpe.br) — Previsoes regionais
+- Defesa Civil SP (defesacivil.sp.gov.br) — Alertas de risco
+
+---
+
 ## GET /v1/oceanography
 
 Dados oceanicos de ondas, swell e marees.

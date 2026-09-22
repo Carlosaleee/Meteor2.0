@@ -293,15 +293,22 @@ Arquivo: `~/.config/opencode/opencode.jsonc`
 ### Backend (Jest)
 | Arquivo | Testes | Status |
 |---------|--------|--------|
-| iron.service.spec.ts | 9 | ✅ |
+| iron.service.spec.ts | 11 | ✅ |
 | meteorology.service.spec.ts | 5 | ✅ |
 | oceanography.service.spec.ts | 4 | ⏭️ Skip (timeout) |
 | gemini.repository.spec.ts | 4 | ✅ |
+| gemini-chat.repository.spec.ts | 6 | ✅ |
 | traffic.service.spec.ts | 4 | ✅ |
 | noticias-regionais.service.spec.ts | 4 | ✅ |
 | comercio.service.spec.ts | 4 | ✅ |
 | news.service.spec.ts | 4 | ✅ |
 | fallback.service.spec.ts | 3 | ✅ |
+| meteorology.controller.spec.ts | 4 | ✅ |
+| refresh.service.spec.ts | 8 | ✅ |
+| cron.controller.spec.ts | 4 | ✅ |
+| wsl.repository.spec.ts | 4 | ✅ |
+| spsurf.repository.spec.ts | 3 | ✅ |
+| weather-news.repository.spec.ts | 5 | ✅ |
 | api-health.spec.ts | 2 | ✅ |
 | http-exception.filter.spec.ts | 3 | ✅ |
 | envelope.interceptor.spec.ts | 3 | ✅ |
@@ -313,8 +320,14 @@ Arquivo: `~/.config/opencode/opencode.jsonc`
 | ChatWidget.test.tsx | 3 | ✅ (corrigido: ChatProvider wrapper) |
 | Footer.test.tsx | 3 | ✅ |
 | useComercio.test.ts | 3 | ✅ |
+| useWeatherNews.test.ts | 5 | ✅ |
+| useMeteorology.test.ts | 3 | ✅ |
+| useSwell.test.ts | 3 | ✅ |
+| useAllCities.test.ts | 2 | ✅ |
+| api.test.ts | 4 | ✅ |
+| utils.test.ts | 11 | ✅ |
 
-**Total: 53 testes (50 passam, 3 pulam timeout)**
+**Total: 121 testes (119 passam, 2 pulam timeout)**
 
 ---
 
@@ -615,8 +628,8 @@ Pipeline em `.github/workflows/ci.yml`:
 
 | Job | Descrição | Trigger |
 |-----|-----------|---------|
-| `backend-test` | Jest (50 testes) | push/PR |
-| `frontend-test` | Vitest (13 testes) | push/PR |
+| `backend-test` | Jest (80 testes) | push/PR |
+| `frontend-test` | Vitest (41 testes) | push/PR |
 | `lint` | oxlint (frontend) | push/PR |
 | `build` | Valida compilação | Após testes |
 

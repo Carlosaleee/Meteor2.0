@@ -6,6 +6,7 @@ import { MarineRepository } from '../../modules/oceanography/marine.repository';
 import { NewsRepository } from '../../modules/news/news.repository';
 import { WslRepository } from '../../modules/news/wsl.repository';
 import { SpsurfRepository } from '../../modules/news/spsurf.repository';
+import { WeatherNewsRepository } from '../../modules/meteorology/weather-news.repository';
 
 const LOCATIONS = [
   { id: 'ilha-comprida', lat: -24.73, lon: -47.55 },
@@ -26,6 +27,7 @@ export class RefreshService implements OnModuleInit {
     private readonly newsRepo: NewsRepository,
     private readonly wslRepo: WslRepository,
     private readonly spsurfRepo: SpsurfRepository,
+    private readonly weatherNewsRepo: WeatherNewsRepository,
   ) {}
 
   onModuleInit() {
@@ -50,6 +52,7 @@ export class RefreshService implements OnModuleInit {
     const details: Record<string, string> = {};
 
     try {
+      // 1. Meteorologia (4 cidades)
       this.logger.log('Refreshing meteorology data...');
       try {
         for (const loc of LOCATIONS) {
@@ -62,6 +65,7 @@ export class RefreshService implements OnModuleInit {
         this.logger.error(`Meteorology refresh failed: ${err}`);
       }
 
+      // 2. Oceanografia
       this.logger.log('Refreshing oceanography data...');
       try {
         await this.marineRepo.forceRefresh(LOCATIONS[0].lat, LOCATIONS[0].lon);
@@ -72,10 +76,33 @@ export class RefreshService implements OnModuleInit {
         this.logger.error(`Oceanography refresh failed: ${err}`);
       }
 
-      this.logger.log('Refreshing news data...');
+      // 3. Weather News (INMET/CPTEC/Defesa Civil)
+      this.logger.log('Refreshing weather news...');
+      try {
+        await this.weatherNewsRepo.forceRefresh();
+        details['weather-news'] = 'OK';
+        this.logger.log('Weather news refreshed successfully');
+      } catch (err) {
+        details['weather-news'] = `ERROR: ${err}`;
+        this.logger.error(`Weather news refresh failed: ${err}`);
+      }
+
+      // 4. Rankings WSL (explícito)
+      this.logger.log('Refreshing WSL rankings...');
       try {
         this.wslRepo.clearCache();
         this.spsurfRepo.clearCache();
+        const rankings = await this.wslRepo.getRankings();
+        details['rankings'] = `OK (${rankings.men.length} men, ${rankings.women.length} women, ${rankings.events.length} events)`;
+        this.logger.log(`Rankings refreshed: ${rankings.men.length} men, ${rankings.women.length} women, ${rankings.events.length} events`);
+      } catch (err) {
+        details['rankings'] = `ERROR: ${err}`;
+        this.logger.error(`Rankings refresh failed: ${err}`);
+      }
+
+      // 5. News (WSL + SPSurf)
+      this.logger.log('Refreshing news data...');
+      try {
         await this.newsRepo.forceRefresh();
         details['news'] = 'OK';
         this.logger.log('News refreshed successfully');
