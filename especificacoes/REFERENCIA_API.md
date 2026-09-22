@@ -457,6 +457,87 @@ Para forcar atualizacao do fallback, basta aguardar 24h ou reiniciar o backend (
 
 ---
 
+## POST /v1/iron/chat
+
+Rota para envio de mensagens ao agente IA (MeteorBot).
+
+**Headers:**
+| Header | Tipo | Obrigatorio | Descricao |
+|--------|------|-------------|-----------|
+| Content-Type | string | Sim | application/json |
+
+**Request Body:**
+```json
+{
+  "message": "Qual a previsão do tempo amanhã?"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "reply": "Amanhã em Ilha Comprida...",
+    "timestamp": "2026-09-10T14:00:00.000Z"
+  }
+}
+```
+
+---
+
+## GET /v1/cron/status
+
+Retorna o status do agente de refresh automatico.
+
+**Response:**
+```json
+{
+  "lastRefresh": "2026-09-21T10:00:00.000Z",
+  "isRefreshing": false
+}
+```
+
+**Campos:**
+| Campo | Tipo | Descricao |
+|-------|------|-----------|
+| lastRefresh | string | Data/hora do ultimo refresh (ISO 8601) |
+| isRefreshing | boolean | Se true, refresh esta em andamento |
+
+---
+
+## POST /v1/cron/refresh
+
+Forca refresh manual de todas as fontes de dados.
+
+**Headers:**
+| Header | Tipo | Obrigatorio | Descricao |
+|--------|------|-------------|-----------|
+| x-cron-secret | string | Sim | Chave de autenticacao (CRON_SECRET) |
+
+**Response (sucesso):**
+```json
+{
+  "success": true,
+  "details": {
+    "meteorology": "OK",
+    "oceanography": "OK",
+    "news": "OK"
+  },
+  "duration": 12500
+}
+```
+
+**Response (erro auth):**
+```json
+{
+  "error": "Unauthorized",
+  "message": "Invalid CRON_SECRET"
+}
+```
+
+---
+
 ## Fontes de Dados Externas
 
 | Fonte | API | Custo | Uso |

@@ -25,6 +25,7 @@
 - Seguranca: Helmet, CORS, Throttler (30 req/min)
 - Validacao: Zod (env schema + pipes)
 - Resiliencia: FallbackService com JSONs diarios
+- **Automacao:** RefreshService com @nestjs/schedule (startup + cron 6h)
 
 ### Frontend (Next.js 15)
 - App Router com React 19
@@ -108,6 +109,20 @@
 - Verifica staleness (> 24h = stale)
 - Fallback final: medias sazonais da regiao
 
+### 4.8 RefreshService (Automacao)
+- **Startup:** Executa refresh de todos os módulos ao iniciar (`onModuleInit`)
+- **Cron:** Executa a cada 6 horas (`@Cron('0 */6 * * *')`)
+- **Modulos afetados:** Meteorologia, Oceanografia, Noticias (WSL + SPSurf)
+- **Endpoints:**
+  - `GET /v1/cron/status` — Retorna ultimo refresh e status
+  - `POST /v1/cron/refresh` — Forca refresh manual (autenticado via `CRON_SECRET`)
+- **Metodos novos nos repositories:**
+  - `open-meteo.repository.ts`: `forceRefresh(lat, lon)`
+  - `marine.repository.ts`: `forceRefresh(lat, lon)`
+  - `news.repository.ts`: `forceRefresh()`
+  - `wsl.repository.ts`: `clearCache()`
+  - `spsurf.repository.ts`: `clearCache()`
+
 ---
 
 ## 5. Variaveis de Ambiente
@@ -131,6 +146,7 @@
 | STORMGLASS_API_KEY | (vazio) | Oceanografia avancada |
 | INMET_API_TOKEN | (vazio) | Estacoes INMET |
 | DATABASE_URL | file:./data/meteor.db | Drizzle ORM |
+| CRON_SECRET | meteor-refresh-secret | RefreshService (auth do endpoint) |
 
 ---
 
@@ -153,8 +169,13 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 - data/fallback-meteorology.json — Dados por localizacao (current + hourly + daily)
 - data/fallback-oceanography.json — Ondas, swell, marees, spots
 - data/fallback-traffic.json — Rodovias com simulacao por horario
-- data/fallback-noticias-regionais.json — 12 noticias regionais + 4 rotas de transito
-- data/fallback-localismo.json — 50 comercios de Ilha Comprida (formato FallbackData envelope)
+- data/fallback-noticias-regionais.json — 12 noticias regionais + 5 rotas de transito
+- data/fallback-news.json — Noticias WSL + SPSurf
+
+**Automacao de refresh:**
+- Startup: todos os dados sao atualizados ao iniciar o backend
+- Cron: a cada 6 horas via @nestjs/schedule
+- Manual: `POST /v1/cron/refresh` com header `x-cron-secret`
 
 ---
 
@@ -279,8 +300,11 @@ Arquivo: `~/.config/opencode/opencode.jsonc`
 | traffic.service.spec.ts | 4 | ✅ |
 | noticias-regionais.service.spec.ts | 4 | ✅ |
 | comercio.service.spec.ts | 4 | ✅ |
+| news.service.spec.ts | 4 | ✅ |
 | fallback.service.spec.ts | 3 | ✅ |
 | api-health.spec.ts | 2 | ✅ |
+| http-exception.filter.spec.ts | 3 | ✅ |
+| envelope.interceptor.spec.ts | 3 | ✅ |
 
 ### Frontend (Vitest + RTL)
 | Arquivo | Testes | Status |
@@ -290,7 +314,7 @@ Arquivo: `~/.config/opencode/opencode.jsonc`
 | Footer.test.tsx | 3 | ✅ |
 | useComercio.test.ts | 3 | ✅ |
 
-**Total: 46 testes (43 passam, 4 pulam timeout)**
+**Total: 53 testes (50 passam, 3 pulam timeout)**
 
 ---
 
@@ -305,6 +329,7 @@ Meteor_2.0/
           config/env.schema.ts
           fallback/fallback.service.ts
           http/ (envelope, filter, pipe)
+          refresh/ (refresh.service, refresh.module, cron.controller)
         modules/
           meteorology/ (controller, service, repository)
           oceanography/ (controller, service, marine.repository, gemini.repository)
@@ -590,7 +615,7 @@ Pipeline em `.github/workflows/ci.yml`:
 
 | Job | Descrição | Trigger |
 |-----|-----------|---------|
-| `backend-test` | Jest (41 testes) | push/PR |
+| `backend-test` | Jest (50 testes) | push/PR |
 | `frontend-test` | Vitest (13 testes) | push/PR |
 | `lint` | oxlint (frontend) | push/PR |
 | `build` | Valida compilação | Após testes |

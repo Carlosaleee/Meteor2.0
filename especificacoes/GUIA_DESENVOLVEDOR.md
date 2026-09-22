@@ -64,7 +64,7 @@ Meteor_2.0/
   apps/
     backend/           # API NestJS
       src/
-        common/        # Servicos compartilhados (fallback, http, config)
+        common/        # Servicos compartilhados (fallback, http, config, refresh)
         modules/       # Modulos de dominio (meteorology, oceanography, traffic, noticias-regionais, comercio, iron)
         data/          # JSONs de fallback
     frontend/          # App Next.js
@@ -110,6 +110,7 @@ Meteor_2.0/
 - Services: logica de negocio
 - Repositories: acesso a dados (APIs externas + fallback)
 - FallbackService: compartilhado via modulo global
+- **RefreshService:** automacao de refresh (startup + cron 6h)
 
 ### Estilizacao
 - Tailwind CSS v4 (sem tailwind.config.js)
@@ -195,6 +196,7 @@ PORT=3001
 FRONTEND_ORIGIN=http://localhost:3000
 FALLBACK_DIR=data
 FALLBACK_MAX_AGE_HOURS=24
+CRON_SECRET=meteor-refresh-secret
 ```
 
 ### Frontend (.env.local)
@@ -244,6 +246,16 @@ const CommerceMap = dynamic(() => import('./CommerceMap').then(mod => mod.Commer
 - Qualquer componente que importa `leaflet` ou `leaflet/dist/leaflet.css`
 - Qualquer componente que usa `window`, `document`, `navigator` diretamente
 - Graficos ApexCharts (react-apexcharts)
+
+### RefreshService nao atualiza dados
+**Causa:** Endpoint de refresh nao configurado ou CRON_SECRET incorreto.
+
+**Verificacoes:**
+1. Verificar se `@nestjs/schedule` esta instalado: `npm ls @nestjs/schedule`
+2. Verificar se `ScheduleModule.forRoot()` esta no `app.module.ts`
+3. Verificar se `RefreshModule` esta no `app.module.ts`
+4. Testar manualmente: `curl -X POST http://localhost:3001/v1/cron/refresh -H "x-cron-secret: meteor-refresh-secret"`
+5. Verificar status: `curl http://localhost:3001/v1/cron/status`
 
 ### Erro "Unable to find element with text" nos testes
 **Causa:** Componente usa Context (ex: `useChat()`) mas o teste nao fornece o Provider.
@@ -585,7 +597,7 @@ Variáveis configuradas no Vercel Dashboard (Settings → Environment Variables)
 Pipeline ativo em `.github/workflows/ci.yml`:
 
 **Jobs:**
-- `backend-test`: Roda Jest (41 testes)
+- `backend-test`: Roda Jest (50 testes)
 - `frontend-test`: Roda Vitest (13 testes)
 - `lint`: oxlint (frontend)
 - `build`: Valida compilação (após testes)
