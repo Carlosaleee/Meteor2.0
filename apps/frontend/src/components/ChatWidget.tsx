@@ -11,7 +11,7 @@ const MAX_MESSAGES = 50;
 
 const WELCOME: Message = {
   role: 'bot',
-  text: 'Olá! Sou o **Irons**, seu assistente tático de surf e clima. Pergunte sobre previsão do tempo, ondas, vento, trânsito ou comércio na região de Ilha Comprida e Vale do Ribeira.',
+  text: 'Olá! Sou o **Irons**, assistente tático do Meteor 2.0. 🌊\n\nPosso ajudar com informações sobre:\n• 🌤️ Tempo e clima de Ilha Comprida, Iguape, Cananéia e Registro\n• 🏄 Condições de ondas, swell, maré e spots de surf\n• 🚗 Trânsito na SP-222, BR-116 e Balsa Cananeia\n• 🏪 Comércio e serviços da região\n• 📰 Notícias do Vale do Ribeira\n• 🏆 Rankings e eventos da WSL\n\nComo posso ajudar?',
 };
 
 function loadMessages(): Message[] {
@@ -31,43 +31,6 @@ function saveMessages(msgs: Message[]) {
     const toSave = msgs.slice(-MAX_MESSAGES);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
   } catch {}
-}
-
-function getReply(userMsg: string): string {
-  const q = userMsg.toLowerCase();
-
-  if (q.includes('vento') || q.includes('kite') || q.includes('windsurf')) {
-    return '💨 **Vento em tempo real:** Acesse a aba "Previsão de Ventos" na tela de Swell para dados atualizados de velocidade, rajada e direção. Condições ideais para kite: 15-25 km/h. Para windsurf: 12-30 km/h.';
-  }
-  if (q.includes('chuva') || q.includes('sol') || q.includes('tempo') || q.includes('clima')) {
-    return '🌤️ **Previsão meteorológica:** Acesse a tela de Meteorologia para dados em tempo real das 4 cidades (Ilha Comprida, Iguape, Cananéia, Registro). Dados via Open-Meteo com atualização a cada 24h.';
-  }
-  if (q.includes('onda') || q.includes('swell') || q.includes('surf') || q.includes('mar')) {
-    return '🏄 **Condições do mar:** Acesse a tela de Swell para gráficos de ondas, spots de surf e resumo IA com briefing tático. Dados via Open-Meteo Marine com qualidade分类ada por altura e período.';
-  }
-  if (q.includes('mare') || q.includes('maré') || q.includes('coeficiente')) {
-    return '🌙 **Marés:** Próximas marés altas e baixas estão disponíveis na aba "Marés" da tela de Swell. Coeficiente e horários são atualizados diariamente.';
-  }
-  if (q.includes('balsa') || q.includes('transito') || q.includes('trânsito') || q.includes('rodovia')) {
-    return '🚗 **Trânsito:** Status das rodovias SP-222, BR-116 e Balsa Cananeia disponível na tela de Notícias. Dados de fluxo e tempo de espera atualizados.';
-  }
-  if (q.includes('comercio') || q.includes('comércio') || q.includes('restaurante') || q.includes('hotel') || q.includes('pousada')) {
-    return '🏪 **Comércio local:** Diretório com 50 estabelecimentos em Ilha Comprida — alimentação, hospedagem, comércio, serviços e lazer. Acesse a tela de Comércio com mapa interativo.';
-  }
-  if (q.includes('noticia') || q.includes('notícia') || q.includes('regional')) {
-    return '📰 **Notícias regionais:** 12 notícias do Vale do Ribeira com status de trânsito e rotas. Acesse a tela de Notícias para mais detalhes.';
-  }
-  if (q.includes('picos') || q.includes('spot') || q.includes('prancha')) {
-    return '📍 **Spots de surf:** 6 points mapeados — Juréia, Ponta da Praia Norte, Boqueirão Norte/Sul, Costão do Sul e Parada do Surf. Filtre por nível (iniciante/intermediário/avançado) na aba "Points".';
-  }
-  if (q.includes('oi') || q.includes('olá') || q.includes('ola') || q.includes('hello')) {
-    return 'Olá! Sou o Irons. Como posso ajudar? Pergunte sobre o tempo, ondas, vento, trânsito ou comércio.';
-  }
-  if (q.includes('quem') || q.includes('sobre') || q.includes('faz')) {
-    return 'Sou o Irons, assistente tático do Meteor 2.0. Fui criado em homenagem ao surfista Andy Irons. Meu objetivo é te ajudar com informações sobre clima, surf, trânsito e comércio de Ilha Comprida e Vale do Ribeira.';
-  }
-
-  return '📊 **Consulte os dados em tempo real:** Use as telas do Meteor 2.0 para previsões precisas de Previsão do Tempo, ondas, vento, trânsito e comércio. Para dúvidas específicas, pergunte sobre um desses tópicos!';
 }
 
 export function ChatWidget() {
@@ -93,7 +56,7 @@ export function ChatWidget() {
     }
   }, [isChatOpen]);
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
 
@@ -102,11 +65,26 @@ export function ChatWidget() {
     setInput('');
     setIsTyping(true);
 
-    setTimeout(() => {
-      const reply = getReply(userMsg);
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+      const res = await fetch(`${apiBase}/v1/iron/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMsg }),
+      });
+
+      if (!res.ok) throw new Error(`API ${res.status}`);
+
+      const { reply } = await res.json() as { reply: string };
       setMessages(prev => [...prev, { role: 'bot', text: reply }]);
+    } catch {
+      setMessages(prev => [...prev, {
+        role: 'bot',
+        text: '⚠️ Não consegui processar sua mensagem. Verifique se o backend está rodando e tente novamente.',
+      }]);
+    } finally {
       setIsTyping(false);
-    }, 600 + Math.random() * 400);
+    }
   };
 
   return (
