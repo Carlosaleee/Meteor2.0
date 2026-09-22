@@ -6,6 +6,6 @@ import { OpenMeteoRepository } from './open-meteo.repository';
 @Module({
   controllers: [MeteorologyController],
   providers: [MeteorologyService, OpenMeteoRepository],
-  exports: [MeteorologyService],
+  exports: [MeteorologyService, OpenMeteoRepository],
 })
 export class MeteorologyModule {}

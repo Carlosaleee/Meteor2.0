@@ -42,6 +42,12 @@ export class NewsRepository {
     private readonly fallback: FallbackService,
   ) {}
 
+  async forceRefresh(): Promise<void> {
+    this.logger.log('Force refreshing news data...');
+    this.cache = null;
+    await this.getNewsData();
+  }
+
   async getNewsData(): Promise<NewsResponse> {
     if (this.cache && Date.now() - new Date(this.cache.timestamp).getTime() < this.CACHE_TTL_MS) {
       return this.cache;

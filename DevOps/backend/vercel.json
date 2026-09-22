@@ -19,5 +19,11 @@
       "maxDuration": 10,
       "memory": 1024
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/v1/cron/refresh",
+      "schedule": "0 */6 * * *"
+    }
+  ]
 }

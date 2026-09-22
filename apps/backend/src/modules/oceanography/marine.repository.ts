@@ -34,6 +34,30 @@ export class MarineRepository {
 
   constructor(private readonly fallback: FallbackService) {}
 
+  async forceRefresh(lat: number, lon: number): Promise<MarineData> {
+    this.logger.log('Force refreshing oceanography data...');
+    try {
+      const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&current=wave_height,wave_direction,wave_period,swell_wave_height,swell_wave_direction,swell_wave_period,wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=America/Sao_Paulo`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Open-Meteo Marine returned ${res.status}`);
+      const data = await res.json();
+      const raw = data.current as MarineData | undefined;
+      if (raw) {
+        const current: MarineData = {
+          ...raw,
+          wind_speed_10m: raw.wind_speed_10m ?? 12,
+          wind_direction_10m: raw.wind_direction_10m ?? 180,
+          wind_gusts_10m: raw.wind_gusts_10m ?? 18,
+        };
+        await this.saveFallback(current);
+        return current;
+      }
+    } catch (err) {
+      this.logger.warn(`Force refresh oceanography failed: ${err}`);
+    }
+    return this.getDefault();
+  }
+
   async getMarineData(lat: number, lon: number): Promise<MarineData> {
     const { data: cached, isStale } = await this.fallback.loadWithTimestamp<{ current: MarineData }>(FALLBACK_FILE);
 

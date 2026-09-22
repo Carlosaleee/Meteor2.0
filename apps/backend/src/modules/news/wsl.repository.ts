@@ -29,6 +29,10 @@ export class WslRepository {
   private cache: WslRankingsResult | null = null;
   private readonly CACHE_TTL_MS = 30 * 60 * 1000;
 
+  clearCache(): void {
+    this.cache = null;
+  }
+
   async getRankings(): Promise<WslRankingsResult> {
     if (this.cache && Date.now() - new Date(this.cache.fetchedAt).getTime() < this.CACHE_TTL_MS) {
       return this.cache;

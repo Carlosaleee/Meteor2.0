@@ -1,11 +1,13 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
+import { ScheduleModule } from "@nestjs/schedule";
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from "@nestjs/core";
 import { parseEnv } from "./common/config/env.schema";
 import { FallbackModule } from "./common/fallback/fallback.module";
 import { EnvelopeInterceptor } from "./common/http/envelope.interceptor";
 import { HttpExceptionFilter } from "./common/http/http-exception.filter";
 import { HealthController } from "./health.controller";
+import { RefreshModule } from "./common/refresh/refresh.module";
 import { ComercioModule } from "./modules/comercio/comercio.module";
 import { IronModule } from "./modules/iron/iron.module";
 import { MeteorologyModule } from "./modules/meteorology/meteorology.module";
@@ -34,6 +36,7 @@ try {
       envFilePath: ["../../.env", ".env"],
       validate: parseEnv,
     }),
+    ScheduleModule.forRoot(),
     ...(throttlerImports as never[]),
     FallbackModule,
     ComercioModule,
@@ -43,6 +46,7 @@ try {
     NoticiasRegionaisModule,
     OceanographyModule,
     TrafficModule,
+    RefreshModule,
   ],
   controllers: [HealthController],
   providers: [

@@ -8,6 +8,6 @@ import { SpsurfRepository } from './spsurf.repository';
 @Module({
   controllers: [NewsController],
   providers: [NewsService, NewsRepository, WslRepository, SpsurfRepository],
-  exports: [NewsService],
+  exports: [NewsService, NewsRepository, WslRepository, SpsurfRepository],
 })
 export class NewsModule {}

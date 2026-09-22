@@ -7,6 +7,6 @@ import { GeminiRepository } from './gemini.repository';
 @Module({
   controllers: [OceanographyController],
   providers: [OceanographyService, MarineRepository, GeminiRepository],
-  exports: [OceanographyService],
+  exports: [OceanographyService, MarineRepository],
 })
 export class OceanographyModule {}

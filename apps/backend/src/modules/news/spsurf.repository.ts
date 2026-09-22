@@ -15,6 +15,10 @@ export class SpsurfRepository {
   private cacheTs = 0;
   private readonly CACHE_TTL_MS = 30 * 60 * 1000;
 
+  clearCache(): void {
+    this.cache = null;
+  }
+
   async getNews(): Promise<SpsurfNewsItem[]> {
     if (this.cache && Date.now() - this.cacheTs < this.CACHE_TTL_MS) {
       return this.cache;

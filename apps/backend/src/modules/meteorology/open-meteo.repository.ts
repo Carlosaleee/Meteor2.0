@@ -51,6 +51,42 @@ export class OpenMeteoRepository {
 
   constructor(private readonly fallback: FallbackService) {}
 
+  async forceRefresh(lat: number, lon: number): Promise<AtmosphereData | null> {
+    this.logger.log(`Force refreshing meteorology for (${lat}, ${lon})...`);
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
+        + `&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,surface_pressure`
+        + `&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m,cloud_cover,visibility`
+        + `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,weather_code,sunrise,sunset,uv_index_max`
+        + `&forecast_days=7&timezone=America/Sao_Paulo`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Open-Meteo returned ${res.status}`);
+      const data = await res.json();
+      if (!data.current || typeof data.current.temperature_2m !== 'number') {
+        throw new Error('Open-Meteo returned invalid current data');
+      }
+      const result: AtmosphereData = {
+        current: data.current as CurrentData,
+        hourly: data.hourly as HourlyData,
+        daily: data.daily as DailyData,
+      };
+      const locationId = this.getIdFromCoords(lat, lon);
+      await this.saveFallback(locationId, result);
+      return result;
+    } catch (err) {
+      this.logger.warn(`Force refresh meteorology failed: ${err}`);
+      return null;
+    }
+  }
+
+  private getIdFromCoords(lat: number, lon: number): string {
+    if (Math.abs(lat - (-24.73)) < 0.1 && Math.abs(lon - (-47.55)) < 0.1) return 'ilha-comprida';
+    if (Math.abs(lat - (-24.70)) < 0.1 && Math.abs(lon - (-47.55)) < 0.1) return 'iguape';
+    if (Math.abs(lat - (-25.01)) < 0.1 && Math.abs(lon - (-47.92)) < 0.1) return 'cananeia';
+    if (Math.abs(lat - (-24.48)) < 0.1 && Math.abs(lon - (-47.84)) < 0.1) return 'registro';
+    return 'ilha-comprida';
+  }
+
   async getAtmosphereData(lat: number, lon: number, locationId: string): Promise<AtmosphereData> {
     const { data: cached, isStale } = await this.fallback.loadWithTimestamp<{
       locations: Record<string, AtmosphereData>;
