@@ -20,7 +20,9 @@ function loadMessages(): Message[] {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as Message[];
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.filter((m): m is Message => m && typeof m.text === 'string');
+      }
     }
   } catch {}
   return [WELCOME];
@@ -138,7 +140,7 @@ export function ChatWidget() {
                       : 'bg-slate-800/80 text-slate-200 border border-slate-700/50 rounded-bl-md'
                   }`}
                 >
-                  {m.text.split('**').map((part, j) =>
+                  {(m.text ?? '').split('**').map((part, j) =>
                     j % 2 === 1 ? <strong key={j} className="text-white font-semibold">{part}</strong> : part
                   )}
                 </div>
