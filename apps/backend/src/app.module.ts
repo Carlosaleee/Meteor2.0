@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import type { ExecutionContext } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { ScheduleModule } from "@nestjs/schedule";
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from "@nestjs/core";
@@ -16,13 +17,19 @@ import { NoticiasRegionaisModule } from "./modules/noticias-regionais/noticias-r
 import { OceanographyModule } from "./modules/oceanography/oceanography.module";
 import { TrafficModule } from "./modules/traffic/traffic.module";
 
-// Throttler 30 req/min — optional, requires `pnpm install` of @nestjs/throttler; fallback no-op if missing
+// Throttler 60 req/min — opcional, requires `pnpm install` of @nestjs/throttler; fallback no-op if missing
+// Loopback (dev local: 127.0.0.1 / ::1) e sempre isento para nunca 429 em localhost
 let throttlerImports: unknown[] = [];
 let throttlerProviders: unknown[] = [];
 try {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const throttler = require("@nestjs/throttler");
-  throttlerImports = [throttler.ThrottlerModule.forRoot([{ ttl: 60_000, limit: 30 }])];
+  const isLoopback = (context: ExecutionContext): boolean => {
+    const req = context.switchToHttp().getRequest<{ ip?: string; socket?: { remoteAddress?: string } }>();
+    const ip = req.ip ?? req.socket?.remoteAddress ?? "";
+    return ip === "127.0.0.1" || ip === "::1" || ip === "::ffff:127.0.0.1" || ip.startsWith("127.");
+  };
+  throttlerImports = [throttler.ThrottlerModule.forRoot([{ ttl: 60_000, limit: 60, skipIf: isLoopback }])];
   throttlerProviders = [{ provide: APP_GUARD, useClass: throttler.ThrottlerGuard }];
 } catch {
   throttlerImports = [];

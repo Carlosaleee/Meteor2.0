@@ -23,7 +23,7 @@ Dashboard tático e central de inteligência regional focado na região de **Ilh
 * **Padrão Arquitetural:** Controller → Service → Repository (3 camadas)
 * **Módulos:** Meteorology, Oceanography, Traffic, NotíciasRegionais, Comércio, **Iron** (agente IA)
 * **Resiliência:** FallbackService com JSONs diários + cache
-* **Segurança:** Helmet, CORS, Throttler (30 req/min)
+* **Segurança:** Helmet, CORS, Throttler (60 req/min — loopback isento)
 * **Validação:** Zod (env schema + pipes)
 * **Testes:** Jest (39+ testes)
 

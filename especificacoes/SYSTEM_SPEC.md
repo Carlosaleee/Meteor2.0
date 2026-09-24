@@ -22,7 +22,7 @@
 
 ### Backend (NestJS)
 - Padrao arquitetural: Controller > Service > Repository (3 camadas)
-- Seguranca: Helmet, CORS, Throttler (30 req/min)
+- Seguranca: Helmet, CORS, Throttler (60 req/min, loopback isento)
 - Validacao: Zod (env schema + pipes)
 - Resiliencia: FallbackService com JSONs diarios
 - **Automacao:** RefreshService com @nestjs/schedule (startup + cron 6h para dados pesados + cron 1h para rankings/noticias)

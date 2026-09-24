@@ -205,7 +205,7 @@ export const IRONS_KNOWLEDGE = {
 
     architecture: 'Controller > Service > Repository (3 camadas)',
     resilience: 'FallbackService com JSONs diários, verificação de stale (>24h)',
-    security: 'Helmet, CORS, Throttler (30 req/min)',
+    security: 'Helmet, CORS, Throttler (60 req/min, loopback isento)',
     validation: 'Zod (env schema + pipes)',
   },
 
