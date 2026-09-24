@@ -28,16 +28,14 @@ echo "NEXT_PUBLIC_API_URL=http://localhost:3001" > apps/frontend/.env.local
 
 ### Backend (Terminal 1)
 ```bash
-cd apps/backend
-npm run dev
+pnpm --filter backend dev
 # Acessa em http://localhost:3001
 # Health check: http://localhost:3001/health
 ```
 
 ### Frontend (Terminal 2)
 ```bash
-cd apps/frontend
-npm run dev
+pnpm --filter frontend dev
 # Acessa em http://localhost:3000
 ```
 
@@ -90,7 +88,7 @@ Meteor_2.0/
           Header.tsx   # Nav responsiva (7 itens)
           Footer.tsx   # 4 colunas com chatbot
           PageBanner.tsx # Hero reutilizavel (banner-meteor.jpg)
-        hooks/         # Hooks customizados (8 hooks)
+        hooks/         # Hooks customizados (9 hooks)
         lib/           # Utilitarios (api.ts)
   especificacoes/      # Documentacao do projeto
   DESIGN.md            # Design system tokens
@@ -110,7 +108,7 @@ Meteor_2.0/
 - Services: logica de negocio
 - Repositories: acesso a dados (APIs externas + fallback)
 - FallbackService: compartilhado via modulo global
-- **RefreshService:** automacao de refresh (startup + cron 6h)
+- **RefreshService:** automacao de refresh (startup + cron 6h pesado + cron 1h rankings/noticias)
 
 ### Estilizacao
 - Tailwind CSS v4 (sem tailwind.config.js)
@@ -197,6 +195,12 @@ FRONTEND_ORIGIN=http://localhost:3000
 FALLBACK_DIR=data
 FALLBACK_MAX_AGE_HOURS=24
 CRON_SECRET=meteor-refresh-secret
+
+# Gemini API — Migração Set/2026
+# Formato antigo (descontinuado): AIzaSy...
+# Formato novo (recomendado): AQ.SUA_CHAVE_AQUI
+# Obter nova chave: https://aistudio.google.com/apikey
+GEMINI_API_KEY=SUA_CHAVE_AQUI
 ```
 
 ### Frontend (.env.local)
@@ -205,7 +209,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
 ### Backend
-- Logs aparecem no terminal do `npm run dev`
+- Logs aparecem no terminal do `pnpm --filter backend dev`
 - Erros retornam no formato ApiEnvelope: `{ success, data, error }`
 - Health check: `GET /health`
 
@@ -246,6 +250,11 @@ const CommerceMap = dynamic(() => import('./CommerceMap').then(mod => mod.Commer
 - Qualquer componente que importa `leaflet` ou `leaflet/dist/leaflet.css`
 - Qualquer componente que usa `window`, `document`, `navigator` diretamente
 - Graficos ApexCharts (react-apexcharts)
+
+### Erro "Must use import to load ES Module" no Jest (backend)
+**Causa:** NestJS 12 publica pacotes ESM-only; o Jest (CJS) precisa do `require(esm)` do Node 24.9+ e da flag `--experimental-vm-modules`.
+
+**Correcao:** Rodar os testes via `pnpm --filter backend test` (o script ja embute `node --experimental-vm-modules`). O `require(esm)` do Jest exige **Node 24.9+** — em versoes antiores o Jest lanca `ERR_REQUIRE_ESM`.
 
 ### RefreshService nao atualiza dados
 **Causa:** Endpoint de refresh nao configurado ou CRON_SECRET incorreto.
@@ -493,6 +502,8 @@ function renderMarkdown(text: string): React.ReactNode[]
 - Cache: 1h no backend (`summaryCache`)
 - Fallback: resumo estatico baseado nos dados quando Gemini falha
 
+> **[LLM_CONTEXT] Gemini API Key (Set/2026):** formato novo `AQ...` (obter em https://aistudio.google.com/apikey). O SDK `@google/genai` aceita ambos os formatos — a mudança é transparente para o código. Variável de ambiente: `GEMINI_API_KEY` no backend (.env).
+
 ---
 
 ## Pagina de Noticias (Guia Completo)
@@ -587,7 +598,7 @@ Variáveis configuradas no Vercel Dashboard (Settings → Environment Variables)
 | Variável | Valor | Descrição |
 |----------|-------|-----------|
 | `FRONTEND_ORIGIN` | `https://meteor2-0-frontend.vercel.app` | CORS origin |
-| `GEMINI_API_KEY` | *(chave secreta)* | API Gemini |
+| `GEMINI_API_KEY` | *(chave secreta — formato AQ... desde Set/2026)* | API Gemini |
 | `GEMINI_MODEL` | `gemini-2.5-flash` | Modelo Gemini |
 | `GEMINI_TEMPERATURE` | `0.7` | Temperatura |
 | `FALLBACK_DIR` | `data` | Diretório fallback |
@@ -597,8 +608,8 @@ Variáveis configuradas no Vercel Dashboard (Settings → Environment Variables)
 Pipeline ativo em `.github/workflows/ci.yml`:
 
 **Jobs:**
-- `backend-test`: Roda Jest (80 testes)
-- `frontend-test`: Roda Vitest (41 testes)
+- `backend-test`: Roda Jest (99 testes — requer Node 24.9+ p/ Nest 12 ESM)
+- `frontend-test`: Roda Vitest (48 testes)
 - `lint`: oxlint (frontend)
 - `build`: Valida compilação (após testes)
 

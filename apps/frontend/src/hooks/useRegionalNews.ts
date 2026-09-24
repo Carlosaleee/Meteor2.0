@@ -41,8 +41,8 @@ export function useRegionalNews(): UseRegionalNewsResult {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
+  const fetchData = useCallback(async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     setError(null);
     try {
       const result = await fetchAPI<RegionalNewsResponse>('/v1/noticias-regionais');
@@ -56,7 +56,11 @@ export function useRegionalNews(): UseRegionalNewsResult {
 
   useEffect(() => {
     fetchData();
+    const interval = setInterval(() => {
+      void fetchData(false);
+    }, 5 * 60 * 1000);
+    return () => clearInterval(interval);
   }, [fetchData]);
 
-  return { data, loading, error, refetch: fetchData };
+  return { data, loading, error, refetch: () => fetchData() };
 }

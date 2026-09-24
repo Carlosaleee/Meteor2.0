@@ -7,6 +7,7 @@ import { NewsRepository } from '../../modules/news/news.repository';
 import { WslRepository } from '../../modules/news/wsl.repository';
 import { SpsurfRepository } from '../../modules/news/spsurf.repository';
 import { WeatherNewsRepository } from '../../modules/meteorology/weather-news.repository';
+import { NoticiasRegionaisRepository } from '../../modules/noticias-regionais/noticias-regionais.repository';
 
 const LOCATIONS = [
   { id: 'ilha-comprida', lat: -24.73, lon: -47.55 },
@@ -19,6 +20,7 @@ const LOCATIONS = [
 export class RefreshService implements OnModuleInit {
   private readonly logger = new Logger(RefreshService.name);
   private lastRefresh: Date | null = null;
+  private lastNewsRefresh: Date | null = null;
   private isRefreshing = false;
 
   constructor(
@@ -28,6 +30,7 @@ export class RefreshService implements OnModuleInit {
     private readonly wslRepo: WslRepository,
     private readonly spsurfRepo: SpsurfRepository,
     private readonly weatherNewsRepo: WeatherNewsRepository,
+    private readonly regionalRepo: NoticiasRegionaisRepository,
   ) {}
 
   onModuleInit() {
@@ -39,6 +42,36 @@ export class RefreshService implements OnModuleInit {
   handleCron() {
     this.logger.log('Cron triggered — refreshing all data sources...');
     this.refreshAll();
+  }
+
+  @Cron('0 * * * *')
+  handleNewsCron() {
+    this.logger.log('News cron triggered — refreshing rankings and news...');
+    this.refreshNews();
+  }
+
+  async refreshNews(): Promise<{ success: boolean; details: Record<string, string>; duration: number }> {
+    if (this.isRefreshing) {
+      this.logger.warn('Refresh already in progress, skipping news refresh...');
+      return { success: false, details: {}, duration: 0 };
+    }
+
+    this.isRefreshing = true;
+    const start = Date.now();
+    const details: Record<string, string> = {};
+
+    try {
+      await this.refreshNewsSources(details);
+      this.lastNewsRefresh = new Date();
+      const duration = Date.now() - start;
+      this.logger.log(`Rankings and news refreshed in ${duration}ms`);
+      return { success: true, details, duration };
+    } catch (err) {
+      this.logger.error(`Unexpected error during news refresh: ${err}`);
+      return { success: false, details, duration: Date.now() - start };
+    } finally {
+      this.isRefreshing = false;
+    }
   }
 
   async refreshAll(): Promise<{ success: boolean; details: Record<string, string>; duration: number }> {
@@ -87,29 +120,8 @@ export class RefreshService implements OnModuleInit {
         this.logger.error(`Weather news refresh failed: ${err}`);
       }
 
-      // 4. Rankings WSL (explícito)
-      this.logger.log('Refreshing WSL rankings...');
-      try {
-        this.wslRepo.clearCache();
-        this.spsurfRepo.clearCache();
-        const rankings = await this.wslRepo.getRankings();
-        details['rankings'] = `OK (${rankings.men.length} men, ${rankings.women.length} women, ${rankings.events.length} events)`;
-        this.logger.log(`Rankings refreshed: ${rankings.men.length} men, ${rankings.women.length} women, ${rankings.events.length} events`);
-      } catch (err) {
-        details['rankings'] = `ERROR: ${err}`;
-        this.logger.error(`Rankings refresh failed: ${err}`);
-      }
-
-      // 5. News (WSL + SPSurf)
-      this.logger.log('Refreshing news data...');
-      try {
-        await this.newsRepo.forceRefresh();
-        details['news'] = 'OK';
-        this.logger.log('News refreshed successfully');
-      } catch (err) {
-        details['news'] = `ERROR: ${err}`;
-        this.logger.error(`News refresh failed: ${err}`);
-      }
+      // 4. Rankings WSL + News + Regionais
+      await this.refreshNewsSources(details);
 
       this.lastRefresh = new Date();
       const duration = Date.now() - start;
@@ -123,9 +135,49 @@ export class RefreshService implements OnModuleInit {
     }
   }
 
+  private async refreshNewsSources(details: Record<string, string>): Promise<void> {
+    // Rankings WSL (explícito)
+    this.logger.log('Refreshing WSL rankings...');
+    try {
+      this.wslRepo.clearCache();
+      this.spsurfRepo.clearCache();
+      const rankings = await this.wslRepo.getRankings();
+      details['rankings'] = `OK (${rankings.men.length} men, ${rankings.women.length} women, ${rankings.events.length} events)`;
+      this.logger.log(`Rankings refreshed: ${rankings.men.length} men, ${rankings.women.length} women, ${rankings.events.length} events`);
+    } catch (err) {
+      details['rankings'] = `ERROR: ${err}`;
+      this.logger.error(`Rankings refresh failed: ${err}`);
+    }
+
+    // News (WSL + SPSurf)
+    this.logger.log('Refreshing news data...');
+    try {
+      await this.newsRepo.forceRefresh();
+      details['news'] = 'OK';
+      this.logger.log('News refreshed successfully');
+    } catch (err) {
+      details['news'] = `ERROR: ${err}`;
+      this.logger.error(`News refresh failed: ${err}`);
+    }
+
+    // Noticias regionais (RSS)
+    this.logger.log('Refreshing regional news...');
+    try {
+      await this.regionalRepo.forceRefresh();
+      details['regional-news'] = 'OK';
+      this.logger.log('Regional news refreshed successfully');
+    } catch (err) {
+      details['regional-news'] = `ERROR: ${err}`;
+      this.logger.error(`Regional news refresh failed: ${err}`);
+    }
+
+    this.lastNewsRefresh = new Date();
+  }
+
   getStatus() {
     return {
       lastRefresh: this.lastRefresh?.toISOString() ?? null,
+      lastNewsRefresh: this.lastNewsRefresh?.toISOString() ?? null,
       isRefreshing: this.isRefreshing,
     };
   }

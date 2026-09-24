@@ -2,5 +2,10 @@ packages:
   - "apps/*"
 allowBuilds:
   '@google/genai': true
+  '@parcel/watcher': true
+  '@swc/core': true
   esbuild: true
   protobufjs: true
+  unrs-resolver: true
+overrides:
+  multer: "^2.4.0"

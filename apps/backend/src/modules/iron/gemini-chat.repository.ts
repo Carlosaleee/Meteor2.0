@@ -56,7 +56,7 @@ export class GeminiChatRepository {
       const model = this.config.get('GEMINI_MODEL') ?? 'gemini-2.5-flash';
       const prompt = this.buildPrompt(userMessage, context);
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+       
       const response = await (client as { models: { generateContent: (opts: unknown) => Promise<unknown> } }).models.generateContent({
         model,
         contents: prompt,

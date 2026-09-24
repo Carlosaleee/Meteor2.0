@@ -1,7 +1,7 @@
 {
   "name": "meteor-2",
   "private": true,
-  "packageManager": "pnpm@11",
+  "packageManager": "pnpm@11.10.0",
   "scripts": {
     "predev": "pnpm -r test",
     "dev": "pnpm -r --parallel dev",
@@ -17,12 +17,5 @@
   },
   "dependencies": {
     "@octokit/rest": "^21.1.1"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@google/genai",
-      "esbuild",
-      "protobufjs"
-    ]
   }
 }

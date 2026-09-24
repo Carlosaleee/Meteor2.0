@@ -51,7 +51,7 @@ describe('CATEGORY_CONFIG', () => {
   });
 
   it('should have label and emoji for each category', () => {
-    for (const [key, config] of Object.entries(CATEGORY_CONFIG)) {
+    for (const config of Object.values(CATEGORY_CONFIG)) {
       expect(config.label).toBeTruthy();
       expect(config.emoji).toBeTruthy();
     }

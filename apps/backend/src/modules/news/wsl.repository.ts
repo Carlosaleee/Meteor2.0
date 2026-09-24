@@ -98,88 +98,73 @@ export class WslRepository {
   }
 
   private parseRankingHtml(html: string, defaultRanking: WslRankingEntry[]): WslRankingEntry[] {
+    const rows = html.split('<tr class="athlete-').slice(1);
     const entries: WslRankingEntry[] = [];
 
-    const rowRegex = /(\d+)\s*\n\s*([\s\S]*?)\n\s*([\s\S]*?)\n\s*([\s\S]*?)\n\s*([\s\S]*?)\n\s*Total Points/g;
-    let match: RegExpExecArray | null;
+    for (const block of rows) {
+      const rankMatch = block.match(/athlete-rank[^>]*>\s*(\d{1,2})\s*</);
+      const nameMatch =
+        block.match(/avatar-text-primary[^>]*>[\s\S]*?<a[^>]*>([^<]+)<\/a>/) ||
+        block.match(/aria-label='([^']+)'/);
+      const countryMatch = block.match(/athlete-country-name">([^<]+)</);
+      const pointsMatch = block.match(/tour-points">([\d,]+)</);
 
-    while ((match = rowRegex.exec(html)) !== null) {
-      const rank = parseInt(match[1], 10);
-      if (isNaN(rank) || rank > 35) continue;
+      if (!rankMatch || !nameMatch || !pointsMatch) continue;
 
-      const block = match[0];
-      const nameMatch = block.match(/(?:Artboard[\s\S]*?\n\s*){0,2}\s*(?:\d+\s*\n\s*(?:Artboard[\s\S]*?\n\s*){0,2}\s*)*([\w\s.'-]+?)(?:\n|$)/m);
-      const pointsMatch = block.match(/(\d{1,3}(?:,\d{3})+)\s*$/m);
+      const rank = parseInt(rankMatch[1], 10);
+      if (isNaN(rank) || rank < 1 || rank > 50) continue;
 
-      if (nameMatch && pointsMatch) {
-        const name = nameMatch[1].trim();
-        const points = parseInt(pointsMatch[1].replace(/,/g, ''), 10);
-        const country = this.guessCountry(name);
-        entries.push({ rank, name, country, points, trend: 0 });
-      }
+      const name = nameMatch[1].trim();
+      entries.push({
+        rank,
+        name,
+        country: countryMatch ? countryMatch[1].trim() : this.guessCountry(name),
+        points: parseInt(pointsMatch[1].replace(/,/g, ''), 10),
+        trend: this.parseTrend(block),
+      });
     }
 
     if (entries.length >= 5) return entries.slice(0, 15);
-
-    return this.parseRankingFallback(html, defaultRanking);
+    return defaultRanking;
   }
 
-  private parseRankingFallback(html: string, defaultRanking: WslRankingEntry[]): WslRankingEntry[] {
-    const entries: WslRankingEntry[] = [];
-
-    const lines = html.split('\n');
-    let currentRank = 0;
-
-    for (let i = 0; i < lines.length && entries.length < 15; i++) {
-      const line = lines[i].trim();
-
-      const rankMatch = line.match(/^(\d{1,2})$/);
-      if (rankMatch) {
-        const r = parseInt(rankMatch[1], 10);
-        if (r >= 1 && r <= 35) currentRank = r;
-        continue;
-      }
-
-      if (currentRank > 0 && line.length > 3 && line.length < 40 && !line.match(/^\d/) && !line.includes('Artboard')) {
-        const name = line.replace(/\s+/g, ' ').trim();
-        if (name && !entries.find(e => e.name === name)) {
-          const country = this.guessCountry(name);
-          entries.push({ rank: currentRank, name, country, points: 0, trend: 0 });
-          currentRank = 0;
-        }
-      }
-    }
-
-    if (entries.length < 5) return defaultRanking;
-    return entries;
+  private parseTrend(block: string): number {
+    const cell = block.match(/athlete-rank-change[^>]*>([\s\S]*?)<\/td>/);
+    if (!cell) return 0;
+    const body = cell[1];
+    const direction = body.includes('positive') ? 1 : body.includes('negative') ? -1 : 0;
+    if (direction === 0) return 0;
+    const numberMatch = body.match(/(\d{1,2})\s*<\/span>\s*$/);
+    return numberMatch ? direction * parseInt(numberMatch[1], 10) : 0;
   }
 
   private parseEventsHtml(html: string): WslEvent[] {
+    const rows = html.split('<tr class="event-').slice(1);
     const events: WslEvent[] = [];
 
-    const statusRegex = /(Completed|Standby|Upcoming)/g;
-    let statusMatch: RegExpExecArray | null;
+    for (const block of rows) {
+      const dateMatch = block.match(/event-date-range[^>]*>([^<]+)</);
+      const nameMatch = block.match(/event-schedule-details__event-name[^>]*>([^<]+)<\/a>/);
+      const locationMatch = block.match(/event-schedule-details__location">([^<]+)</);
+      const tourMatch = block.match(/event-tour-details__tour-name">([^<]+)</);
+      const statusMatch = block.match(/event-status[^>]*><span>(Completed|Standby|Upcoming)<\/span>/);
 
-    while ((statusMatch = statusRegex.exec(html)) !== null) {
-      const status = statusMatch[1] as WslEvent['status'];
-      const block = html.substring(Math.max(0, statusMatch.index - 500), statusMatch.index + 50);
+      if (!dateMatch || !nameMatch || !statusMatch) continue;
 
-      const dateMatch = block.match(/([A-Z][a-z]+\s+\d+\s*-\s*[A-Z]?[a-z]*\s*\d+)/);
-      const nameMatch = block.match(/(?:Pro|Festival|Classic|Open|Cup)[^<]*/i);
-
-      if (dateMatch) {
-        events.push({
-          name: nameMatch ? nameMatch[0].trim() : 'WSL Event',
-          location: '',
-          dates: dateMatch[1].trim(),
-          status,
-          tour: 'Championship Tour',
-        });
-      }
+      events.push({
+        name: nameMatch[1].trim(),
+        location: locationMatch ? locationMatch[1].trim() : '',
+        dates: dateMatch[1].trim(),
+        status: statusMatch[1] as WslEvent['status'],
+        tour: tourMatch ? tourMatch[1].trim() : 'Championship Tour',
+      });
     }
 
-    if (events.length >= 2) return events.slice(0, 5);
-    return this.getDefaultEvents();
+    if (events.length < 2) return this.getDefaultEvents();
+
+    const statusPriority: Record<string, number> = { Upcoming: 0, Standby: 1, Completed: 2 };
+    events.sort((a, b) => statusPriority[a.status] - statusPriority[b.status]);
+    return events.slice(0, 10);
   }
 
   private guessCountry(name: string): string {

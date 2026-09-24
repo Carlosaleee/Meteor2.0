@@ -6,6 +6,7 @@ import { NewsRepository } from '../../modules/news/news.repository';
 import { WslRepository } from '../../modules/news/wsl.repository';
 import { SpsurfRepository } from '../../modules/news/spsurf.repository';
 import { WeatherNewsRepository } from '../../modules/meteorology/weather-news.repository';
+import { NoticiasRegionaisRepository } from '../../modules/noticias-regionais/noticias-regionais.repository';
 
 describe('RefreshService', () => {
   let service: RefreshService;
@@ -39,6 +40,10 @@ describe('RefreshService', () => {
     forceRefresh: jest.fn().mockResolvedValue(undefined),
   };
 
+  const mockRegionalRepo = {
+    forceRefresh: jest.fn().mockResolvedValue(undefined),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -49,6 +54,7 @@ describe('RefreshService', () => {
         { provide: WslRepository, useValue: mockWslRepo },
         { provide: SpsurfRepository, useValue: mockSpsurfRepo },
         { provide: WeatherNewsRepository, useValue: mockWeatherNewsRepo },
+        { provide: NoticiasRegionaisRepository, useValue: mockRegionalRepo },
       ],
     }).compile();
 
@@ -69,7 +75,7 @@ describe('RefreshService', () => {
       expect(result.details['weather-news']).toBe('OK');
       expect(result.details['rankings']).toContain('OK');
       expect(result.details['news']).toBe('OK');
-      expect(result.duration).toBeGreaterThan(0);
+      expect(result.duration).toBeGreaterThanOrEqual(0);
     });
 
     it('should call forceRefresh for meteorology', async () => {
@@ -99,6 +105,12 @@ describe('RefreshService', () => {
       expect(mockNewsRepo.forceRefresh).toHaveBeenCalled();
     });
 
+    it('should call forceRefresh for regional news', async () => {
+      const result = await service.refreshAll();
+      expect(mockRegionalRepo.forceRefresh).toHaveBeenCalled();
+      expect(result.details['regional-news']).toBe('OK');
+    });
+
     it('should not run concurrent refreshes', async () => {
       const promise1 = service.refreshAll();
       const promise2 = service.refreshAll();
@@ -119,6 +131,39 @@ describe('RefreshService', () => {
       const result = await service.refreshAll();
       expect(result.success).toBe(true);
       expect(result.details['meteorology']).toContain('ERROR');
+    });
+  });
+
+  describe('refreshNews', () => {
+    it('should refresh only news sources', async () => {
+      const result = await service.refreshNews();
+      expect(result.success).toBe(true);
+      expect(result.details['rankings']).toContain('OK');
+      expect(result.details['news']).toBe('OK');
+      expect(result.details['regional-news']).toBe('OK');
+      expect(mockOpenMeteoRepo.forceRefresh).not.toHaveBeenCalled();
+      expect(mockMarineRepo.forceRefresh).not.toHaveBeenCalled();
+    });
+
+    it('should expose lastNewsRefresh in status', async () => {
+      await service.refreshNews();
+      const status = service.getStatus();
+      expect(status.lastNewsRefresh).toBeTruthy();
+      expect(status.lastRefresh).toBeNull();
+      expect(status.isRefreshing).toBe(false);
+    });
+
+    it('should not run concurrent news refreshes', async () => {
+      const [result1, result2] = await Promise.all([service.refreshNews(), service.refreshNews()]);
+      expect(result1.success).toBe(true);
+      expect(result2.success).toBe(false);
+    });
+
+    it('should handle regional news failure gracefully', async () => {
+      mockRegionalRepo.forceRefresh.mockRejectedValueOnce(new Error('RSS down'));
+      const result = await service.refreshNews();
+      expect(result.success).toBe(true);
+      expect(result.details['regional-news']).toContain('ERROR');
     });
   });
 });

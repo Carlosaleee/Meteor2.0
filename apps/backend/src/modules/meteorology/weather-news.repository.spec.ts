@@ -4,6 +4,7 @@ import { FallbackService } from '../../common/fallback/fallback.service';
 
 describe('WeatherNewsRepository', () => {
   let repository: WeatherNewsRepository;
+  const originalFetch = global.fetch;
 
   const mockFallbackService = {
     load: jest.fn().mockResolvedValue(null),
@@ -12,6 +13,7 @@ describe('WeatherNewsRepository', () => {
   };
 
   beforeEach(async () => {
+    global.fetch = jest.fn().mockRejectedValue(new Error('Network disabled in tests')) as unknown as typeof fetch;
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         WeatherNewsRepository,
@@ -21,6 +23,10 @@ describe('WeatherNewsRepository', () => {
 
     repository = module.get<WeatherNewsRepository>(WeatherNewsRepository);
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    global.fetch = originalFetch;
   });
 
   it('should be defined', () => {

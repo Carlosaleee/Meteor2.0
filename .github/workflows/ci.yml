@@ -27,7 +27,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run tests
-        run: cd apps/backend && npx jest --forceExit --detectOpenHandles
+        run: cd apps/backend && NODE_OPTIONS="--experimental-vm-modules" npx jest --forceExit --detectOpenHandles
 
   frontend-test:
     name: Frontend Tests (Vitest)

@@ -581,6 +581,15 @@ Forca refresh manual de todas as fontes de dados.
 
 ## Fontes de Dados Externas
 
+> **[LLM_CONTEXT] Gemini API — Migração de Chaves (Set/2026)**
+> O Google migrou as chaves de API do Google AI Studio para o Gemini.
+> Formato antigo: `AIzaSy...` → Formato novo: `AQ.SUA_CHAVE_AQUI`
+> As chaves novas são vinculadas a uma conta de serviço interna do Google Cloud, permitindo controle de acesso mais restrito.
+> Para obter uma nova chave: https://aistudio.google.com/apikey
+> O endpoint da API continua o mesmo: `https://generativelanguage.googleapis.com/v1beta/models`
+> O SDK `@google/genai` aceita ambos os formatos — a mudança é transparente para o código.
+> Uses do Gemini no Meteor 2.0: resumo tático de surf (oceanography/summary) e chatbot Irons (iron/chat).
+
 | Fonte | API | Custo | Uso |
 |-------|-----|-------|-----|
 | Open-Meteo | Forecast API | Gratuita | Previsao do tempo (current, hourly, daily) |

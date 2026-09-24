@@ -13,7 +13,7 @@
 |                   MONOREPO (pnpm)                  |
 +-------------------------+-------------------------+
 |      apps/backend       |      apps/frontend      |
-|      NestJS 11          |      Next.js 15         |
+|      NestJS 12          |      Next.js 15         |
 |      Porta 3001         |      Porta 3000         |
 +-------------------------+-------------------------+
 |                  pnpm-workspace.yaml               |
@@ -25,7 +25,7 @@
 - Seguranca: Helmet, CORS, Throttler (30 req/min)
 - Validacao: Zod (env schema + pipes)
 - Resiliencia: FallbackService com JSONs diarios
-- **Automacao:** RefreshService com @nestjs/schedule (startup + cron 6h)
+- **Automacao:** RefreshService com @nestjs/schedule (startup + cron 6h para dados pesados + cron 1h para rankings/noticias)
 
 ### Frontend (Next.js 15)
 - App Router com React 19
@@ -33,7 +33,7 @@
 - Tema: dark/light com `data-theme` + `localStorage` + `prefers-color-scheme`
 - Mapas: Leaflet nativo (useRef + cleanup pattern) — tiles OpenStreetMap (gratuitos, sem API key)
 - **SSR Protection:** Componentes Leaflet importados via `next/dynamic` com `{ ssr: false }` para evitar `ReferenceError: window is not defined` durante build estatico
-- Hooks: useMeteorology, useSwell, useHourlyMarine, useAiSummary, useAllCities, useRegionalNews, useComercio
+- Hooks: useMeteorology, useSwell, useHourlyMarine, useAiSummary, useAllCities, useRegionalNews, useComercio, useNews, useWeatherNews (9 hooks)
 - API Layer: lib/api.ts com fetch generico
 - Icones: React Icons (Font Awesome)
 - Graficos: ApexCharts (react-apexcharts)
@@ -48,8 +48,9 @@
 | `/` | Portal principal - HUD Tatico | Estatico + ChatWidget + banner |
 | `/meteorologia` | Previsão do Tempo & Vento | **API real** (4 cidades) + RainViewer radar + PageBanner |
 | `/swell` | Swell & Points | **API real** + Gemini AI + ApexCharts + Leaflet |
-| `/noticias` | Noticias Regionais + Transito | **API real** (fallback-noticias-regionais) + TrafficMap Leaflet + CityGrid |
+| `/noticias` | Noticias Regionais + Transito | **RSS auto-atualizado** (ISN + Santa Portal + Google News) + TrafficMap Leaflet + CityGrid |
 | `/comercio` | Comercio de Ilha Comprida | **API real** (fallback-comercio) + CommerceMap Leaflet + OSRM routing |
+| `/transito` | Transito Regional | Marcadores estaticos + BaseLeafletMap Leaflet (SP-222, BR-116, Balsa) |
 | `/blog` | Blog Tecnico | Estatico (4 artigos) |
 | `/creditos` | Creditos & Fontes | Estatico |
 | `/mapa` | Mapa de Localizacoes | Leaflet (6 marcadores) |
@@ -84,9 +85,10 @@
 
 ### 4.4 NoticiasRegionaisModule
 - Endpoint: GET /v1/noticias-regionais
-- API externa: Nenhuma (dados estaticos)
-- Fallback: data/fallback-noticias-regionais.json (12 noticias + 4 rotas)
-- Dados: noticias regionais do Vale do Ribeira + status de rodovias
+- API externa: RSS automatico — ISN Online (isnonline.com.br/feed), Santa Portal (santaportal.com.br/feed), Google News RSS ("Vale do Ribeira")
+- Fallback: data/fallback-noticias-regionais.json (merge: RSS fresco + base, rolling 30 noticias + 5 rotas)
+- Dados: noticias regionais do Vale do Ribeira (categorias: transito/policial/turismo/cotidiano/noticia por keyword) + status de rodovias (rotas estaticas)
+- Cache: 30min em memoria; `forceRefresh()` re-coleta todos os feeds (cron 1h + a cada 6h)
 
 ### 4.5 ComercioModule
 - Endpoint: GET /v1/comercio
@@ -94,7 +96,15 @@
 - Fallback: data/fallback-localismo.json (50 comercios de Ilha Comprida)
 - Dados: diretorio comercial com geolocalizacao (5 setores: alimentacao, hospedagem, comercio, servicos, lazer)
 
-### 4.6 IronModule
+### 4.6 NewsModule
+- Endpoint: GET /v1/news
+- API externa: WSL (worldsurfleague.com) + SPSurf (noticias de surf)
+- Ranking WSL: parser de tabela HTML real (`<tr class="athlete-*">` → rank/nome/pais/pontos/trend; `<tr class="event-*">` → eventos com status; Upcoming primeiro) — fallback hardcoded se parse < 5 entradas
+- Fallback: data/fallback-news.json (atualizado pelo RefreshService)
+- Dados: rankings WSL (men/women/events), noticias de surf, calendario
+- Repositories: news.repository (orquestador), wsl.repository, spsurf.repository (cache 30min com clearCache)
+
+### 4.7 IronModule
 - Endpoint: POST /v1/iron/chat
 - Servico: Integracao com agente IA para respostas contextuais
 - Modulos integrados: Meteorology, Oceanography, Traffic, Comercio, NoticiasRegionais
@@ -102,26 +112,28 @@
 - Validacao: Zod schema para input do usuario
 - Contexto: Coleta dados de todos os modulos e envia como contexto para Gemini
 
-### 4.7 FallbackService (Global)
+### 4.8 FallbackService (Global)
 - Servico compartilhado entre todos os modulos
 - Carrega fallback do disco de forma assincrona (fs.promises)
 - Salva dados frescos quando API responde
 - Verifica staleness (> 24h = stale)
 - Fallback final: medias sazonais da regiao
 
-### 4.8 RefreshService (Automacao)
+### 4.9 RefreshService (Automacao)
 - **Startup:** Executa refresh de todos os módulos ao iniciar (`onModuleInit`)
-- **Cron:** Executa a cada 6 horas (`@Cron('0 */6 * * *')`)
-- **Modulos afetados:** Meteorologia, Oceanografia, Noticias (WSL + SPSurf)
+- **Cron pesado:** a cada 6 horas (`@Cron('0 */6 * * *')`) — meteorologia, oceanografia, weather news, rankings, noticias, regionais
+- **Cron de noticias:** a cada 1 hora (`@Cron('0 * * * *')`) → `refreshNews()` — apenas rankings WSL + noticias + regionais (leve)
+- **Modulos afetados:** Meteorologia, Oceanografia, Noticias (WSL + SPSurf), Noticias Regionais (RSS)
 - **Endpoints:**
-  - `GET /v1/cron/status` — Retorna ultimo refresh e status
-  - `POST /v1/cron/refresh` — Forca refresh manual (autenticado via `CRON_SECRET`)
+  - `GET /v1/cron/status` — Retorna ultimo refresh (`lastRefresh`, `lastNewsRefresh`) e status
+  - `POST /v1/cron/refresh` — Forca refresh completo manual (autenticado via `CRON_SECRET`)
 - **Metodos novos nos repositories:**
   - `open-meteo.repository.ts`: `forceRefresh(lat, lon)`
   - `marine.repository.ts`: `forceRefresh(lat, lon)`
   - `news.repository.ts`: `forceRefresh()`
   - `wsl.repository.ts`: `clearCache()`
   - `spsurf.repository.ts`: `clearCache()`
+  - `noticias-regionais.repository.ts`: `forceRefresh()` (re-coleta RSS)
 
 ---
 
@@ -148,6 +160,12 @@
 | DATABASE_URL | file:./data/meteor.db | Drizzle ORM |
 | CRON_SECRET | meteor-refresh-secret | RefreshService (auth do endpoint) |
 
+> **[LLM_CONTEXT] Migracao das Chaves Gemini API (Set/2026)**
+> - Formato antigo (descontinuado): `AIzaSy...`
+> - Formato novo (recomendado): `AQ.SUA_CHAVE_AQUI` — obter em https://aistudio.google.com/apikey
+> - O SDK `@google/genai` aceita ambos os formatos (mudanca transparente para o codigo)
+> - Endpoints que usam Gemini: `GET /v1/oceanography/summary` e `POST /v1/iron/chat`
+
 ---
 
 ## 6. Sistema de Fallback
@@ -169,12 +187,12 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 - data/fallback-meteorology.json — Dados por localizacao (current + hourly + daily)
 - data/fallback-oceanography.json — Ondas, swell, marees, spots
 - data/fallback-traffic.json — Rodovias com simulacao por horario
-- data/fallback-noticias-regionais.json — 12 noticias regionais + 5 rotas de transito
+- data/fallback-noticias-regionais.json — rolling 30 noticias regionais (RSS auto) + 5 rotas de transito
 - data/fallback-news.json — Noticias WSL + SPSurf
 
 **Automacao de refresh:**
 - Startup: todos os dados sao atualizados ao iniciar o backend
-- Cron: a cada 6 horas via @nestjs/schedule
+- Cron: a cada 6 horas (dados pesados) + a cada 1 hora (rankings WSL + noticias + regionais) via @nestjs/schedule
 - Manual: `POST /v1/cron/refresh` com header `x-cron-secret`
 
 ---
@@ -192,13 +210,13 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 - Vitest (testes)
 
 ### Backend
-- NestJS 11.1
+- NestJS 12.1
 - Node.js + Express
 - TypeScript 5.9
 - Zod (validacao)
 - Helmet (seguranca)
 - @google/genai (Gemini AI — resumo tatico)
-- Jest (testes)
+- Jest 30 (testes — requer `--experimental-vm-modules` p/ Nest 12 ESM)
 
 ### Infra
 - pnpm 11 (monorepo)
@@ -288,25 +306,26 @@ Arquivo: `~/.config/opencode/opencode.jsonc`
 
 ---
 
-## 9.1 Cobertura de Testes
+## 9. Cobertura de Testes
 
 ### Backend (Jest)
 | Arquivo | Testes | Status |
 |---------|--------|--------|
 | iron.service.spec.ts | 11 | ✅ |
 | meteorology.service.spec.ts | 5 | ✅ |
-| oceanography.service.spec.ts | 4 | ⏭️ Skip (timeout) |
+| oceanography.service.spec.ts | 4 | ✅ |
 | gemini.repository.spec.ts | 4 | ✅ |
 | gemini-chat.repository.spec.ts | 6 | ✅ |
 | traffic.service.spec.ts | 4 | ✅ |
 | noticias-regionais.service.spec.ts | 4 | ✅ |
+| noticias-regionais.repository.spec.ts | 11 | ✅ (RSS com mock) |
 | comercio.service.spec.ts | 4 | ✅ |
 | news.service.spec.ts | 4 | ✅ |
 | fallback.service.spec.ts | 3 | ✅ |
 | meteorology.controller.spec.ts | 4 | ✅ |
-| refresh.service.spec.ts | 8 | ✅ |
+| refresh.service.spec.ts | 15 | ✅ |
 | cron.controller.spec.ts | 4 | ✅ |
-| wsl.repository.spec.ts | 4 | ✅ |
+| wsl.repository.spec.ts | 7 | ✅ (fixture WSL real) |
 | spsurf.repository.spec.ts | 3 | ✅ |
 | weather-news.repository.spec.ts | 5 | ✅ |
 | api-health.spec.ts | 2 | ✅ |
@@ -316,8 +335,8 @@ Arquivo: `~/.config/opencode/opencode.jsonc`
 ### Frontend (Vitest + RTL)
 | Arquivo | Testes | Status |
 |---------|--------|--------|
-| ResumoIA.test.tsx | 4 | ✅ |
-| ChatWidget.test.tsx | 3 | ✅ (corrigido: ChatProvider wrapper) |
+| ResumoIA.test.tsx | 6 | ✅ |
+| ChatWidget.test.tsx | 8 | ✅ (corrigido: ChatProvider wrapper) |
 | Footer.test.tsx | 3 | ✅ |
 | useComercio.test.ts | 3 | ✅ |
 | useWeatherNews.test.ts | 5 | ✅ |
@@ -327,11 +346,11 @@ Arquivo: `~/.config/opencode/opencode.jsonc`
 | api.test.ts | 4 | ✅ |
 | utils.test.ts | 11 | ✅ |
 
-**Total: 121 testes (119 passam, 2 pulam timeout)**
+**Total: 147 testes (147 passam) — backend Jest 30 (99) + frontend Vitest (48)**
 
 ---
 
-## 9. Estrutura de Diretorios
+## 10. Estrutura de Diretorios
 
 ```
 Meteor_2.0/
@@ -401,7 +420,7 @@ Meteor_2.0/
 
 ---
 
-## 10. UI/UX — Header, Footer, Nav
+## 11. UI/UX — Header, Footer, Nav
 
 ### Header
 - Logo "Meteor" com icone FaWater
@@ -450,7 +469,7 @@ Meteor_2.0/
 
 ---
 
-## 11. Pagina de Previsão do Tempo (Detalhes)
+## 12. Pagina de Previsão do Tempo (Detalhes)
 
 ### Estrutura Principal
 - **Container:** `<main>` com `bg-slate-950 border border-slate-800 rounded-2xl`
@@ -503,7 +522,7 @@ Meteor_2.0/
 
 ---
 
-## 12. Pagina de Swell (Detalhes)
+## 13. Pagina de Swell (Detalhes)
 
 ### Estrutura Principal
 - **Container:** `<div className="space-y-8">` com PageBanner + Hero + Tabs + Conteudo
@@ -558,7 +577,7 @@ Meteor_2.0/
 | DailyTip.tsx | Dica prática do dia |
 | Skeletons.tsx | Loading states (6 tipos) |
 
-### Hooks (8 hooks)
+### Hooks (9 hooks)
 | Hook | Descricao |
 |------|-----------|
 | useMeteorology.ts | Busca GET /v1/meteorology |
@@ -567,6 +586,7 @@ Meteor_2.0/
 | useAiSummary.ts | Busca GET /v1/oceanography/summary |
 | useAllCities.ts | Busca 4 cidades em paralelo |
 | useNews.ts | Busca noticias de surf |
+| useWeatherNews.ts | Busca GET /v1/meteorology/news |
 | useRegionalNews.ts | Busca GET /v1/noticias-regionais |
 | useComercio.ts | Busca GET /v1/comercio |
 
@@ -587,7 +607,7 @@ Meteor_2.0/
 
 ---
 
-## 13. Deploy em Produção
+## 14. Deploy em Produção
 
 ### URLs de Produção
 
@@ -617,7 +637,7 @@ Configurado em: `apps/frontend/.env.production`
 | Variável | Valor | Descrição |
 |----------|-------|-----------|
 | `FRONTEND_ORIGIN` | `https://meteor2-0-frontend.vercel.app` | CORS origin |
-| `GEMINI_API_KEY` | *(chave secreta)* | API Gemini para resumo IA |
+| `GEMINI_API_KEY` | *(chave secreta — formato AQ... desde Set/2026)* | API Gemini para resumo IA |
 | `GEMINI_MODEL` | `gemini-2.5-flash` | Modelo Gemini |
 | `GEMINI_TEMPERATURE` | `0.7` | Temperatura Gemini |
 | `FALLBACK_DIR` | `data` | Diretório de fallback |
@@ -628,8 +648,8 @@ Pipeline em `.github/workflows/ci.yml`:
 
 | Job | Descrição | Trigger |
 |-----|-----------|---------|
-| `backend-test` | Jest (80 testes) | push/PR |
-| `frontend-test` | Vitest (41 testes) | push/PR |
+| `backend-test` | Jest (99 testes) | push/PR |
+| `frontend-test` | Vitest (48 testes) | push/PR |
 | `lint` | oxlint (frontend) | push/PR |
 | `build` | Valida compilação | Após testes |
 
@@ -654,7 +674,7 @@ DevOps/
 
 ---
 
-## 14. Imagens
+## 15. Imagens
 
 | Arquivo | Dimensoes | Uso |
 |---------|-----------|-----|

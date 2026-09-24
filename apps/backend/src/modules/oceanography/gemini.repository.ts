@@ -53,7 +53,7 @@ export class GeminiRepository {
       const model = this.config.get('GEMINI_MODEL') ?? 'gemini-2.5-flash';
       const prompt = this.buildPrompt(data);
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+       
       const response = await (client as { models: { generateContent: (opts: unknown) => Promise<unknown> } }).models.generateContent({
         model,
         contents: prompt,

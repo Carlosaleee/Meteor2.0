@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-22T03:00:10.658Z",
+  "updatedAt": "2026-09-24T21:51:45.838Z",
   "data": {
     "news": [
       {
@@ -11,7 +11,7 @@
         "description": "Miguel Pupo derrotou Kanoa Igarashi na final por 14,77 a 14,40 em Lower Trestles. Segunda vitoria do brasileiro na temporada.",
         "image": "https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67",
         "category": "WSL",
-        "publishedAt": "2026-09-20T03:00:10.646Z"
+        "publishedAt": "2026-09-22T21:51:45.836Z"
       },
       {
         "id": "wsl-yago-lideranca",
@@ -22,7 +22,7 @@
         "description": "Atual campeao mundial vence duelo de aereos contra Kauli Vaast e assume 1a posicao com 42.780 pontos.",
         "image": "https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67",
         "category": "WSL",
-        "publishedAt": "2026-09-18T03:00:10.646Z"
+        "publishedAt": "2026-09-20T21:51:45.836Z"
       },
       {
         "id": "wsl-erin-tripla",
@@ -33,7 +33,7 @@
         "description": "Canadense derrotou Gabriela Bryan na final por 13,00 a 11,90. Terceiro titulo consecutivo apos Taiti e Fiji.",
         "image": "https://d3qf8nvav5av0u.cloudfront.net/image/05d0c45992d04a5409e4f0752d17382f.png?&x=1440&y=513&icq=74&sig=b95e55f8d4a05ce4133bcc58ba78e486",
         "category": "WSL",
-        "publishedAt": "2026-09-20T03:00:10.646Z"
+        "publishedAt": "2026-09-22T21:51:45.836Z"
       },
       {
         "id": "wsl-medina-eliminado",
@@ -44,7 +44,7 @@
         "description": "Tricampeao mundial cai para Mateus Herdy na segunda rodada (11,83 a 12,00). Ja tem 3 eliminacoes no Round 2 esta temporada.",
         "image": "https://d3qf8nvav5av0u.cloudfront.net/image/05d0c45992d04a5409e4f0752d17382f.png?&x=1440&y=513&icq=74&sig=b95e55f8d4a05ce4133bcc58ba78e486",
         "category": "WSL",
-        "publishedAt": "2026-09-18T03:00:10.646Z"
+        "publishedAt": "2026-09-20T21:51:45.836Z"
       },
       {
         "id": "wsl-trestles-corte",
@@ -55,7 +55,7 @@
         "description": "Filipe Toledo escapou do corte. Mateus Herdy e Alejo Muniz ficam fora das proximas duas etapas do CT.",
         "image": "https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67",
         "category": "WSL",
-        "publishedAt": "2026-09-19T03:00:10.646Z"
+        "publishedAt": "2026-09-21T21:51:45.836Z"
       },
       {
         "id": "wsl-portugal-proximo",
@@ -66,7 +66,7 @@
         "description": "Decima etapa do CT 2026 em Peniche de 16 a 25 de outubro. Classificados pelo corte disputam penultima etapa.",
         "image": "https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67",
         "category": "WSL",
-        "publishedAt": "2026-09-21T03:00:10.646Z"
+        "publishedAt": "2026-09-23T21:51:45.836Z"
       },
       {
         "id": "spsurf-1",
@@ -77,7 +77,7 @@
         "description": "",
         "image": "https://static.wixstatic.com/media/690598_cf6012b3a7aa4ffd8b88893077d96484~mv2.jpeg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/690598_cf6012b3a7aa4ffd8b88893077d96484~mv2.webp",
         "category": "Paulista",
-        "publishedAt": "2026-09-22T03:00:10.640Z"
+        "publishedAt": "2026-09-24T21:51:45.785Z"
       },
       {
         "id": "spsurf-2",
@@ -88,7 +88,7 @@
         "description": "",
         "image": "https://static.wixstatic.com/media/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.jpeg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.webp",
         "category": "Paulista",
-        "publishedAt": "2026-09-22T03:00:10.642Z"
+        "publishedAt": "2026-09-24T21:51:45.787Z"
       },
       {
         "id": "spsurf-3",
@@ -99,7 +99,7 @@
         "description": "",
         "image": "https://static.wixstatic.com/media/71b9f8_d53b9f235c844cb09ce5789c48052bf6~mv2.jpg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/71b9f8_d53b9f235c844cb09ce5789c48052bf6~mv2.jpg",
         "category": "Paulista",
-        "publishedAt": "2026-09-22T03:00:10.644Z"
+        "publishedAt": "2026-09-24T21:51:45.787Z"
       },
       {
         "id": "spsurf-4",
@@ -110,7 +110,7 @@
         "description": "",
         "image": "https://static.wixstatic.com/media/71b9f8_d47f44af83e043a590507fe765bd2d32~mv2.jpg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/71b9f8_d47f44af83e043a590507fe765bd2d32~mv2.jpg",
         "category": "Paulista",
-        "publishedAt": "2026-09-22T03:00:10.644Z"
+        "publishedAt": "2026-09-24T21:51:45.787Z"
       },
       {
         "id": "spsurf-5",
@@ -121,7 +121,7 @@
         "description": "",
         "image": "https://static.wixstatic.com/media/71b9f8_1f4cfb108dfd43299fb87ae66da9782c~mv2.jpg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/71b9f8_1f4cfb108dfd43299fb87ae66da9782c~mv2.jpg",
         "category": "Paulista",
-        "publishedAt": "2026-09-22T03:00:10.644Z"
+        "publishedAt": "2026-09-24T21:51:45.787Z"
       },
       {
         "id": "spsurf-6",
@@ -132,162 +132,274 @@
         "description": "",
         "image": "https://static.wixstatic.com/media/b7060dede1e849e483cc931023aec49f.jpg/v1/fill/w_118,h_78,al_c,q_80,usm_0.66_1.00_0.01,blur_2,enc_avif,quality_auto/b7060dede1e849e483cc931023aec49f.jpg",
         "category": "Paulista",
-        "publishedAt": "2026-09-22T03:00:10.646Z"
+        "publishedAt": "2026-09-24T21:51:45.787Z"
       }
     ],
     "rankings": {
       "men": [
         {
           "rank": 1,
-          "name": "Leonardo Fioravanti",
-          "country": "Italy",
-          "points": 40015,
-          "trend": 0
+          "name": "Yago Dora",
+          "country": "Brazil",
+          "points": 42780,
+          "trend": 2
         },
         {
           "rank": 2,
-          "name": "Italo Ferreira",
-          "country": "Brazil",
-          "points": 39930,
-          "trend": 0
+          "name": "Leonardo Fioravanti",
+          "country": "Italy",
+          "points": 40015,
+          "trend": -1
         },
         {
           "rank": 3,
-          "name": "Yago Dora",
+          "name": "Italo Ferreira",
           "country": "Brazil",
-          "points": 37695,
-          "trend": 0
+          "points": 39930,
+          "trend": -1
         },
         {
           "rank": 4,
-          "name": "Gabriel Medina",
+          "name": "Miguel Pupo",
           "country": "Brazil",
-          "points": 35410,
-          "trend": 0
+          "points": 39450,
+          "trend": 1
         },
         {
           "rank": 5,
-          "name": "Miguel Pupo",
+          "name": "Gabriel Medina",
           "country": "Brazil",
-          "points": 32770,
-          "trend": 0
+          "points": 35410,
+          "trend": -1
         },
         {
           "rank": 6,
           "name": "Griffin Colapinto",
           "country": "United States",
-          "points": 31375,
+          "points": 33695,
           "trend": 0
         },
         {
           "rank": 7,
-          "name": "Ethan Ewing",
-          "country": "Australia",
-          "points": 28575,
-          "trend": 0
+          "name": "Kanoa Igarashi",
+          "country": "Japan",
+          "points": 31910,
+          "trend": 3
         },
         {
           "rank": 8,
+          "name": "Ethan Ewing",
+          "country": "Australia",
+          "points": 30895,
+          "trend": -1
+        },
+        {
+          "rank": 9,
           "name": "Samuel Pupo",
           "country": "Brazil",
           "points": 27960,
+          "trend": -1
+        },
+        {
+          "rank": 10,
+          "name": "George Pittar",
+          "country": "Australia",
+          "points": 26705,
+          "trend": -1
+        },
+        {
+          "rank": 11,
+          "name": "Kauli Vaast",
+          "country": "France",
+          "points": 26620,
+          "trend": 0
+        },
+        {
+          "rank": 12,
+          "name": "Liam O'Brien",
+          "country": "Australia",
+          "points": 26005,
+          "trend": 0
+        },
+        {
+          "rank": 13,
+          "name": "Cole Houshmand",
+          "country": "United States",
+          "points": 24830,
+          "trend": 4
+        },
+        {
+          "rank": 14,
+          "name": "Jack Robinson",
+          "country": "Australia",
+          "points": 24665,
+          "trend": -1
+        },
+        {
+          "rank": 15,
+          "name": "Marco Mignot",
+          "country": "France",
+          "points": 23770,
           "trend": 0
         }
       ],
       "women": [
         {
           "rank": 1,
-          "name": "Carissa Moore",
+          "name": "Gabriela Bryan",
           "country": "Hawaii",
-          "points": 39575,
-          "trend": 0
+          "points": 42865,
+          "trend": 1
         },
         {
           "rank": 2,
-          "name": "Gabriela Bryan",
+          "name": "Carissa Moore",
           "country": "Hawaii",
-          "points": 37065,
-          "trend": 0
+          "points": 42320,
+          "trend": -1
         },
         {
           "rank": 3,
           "name": "Sawyer Lindblad",
           "country": "United States",
-          "points": 35970,
+          "points": 40055,
           "trend": 0
         },
         {
           "rank": 4,
           "name": "Molly Picklum",
           "country": "Australia",
-          "points": 34865,
+          "points": 38950,
           "trend": 0
         },
         {
           "rank": 5,
-          "name": "Luana Silva",
-          "country": "Brazil",
-          "points": 33835,
-          "trend": 0
+          "name": "Erin Brooks",
+          "country": "Canada",
+          "points": 38000,
+          "trend": 3
         },
         {
           "rank": 6,
-          "name": "Caitlin Simmers",
-          "country": "United States",
-          "points": 31810,
-          "trend": 0
+          "name": "Luana Silva",
+          "country": "Brazil",
+          "points": 36580,
+          "trend": -1
         },
         {
           "rank": 7,
-          "name": "Lakey Peterson",
+          "name": "Caitlin Simmers",
           "country": "United States",
-          "points": 30235,
-          "trend": 0
+          "points": 31810,
+          "trend": -1
         },
         {
           "rank": 8,
-          "name": "Erin Brooks",
-          "country": "Canada",
-          "points": 29000,
+          "name": "Lakey Peterson",
+          "country": "United States",
+          "points": 30235,
+          "trend": -1
+        },
+        {
+          "rank": 9,
+          "name": "Isabella Nichols",
+          "country": "Australia",
+          "points": 27970,
+          "trend": 0
+        },
+        {
+          "rank": 10,
+          "name": "Caroline Marks",
+          "country": "United States",
+          "points": 26320,
+          "trend": 0
+        },
+        {
+          "rank": 11,
+          "name": "Nadia Erostarbe",
+          "country": "Spain",
+          "points": 23915,
+          "trend": 0
+        },
+        {
+          "rank": 12,
+          "name": "Bettylou Sakura Johnson",
+          "country": "Hawaii",
+          "points": 22575,
+          "trend": 0
+        },
+        {
+          "rank": 13,
+          "name": "Tyler Wright",
+          "country": "Australia",
+          "points": 20545,
+          "trend": 0
+        },
+        {
+          "rank": 14,
+          "name": "Yolanda Hopkins",
+          "country": "Portugal",
+          "points": 19830,
+          "trend": 0
+        },
+        {
+          "rank": 15,
+          "name": "Anat Lelior",
+          "country": "Israel",
+          "points": 18545,
           "trend": 0
         }
       ]
     },
     "events": [
       {
-        "name": "Lexus Trestles Pro",
-        "location": "Lower Trestles, California, EUA",
-        "dates": "11-20 Set 2026",
-        "status": "Standby",
-        "tour": "Championship Tour"
-      },
-      {
-        "name": "Banco do Brasil Sao Sebastiao Pro",
-        "location": "Sao Sebastiao, Sao Paulo",
-        "dates": "26 Set - 3 Out 2026",
+        "name": "Banco do Brasil São Sebastião Pro",
+        "location": "São Sebastião, São Paulo, Brazil",
+        "dates": "Sep 26 - Oct 3",
         "status": "Upcoming",
         "tour": "Challenger Series"
       },
       {
-        "name": "MEO Rip Curl Pro Portugal",
-        "location": "Supertubos, Peniche, Portugal",
-        "dates": "16-25 Out 2026",
-        "status": "Upcoming",
+        "name": "Xacobeo Norte Surf Fest",
+        "location": "Matosinhos, Leça da Palmeira, Portugal",
+        "dates": "Sep 1 - 6",
+        "status": "Completed",
+        "tour": "Qualifying Series"
+      },
+      {
+        "name": "WRV Outer Banks Pro",
+        "location": "Nags Head, North Carolina, United States",
+        "dates": "Sep 3 - 6",
+        "status": "Completed",
+        "tour": "Men's Qualifying Series"
+      },
+      {
+        "name": "Circuito Banco do Brasil de Surfe - Guarapari",
+        "location": "Praia D'Ulé, Espírito Santo, Brazil",
+        "dates": "Sep 4 - 6",
+        "status": "Completed",
+        "tour": "Qualifying Series"
+      },
+      {
+        "name": "Virginia Beach Super Girl Surf Festival",
+        "location": "Virginia Beach, Virginia, United States",
+        "dates": "Sep 5 - 7",
+        "status": "Completed",
+        "tour": "Women's Qualifying Series"
+      },
+      {
+        "name": "Lexus Trestles Pro",
+        "location": "Lower Trestles, San Clemente, California, United States",
+        "dates": "Sep 11 - 20",
+        "status": "Completed",
         "tour": "Championship Tour"
       },
       {
-        "name": "Philippines Pro",
-        "location": "Filipinas",
-        "dates": "31 Out - 10 Nov 2026",
-        "status": "Upcoming",
-        "tour": "Championship Tour"
-      },
-      {
-        "name": "Lexus Pipe Masters",
-        "location": "Pipeline, Oahu, Hawaii",
-        "dates": "8-20 Dez 2026",
-        "status": "Upcoming",
-        "tour": "Championship Tour"
+        "name": "REMA Saquarema Surf Festival",
+        "location": "Saquarema, Rio de Janeiro, Brazil",
+        "dates": "Sep 14 - 20",
+        "status": "Completed",
+        "tour": "Qualifying Series"
       }
     ]
   }

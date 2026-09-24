@@ -112,7 +112,7 @@ function renderBold(text: string): React.ReactNode[] {
 function renderMarkdown(text: string): React.ReactNode[] {
   const lines = text.split('\n');
   return lines.map((line, i) => {
-    if (/^[🎳🌬️🪁⏰🏆⚠️]/.test(line)) {
+    if (/^\p{Extended_Pictographic}/u.test(line)) {
       return (
         <p key={i} className="text-sm font-bold text-white mt-3 mb-1">
           {renderBold(line)}
