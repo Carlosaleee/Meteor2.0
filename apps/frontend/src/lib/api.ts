@@ -146,22 +146,6 @@ export type NewsResponse = {
   timestamp: string;
 };
 
-export type TrafficRoute = {
-  id: string;
-  name: string;
-  stretch: string;
-  condition: string;
-  description: string;
-  updatedAt: number;
-  waitTimeMinutes?: number;
-};
-
-export type TrafficResponse = {
-  timestamp: string;
-  location: string;
-  routes: TrafficRoute[];
-};
-
 export type CommerceItem = {
   id: string;
   name: string;
