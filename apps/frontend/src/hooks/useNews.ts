@@ -31,5 +31,9 @@ export function useNews() {
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  return { data, loading, error, refetch: () => fetchData() };
+  const refetch = useCallback(() => {
+    void fetchData();
+  }, [fetchData]);
+
+  return { data, loading, error, refetch };
 }

@@ -50,12 +50,6 @@ export default function SwellPage() {
   const { data: newsData, loading: newsLoading, refetch: refetchNews } = useNews();
 
   useEffect(() => {
-    refetch();
-    refetchHourly();
-    refetchNews();
-  }, [refetch, refetchHourly, refetchNews]);
-
-  useEffect(() => {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         pos => setUserPosition([pos.coords.latitude, pos.coords.longitude]),
