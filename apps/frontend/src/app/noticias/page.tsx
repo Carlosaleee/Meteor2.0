@@ -15,7 +15,7 @@ const CATEGORY_CONFIG: Record<string, { label: string; emoji: string; color: str
   noticia: { label: 'Noticias', emoji: '📰', color: 'text-blue-400', bg: 'bg-blue-500/10' },
   policial: { label: 'Policial', emoji: '🚨', color: 'text-red-400', bg: 'bg-red-500/10' },
   turismo: { label: 'Turismo', emoji: '🏖️', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-  cotidiano: { label: 'Cotidiano', emoji: '🏠', color: 'text-purple-400', bg: 'bg-purple-500/10' },
+  cotidiano: { label: 'Cotidiano', emoji: '🏠', color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
 };
 
 const ROUTE_CONDITION_COLORS: Record<string, { text: string; bg: string; border: string }> = {

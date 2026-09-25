@@ -67,7 +67,7 @@ function parseCardsFromSummary(summary: string): BriefingCard[] {
       title: 'Horários',
       value: bestTimeMatch[1].trim(),
       detail: 'Janela ideal para surf',
-      color: 'from-purple-500/20 to-purple-600/10 border-purple-500/30',
+      color: 'from-rose-500/20 to-rose-600/10 border-rose-500/30',
     });
   }
 

@@ -58,7 +58,7 @@ export function SurfNews({ news, loading, category, title }: SurfNewsProps) {
             <div className="h-40 bg-slate-800 overflow-hidden relative">
               <img
                 src={item.image || FALLBACK_IMAGES[item.category] || FALLBACK_IMAGES.WSL}
-                alt=""
+                alt={item.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
                 onError={(e) => {

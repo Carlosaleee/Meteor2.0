@@ -18,7 +18,7 @@ const SECTOR_COLORS: Record<string, string> = {
   hospedagem: '#3b82f6',
   comercio: '#10b981',
   servicos: '#eab308',
-  lazer: '#a855f7',
+  lazer: '#06b6d4',
 };
 
 const SECTOR_EMOJI: Record<string, string> = {

@@ -21,6 +21,14 @@ const mono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Meteor 2.0 — Dashboard Tático",
   description: "Dashboard tático de telemetria para Ilha Comprida e Vale do Ribeira",
+  openGraph: {
+    title: "Meteor 2.0 — Dashboard Tático",
+    description: "Dashboard tático de telemetria para Ilha Comprida e Vale do Ribeira",
+    siteName: "Meteor 2.0",
+    images: [{ url: "/CapaMeteor.jpg", width: 1200, height: 630 }],
+    locale: "pt_BR",
+    type: "website",
+  },
   robots: { index: true, follow: true },
 };
 
