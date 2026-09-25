@@ -1,8 +1,12 @@
 ﻿# Guia do Desenvolvedor — Meteor 2.0
 
+> **Ultima atualizacao:** 24/09/2026 (review completo: limpeza de codigo morto, 7 rotas, 136 testes)
+>
+> **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
+
 ## Pre-requisitos
 
-- Node.js 20+ (recomendado: 22 LTS)
+- Node.js 22+ (dev local usa 24+; CI roda em Node 22 com `NODE_OPTIONS=--experimental-vm-modules`)
 - pnpm 11+
 - Git
 
@@ -55,6 +59,32 @@ pnpm test
 pnpm format
 ```
 
+## Testes
+
+**Total: 136 testes — backend Jest 30 (99) + frontend Vitest (37)**
+
+```bash
+# Backend (99 testes — o script ja embute --experimental-vm-modules)
+pnpm --filter backend test
+
+# Frontend (37 testes — Vitest + React Testing Library)
+pnpm --filter frontend test
+```
+
+| Suite | Runner | Testes | Observacao |
+|-------|--------|--------|------------|
+| `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 99 | 20 arquivos `*.spec.ts` |
+| `apps/frontend` | Vitest + RTL + jsdom | 37 | 9 arquivos `*.test.{ts,tsx}` |
+
+Detalhamento por arquivo: [SYSTEM_SPEC.md §9](./SYSTEM_SPEC.md#9-cobertura-de-testes).
+
+## Rate Limit (Seguranca)
+
+- `@nestjs/throttler` **60 req/min** por IP (`TTL` 60s)
+- **Loopback isento:** `127.0.0.1`/`::1` nao contam (testes e dev locais nao sao bloqueados)
+- Respostas incluem headers `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`
+- Ao exceder: HTTP **429** com header `Retry-After`
+
 ## Estrutura do Projeto
 
 ```
@@ -63,15 +93,15 @@ Meteor_2.0/
     backend/           # API NestJS
       src/
         common/        # Servicos compartilhados (fallback, http, config, refresh)
-        modules/       # Modulos de dominio (meteorology, oceanography, traffic, noticias-regionais, comercio, iron)
-        data/          # JSONs de fallback
+        modules/       # Modulos de dominio (meteorology, oceanography, traffic, noticias-regionais, comercio, iron, news)
+      data/            # JSONs de fallback
     frontend/          # App Next.js
       src/
-        app/           # Paginas (9 rotas)
+        app/           # Paginas (7 rotas)
           meteorologia/
             page.tsx   # PageBanner + cards temperatura + Tabs
             components/ # 13 componentes
-          swell/           # 5 abas + 11 componentes
+          swell/           # 5 abas + 21 componentes
             page.tsx
             components/
           noticias/        # Noticias regionais + TrafficMap + CityGrid
@@ -80,16 +110,14 @@ Meteor_2.0/
           comercio/        # Comercio de Ilha Comprida + CommerceMap
             page.tsx
             CommerceMap.tsx
-          transito/
           blog/
           creditos/
-          mapa/
         components/    # Componentes reutilizaveis
-          Header.tsx   # Nav responsiva (7 itens)
-          Footer.tsx   # 4 colunas com chatbot
+          Header.tsx   # Nav responsiva (7 itens) + toggle idioma pt/es
+          Footer.tsx   # 4 colunas (Navegacao, Fontes, Stack, Links uteis)
           PageBanner.tsx # Hero reutilizavel (banner-meteor.jpg)
-        hooks/         # Hooks customizados (9 hooks)
-        lib/           # Utilitarios (api.ts)
+        hooks/         # Hooks customizados (9 hooks + 5 testes)
+        lib/           # Utilitarios (api.ts, spots-data.ts)
   especificacoes/      # Documentacao do projeto
   DESIGN.md            # Design system tokens
 ```
@@ -188,32 +216,39 @@ Tipos: feat, fix, docs, style, refactor, test, chore, ci
 
 ## Variaveis de Ambiente
 
-### Backend (.env)
-```
-PORT=3001
-FRONTEND_ORIGIN=http://localhost:3000
-FALLBACK_DIR=data
-FALLBACK_MAX_AGE_HOURS=24
-CRON_SECRET=meteor-refresh-secret
+Schema validado por Zod em `apps/backend/src/common/config/env.schema.ts`.
 
-# Gemini API — Migração Set/2026
-# Formato antigo (descontinuado): AIzaSy...
-# Formato novo (recomendado): AQ.SUA_CHAVE_AQUI
-# Obter nova chave: https://aistudio.google.com/apikey
-GEMINI_API_KEY=SUA_CHAVE_AQUI
-```
+### Backend (.env)
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PORT` | Porta do backend | `3001` |
+| `FRONTEND_ORIGIN` | CORS origin permitido | `http://localhost:3000` |
+| `FALLBACK_DIR` | Diretorio dos JSONs de fallback | `data` |
+| `FALLBACK_MAX_AGE_HOURS` | Idade maxima aceita do fallback | `24` |
+| `NODE_ENV` | Modo da aplicacao (`development`/`test`/`production`) | `development` |
+| `GEMINI_API_KEY` | Chave Gemini (resumo IA) — formato novo `AQ...` desde Set/2026 (antigo `AIzaSy...` descontinuado); obter em https://aistudio.google.com/apikey | *(vazio)* |
+| `GEMINI_MODEL` | Modelo Gemini | `gemini-2.5-flash` |
+| `GEMINI_TEMPERATURE` | Temperatura de amostragem | `0.7` |
+| `GEMINI_API_BASE_URL` | Host do SDK (declarada no schema; o SDK usa a URL padrao) | `generativelanguage.googleapis.com` |
+| `STORMGLASS_API_KEY` | Reservada (oceanografia avancada) | *(vazio)* |
+| `INMET_API_TOKEN` | Reservada (estacoes INMET) | *(vazio)* |
+| `INMET_BASE_URL` | Declarada no schema (repositorio usa URL direta) | `apitempo.inmet.gov.br` |
+| `GITHUB_TOKEN` | Consumida apenas pelo MCP local (`.opencode/mcp/github-server.mjs`) | *(vazio)* |
+| `CRON_SECRET` | Auth do endpoint `POST /v1/cron/refresh` — lida via `process.env` cru, fora do schema Zod | `meteor-refresh-secret` |
 
 ### Frontend (.env.local)
-```
-NEXT_PUBLIC_API_URL=http://localhost:3001
-```
 
-### Backend
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `NEXT_PUBLIC_API_URL` | URL da API backend (bundled no JS) | `http://localhost:3001` |
+
+### Logs e Depuracao (Backend)
 - Logs aparecem no terminal do `pnpm --filter backend dev`
 - Erros retornam no formato ApiEnvelope: `{ success, data, error }`
 - Health check: `GET /health`
 
-### Frontend
+### Logs e Depuracao (Frontend)
 - Erros de compilacao aparecem no browser
 - Dados da API: abrir Network tab > `/v1/meteorology`
 - Mapas: verificar console por erros Leaflet
@@ -252,9 +287,9 @@ const CommerceMap = dynamic(() => import('./CommerceMap').then(mod => mod.Commer
 - Graficos ApexCharts (react-apexcharts)
 
 ### Erro "Must use import to load ES Module" no Jest (backend)
-**Causa:** NestJS 12 publica pacotes ESM-only; o Jest (CJS) precisa do `require(esm)` do Node 24.9+ e da flag `--experimental-vm-modules`.
+**Causa:** NestJS 12 publica pacotes ESM-only; o Jest (CJS) precisa da flag `--experimental-vm-modules`.
 
-**Correcao:** Rodar os testes via `pnpm --filter backend test` (o script ja embute `node --experimental-vm-modules`). O `require(esm)` do Jest exige **Node 24.9+** — em versoes antiores o Jest lanca `ERR_REQUIRE_ESM`.
+**Correcao:** Rodar os testes via `pnpm --filter backend test` (o script ja embute `node --experimental-vm-modules`). A CI usa o mesmo setup em Node 22 (`NODE_OPTIONS="--experimental-vm-modules" npx jest`).
 
 ### RefreshService nao atualiza dados
 **Causa:** Endpoint de refresh nao configurado ou CRON_SECRET incorreto.
@@ -302,11 +337,11 @@ render(
 
 ### Footer (4 Colunas — Layout Atualizado)
 - **Linha 1:** "METEOR 2.0" centralizado em dourado + descricao
-- **Coluna 1:** Navegacao (7 links internos)
-- **Coluna 2:** Fontes de Dados (5 links externos)
-- **Coluna 3:** Stack Tecnologica (5 links externos)
-- **Coluna 4:** Card MeteorBot IA com mini chat
-- **Rodape:** "Meteor — Creditos de Desenvolvimento: Carlos Alexandre"
+- **Coluna 1:** Navegacao (6 links internos: Previsao, Swell, Noticias, Comercio, Blog, Creditos)
+- **Coluna 2:** Fontes de Dados (5 links externos: Open-Meteo, INMET, RainViewer, CPTEC, OSM)
+- **Coluna 3:** Stack Tecnologica (5 links externos: Next.js 15, NestJS, Tailwind, Leaflet, TypeScript)
+- **Coluna 4:** Links Uteis — contatos de emergencia `tel:` (190, 193, 192, 199, 197, Hospital)
+- **Rodape:** ano atual + "Meteor — Creditos de Desenvolvimento: Carlos Alexandre"
 - Linha dourada no topo
 
 ### PageBanner (Hero Reutilizavel)
@@ -408,18 +443,28 @@ fetch('https://api.rainviewer.com/public/weather-maps.json')
 ### Estrutura
 ```
 swell/
-  page.tsx                    # 5 abas: Noticias, Ondas, Points, Marees, Visao Geral
+  page.tsx                    # 5 abas (padrao: Visao Geral)
   components/
     SwellTabs.tsx             # Navegacao por abas com aria pattern
-    ResumoIA.tsx              # Briefing Gemini com markdown
+    OverviewTab.tsx           # Aba Visao Geral (orquestra os demais)
+    ResumoIA.tsx              # Briefing Gemini com markdown (+ .test.tsx)
+    ForecastSection.tsx       # Secao de previsao horaria
     WaveChart.tsx             # Grafico ApexCharts area (ondas)
+    WindChart.tsx             # Grafico ApexCharts (vento)
     TideChart.tsx             # Grafico ApexCharts linha (mares)
     SpotGrid.tsx              # Cards de spots com filtros e busca
-    SurfNews.tsx              # 10 noticias com imagens
-    HourlySwell.tsx           # Grid responsivo 12h
+    SpotsMap.tsx              # Mapa Leaflet dos points
+    SurfNews.tsx              # Noticias por categoria
+    WslRankings.tsx           # Rankings WSL masc/fem
+    UpcomingEvents.tsx        # Proximos eventos
+    HourlySwell.tsx           # Grid responsivo 12h (ondas)
+    HourlyWind.tsx            # Grid responsivo 12h (vento)
     ConditionCards.tsx        # 5 mini cards de condicoes
+    WindConditionCards.tsx    # Mini cards de vento
     DailyTip.tsx              # Dica pratica do dia
-    Skeletons.tsx             # Loading states (6 tipos)
+    CommerceGrid.tsx          # Grid de comercio (compartilhado)
+    Skeletons.tsx             # Loading states
+    windUtils.ts              # Helpers de vento
 ```
 
 ### Hooks
@@ -428,10 +473,12 @@ swell/
 | useSwell.ts | src/hooks/ | Busca GET /v1/oceanography |
 | useHourlyMarine.ts | src/hooks/ | Busca GET /v1/oceanography/hourly |
 | useAiSummary.ts | src/hooks/ | Busca GET /v1/oceanography/summary |
+| useNews.ts | src/hooks/ | Busca GET /v1/news (refetch via `useCallback` estavel) |
+| useWeatherNews.ts | src/hooks/ | Busca GET /v1/meteorology/news (auto-refresh 10min) |
 
-### Ordem das Abas
+### Ordem das Abas (padrao: Visao Geral)
 ```
-[Noticias] [Ondas] [Points] [Marees] [Visao Geral]
+[Visao Geral] [Noticias] [Previsao de Ondas] [Previsao de Ventos] [Points]
 ```
 
 ### Graficos ApexCharts
@@ -607,11 +654,11 @@ Variáveis configuradas no Vercel Dashboard (Settings → Environment Variables)
 
 Pipeline ativo em `.github/workflows/ci.yml`:
 
-**Jobs:**
-- `backend-test`: Roda Jest (99 testes — requer Node 24.9+ p/ Nest 12 ESM)
-- `frontend-test`: Roda Vitest (48 testes)
+**Jobs:** (todos em Node 22)
+- `backend-test`: Jest (99 testes) — `NODE_OPTIONS="--experimental-vm-modules" npx jest`
+- `frontend-test`: Vitest (37 testes)
 - `lint`: oxlint (frontend)
-- `build`: Valida compilação (após testes)
+- `build`: valida backend + frontend (após testes)
 
 ### Fluxo de Deploy
 

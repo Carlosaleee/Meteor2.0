@@ -1,4 +1,14 @@
-﻿# Especificacao Tecnica — Meteor 2.0
+# Especificacao Tecnica — Meteor 2.0
+
+> **Ultima atualizacao:** 24/09/2026 (review completo: limpeza de codigo morto, 7 rotas, 136 testes)
+>
+> **Documentos relacionados:** [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
+
+## Sumario
+
+1. [Visao Geral](#1-visao-geral) · 2. [Arquitetura](#2-arquitetura) · 3. [Paginas Implementadas](#3-paginas-implementadas-7-rotas) · 4. [Backend Modulos](#4-backend--modulos) · 5. [Variaveis de Ambiente](#5-variaveis-de-ambiente) · 6. [Sistema de Fallback](#6-sistema-de-fallback) · 7. [Stack Tecnologica](#7-stack-tecnologica) · 8. [Fluxo de Branches](#8-fluxo-de-branches) · 9. [Cobertura de Testes](#9-cobertura-de-testes) · 10. [Estrutura de Diretorios](#10-estrutura-de-diretorios) · 11. [UI/UX Header Footer Nav](#11-uiux--header-footer-nav) · 12. [Pagina Previsao](#12-pagina-de-previsão-do-tempo-detalhes) · 13. [Pagina Swell](#13-pagina-de-swell-detalhes) · 14. [Deploy](#14-deploy-em-produção) · 15. [Imagens](#15-imagens) · [Anexo A: SSR](#anexo-a--correcao-de-erros-de-build-ssr) · [Anexo B: Vercel MCP](#anexo-b--configuracao-vercel-mcp)
+
+---
 
 ## 1. Visao Geral
 
@@ -41,7 +51,7 @@
 
 ---
 
-## 3. Paginas Implementadas (9 rotas)
+## 3. Paginas Implementadas (7 rotas)
 
 | Rota | Descricao | Dados |
 |------|-----------|-------|
@@ -50,10 +60,10 @@
 | `/swell` | Swell & Points | **API real** + Gemini AI + ApexCharts + Leaflet |
 | `/noticias` | Noticias Regionais + Transito | **RSS auto-atualizado** (ISN + Santa Portal + Google News) + TrafficMap Leaflet + CityGrid |
 | `/comercio` | Comercio de Ilha Comprida | **API real** (fallback-comercio) + CommerceMap Leaflet + OSRM routing |
-| `/transito` | Transito Regional | Marcadores estaticos + BaseLeafletMap Leaflet (SP-222, BR-116, Balsa) |
 | `/blog` | Blog Tecnico | Estatico (4 artigos) |
 | `/creditos` | Creditos & Fontes | Estatico |
-| `/mapa` | Mapa de Localizacoes | Leaflet (6 marcadores) |
+
+> **Removidas no review 2026-09:** `/mapa` e `/transito` (paginas orfas sem link no Header/Footer; `/transito` tinha apenas mocks hardcoded). Componentes `SpotMap` e `BaseLeafletMap` tambem removidos.
 
 ---
 
@@ -84,16 +94,21 @@
 - Rodovias: SP-222, BR-116, Balsa Cananeia
 
 ### 4.4 NoticiasRegionaisModule
-- Endpoint: GET /v1/noticias-regionais
+- Endpoints:
+  - GET /v1/noticias-regionais — noticias + rotas
+  - GET /v1/noticias-regionais/news?category= — noticias filtradas por categoria
+  - GET /v1/noticias-regionais/routes — status das rodovias
 - API externa: RSS automatico — ISN Online (isnonline.com.br/feed), Santa Portal (santaportal.com.br/feed), Google News RSS ("Vale do Ribeira")
 - Fallback: data/fallback-noticias-regionais.json (merge: RSS fresco + base, rolling 30 noticias + 5 rotas)
 - Dados: noticias regionais do Vale do Ribeira (categorias: transito/policial/turismo/cotidiano/noticia por keyword) + status de rodovias (rotas estaticas)
 - Cache: 30min em memoria; `forceRefresh()` re-coleta todos os feeds (cron 1h + a cada 6h)
 
 ### 4.5 ComercioModule
-- Endpoint: GET /v1/comercio
+- Endpoints:
+  - GET /v1/comercio — diretorio completo
+  - GET /v1/comercio/commerce?sector= — comercios filtrados por setor
 - API externa: Nenhuma (dados estaticos)
-- Fallback: data/fallback-localismo.json (50 comercios de Ilha Comprida)
+- Fallback: data/fallback-comercio.json (50 comercios de Ilha Comprida)
 - Dados: diretorio comercial com geolocalizacao (5 setores: alimentacao, hospedagem, comercio, servicos, lazer)
 
 ### 4.6 NewsModule
@@ -139,6 +154,8 @@
 
 ## 5. Variaveis de Ambiente
 
+Schema validado com Zod em `apps/backend/src/common/config/env.schema.ts` (`parseEnv`).
+
 ### Ativamente usadas
 | Variavel | Default | Descricao |
 |----------|---------|-----------|
@@ -146,19 +163,21 @@
 | FRONTEND_ORIGIN | http://localhost:3000 | CORS origin |
 | FALLBACK_DIR | data | Diretorio dos JSONs de fallback |
 | FALLBACK_MAX_AGE_HOURS | 24 | Idade maxima do fallback |
-| NEXT_PUBLIC_API_URL | http://localhost:3001 | URL da API no frontend |
+| NEXT_PUBLIC_API_URL | http://localhost:3001 | URL da API no frontend (frontend) |
 
 ### Definidas (em uso)
 | Variavel | Default | Modulo |
 |----------|---------|--------|
-| GEMINI_API_KEY | (vazio) | OceanographyModule (resumo IA) |
-| GEMINI_MODEL | gemini-2.5-flash | OceanographyModule |
+| NODE_ENV | development | Enum: development/test/production (validada no schema; lida pelo tooling) |
+| GEMINI_API_KEY | (vazio) | OceanographyModule (resumo IA) + IronModule |
+| GEMINI_MODEL | gemini-2.5-flash | OceanographyModule / IronModule |
 | GEMINI_TEMPERATURE | 0.7 | OceanographyModule |
-| GEMINI_API_BASE_URL | generativelanguage.googleapis.com | OceanographyModule |
-| STORMGLASS_API_KEY | (vazio) | Oceanografia avancada |
-| INMET_API_TOKEN | (vazio) | Estacoes INMET |
-| DATABASE_URL | file:./data/meteor.db | Drizzle ORM |
-| CRON_SECRET | meteor-refresh-secret | RefreshService (auth do endpoint) |
+| GEMINI_API_BASE_URL | generativelanguage.googleapis.com | Declarada no schema (o SDK usa a URL padrao) |
+| STORMGLASS_API_KEY | (vazio) | Reservada (Oceanografia avancada) |
+| INMET_API_TOKEN | (vazio) | Reservada |
+| INMET_BASE_URL | apitempo.inmet.gov.br | Declarada no schema (weather-news.repository usa URL direta) |
+| GITHUB_TOKEN | (vazio) | Consumida apenas pelo MCP local (`.opencode/mcp/github-server.mjs`) |
+| CRON_SECRET | meteor-refresh-secret | RefreshService (auth do endpoint) — lida via `process.env` cru, fora do schema Zod |
 
 > **[LLM_CONTEXT] Migracao das Chaves Gemini API (Set/2026)**
 > - Formato antigo (descontinuado): `AIzaSy...`
@@ -187,8 +206,10 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 - data/fallback-meteorology.json — Dados por localizacao (current + hourly + daily)
 - data/fallback-oceanography.json — Ondas, swell, marees, spots
 - data/fallback-traffic.json — Rodovias com simulacao por horario
+- data/fallback-comercio.json — 50 comercios de Ilha Comprida
 - data/fallback-noticias-regionais.json — rolling 30 noticias regionais (RSS auto) + 5 rotas de transito
 - data/fallback-news.json — Noticias WSL + SPSurf
+- data/fallback-weather-news.json — Criado em runtime pelo weather-news.repository (pode nao existir em clone novo)
 
 **Automacao de refresh:**
 - Startup: todos os dados sao atualizados ao iniciar o backend
@@ -210,16 +231,19 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 - Vitest (testes)
 
 ### Backend
-- NestJS 12.1
+- NestJS 12 (`@nestjs/* ^12.0.4`)
+- @nestjs/throttler ^6.7.0 (rate limit 60 req/min)
+- @nestjs/schedule ^12.0.2 (crons 1h/6h)
 - Node.js + Express
 - TypeScript 5.9
 - Zod (validacao)
 - Helmet (seguranca)
 - @google/genai (Gemini AI — resumo tatico)
-- Jest 30 (testes — requer `--experimental-vm-modules` p/ Nest 12 ESM)
+- Jest 30.5 (testes — requer `--experimental-vm-modules` p/ Nest 12 ESM)
 
 ### Infra
-- pnpm 11 (monorepo)
+- pnpm 11.10 (monorepo)
+- Node 22 (CI) / 24+ (dev local)
 - Conventional Commits
 - oxlint (frontend lint)
 - ESLint + Prettier
@@ -241,112 +265,48 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 
 ---
 
-## 8.1 Correcao de Erros de Build (SSR)
-
-### Problema
-Componentes que usam Leaflet (mapas) causam `ReferenceError: window is not defined` durante `next build` porque o Leaflet depende de APIs do navegador que nao existem no servidor Node.js.
-
-### Solucao
-Usar `next/dynamic` com `{ ssr: false }` para importar componentes que dependem de APIs do navegador:
-
-```tsx
-// ANTES (causa erro no build)
-import { CommerceMap } from './CommerceMap';
-
-// DEPOIS (correto)
-import dynamic from 'next/dynamic';
-const CommerceMap = dynamic(() => import('./CommerceMap').then(mod => mod.CommerceMap), { ssr: false });
-```
-
-### Componentes Protegidos
-| Pagina | Componente | Arquivo |
-|--------|------------|---------|
-| `/comercio` | CommerceMap | `comercio/page.tsx` |
-| `/swell` | SpotsMap | `swell/page.tsx` |
-| `/noticias` | TrafficMap | `noticias/page.tsx` |
-| `/meteorologia` | NumericaTab | `meteorologia/page.tsx` |
-| `/meteorologia` | WeatherMapDetail | `meteorologia/components/PrevisaoTab.tsx` |
-| `/mapa` | SpotMap | `mapa/page.tsx` |
-| `/transito` | BaseLeafletMap | `transito/page.tsx` |
-
-### Regra
-**TODO** componente que importa `leaflet` ou usa `window` deve ser importado via `next/dynamic` com `{ ssr: false }`.
-
----
-
-## 8.2 Configuracao Vercel MCP
-
-### O que e
-O Vercel MCP (Model Context Protocol) e um servidor remoto que permite a ferramentas de IA (Claude, Cursor, VS Code) interagir com projetos no Vercel.
-
-### Configuracao
-Arquivo: `~/.config/opencode/opencode.jsonc`
-
-```json
-{
-  "mcpServers": {
-    "vercel": {
-      "url": "https://mcp.vercel.com"
-    }
-  }
-}
-```
-
-### Tools Disponiveis
-| Tool | Descricao |
-|------|-----------|
-| `search_docs` | Busca na documentacao oficial do Vercel |
-| `get_deployment_logs` | Logs de deploys que falharam |
-| `fetch_teams` | Lista times vinculados a conta |
-| `fetch_projects` | Lista projetos do Vercel |
-
-### Autenticacao
-- OAuth: na primeira uso, segue o link para autenticar a conta do Vercel
-- Clientes suportados: Claude, Cursor, VS Code
-
----
-
 ## 9. Cobertura de Testes
 
-### Backend (Jest)
-| Arquivo | Testes | Status |
-|---------|--------|--------|
-| iron.service.spec.ts | 11 | ✅ |
-| meteorology.service.spec.ts | 5 | ✅ |
-| oceanography.service.spec.ts | 4 | ✅ |
-| gemini.repository.spec.ts | 4 | ✅ |
-| gemini-chat.repository.spec.ts | 6 | ✅ |
-| traffic.service.spec.ts | 4 | ✅ |
-| noticias-regionais.service.spec.ts | 4 | ✅ |
-| noticias-regionais.repository.spec.ts | 11 | ✅ (RSS com mock) |
-| comercio.service.spec.ts | 4 | ✅ |
-| news.service.spec.ts | 4 | ✅ |
-| fallback.service.spec.ts | 3 | ✅ |
-| meteorology.controller.spec.ts | 4 | ✅ |
-| refresh.service.spec.ts | 15 | ✅ |
-| cron.controller.spec.ts | 4 | ✅ |
-| wsl.repository.spec.ts | 7 | ✅ (fixture WSL real) |
-| spsurf.repository.spec.ts | 3 | ✅ |
-| weather-news.repository.spec.ts | 5 | ✅ |
-| api-health.spec.ts | 2 | ✅ |
-| http-exception.filter.spec.ts | 3 | ✅ |
-| envelope.interceptor.spec.ts | 3 | ✅ |
+**Total: 136 testes (136 passam) — backend Jest 30 (99) + frontend Vitest (37)**
 
-### Frontend (Vitest + RTL)
+### Backend (Jest) — 99 testes em 20 arquivos
 | Arquivo | Testes | Status |
 |---------|--------|--------|
-| ResumoIA.test.tsx | 6 | ✅ |
+| refresh.service.spec.ts | 15 | ✅ |
+| noticias-regionais.repository.spec.ts | 11 | ✅ (RSS com mock) |
+| wsl.repository.spec.ts | 7 | ✅ (fixture WSL real) |
+| gemini-chat.repository.spec.ts | 6 | ✅ |
+| iron.service.spec.ts | 6 | ✅ |
+| meteorology.controller.spec.ts | 5 | ✅ |
+| meteorology.service.spec.ts | 5 | ✅ |
+| weather-news.repository.spec.ts | 5 | ✅ |
+| comercio.service.spec.ts | 4 | ✅ |
+| cron.controller.spec.ts | 4 | ✅ |
+| gemini.repository.spec.ts | 4 | ✅ |
+| news.service.spec.ts | 4 | ✅ |
+| noticias-regionais.service.spec.ts | 4 | ✅ |
+| oceanography.service.spec.ts | 4 | ✅ |
+| spsurf.repository.spec.ts | 4 | ✅ |
+| traffic.service.spec.ts | 4 | ✅ |
+| api-health.spec.ts | 2 | ✅ |
+| envelope.interceptor.spec.ts | 2 | ✅ |
+| fallback.service.spec.ts | 2 | ✅ |
+| http-exception.filter.spec.ts | 1 | ✅ |
+
+### Frontend (Vitest + RTL) — 37 testes em 9 arquivos
+| Arquivo | Testes | Status |
+|---------|--------|--------|
 | ChatWidget.test.tsx | 8 | ✅ (corrigido: ChatProvider wrapper) |
+| ResumoIA.test.tsx | 6 | ✅ |
+| useWeatherNews.test.ts | 5 | ✅ |
+| api.test.ts | 4 | ✅ |
 | Footer.test.tsx | 3 | ✅ |
 | useComercio.test.ts | 3 | ✅ |
-| useWeatherNews.test.ts | 5 | ✅ |
 | useMeteorology.test.ts | 3 | ✅ |
 | useSwell.test.ts | 3 | ✅ |
 | useAllCities.test.ts | 2 | ✅ |
-| api.test.ts | 4 | ✅ |
-| utils.test.ts | 11 | ✅ |
 
-**Total: 147 testes (147 passam) — backend Jest 30 (99) + frontend Vitest (48)**
+> **Nota (review 2026-09):** `utils.test.ts` (11 testes) foi removido junto com `lib/utils.ts` — o teste so exercitava a propria lib morta; as paginas usam implementacoes locais mais ricas.
 
 ---
 
@@ -358,9 +318,9 @@ Meteor_2.0/
     backend/
       src/
         common/
-          config/env.schema.ts
+          config/ (env.schema.ts, locations.ts — apenas SURF_CENTER)
           fallback/fallback.service.ts
-          http/ (envelope, filter, pipe)
+          http/ (api-envelope, envelope.interceptor, http-exception.filter + specs)
           refresh/ (refresh.service, refresh.module, cron.controller)
         modules/
           meteorology/ (controller, service, repository)
@@ -368,7 +328,8 @@ Meteor_2.0/
           traffic/ (controller, service, repository)
           noticias-regionais/ (controller, service, repository)
           comercio/ (controller, service, repository)
-          iron/ (controller, service, module)
+          iron/ (controller, service, gemini-chat.repository)
+          news/ (controller, service, wsl.repository, spsurf.repository)
         app.module.ts
         main.ts
       data/ (fallback JSONs)
@@ -379,24 +340,24 @@ Meteor_2.0/
             page.tsx (PageBanner + cards temperatura + LocationSelector + Tabs)
             components/ (13 componentes)
           swell/
-            page.tsx (5 abas: Noticias, Ondas, Picos, Marees, Visao Geral)
-            components/ (11 componentes + CommerceGrid compartilhado)
+            page.tsx (5 abas: Visao Geral, Noticias, Previsao, Vento, Picos)
+            components/ (21 arquivos — ver secao 13)
           noticias/
             page.tsx (PageBanner + TrafficMap + CityGrid + filtros + grid noticias)
             components/ (TrafficMap)
           comercio/
             page.tsx (PageBanner + CommerceMap + CommerceGrid)
             CommerceMap.tsx (Leaflet + OSRM routing)
-          transito/page.tsx
           blog/page.tsx
           creditos/page.tsx
-          mapa/page.tsx
           page.tsx (portal principal)
+          layout.tsx, error.tsx, loading.tsx (raiz App Router)
         components/
-          Header.tsx (nav responsiva)
-          Footer.tsx (4 colunas: Navegacao, Fontes, Stack, Chatbot)
+          Header.tsx (nav responsiva + toggle idioma pt/es)
+          Footer.tsx (4 colunas: Navegacao, Fontes de Dados, Stack Tecnologica, Links uteis)
           PageBanner.tsx (hero reutilizavel — banner-meteor.jpg)
-          ChatWidget.tsx (bot flutuante)
+          ChatWidget.tsx + ChatContext.tsx (bot flutuante)
+          HeroCarousel.tsx, ScrollToTopButton.tsx
         hooks/
           useMeteorology.ts
           useSwell.ts
@@ -404,8 +365,13 @@ Meteor_2.0/
           useAiSummary.ts (resumo Gemini)
           useAllCities.ts (4 cidades paralelo)
           useRegionalNews.ts (noticias regionais + rotas)
+          useNews.ts (noticias WSL/SPSurf — refetch useCallback estavel)
+          useWeatherNews.ts (auto-refresh 10min)
           useComercio.ts (diretorio comercial)
-        lib/api.ts
+          *.test.ts (5 arquivos de teste de hooks)
+        lib/
+          api.ts (client HTTP + tipos)
+          spots-data.ts (dados estaticos de picos)
         app/globals.css (CSS custom properties + temas)
       public/
         banner-meteor.jpg (imagem de banner)
@@ -439,11 +405,11 @@ Meteor_2.0/
 
 ### Footer (4 Colunas — Layout Atualizado)
 - **Linha 1:** "METEOR 2.0" centralizado em dourado + descricao do projeto
-- **Coluna 1 — Navegacao:** 7 links internos (Previsão do Tempo, Swell, Transito, Noticias, Blog, Mapa, Creditos)
+- **Coluna 1 — Navegacao:** 6 links internos (Previsao do Tempo, Swell & Points, Noticias Regionais, Comercio, Blog Tecnico, Creditos & Fontes)
 - **Coluna 2 — Fontes de Dados:** Open-Meteo, INMET, RainViewer, CPTEC/INPE, OpenStreetMap
 - **Coluna 3 — Stack Tecnologica:** Next.js 15, NestJS, Tailwind CSS, Leaflet, TypeScript
-- **Coluna 4 — Links Uteis:** Contatos de emergencia (PM 190, Bombeiros 193, SAMU 192, Defesa Civil 199, Hospital, Policia Rodoviaria 197)
-- **Rodape:** "Meteor — Creditos de Desenvolvimento: Carlos Alexandre"
+- **Coluna 4 — Links Uteis:** Contatos de emergencia `tel:` (190, 193, 192, 199, 197, Hospital Regional)
+- **Rodape:** ano atual + "Meteor — Creditos de Desenvolvimento: Carlos Alexandre"
 - Linha dourada `bg-[var(--color-gold-line)]` no topo
 - Links externos com `FaExternalLinkAlt` no hover
 - Acessibilidade: `role="contentinfo"`, `aria-label`, `focus-visible` rings
@@ -526,56 +492,64 @@ Meteor_2.0/
 
 ### Estrutura Principal
 - **Container:** `<div className="space-y-8">` com PageBanner + Hero + Tabs + Conteudo
-- **Hero:** Gradient blue com qualidade, melhor horário, botão Atualizar
-- **KPI Cards:** 4 cards (Altura, Swell, Direção, Maré)
-- **SwellTabs:** 5 abas (Notícias → Ondas → Points → Marés → Visão Geral)
+- **Hero:** Gradient blue com qualidade, melhor horario, botao Atualizar
+- **KPI Cards:** 4 cards (Altura, Swell, Direcao, Mare)
+- **SwellTabs:** 5 abas (padrao `overview`): **Visao Geral → Noticias → Previsao de Ondas → Previsao de Ventos → Points**
 
-### Abas e Conteúdo
+### Abas e Conteudo
 
-#### Notícias (aba padrão)
-- 10 notícias com imagens reais (Unsplash)
-- Categorias: WSL, Paulista, Previsão, Alertas, ISA, Magazine, Global
-- Grid responsivo: 1 coluna mobile, 2 tablet, 3 desktop
-- Links externos para fontes oficiais
+#### Visao Geral (aba padrao — `OverviewTab.tsx`)
+- **ResumoIA:** Briefing Gemini com topicos (Ondas, Vento, Horarios, Points, Alertas)
+- **ConditionCards + WindConditionCards:** mini cards de condicoes (onda/swell/periodo/direcao/qualidade + vento)
+- **HourlySwell:** grid 12 horas com classificacao de qualidade
+- **SurfNews:** noticias por categoria
+- **DailyTip:** dica pratica + prancha recomendada
+- **ForecastSection:** previsao por horario
 
-#### Ondas
-- **WaveChart:** Gráfico ApexCharts área com 2 séries (Onda + Swell)
-  - Legendas explicativas ("Onda = altura na praia" / "Swell = onda de origem")
-  - Faixas de qualidade tracejadas (Clássico 1.5m, Boas 1.0m)
-  - Tooltip detalhado: hora, altura, qualidade, período, direção
-  - Altura: 350px
-- **HourlySwell:** Grid responsivo 12 horas com classificação de qualidade
+#### Noticias (`news`)
+- **SurfNews** (WSL) e **SurfNews** (Circuito Paulista) com imagens reais (Unsplash)
+- **WslRankings:** rankings masc/fem (dados reais do WSL via backend `wsl.repository`)
+- **UpcomingEvents:** proximos eventos com status
+- Grid responsivo: 1 coluna mobile, 2 tablet, 3 desktop; links externos para fontes oficiais
 
-#### Points
-- **SpotGrid:** Cards com filtros (Iniciante/Intermediário/Avançado) e busca
-- **SwellMap:** Leaflet com 6 marcadores coloridos
+#### Previsao de Ondas (`forecast`)
+- **ForecastSection:** condicoes, grafico, mareis e resumo IA
+- **WaveChart:** grafico ApexCharts area com 2 series (Onda + Swell), faixas de qualidade tracejadas, tooltip detalhado, altura 350px
+- **TideChart:** grafico ApexCharts linha com annotations + tabela das proximas 4 mareis (320px)
+- **HourlySwell / ResumoIA / DailyTip**
 
-#### Marés
-- **TideChart:** Gráfico ApexCharts linha com annotations
-  - Tabela de próximas 4 marés (Alta/Baixa)
-  - Gradiente preenchido abaixo da curva
-  - Tooltip com tipo e altura
-  - Altura: 320px
+#### Previsao de Ventos (`wind`)
+- **WindConditionCards:** velocidade, rajada e direcao (kitesurf/windsurf)
+- **WindChart:** grafico ApexCharts de vento
+- **HourlyWind:** grid 12 horas de vento (usa `windEmoji` local)
 
-#### Visão Geral
-- **ResumoIA:** Briefing Gemini com tópicos (Ondas, Vento, Horários, Points, Alertas)
-- **ConditionCards:** 5 mini cards (Onda, Swell, Período, Direção, Qualidade)
-- **HourlySwell:** Grid 12 horas
-- **DailyTip:** Dica prática + prancha recomendada
+#### Points (`spots`)
+- **SpotsMap:** Leaflet com marcadores coloridos
+- **SpotGrid:** cards com filtros (Iniciante/Intermediario/Avancado) e busca
 
-### Componentes (11 arquivos em swell/components/)
-| Componente | Descrição |
+### Componentes (21 arquivos em swell/components/)
+| Componente | Descricao |
 |------------|-----------|
-| SwellTabs.tsx | 5 abas com aria pattern |
-| ResumoIA.tsx | Briefing Gemini com markdown |
-| WaveChart.tsx | Gráfico ApexCharts área (ondas) |
-| TideChart.tsx | Gráfico ApexCharts linha (marés) |
+| SwellTabs.tsx | 5 abas com aria pattern (padrao `overview`) |
+| OverviewTab.tsx | Aba Visao Geral (orquestra os componentes abaixo) |
+| ResumoIA.tsx (+ .test.tsx) | Briefing Gemini com markdown — 6 testes |
+| ForecastSection.tsx | Secao de previsao horaria (forecast/wind) |
+| WaveChart.tsx | Grafico ApexCharts area (ondas) |
+| WindChart.tsx | Grafico ApexCharts (vento) |
+| TideChart.tsx | Grafico ApexCharts linha (mares) |
 | SpotGrid.tsx | Cards de spots com filtros e busca |
-| SurfNews.tsx | 10 notícias com imagens |
-| HourlySwell.tsx | Grid responsivo 12h |
-| ConditionCards.tsx | 5 mini cards de condições |
-| DailyTip.tsx | Dica prática do dia |
-| Skeletons.tsx | Loading states (6 tipos) |
+| SpotsMap.tsx | Mapa Leaflet dos points |
+| SurfNews.tsx | Noticias por categoria |
+| WslRankings.tsx | Rankings WSL masc/fem |
+| UpcomingEvents.tsx | Proximos eventos |
+| HourlySwell.tsx | Grid responsivo 12h (ondas) |
+| HourlyWind.tsx | Grid responsivo 12h (vento) |
+| ConditionCards.tsx | 5 mini cards de condicoes |
+| WindConditionCards.tsx | Mini cards de vento |
+| DailyTip.tsx | Dica pratica do dia |
+| CommerceGrid.tsx | Grid de comercio (compartilhado com /comercio) |
+| Skeletons.tsx | Loading states |
+| windUtils.ts | Helpers de vento (classificacao, direcao) |
 
 ### Hooks (9 hooks)
 | Hook | Descricao |
@@ -585,8 +559,8 @@ Meteor_2.0/
 | useHourlyMarine.ts | Busca GET /v1/oceanography/hourly |
 | useAiSummary.ts | Busca GET /v1/oceanography/summary |
 | useAllCities.ts | Busca 4 cidades em paralelo |
-| useNews.ts | Busca noticias de surf |
-| useWeatherNews.ts | Busca GET /v1/meteorology/news |
+| useNews.ts | Busca GET /v1/news (refetch via `useCallback` estavel — corrige loop de atualizacao) |
+| useWeatherNews.ts | Busca GET /v1/meteorology/news (auto-refresh 10min) |
 | useRegionalNews.ts | Busca GET /v1/noticias-regionais |
 | useComercio.ts | Busca GET /v1/comercio |
 
@@ -649,7 +623,7 @@ Pipeline em `.github/workflows/ci.yml`:
 | Job | Descrição | Trigger |
 |-----|-----------|---------|
 | `backend-test` | Jest (99 testes) | push/PR |
-| `frontend-test` | Vitest (48 testes) | push/PR |
+| `frontend-test` | Vitest (37 testes) | push/PR |
 | `lint` | oxlint (frontend) | push/PR |
 | `build` | Valida compilação | Após testes |
 
@@ -657,19 +631,19 @@ Pipeline em `.github/workflows/ci.yml`:
 
 ```
 DevOps/
-├── README.md                    # Guia completo de deploy
-├── frontend/
-│   ├── vercel.json              # Config Vercel (monorepo)
-│   └── .vercelignore            # Arquivos ignorados
-├── backend/
-│   ├── Dockerfile               # Container (alternativa)
-│   ├── railway.json             # Deploy Railway (alternativa)
-│   └── render.yaml              # Deploy Render (alternativa)
-├── github-actions/
-│   └── ci.yml                   # Pipeline CI/CD
-└── env/
-    ├── .env.frontend.example    # Vars frontend
-    └── .env.backend.example     # Vars backend
++-- README.md                    # Guia completo de deploy
++-- frontend/
+¦   +-- vercel.json              # Config Vercel (monorepo)
+¦   +-- .vercelignore            # Arquivos ignorados
++-- backend/
+¦   +-- Dockerfile               # Container (alternativa)
+¦   +-- railway.json             # Deploy Railway (alternativa)
+¦   +-- render.yaml              # Deploy Render (alternativa)
++-- github-actions/
+¦   +-- ci.yml                   # Pipeline CI/CD
++-- env/
+    +-- .env.frontend.example    # Vars frontend
+    +-- .env.backend.example     # Vars backend
 ```
 
 ---
@@ -680,3 +654,66 @@ DevOps/
 |---------|-----------|-----|
 | `banner-meteor.jpg` | Variavel | Banner em todas as paginas via PageBanner |
 | `CapaMeteor.jpg` | 3328x1248 | Imagem de capa original (backup) |
+
+---
+
+## Anexo A — Correcao de Erros de Build (SSR)
+
+### Problema
+Componentes que usam Leaflet (mapas) causam `ReferenceError: window is not defined` durante `next build` porque o Leaflet depende de APIs do navegador que nao existem no servidor Node.js.
+
+### Solucao
+Usar `next/dynamic` com `{ ssr: false }` para importar componentes que dependem de APIs do navegador:
+
+```tsx
+// ANTES (causa erro no build)
+import { CommerceMap } from './CommerceMap';
+
+// DEPOIS (correto)
+import dynamic from 'next/dynamic';
+const CommerceMap = dynamic(() => import('./CommerceMap').then(mod => mod.CommerceMap), { ssr: false });
+```
+
+### Componentes Protegidos
+| Pagina | Componente | Arquivo |
+|--------|------------|---------|
+| `/comercio` | CommerceMap | `comercio/page.tsx` |
+| `/swell` | SpotsMap | `swell/page.tsx` |
+| `/noticias` | TrafficMap | `noticias/page.tsx` |
+| `/meteorologia` | NumericaTab | `meteorologia/page.tsx` |
+| `/meteorologia` | WeatherMapDetail | `meteorologia/components/PrevisaoTab.tsx` |
+
+### Regra
+**TODO** componente que importa `leaflet` ou usa `window` deve ser importado via `next/dynamic` com `{ ssr: false }`.
+
+---
+
+## Anexo B — Configuracao Vercel MCP
+
+### O que e
+O Vercel MCP (Model Context Protocol) e um servidor remoto que permite a ferramentas de IA (Claude, Cursor, VS Code) interagir com projetos no Vercel.
+
+### Configuracao
+Arquivo: `~/.config/opencode/opencode.jsonc`
+
+```json
+{
+  "mcpServers": {
+    "vercel": {
+      "url": "https://mcp.vercel.com"
+    }
+  }
+}
+```
+
+### Tools Disponiveis
+| Tool | Descricao |
+|------|-----------|
+| `search_docs` | Busca na documentacao oficial do Vercel |
+| `get_deployment_logs` | Logs de deploys que falharam |
+| `fetch_teams` | Lista times vinculados a conta |
+| `fetch_projects` | Lista projetos do Vercel |
+
+### Autenticacao
+- OAuth: na primeira uso, segue o link para autenticar a conta do Vercel
+- Clientes suportados: Claude, Cursor, VS Code

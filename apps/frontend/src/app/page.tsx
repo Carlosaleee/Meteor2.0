@@ -45,7 +45,7 @@ const CATEGORY_CONFIG: Record<string, { label: string; emoji: string; color: str
   noticia: { label: 'Notícia', emoji: '📰', color: 'text-blue-400', bg: 'bg-blue-500/10' },
   policial: { label: 'Policial', emoji: '🚨', color: 'text-red-400', bg: 'bg-red-500/10' },
   turismo: { label: 'Turismo', emoji: '🏖️', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-  cotidiano: { label: 'Cotidiano', emoji: '🏠', color: 'text-purple-400', bg: 'bg-purple-500/10' },
+  cotidiano: { label: 'Cotidiano', emoji: '🏠', color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
 };
 
 const SECTOR_ICONS: Record<string, string> = {
@@ -332,7 +332,7 @@ export default function HomePage() {
               <div className="h-36 bg-slate-800 overflow-hidden relative">
                 <img
                   src={item.image || (item.category === 'WSL' ? 'https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67' : 'https://static.wixstatic.com/media/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.jpeg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.webp')}
-                  alt=""
+                  alt={item.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   loading="lazy"
                   onError={(e) => {

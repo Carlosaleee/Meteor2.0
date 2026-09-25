@@ -15,7 +15,7 @@ const SECTORS = [
   { id: 'hospedagem', label: 'Hospedagem', emoji: '🏨', color: 'text-blue-400' },
   { id: 'comercio', label: 'Comércio', emoji: '🛒', color: 'text-emerald-400' },
   { id: 'servicos', label: 'Serviços', emoji: '🔧', color: 'text-yellow-400' },
-  { id: 'lazer', label: 'Lazer', emoji: '🎯', color: 'text-purple-400' },
+  { id: 'lazer', label: 'Lazer', emoji: '🎯', color: 'text-cyan-400' },
 ];
 
 const SECTOR_BG: Record<string, string> = {
@@ -23,7 +23,7 @@ const SECTOR_BG: Record<string, string> = {
   hospedagem: 'bg-blue-500/10 border-blue-500/30',
   comercio: 'bg-emerald-500/10 border-emerald-500/30',
   servicos: 'bg-yellow-500/10 border-yellow-500/30',
-  lazer: 'bg-purple-500/10 border-purple-500/30',
+  lazer: 'bg-cyan-500/10 border-cyan-500/30',
 };
 
 export function CommerceGrid({ commerce, onGetDirections }: CommerceGridProps) {

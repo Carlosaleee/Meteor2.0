@@ -18,7 +18,7 @@ const TIPS: Record<string, string> = {
   Chuva: 'Precipitação acumulada em milímetros nas últimas horas.',
   Pressão: 'Pressão atmosférica em hectopascais. Queda indica possibilidade de chuva.',
   Nuvens: 'Porcentagem do céu coberto por nuvens. 0% = céu limpo, 100% = totalmente nublado.',
-  'Índice UV': 'Índice ultravioleta. 1-2 baixo, 3-5 moderado, 6-7 alto, 8+ muito alto.',
+  'Índice UV': 'Nível de radiação UV do sol. 1-2 baixo, 3-5 moderado, 6-7 alto, 8+ muito alto.',
   Visibilidade: 'Distância de visão em km. Abaixo de 1km indica neblina ou chuva forte.',
 };
 

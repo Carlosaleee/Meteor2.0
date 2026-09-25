@@ -55,11 +55,11 @@ export function ConditionCards({ waveHeight, wavePeriod, waveDirection, swellHei
         </div>
 
         <div
-          className="flex flex-col items-center gap-1.5 p-2 rounded-xl bg-slate-800/60 border border-slate-700/50 hover:border-purple-500/30 transition-colors"
+          className="flex flex-col items-center gap-1.5 p-2 rounded-xl bg-slate-800/60 border border-slate-700/50 hover:border-rose-500/30 transition-colors"
           title={`Período: ${wavePeriod} segundos`}
           aria-label={`Período: ${wavePeriod} segundos`}
         >
-          <div className="p-1.5 rounded-lg bg-purple-500/20 text-purple-400">
+          <div className="p-1.5 rounded-lg bg-rose-500/20 text-rose-400">
             <FaClock className="w-3.5 h-3.5" aria-hidden="true" />
           </div>
           <span className="text-lg font-bold text-white tabular-nums">{wavePeriod}s</span>

@@ -1,6 +1,12 @@
 ﻿# Referencia da API — Meteor 2.0
 
+> **Ultima atualizacao:** 24/09/2026 (review 2026-09: +4 endpoints, rate limit 60 loopback, envelope global)
+>
+> **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [../README.md](../README.md)
+
 Base URL: http://localhost:3001
+
+**Envelope global:** todo response de sucesso passa pelo `EnvelopeInterceptor` e chega como `{"success": true, "data": <payload>, "error": null}`. Os exemplos deste documento mostram o payload de `data` por brevidade (exceto onde o envelope e relevante, como erros).
 
 ---
 
@@ -334,6 +340,68 @@ GET /v1/traffic
 
 ---
 
+## GET /v1/news
+
+Noticias de surf (WSL + Circulo Paulista), rankings oficiais WSL e calendario de eventos. Cache 30min no backend.
+
+**Query Parameters:** Nenhum
+
+**Exemplo de Request:**
+```
+GET /v1/news
+```
+
+**Response (payload de `data`):**
+```json
+{
+  "news": [
+    {
+      "id": "wsl-trestles-miguel-vence",
+      "title": "Miguel Pupo vence Trestles e sobe para 4o do ranking mundial",
+      "source": "World Surf League",
+      "sourceUrl": "https://www.worldsurfleague.com",
+      "url": "https://ne9.com.br/wsl-trestles-miguel-pupo-erin-brooks-ranking/",
+      "description": "Miguel Pupo derrotou Kanoa Igarashi na final...",
+      "image": "https://d3qf8nvav5av0u.cloudfront.net/...",
+      "category": "WSL",
+      "publishedAt": "2026-09-23T01:56:08.518Z"
+    }
+  ],
+  "rankings": {
+    "men": [
+      { "rank": 1, "name": "Yago Dora", "country": "Brazil", "points": 42780, "trend": 2 }
+    ],
+    "women": [
+      { "rank": 1, "name": "...", "country": "...", "points": 0, "trend": 0 }
+    ]
+  },
+  "events": [
+    {
+      "name": "Banco do Brasil Sao Sebastiao Pro",
+      "location": "Sao Sebastiao, Sao Paulo, Brazil",
+      "dates": "Sep 26 - Oct 3",
+      "status": "Upcoming",
+      "tour": "Challenger Series"
+    }
+  ],
+  "timestamp": "2026-09-25T01:56:08.518Z"
+}
+```
+
+**Campos do response:**
+| Campo | Tipo | Descricao |
+|-------|------|-----------|
+| news[].id | string | ID unico da noticia |
+| news[].category | string | `WSL` ou `Paulista` |
+| news[].publishedAt | string | Data de publicacao (ISO 8601) — sempre 12 noticias (ultimos 7 dias) |
+| rankings.men[] / women[] | array | Top 15 do ranking WSL (rank, name, country, points, trend) |
+| events[].status | string | `Completed`, `Standby` ou `Upcoming` (Upcoming listado primeiro) |
+| timestamp | string | Momento da montagem da resposta (ISO 8601) |
+
+**Fontes:** WSL (worldsurfleague.com — parser da tabela HTML real) + SPSurf (RSS). Fallback: `data/fallback-news.json`. Refresh: cron 1h (leve) + 6h (completo).
+
+---
+
 ## GET /v1/noticias-regionais
 
 Noticias regionais do Vale do Ribeira e status de rodovias.
@@ -387,8 +455,78 @@ GET /v1/noticias-regionais
 | news[].publishedAt | string | Data de publicacao (ISO 8601) |
 | routes[].id | string | ID da rodovia |
 | routes[].name | string | Nome da rodovia |
-| routes[].condition | string | Condicao: LIVRE, MODERADO, LENTO, BLOQUEADO, OPERACIONAL |
+| routes[].condition | string | Condicao: LIVRE, MODERADO, LENTO, BLOQUEADO, OPERACIONAL, INTERROMPIDO |
 | routes[].description | string | Descricao da condicao |
+
+---
+
+## GET /v1/noticias-regionais/news
+
+Noticias regionais filtradas por categoria (retorna **array** de `RegionalNewsItem`, sem `routes` nem `timestamp`).
+
+**Query Parameters:**
+| Parametro | Tipo | Obrigatorio | Descricao |
+|-----------|------|-------------|-----------|
+| category | string | Nao | `todas` (default), `transito`, `policial`, `turismo`, `cotidiano`, `noticia` |
+
+**Exemplo de Request:**
+```
+GET /v1/noticias-regionais/news?category=transito
+```
+
+**Response (payload de `data`):**
+```json
+[
+  {
+    "id": "reg-1qxqale",
+    "title": "Adolescente atropelado por motociclista sem CNH em Santos recebe alta",
+    "source": "Santa Portal",
+    "sourceUrl": "https://santaportal.com.br",
+    "url": "https://santaportal.com.br/baixada/...",
+    "description": "Condutor, de 22 anos, segue internado...",
+    "image": "https://santaportal.com.br/wp-content/uploads/2026/08/...",
+    "category": "transito",
+    "publishedAt": "2026-09-24T23:15:00.000Z"
+  }
+]
+```
+
+**Nota:** a categoria e classificada automaticamente no coletor RSS (`noticias-regionais.repository.classify`) por keyword do titulo/descricao. Cache 30min; `forceRefresh()` re-coleta os feeds (cron 1h).
+
+---
+
+## GET /v1/noticias-regionais/routes
+
+Apenas o status das rodovias regionais (retorna **array** de `TrafficRoute`).
+
+**Query Parameters:** Nenhum
+
+**Exemplo de Request:**
+```
+GET /v1/noticias-regionais/routes
+```
+
+**Response (payload de `data`):**
+```json
+[
+  {
+    "id": "sp-222",
+    "name": "SP-222",
+    "condition": "MODERADO",
+    "description": "Trecho de Iguape com fluxo intenso apos enchentes. Alagamentos pontuais em areas rurais",
+    "updatedAt": "2026-09-21T12:00:00.000Z"
+  },
+  {
+    "id": "sp-165",
+    "name": "SP-165",
+    "condition": "INTERROMPIDO",
+    "description": "Interditada nos km 88 (Eldorado) e 42,5 e 73 (Sete Barras) apos deslizamentos",
+    "updatedAt": "2026-09-21T12:00:00.000Z"
+  }
+]
+```
+
+**Campos:** mesmos de `routes[]` no endpoint pai (`id`, `name`, `condition`, `description`, `updatedAt`). Rotas (5): SP-222, BR-116 (Regis Bittencourt), SP-165, Balsa Cananeia-Ilha Comprida, SP-055.
 
 ---
 
@@ -449,6 +587,42 @@ GET /v1/comercio
 
 ---
 
+## GET /v1/comercio/commerce
+
+Comercios em **array plano** (sem envelope `{commerce, timestamp}` do endpoint pai). Com `sector` retorna os filtrados; sem parametro, retorna os 50.
+
+**Query Parameters:**
+| Parametro | Tipo | Obrigatorio | Descricao |
+|-----------|------|-------------|-----------|
+| sector | string | Nao | `alimentacao`, `hospedagem`, `comercio`, `servicos`, `lazer` |
+
+**Exemplo de Request:**
+```
+GET /v1/comercio/commerce?sector=lazer
+```
+
+**Response (payload de `data` — array):**
+```json
+[
+  {
+    "id": "escola-de-surf-vale-do-ribeira",
+    "name": "Escola de Surf Vale do Ribeira",
+    "sector": "lazer",
+    "subsector": "Esportes Nauticos",
+    "lat": -24.7405,
+    "lon": -47.5605,
+    "address": "Proximo a Parada do Surf",
+    "description": "Ensino de surfe para iniciantes e intermediarios, aluguel de pranchas softboard e aulas particulares.",
+    "phone": "(13) 3842-3142",
+    "googleMapsUrl": "https://maps.google.com/?q=-24.7405,-47.5605"
+  }
+]
+```
+
+**Campos:** identicos a `commerce[]` do endpoint pai. Setor invalido retorna array vazio (nao 404).
+
+---
+
 ## Formato de Erro (ApiEnvelope)
 
 Todos os erros retornam no formato padronizado:
@@ -476,11 +650,24 @@ Todos os erros retornam no formato padronizado:
 
 ## Rate Limiting
 
-- Limite: 30 requisicoes por minuto por IP
-- Headers de resposta:
+- `@nestjs/throttler` v6: **60 requisicoes por minuto por IP** (`ttl: 60_000`, `limit: 60` em `app.module.ts`)
+- **Loopback isento:** `127.0.0.1` / `::1` (`skipIf`) — dev local e testes nunca recebem 429
+- Headers de resposta (quando ativo):
   - `X-RateLimit-Limit`: Limite maximo
   - `X-RateLimit-Remaining`: Requisicoes restantes
-  - `X-RateLimit-Reset`: Momento do reset
+  - `X-RateLimit-Reset`: Segundos ate o reset
+- Ao exceder: HTTP **429** com header `Retry-After` e corpo no formato ApiEnvelope:
+
+```json
+{
+  "success": false,
+  "data": null,
+  "error": {
+    "code": "ThrottlerException",
+    "message": "ThrottlerException: Too Many Requests"
+  }
+}
+```
 
 ---
 
@@ -531,10 +718,11 @@ Rota para envio de mensagens ao agente IA (MeteorBot).
 
 Retorna o status do agente de refresh automatico.
 
-**Response:**
+**Response (payload de `data`):**
 ```json
 {
   "lastRefresh": "2026-09-21T10:00:00.000Z",
+  "lastNewsRefresh": "2026-09-21T11:00:00.000Z",
   "isRefreshing": false
 }
 ```
@@ -542,7 +730,8 @@ Retorna o status do agente de refresh automatico.
 **Campos:**
 | Campo | Tipo | Descricao |
 |-------|------|-----------|
-| lastRefresh | string | Data/hora do ultimo refresh (ISO 8601) |
+| lastRefresh | string \| null | Data/hora do ultimo refresh completo (ISO 8601) |
+| lastNewsRefresh | string \| null | Data/hora do ultimo refresh leve de noticias (cron 1h) |
 | isRefreshing | boolean | Se true, refresh esta em andamento |
 
 ---
@@ -556,26 +745,38 @@ Forca refresh manual de todas as fontes de dados.
 |--------|------|-------------|-----------|
 | x-cron-secret | string | Sim | Chave de autenticacao (CRON_SECRET) |
 
-**Response (sucesso):**
+**Response (sucesso — envelope externo + payload interno):**
 ```json
 {
   "success": true,
-  "details": {
-    "meteorology": "OK",
-    "oceanography": "OK",
-    "news": "OK"
+  "data": {
+    "success": true,
+    "details": {
+      "meteorology": "OK",
+      "oceanography": "OK",
+      "weather-news": "OK",
+      "rankings": "OK (15 men, 15 women, 7 events)",
+      "news": "OK",
+      "regional-news": "OK"
+    },
+    "duration": 3617
   },
-  "duration": 12500
+  "error": null
 }
 ```
 
-**Response (erro auth):**
+| Campo (em `data`) | Tipo | Descricao |
+|-------|------|-----------|
+| success | boolean | `false` se um refresh ja estava em andamento (retorna `details: {}`, `duration: 0`) |
+| details.* | string | `OK` / `OK (n men, n women, n events)` ou `ERROR: <motivo>` por modulo |
+| duration | number | Duracao total em ms |
+
+**Response (secret invalido — HTTP 200, envelopado):**
 ```json
-{
-  "error": "Unauthorized",
-  "message": "Invalid CRON_SECRET"
-}
+{ "success": true, "data": { "error": "Unauthorized", "message": "Invalid CRON_SECRET" }, "error": null }
 ```
+
+> **Nota:** o controller usa `@HttpCode(200)` para todos os casos, inclusive auth — verifique `data.error` (nao apenas o status HTTP).
 
 ---
 

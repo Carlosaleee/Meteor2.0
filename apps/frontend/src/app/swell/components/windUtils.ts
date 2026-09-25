@@ -14,14 +14,6 @@ export function windQuality(speed: number): WindQuality {
   return { label: 'Tempestuoso', color: '#ef4444', bgClass: 'bg-red-500/20', textClass: 'text-red-400' };
 }
 
-export function windEmoji(speed: number): string {
-  if (speed < 6) return '🍃';
-  if (speed < 12) return '🌬️';
-  if (speed < 20) return '💨';
-  if (speed < 30) return '🌪️';
-  return '⛈️';
-}
-
 export function beaufortScale(speed: number): number {
   if (speed < 1) return 0;
   if (speed < 6) return 1;
