@@ -1,21 +1,41 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { join } from "path";
+import { pathToFileURL } from "url";
+
+const nativeImport = new Function("s", "return import(s)") as (s: string) => Promise<Record<string, unknown>>;
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
-  const parts: string[] = [`node=${process.version}`, `vercel=${process.env.VERCEL || "-"}`];
+  const parts: string[] = [
+    `node=${process.version}`,
+    `cwd=${process.cwd()}`,
+    `execArgv=${JSON.stringify(process.execArgv)}`,
+    `NODE_OPTIONS=${process.env.NODE_OPTIONS || "(unset)"}`,
+  ];
 
   try {
-    await import("@nestjs/core");
-    parts.push("dynamicImport@nestjs/core=OK");
+    await nativeImport("@nestjs/core");
+    parts.push("bareImport=OK");
   } catch (e) {
     const err = e as Error & { code?: string };
-    parts.push(`dynamicImport@nestjs/core=FAIL(${err.code || err.name}: ${err.message.slice(0, 200)})`);
+    parts.push(`bareImport=FAIL(${err.code}: ${err.message.slice(0, 120)})`);
+    res.statusCode = 500;
+    res.end(parts.join(" | "));
+    return;
   }
 
   try {
-    const { NestFactory } = await import("@nestjs/core");
-    const { ExpressAdapter } = await import("@nestjs/platform-express");
-    const { AppModule } = await import("../src/app.module");
-    const express = (await import("express")).default;
+    await nativeImport(pathToFileURL(join(__dirname, "../src/app.module.js")).href);
+    parts.push("appModuleImport=OK");
+  } catch (e) {
+    const err = e as Error & { code?: string };
+    parts.push(`appModuleImport=FAIL(${err.code}: ${err.message.slice(0, 200)})`);
+  }
+
+  try {
+    const { NestFactory } = (await nativeImport("@nestjs/core")) as never;
+    const { ExpressAdapter } = (await nativeImport("@nestjs/platform-express")) as never;
+    const { AppModule } = (await nativeImport(pathToFileURL(join(__dirname, "../src/app.module.js")).href)) as never;
+    const express = ((await nativeImport("express")) as { default: never }).default;
 
     const app = express();
     const instance = await NestFactory.create(AppModule, new ExpressAdapter(app), {
@@ -27,10 +47,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     parts.push("bootstrap=OK");
     res.statusCode = 200;
     res.end(parts.join(" | "));
-    return;
   } catch (e) {
     const err = e as Error & { code?: string };
-    parts.push(`bootstrap=FAIL(${err.code || err.name}: ${err.message.slice(0, 300)})`);
+    parts.push(`bootstrap=FAIL(${err.code}: ${err.message.slice(0, 250)})`);
     res.statusCode = 500;
     res.end(parts.join(" | "));
   }
