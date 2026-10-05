@@ -236,6 +236,8 @@ Schema validado por Zod em `apps/backend/src/common/config/env.schema.ts`.
 | `INMET_BASE_URL` | Declarada no schema (repositorio usa URL direta) | `apitempo.inmet.gov.br` |
 | `GITHUB_TOKEN` | Consumida apenas pelo MCP local (`.opencode/mcp/github-server.mjs`) | *(vazio)* |
 | `CRON_SECRET` | Auth do endpoint `POST /v1/cron/refresh` — lida via `process.env` cru, fora do schema Zod | `meteor-refresh-secret` |
+| `NODE_OPTIONS` | **Vercel (producao):** `--experimental-require-module` — habilita `require()` de deps ESM-only (Nest 12); a Vercel desativa por padrao via `--no-experimental-require-module` | *(na Vercel)* `--experimental-require-module` |
+| `FALLBACK_DIR` | **Vercel (producao):** `apps/backend/data` — caminho dos `fallback-*.json` dentro do bundle (cwd do lambda e a raiz do repo) | *(na Vercel)* `apps/backend/data` |
 
 ### Frontend (.env.local)
 

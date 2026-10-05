@@ -70,16 +70,17 @@ O backend usa filesystem para fallback (`data/*.json`), por isso Railway é a op
 
 > **Em produção desde 05/10/2026.** Os arquivos **já existem no repo** (não é preciso copiar nada):
 > - `apps/backend/api/index.ts` — handler NestJS + `ExpressAdapter` + helmet + CORS
-> - `apps/backend/vercel.json` — routes, crons 1h/6h, `maxDuration: 30`, `includeFiles: ../data/*.json`
+> - `apps/backend/vercel.json` — routes → handler, cron único `0 3 * * *` (03:00 UTC — limite do plano Hobby: 1 cron/dia), `maxDuration: 30`, `memory: 1024`, `includeFiles: **/data/*.json`
+> - `apps/backend/data/fallback-*.json` versionados (o deploy git precisa deles; `FALLBACK_DIR=apps/backend/data` aponta a leitura para o bundle)
 > - deps `express` + `@vercel/node` no `apps/backend/package.json`
 
 **Configuração no painel Vercel:**
 1. Projeto `meteor2-0-backend` — Root Directory: `apps/backend`
 2. Build Command: `pnpm install && pnpm build` (o `@vercel/node` compila `api/index.ts`)
-3. Variáveis de ambiente: ver tabela acima (`FRONTEND_ORIGIN`, `GEMINI_API_KEY`, `CRON_SECRET`, `NODE_ENV=production`)
+3. Variáveis de ambiente: ver tabela acima (`FRONTEND_ORIGIN`, `GEMINI_API_KEY`, `CRON_SECRET`, `NODE_ENV=production`) + `NODE_OPTIONS=--experimental-require-module` (habilita `require()` de deps ESM-only como Nest 12 — a Vercel desativa por padrão) + `FALLBACK_DIR=apps/backend/data`
 
 **Comportamento em serverless:**
-- `FallbackService` escreve em `/tmp` (raiz do bundle é read-only) e lê em cascata (`/tmp` → cwd)
+- `FallbackService` escreve em `/tmp` (raiz do bundle é read-only) e lê em cascata (`/tmp` → `FALLBACK_DIR` resolvido contra o cwd do bundle)
 - `RefreshService` **não** agenda refresh no startup; o agendamento vem dos **crons da Vercel** (definidos em `vercel.json`), que chamam `GET /v1/cron/refresh` (header automático `x-vercel-cron: 1`; `?scope=news` para o refresh leve)
 - `maxDuration: 30` cobre Gemini (`/v1/oceanography/summary`, `/v1/iron/chat`)
 

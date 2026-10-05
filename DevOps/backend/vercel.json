@@ -1,12 +1,13 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "builds": [
-    {
-      "src": "api/index.ts",
-      "use": "@vercel/node"
+  "functions": {
+    "api/index.ts": {
+      "maxDuration": 30,
+      "memory": 1024,
+      "includeFiles": "**/data/*.json"
     }
-  ],
+  },
   "routes": [
     {
       "src": "/(.*)",
@@ -14,16 +15,10 @@
     }
   ],
   "regions": ["gru1"],
-  "functions": {
-    "api/index.ts": {
-      "maxDuration": 10,
-      "memory": 1024
-    }
-  },
   "crons": [
     {
       "path": "/v1/cron/refresh",
-      "schedule": "0 */6 * * *"
+      "schedule": "0 3 * * *"
     }
   ]
 }

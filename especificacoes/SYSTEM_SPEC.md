@@ -624,7 +624,7 @@ Configurado em: `apps/frontend/.env.production`
 | Arquivo | Papel |
 |---------|-------|
 | `apps/backend/api/index.ts` | Handler da função — NestJS via `ExpressAdapter` + helmet + CORS |
-| `apps/backend/vercel.json` | `builds`/`routes` (todas as rotas → handler), `regions: gru1`, `maxDuration: 30`, `includeFiles: ../data/*.json`, crons 1h/6h |
+| `apps/backend/vercel.json` | `routes` (todas as rotas → handler), `regions: gru1`, `maxDuration: 30`, `memory: 1024`, `includeFiles: **/data/*.json`, cron único `0 3 * * *` (03:00 UTC — limite Hobby: 1 cron/dia) |
 | `apps/backend/package.json` | deps `express` + `@vercel/node` |
 
 > **Validação (05/10):** handler compilado e invocado localmente com `VERCEL=1` → `/health`, `/v1/cron/status` e `/v1/comercio/commerce` retornaram 200 e o startup refresh foi pulado corretamente.

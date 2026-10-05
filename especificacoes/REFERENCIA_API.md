@@ -398,7 +398,7 @@ GET /v1/news
 | events[].status | string | `Completed`, `Standby` ou `Upcoming` (Upcoming listado primeiro) |
 | timestamp | string | Momento da montagem da resposta (ISO 8601) |
 
-**Fontes:** WSL (worldsurfleague.com — parser da tabela HTML real) + SPSurf (RSS). Fallback: `data/fallback-news.json`. Refresh: cron 1h (leve) + 6h (completo).
+**Fontes:** WSL (worldsurfleague.com — parser da tabela HTML real) + SPSurf (RSS). Fallback: `data/fallback-news.json`. Refresh: cron diario 03:00 UTC (unico no plano Hobby) + `POST /v1/cron/refresh`.
 
 ---
 
@@ -681,7 +681,7 @@ O backend aceita requisicoes do frontend configurado em `FRONTEND_ORIGIN` (defau
 
 Quando uma API externa falha, o sistema retorna dados do fallback diario salvo em disco. O frontend mostra o horario da ultima atualizacao para transparencia.
 
-Para forcar atualizacao do fallback: `POST /v1/cron/refresh`, aguardar o cron (1h/6h) ou reiniciar o backend local (que re-busca dados na proxima requisicao).
+Para forcar atualizacao do fallback: `POST /v1/cron/refresh`, aguardar o cron diario (03:00 UTC) ou reiniciar o backend local (que re-busca dados na proxima requisicao).
 
 > **Serverless (Vercel):** a raiz do bundle e read-only — o `FallbackService` escreve em `/tmp` (persistente por instancia quente) e le em cascata (`/tmp` → cwd). Sem instancia quente, as APIs externas sao a fonte primaria.
 
@@ -733,7 +733,7 @@ Retorna o status do agente de refresh automatico.
 | Campo | Tipo | Descricao |
 |-------|------|-----------|
 | lastRefresh | string \| null | Data/hora do ultimo refresh completo (ISO 8601) |
-| lastNewsRefresh | string \| null | Data/hora do ultimo refresh leve de noticias (cron 1h) |
+| lastNewsRefresh | string \| null | Data/hora do ultimo refresh leve de noticias (cron diario ou manual) |
 | isRefreshing | boolean | Se true, refresh esta em andamento |
 
 ---
@@ -762,7 +762,7 @@ GET /v1/cron/refresh          (refresh completo)
 
 **Response:** mesmo formato do `POST /v1/cron/refresh` abaixo.
 
-**Crons na Vercel** (em `apps/backend/vercel.json`): `0 * * * *` → `?scope=news` (leve) e `0 */6 * * *` → completo. Em serverless o `RefreshService` **nao** agenda refresh no startup (o filesystem e efemero); o agendamento vem dos crons.
+**Crons na Vercel** (em `apps/backend/vercel.json`): único `0 3 * * *` (03:00 UTC) → refresh completo. Limite do plano Hobby: 1 cron/dia — em serverless o `RefreshService` **nao** agenda refresh no startup (o filesystem e efemero); o agendamento vem dos crons (demais atualizacoes: `POST/GET /v1/cron/refresh` manual ou refresh por demanda).
 
 ---
 
