@@ -1,52 +1,37 @@
-import { NestFactory } from "@nestjs/core";
-import { ExpressAdapter } from "@nestjs/platform-express";
-import { AppModule } from "../src/app.module";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import express from "express";
 
-const app = express();
+export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
+  const parts: string[] = [`node=${process.version}`, `vercel=${process.env.VERCEL || "-"}`];
 
-type NestApp = Awaited<ReturnType<typeof NestFactory.create>>;
-let nestApp: NestApp | null = null;
+  try {
+    await import("@nestjs/core");
+    parts.push("dynamicImport@nestjs/core=OK");
+  } catch (e) {
+    const err = e as Error;
+    parts.push(`dynamicImport@nestjs/core=FAIL(${err.code || err.name}: ${err.message.slice(0, 200)})`);
+  }
 
-async function bootstrap(): Promise<NestApp> {
-  if (!nestApp) {
+  try {
+    const { NestFactory } = await import("@nestjs/core");
+    const { ExpressAdapter } = await import("@nestjs/platform-express");
+    const { AppModule } = await import("../src/app.module");
+    const express = (await import("express")).default;
+
+    const app = express();
     const instance = await NestFactory.create(AppModule, new ExpressAdapter(app), {
       abortOnError: false,
     });
-
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const helmet = require("helmet");
-      instance.use(
-        helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }),
-      );
-    } catch {
-      // helmet ausente — segue sem headers extras
-    }
-
     const origin = process.env.FRONTEND_ORIGIN || "http://localhost:3000";
     instance.enableCors({ origin, credentials: true });
-
     await instance.init();
-    nestApp = instance;
-  }
-  return nestApp;
-}
-
-export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
-  try {
-    const app = await bootstrap();
-    const instance = app.getHttpAdapter().getInstance() as (
-      req: VercelRequest,
-      res: VercelResponse,
-    ) => void | Promise<void>;
-    await instance(req, res);
-  } catch (err) {
-    // diagnostico temporario: expoe a causa do crash de boot em producao
-    const e = err as Error;
+    parts.push("bootstrap=OK");
+    res.statusCode = 200;
+    res.end(parts.join(" | "));
+    return;
+  } catch (e) {
+    const err = e as Error;
+    parts.push(`bootstrap=FAIL(${err.code || err.name}: ${err.message.slice(0, 300)})`);
     res.statusCode = 500;
-    res.setHeader("content-type", "text/plain; charset=utf-8");
-    res.end(`BOOT_ERROR: ${e?.name}: ${e?.message}\n${(e?.stack || "").split("\n").slice(0, 6).join("\n")}`);
+    res.end(parts.join(" | "));
   }
 }
