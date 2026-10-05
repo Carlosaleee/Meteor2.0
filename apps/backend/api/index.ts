@@ -1,56 +1,63 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { existsSync, readdirSync } from "fs";
 import { join } from "path";
 import { pathToFileURL } from "url";
 
 const nativeImport = new Function("s", "return import(s)") as (s: string) => Promise<Record<string, unknown>>;
 
+function safeList(dir: string, max = 12): string {
+  try {
+    return readdirSync(dir).slice(0, max).join(",");
+  } catch (e) {
+    return `ERR(${(e as Error).message.slice(0, 80)})`;
+  }
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
   const parts: string[] = [
     `node=${process.version}`,
     `cwd=${process.cwd()}`,
-    `execArgv=${JSON.stringify(process.execArgv)}`,
-    `NODE_OPTIONS=${process.env.NODE_OPTIONS || "(unset)"}`,
+    `ls/var/task=${safeList("/var/task", 20)}`,
+    `ls/backend=${safeList("/var/task/apps/backend", 25)}`,
+    `ls/backend/src=${safeList("/var/task/apps/backend/src", 15)}`,
+    `ls/backend/node_modules=${safeList("/var/task/apps/backend/node_modules", 15)}`,
+    `exists/app.module.js=${existsSync("/var/task/apps/backend/src/app.module.js")}`,
+    `exists/dist=${existsSync("/var/task/apps/backend/dist/main.js")}`,
   ];
 
+  let resolved = "";
   try {
-    await nativeImport("@nestjs/core");
-    parts.push("bareImport=OK");
+    resolved = require.resolve("@nestjs/core");
+    parts.push(`resolve/core=${resolved}`);
   } catch (e) {
-    const err = e as Error & { code?: string };
-    parts.push(`bareImport=FAIL(${err.code}: ${err.message.slice(0, 120)})`);
+    parts.push(`resolve/core=FAIL(${(e as Error).message.slice(0, 100)})`);
     res.statusCode = 500;
     res.end(parts.join(" | "));
     return;
   }
 
   try {
-    await nativeImport(pathToFileURL(join(__dirname, "../src/app.module.js")).href);
-    parts.push("appModuleImport=OK");
+    await nativeImport(pathToFileURL(resolved).href);
+    parts.push("fileUrlImport=OK");
   } catch (e) {
-    const err = e as Error & { code?: string };
-    parts.push(`appModuleImport=FAIL(${err.code}: ${err.message.slice(0, 200)})`);
+    parts.push(`fileUrlImport=FAIL(${(e as Error & { code?: string }).code}: ${(e as Error).message.slice(0, 150)})`);
   }
 
   try {
-    const { NestFactory } = (await nativeImport("@nestjs/core")) as any;
-    const { ExpressAdapter } = (await nativeImport("@nestjs/platform-express")) as any;
-    const { AppModule } = (await nativeImport(pathToFileURL(join(__dirname, "../src/app.module.js")).href)) as any;
-    const express = ((await nativeImport("express")) as any).default;
-
-    const app = express();
-    const instance = await NestFactory.create(AppModule, new ExpressAdapter(app), {
-      abortOnError: false,
-    });
-    const origin = process.env.FRONTEND_ORIGIN || "http://localhost:3000";
-    instance.enableCors({ origin, credentials: true });
-    await instance.init();
-    parts.push("bootstrap=OK");
-    res.statusCode = 200;
-    res.end(parts.join(" | "));
+    await nativeImport("@nestjs/core");
+    parts.push("bareImport=OK");
   } catch (e) {
-    const err = e as Error & { code?: string };
-    parts.push(`bootstrap=FAIL(${err.code}: ${err.message.slice(0, 250)})`);
-    res.statusCode = 500;
-    res.end(parts.join(" | "));
+    parts.push(`bareImport=FAIL(${(e as Error & { code?: string }).code})`);
   }
+
+  const appModUrl = pathToFileURL("/var/task/apps/backend/src/app.module.js").href;
+  try {
+    await nativeImport(appModUrl);
+    parts.push("appModuleImport=OK");
+  } catch (e) {
+    parts.push(`appModuleImport=FAIL(${(e as Error & { code?: string }).code}: ${(e as Error).message.slice(0, 180)})`);
+  }
+
+  res.statusCode = parts.some((p) => p.includes("FAIL")) ? 500 : 200;
+  res.end(parts.join(" | "));
 }
