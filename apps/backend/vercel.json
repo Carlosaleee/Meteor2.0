@@ -17,12 +17,8 @@
   "regions": ["gru1"],
   "crons": [
     {
-      "path": "/v1/cron/refresh?scope=news",
-      "schedule": "0 * * * *"
-    },
-    {
       "path": "/v1/cron/refresh",
-      "schedule": "0 */6 * * *"
+      "schedule": "0 3 * * *"
     }
   ]
 }
