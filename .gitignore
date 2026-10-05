@@ -32,6 +32,7 @@ Thumbs.db
 
 # fallback data (auto-generated)
 apps/backend/data/*.json
+!apps/backend/data/fallback-*.json
 
 # test
 .vitest/

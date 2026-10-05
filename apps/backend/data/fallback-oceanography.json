@@ -1,0 +1,90 @@
+{
+  "updatedAt": "2026-10-05T18:44:23.704Z",
+  "data": {
+    "current": {
+      "time": "2026-10-05T15:30",
+      "interval": 900,
+      "wave_height": 1.1,
+      "wave_direction": 138,
+      "wave_period": 8.25,
+      "swell_wave_height": 0.66,
+      "swell_wave_direction": 154,
+      "swell_wave_period": 10.8,
+      "wind_speed_10m": 12,
+      "wind_direction_10m": 180,
+      "wind_gusts_10m": 18
+    },
+    "quality": {
+      "label": "Pequenas",
+      "bestTime": "08:00 - 10:00",
+      "emoji": " ripple"
+    },
+    "tides": {
+      "nextHigh": "06:45",
+      "coefficient": 0.78,
+      "nextLow": "12:30"
+    },
+    "spots": [
+      {
+        "lat": -24.75,
+        "id": "boqueirao-norte",
+        "lon": -47.58,
+        "level": "intermediate",
+        "exposure": "Sul/Sudeste",
+        "name": "Boqueirao Norte",
+        "bestWind": "Terral (Oeste)",
+        "howToGetThere": "https://www.google.com/maps/dir/?api=1&destination=-24.75,-47.58"
+      },
+      {
+        "lat": -24.72,
+        "id": "illedas-cigarras",
+        "lon": -47.53,
+        "level": "beginner",
+        "exposure": "Leste",
+        "name": "Ilha das Cigarras",
+        "bestWind": "Terral (Oeste)",
+        "howToGetThere": "https://www.google.com/maps/dir/?api=1&destination=-24.72,-47.53"
+      },
+      {
+        "lat": -24.74,
+        "id": "prainha",
+        "lon": -47.56,
+        "level": "beginner",
+        "exposure": "Leste",
+        "name": "Prainha",
+        "bestWind": "Terral (Oeste)",
+        "howToGetThere": "https://www.google.com/maps/dir/?api=1&destination=-24.74,-47.56"
+      },
+      {
+        "lat": -24.71,
+        "id": "costa-do-sol",
+        "lon": -47.52,
+        "level": "intermediate",
+        "exposure": "Leste/Nordeste",
+        "name": "Costa do Sol",
+        "bestWind": "Terral (Oeste)",
+        "howToGetThere": "https://www.google.com/maps/dir/?api=1&destination=-24.71,-47.52"
+      },
+      {
+        "lat": -24.76,
+        "id": "farol",
+        "lon": -47.6,
+        "level": "advanced",
+        "exposure": "Sul",
+        "name": "Farol",
+        "bestWind": "Terral (Oeste)",
+        "howToGetThere": "https://www.google.com/maps/dir/?api=1&destination=-24.76,-47.60"
+      },
+      {
+        "lat": -24.68,
+        "id": "barra-do-ribeira",
+        "lon": -47.49,
+        "level": "intermediate",
+        "exposure": "Sudeste",
+        "name": "Barra do Ribeira",
+        "bestWind": "Terral (Noroeste)",
+        "howToGetThere": "https://www.google.com/maps/dir/?api=1&destination=-24.68,-47.49"
+      }
+    ]
+  }
+}

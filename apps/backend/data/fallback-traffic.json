@@ -1,0 +1,41 @@
+{
+  "updatedAt": "2026-09-08T12:00:00Z",
+  "data": {
+    "routes": [
+      {
+        "id": "sp-222",
+        "name": "Rodovia SP-222",
+        "stretch": "Iguape ⇄ Cananéia",
+        "baseCondition": "LIVRE",
+        "description": "Tráfego fluindo normalmente sem retenções.",
+        "rushHours": {
+          "morning": { "start": 7, "end": 9, "condition": "MODERADO", "description": "Fluxo intenso de veículos leves." },
+          "evening": { "start": 17, "end": 19, "condition": "MODERADO", "description": "Retorno do trabalho, tráfego intenso." }
+        }
+      },
+      {
+        "id": "br-116",
+        "name": "Rodovia Régis Bittencourt (BR-116)",
+        "stretch": "Trecho Registro",
+        "baseCondition": "MODERADO",
+        "description": "Fluxo intenso de veículos pesados na serra.",
+        "rushHours": {
+          "morning": { "start": 6, "end": 10, "condition": "LENTO", "description": "Caminhões e veículos pesados na subida da serra." },
+          "evening": { "start": 15, "end": 20, "condition": "LENTO", "description": "Descida de veículos pesados, risco de lentidão." }
+        }
+      },
+      {
+        "id": "balsa-cananeia",
+        "name": "Travessia de Balsa",
+        "stretch": "Cananéia ⇄ Ilha Comprida",
+        "baseCondition": "OPERACIONAL",
+        "description": "Tempo de espera estimado: 15 min",
+        "baseWaitMinutes": 15,
+        "rushHours": {
+          "morning": { "start": 7, "end": 9, "condition": "OPERACIONAL", "description": "Fila moderada, espera de 20-30 min.", "waitMinutes": 25 },
+          "evening": { "start": 17, "end": 19, "condition": "OPERACIONAL", "description": "Fila leve, espera de 15-20 min.", "waitMinutes": 18 }
+        }
+      }
+    ]
+  }
+}

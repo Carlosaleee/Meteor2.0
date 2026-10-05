@@ -1,25 +1,47 @@
+import "reflect-metadata";
+import { NestFactory } from "@nestjs/core";
+import { ExpressAdapter } from "@nestjs/platform-express";
+import { AppModule } from "../src/app.module";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { existsSync, readdirSync } from "fs";
+import express from "express";
+import helmet from "helmet";
 
-function safeList(dir: string, max = 25): string {
-  try {
-    return readdirSync(dir).slice(0, max).join(",");
-  } catch (e) {
-    return `ERR(${(e as Error).message.slice(0, 60)})`;
+const app = express();
+
+type NestApp = Awaited<ReturnType<typeof NestFactory.create>>;
+let nestApp: NestApp | null = null;
+
+async function bootstrap(): Promise<NestApp> {
+  if (!nestApp) {
+    const instance = await NestFactory.create(AppModule, new ExpressAdapter(app), {
+      abortOnError: false,
+    });
+
+    instance.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
+
+    const origin = process.env.FRONTEND_ORIGIN || "http://localhost:3000";
+    instance.enableCors({ origin, credentials: true });
+
+    await instance.init();
+    nestApp = instance;
   }
+  return nestApp;
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
-  const parts: string[] = [
-    `FALLBACK_DIR=${process.env.FALLBACK_DIR || "(unset)"}`,
-    `cwd=${process.cwd()}`,
-    `exists/var/task/data=${existsSync("/var/task/data")}`,
-    `exists/apps/backend/data=${existsSync("/var/task/apps/backend/data")}`,
-    `ls/var/task=${safeList("/var/task", 15)}`,
-    `ls/var/task/data=${safeList("/var/task/data", 10)}`,
-    `ls/var/task/apps/backend/data=${safeList("/var/task/apps/backend/data", 10)}`,
-    `ls/var/task/apps/backend=${safeList("/var/task/apps/backend", 20)}`,
-  ];
-  res.statusCode = 200;
-  res.end(parts.join(" | "));
+  try {
+    const application = await bootstrap();
+    const instance = application.getHttpAdapter().getInstance() as (
+      req: VercelRequest,
+      res: VercelResponse,
+    ) => void | Promise<void>;
+    await instance(req, res);
+  } catch (err) {
+    console.error("serverless handler error:", err);
+    if (!res.headersSent) {
+      res.statusCode = 500;
+      res.setHeader("content-type", "text/plain; charset=utf-8");
+      res.end("Internal Server Error");
+    }
+  }
 }

@@ -1,0 +1,374 @@
+{
+  "updatedAt": "2026-10-05T20:00:10.903Z",
+  "data": {
+    "news": [
+      {
+        "id": "reg-1dd88vj",
+        "title": "João Carlos Martins e Gabriel Chalita apresentam ‘O Pianista e o Poeta’ em SP",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/1077-fm/joao-carlos-martins-e-gabriel-chalita-apresentam-o-pianista-e-o-poeta-em-sp/",
+        "description": "Divulgação O espetáculo \"O Pianista e o Poeta\", protagonizado pelo maestro João Carlos Martins e pelo Gabriel Chalita, será apresentado no Teatro FAAP",
+        "image": "https://santaportal.com.br/wp-content/uploads/2026/10/Joao-Carlos-Martins.webp",
+        "category": "turismo",
+        "publishedAt": "2026-10-05T19:37:10.000Z"
+      },
+      {
+        "id": "reg-1hxeick",
+        "title": "Johnny Marr, do The Smiths, diz que show no Brasil é uma oportunidade para novos fãs",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/1077-fm/johnny-marr-do-the-smiths-diz-que-show-no-brasil-e-uma-oportunidade-para-novos-fas/",
+        "description": "Reprodução Desde maio de 1983, quando lançou \"Hand in Glove\", primeiro compacto do The Smiths e primeira colaboração com o cantor Morrissey, Johnny Marr",
+        "image": "https://santaportal.com.br/wp-content/uploads/2026/07/16136-wiksf-johnny-marr-Hero-e1791228175200.jpg",
+        "category": "noticia",
+        "publishedAt": "2026-10-05T19:27:39.000Z"
+      },
+      {
+        "id": "reg-12k8j84",
+        "title": "Dia das Crianças deve impulsionar vendas na Baixada Santista e Vale do Ribeira - Boqnews",
+        "source": "Boqnews",
+        "sourceUrl": "https://news.google.com",
+        "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxPOVRUd1FiT1NpZlJncVRwa05fWmFzZDU5ZGhlV2l5Qndtbkl6RjlyVjA0NW1zTmgxN3NESWVGQVp6NEVNc01nZzJ2YWVZQlNXMHVtc0E2UFhWSDhIZnExWHB3Vm5hbklQOThwTmhPcmY3QkRUa3dIeVBPVk9jSEVfYmRhaEpaX3RhNXdScjhLX0NwcDV0eEhkNlVKNEVjQW5NRGhWT1R5SXdaSGM?oc=5",
+        "description": "Dia das Crianças deve impulsionar vendas na Baixada Santista e Vale do Ribeira Boqnews",
+        "image": "",
+        "category": "noticia",
+        "publishedAt": "2026-10-05T19:26:26.000Z"
+      },
+      {
+        "id": "reg-1e5o2du",
+        "title": "Aos 72, Monique Lafond celebra volta à TV",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/1077-fm/aos-72-monique-lafond-celebra-volta-a-tv/",
+        "description": "Reprodução/ Monique Lafond Aos 72 anos, Monique Lafond volta à televisão com uma constatação sobre o mercado que conhece há mais de seis décadas",
+        "image": "https://santaportal.com.br/wp-content/uploads/2026/10/monique-lafond-no-super-pop.jpg",
+        "category": "noticia",
+        "publishedAt": "2026-10-05T19:18:15.000Z"
+      },
+      {
+        "id": "reg-z70eoa",
+        "title": "Queda de aeronave militar mata 32 pessoas na Nigéria",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/geral/queda-de-aeronave-militar-mata-32-pessoas-na-nigeria/",
+        "description": "Reprodução/ Facebook Força Aérea Nigeriana O presidente da Nigéria, Bola Tinubu, confirmou a morte das 32 pessoas que estavam a bordo de uma aeronave da Força Aérea que caiu no estado de Ondo.",
+        "image": "https://santaportal.com.br/wp-content/uploads/2026/10/atr-42-1.webp",
+        "category": "policial",
+        "publishedAt": "2026-10-05T19:03:08.000Z"
+      },
+      {
+        "id": "reg-tpr5jr",
+        "title": "Água que cuida: tecnologia ajuda a modernizar o abastecimento",
+        "source": "ISN Online",
+        "sourceUrl": "https://isnonline.com.br",
+        "url": "https://isnonline.com.br/2026/10/05/agua-que-cuida-tecnologia-ajuda-a-modernizar-o-abastecimento/",
+        "description": "Baixada Santista – A tecnologia vem ganhando espaço em diferentes etapas do abastecimento de água e ajudando a tornar os sistemas mais eficientes, monitorados e preparados para identificar problemas. ",
+        "image": "https://isnonline.com.br/wp-content/uploads/2026/10/tecnologia-no-abastecimento-de-agua.jpg",
+        "category": "noticia",
+        "publishedAt": "2026-10-05T19:00:57.000Z"
+      },
+      {
+        "id": "reg-o9tmkd",
+        "title": "Santos recebe Festival do Morango, Burguer e Chopp",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/gastronomia/santos-recebe-festival-do-morango-burguer-e-chopp/",
+        "description": "Divulgação O Emissário Submarino, em Santos, recebe o Festival do Morango, Burguer e Chopp em outubro. O evento terá entrada gratuita.",
+        "image": "https://santaportal.com.br/wp-content/uploads/2026/10/festival-morango-burger-e-chopp.jpg",
+        "category": "turismo",
+        "publishedAt": "2026-10-05T19:00:00.000Z"
+      },
+      {
+        "id": "reg-vb1cvu",
+        "title": "Santos inicia novo contrato de poda com equipe triplicada e estrutura ampliada",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/baixada/santos-inicia-novo-contrato-de-poda-com-equipe-triplicada-e-estrutura-ampliada/",
+        "description": "Francisco Arrais/Divulgação Prefeitura de Santos Além do Embaré, o novo contrato de poda prevê que os trabalhos sejam realizados até o fim de dezembro também na Aparecida e Ponta da Praia.",
+        "image": "https://santaportal.com.br/wp-content/uploads/2026/10/podaarvores.jpg",
+        "category": "turismo",
+        "publishedAt": "2026-10-05T19:00:00.000Z"
+      },
+      {
+        "id": "reg-11053ij",
+        "title": "PG recebe espetáculo “Noroeste” no Teatro Serafim Gonzalez",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/1077-fm/pg-recebe-espetaculo-noroeste-no-teatro-serafim-gonzalez/",
+        "description": "Divulgação Praia Grande recebe, nesta quinta-feira (8), o espetáculo “Noroeste”, produzido pelo Núcleo de Artes Cênicas (NAC) do SESI de Santos.",
+        "image": "https://santaportal.com.br/wp-content/uploads/2026/10/espetaculonoroeste.jpg",
+        "category": "turismo",
+        "publishedAt": "2026-10-05T19:00:00.000Z"
+      },
+      {
+        "id": "reg-kuq34",
+        "title": "Concurso da Prefeitura de Santos terá provas para mais de 47 mil candidatos",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/baixada/concurso-da-prefeitura-de-santos-tera-provas-para-mais-de-47-mil-candidatos/",
+        "description": "Divulgação/Prefeitura de Santos Mais de 47 mil candidatos deverão fazer, neste domingo (11), as provas do concurso público da Prefeitura de Santos.",
+        "image": "https://santaportal.com.br/wp-content/uploads/2026/10/concurso.jpg",
+        "category": "noticia",
+        "publishedAt": "2026-10-05T19:00:00.000Z"
+      },
+      {
+        "id": "reg-1rb7cus",
+        "title": "Preço do diesel no Brasil dispara com retomada da guerra no Irã e ameaça às exportações dos EUA",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/geral/preco-do-diesel-no-brasil-dispara-com-retomada-da-guerra-no-ira-e-ameaca-as-exportacoes-dos-eua/",
+        "description": "Divulgação/IPEDF O preço do diesel S-10 disparou nos postos brasileiros nas últimas semanas, como reflexo de repasses de aumento de custos por importadores privados.",
+        "image": "",
+        "category": "noticia",
+        "publishedAt": "2026-10-05T18:48:38.000Z"
+      },
+      {
+        "id": "reg-1y6g1jx",
+        "title": "Forças do Iêmen chegam a estreito disputado com os houthis",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/geral/forcas-do-iemen-chegam-a-estreito-disputado-com-os-houthis/",
+        "description": "Reprodução/Redes Sociais A ofensiva das forças do governo reconhecido internacionalmente do Iêmen, apoiadas por pesados ataques aéreos da Arábia Saudita, chegou nesta segunda-feira.",
+        "image": "",
+        "category": "cotidiano",
+        "publishedAt": "2026-10-05T18:37:08.000Z"
+      },
+      {
+        "id": "reg-ley9aj",
+        "title": "Justiça do Rio nega liminar para Vasco usar Maracanã contra o Boca",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/esporte/justica-do-rio-nega-liminar-para-vasco-usar-maracana-contra-o-boca/",
+        "description": "Divulgação A Justiça do Rio negou nesta segunda-feira (5) uma liminar tentada pelo Vasco para conseguir jogar contra o Boca Juniors, pela Sul-Americana",
+        "image": "https://santaportal.com.br/wp-content/uploads/2026/07/maracana.jpg",
+        "category": "cotidiano",
+        "publishedAt": "2026-10-05T18:32:29.000Z"
+      },
+      {
+        "id": "reg-1k23lsb",
+        "title": "Dólar cai mais de 4% e fica abaixo de R$ 5 após 1º turno",
+        "source": "ISN Online",
+        "sourceUrl": "https://isnonline.com.br",
+        "url": "https://isnonline.com.br/2026/10/05/dolar-cai-mais-de-4-e-fica-abaixo-de-r-5-apos-1o-turno/",
+        "description": "Economia – O dólar abriu o mercado desta segunda-feira (5) em forte queda e passou a ser negociado abaixo de R$ 5. A moeda norte-americana recuava 4,26% na manhã seguinte ao primeiro turno das eleiçõe",
+        "image": "https://isnonline.com.br/wp-content/uploads/2026/10/dolar-cai.jpg",
+        "category": "cotidiano",
+        "publishedAt": "2026-10-05T18:30:00.000Z"
+      },
+      {
+        "id": "reg-1lhcg6n",
+        "title": "Rosana Valle e Paulo Alexandre falam sobre planos para novos mandatos",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/especiais-santa-portal/rosana-valle-e-paulo-alexandre-falam-sobre-planos-para-novos-mandatos/",
+        "description": "Reprodução/Santa Cecília TV Rosana Valle (PL) e Paulo Alexandre Barbosa (PSD) foram os deputados federais da região eleitos para os próximos quatro anos.",
+        "image": "https://santaportal.com.br/wp-content/uploads/2026/10/federais.jpg",
+        "category": "noticia",
+        "publishedAt": "2026-10-05T18:30:00.000Z"
+      },
+      {
+        "id": "reg-1i6p5m1",
+        "title": "Medvedev é desclassificado após dar bolada em espectador, e Djokovic avança à final na China",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/esporte/medvedev-e-desclassificado-apos-dar-bolada-em-espectador-e-djokovic-avanca-a-final-na-china/",
+        "description": "Reprodução/Tennis Tv Novak Djokovic se classificou para a sua 146ª final de um torneio da ATP nesta segunda-feira (5) após o adversário ser desclassificado ao acertar uma bolinha em um espectador na s",
+        "image": "https://santaportal.com.br/wp-content/uploads/2026/10/Medvedev.jpeg-e1791210726813.webp",
+        "category": "cotidiano",
+        "publishedAt": "2026-10-05T18:25:36.000Z"
+      },
+      {
+        "id": "reg-1ayzao5",
+        "title": "Ibovespa bate 200 mil pontos e dólar cai para menos de R$ 5, com euforia após resultado das eleições",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/geral/ibovespa-bate-200-mil-pontos-e-dolar-cai-para-menos-de-r-5-com-euforia-apos-resultado-das-eleicoes/",
+        "description": "B3/Divulgação A liderança de Flávio Bolsonaro (PL) sobre Lula (PT) no 1º turno das eleições alimenta o apetite por risco no mercado brasileiro nesta segunda-feira (5).",
+        "image": "",
+        "category": "cotidiano",
+        "publishedAt": "2026-10-05T18:23:18.000Z"
+      },
+      {
+        "id": "reg-wzvo68",
+        "title": "Antonelli pode ser campeão da F1 sem precisar vencer mais corridas",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/esporte/antonelli-pode-ser-campeao-da-f1-sem-precisar-vencer-mais-corridas/",
+        "description": "Reprodução X/Fórmula 1 Sem precisar secar os rivais, Andrea Kimi Antonelli pode ser campeão da temporada 2026 da F1 por antecipação no México",
+        "image": "",
+        "category": "noticia",
+        "publishedAt": "2026-10-05T18:14:51.000Z"
+      },
+      {
+        "id": "reg-vvj6ga",
+        "title": "Incêndio atinge fábrica de materiais hospitalares em Blumenau",
+        "source": "ISN Online",
+        "sourceUrl": "https://isnonline.com.br",
+        "url": "https://isnonline.com.br/2026/10/05/incendio-atinge-fabrica-de-materiais-hospitalares-em-blumenau/",
+        "description": "Brasil – Um incêndio de grandes proporções atingiu, na manhã desta segunda-feira (5), um dos galpões de uma fábrica de materiais hospitalares no bairro Salto Weissbach, em Blumenau, Santa Catarina. Nã",
+        "image": "https://isnonline.com.br/wp-content/uploads/2026/10/incendio-em-fabrica-de-materiais-hospitalares.jpg",
+        "category": "cotidiano",
+        "publishedAt": "2026-10-05T18:00:46.000Z"
+      },
+      {
+        "id": "reg-1pi8ird",
+        "title": "Idoso passa mal e morre antes de votar em São Vicente",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/baixada/idoso-passa-mal-e-morre-antes-de-votar-em-sao-vicente/",
+        "description": "Divulgação/Prefeitura de São Vicente Um idoso morreu após passar mal enquanto aguardava para votar em um colégio na Vila Margarida, em São Vicente.",
+        "image": "https://santaportal.com.br/wp-content/uploads/2026/09/ps-central-sao-vicente.jpg",
+        "category": "noticia",
+        "publishedAt": "2026-10-05T18:00:00.000Z"
+      },
+      {
+        "id": "reg-19m79ga",
+        "title": "Homem desacata policiais militares durante votação em Guarujá",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/baixada/guaruja-baixada/homem-desacata-policiais-militares-durante-votacao-em-guaruja/",
+        "description": "Reprodução/Google Street View Um homem de 40 anos foi conduzido à delegacia após desacatar policiais militares durante a votação em um colégio eleitoral, em Guarujá.",
+        "image": "https://santaportal.com.br/wp-content/uploads/2026/10/escolaguaruja.jpg",
+        "category": "policial",
+        "publishedAt": "2026-10-05T18:00:00.000Z"
+      },
+      {
+        "id": "reg-15b14z9",
+        "title": "Deputados estaduais da região falam sobre prioridades em seus mandatos",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/especiais-santa-portal/rumos-e-desafios/deputados-estaduais-da-regiao-falam-sobre-prioridades-em-seus-mandatos/",
+        "description": "Reprodução/Santa Cecília TV A Baixada Santista terá seis deputados estaduais na Assembleia Legislativa de São Paulo (Alesp) a partir de 2027.",
+        "image": "https://santaportal.com.br/wp-content/uploads/2026/10/deputadosestaduais.jpg",
+        "category": "noticia",
+        "publishedAt": "2026-10-05T18:00:00.000Z"
+      },
+      {
+        "id": "reg-1y0y59i",
+        "title": "Mais de 1,4 mil famílias do Vale do Ribeira podem perder benefício da Tarifa Social por desatualização cadastral - Neoenergia",
+        "source": "Neoenergia",
+        "sourceUrl": "https://news.google.com",
+        "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxOM3Uxd3p6YzZmQ0V4SUlmdDZjcU1BVWFiZmViVGhMZHRRRURUNFNKYS11N3lXX1lrSWJQTHFmVFlSU0VwX28yNjFzZm9KZUtvWlNaRHo0Ul9VVGNyMDh4WTFnWi1UX2ctUFIzWUF4LVpvZm13OEx0SDVMamhOVXFVeGs1eHBCOXlobDRJQTJR?oc=5",
+        "description": "Mais de 1,4 mil famílias do Vale do Ribeira podem perder benefício da Tarifa Social por desatualização cadastral Neoenergia",
+        "image": "",
+        "category": "noticia",
+        "publishedAt": "2026-10-05T17:48:57.000Z"
+      },
+      {
+        "id": "reg-7fquat",
+        "title": "Estudante de 15 anos perde a mão durante protesto em escola na França",
+        "source": "ISN Online",
+        "sourceUrl": "https://isnonline.com.br",
+        "url": "https://isnonline.com.br/2026/10/05/estudante-de-15-anos-perde-a-mao-durante-protesto-em-escola-na-franca/",
+        "description": "Mundo – Um estudante de 15 anos teve a mão arrancada após uma granada de efeito moral ser disparada pela polícia durante uma manifestação estudantil na cidade de Lens, no norte da França, nesta segund",
+        "image": "https://isnonline.com.br/wp-content/uploads/2026/10/estudante-de-15-anos-perde-a-mao-na-Franca.jpg",
+        "category": "cotidiano",
+        "publishedAt": "2026-10-05T17:30:24.000Z"
+      },
+      {
+        "id": "reg-fvuctm",
+        "title": "Mais de 62% dos brasileiros no exterior não votaram no 1º turno",
+        "source": "ISN Online",
+        "sourceUrl": "https://isnonline.com.br",
+        "url": "https://isnonline.com.br/2026/10/05/mais-de-62-dos-brasileiros-no-exterior-nao-votaram-no-1o-turno/",
+        "description": "Mundo – Mais de seis em cada dez brasileiros aptos a votar no exterior não compareceram às urnas no primeiro turno das eleições de 2026, realizado neste domingo (4). Segundo dados do Tribunal Superior",
+        "image": "https://isnonline.com.br/wp-content/uploads/2026/10/brasileiros-no-exterior-nao-votaram.jpg",
+        "category": "noticia",
+        "publishedAt": "2026-10-05T17:00:54.000Z"
+      },
+      {
+        "id": "reg-1n3mvbg",
+        "title": "Sérgio Moro é eleito governador do Paraná no 1º turno",
+        "source": "ISN Online",
+        "sourceUrl": "https://isnonline.com.br",
+        "url": "https://isnonline.com.br/2026/10/05/sergio-moro-e-eleito-governador-do-parana-no-1o-turno/",
+        "description": "Política – Sérgio Moro (PL) foi eleito governador do Paraná no primeiro turno das eleições deste domingo (4). O resultado foi confirmado após a apuração dos votos pelo Tribunal Superior Eleitoral (TSE",
+        "image": "https://isnonline.com.br/wp-content/uploads/2026/10/Sergio-Moro-eleito-governador-do-Parana.jpg",
+        "category": "noticia",
+        "publishedAt": "2026-10-05T16:30:58.000Z"
+      },
+      {
+        "id": "reg-n8ga8y",
+        "title": "Guilherme Derrite e André do Prado são eleitos senadores por São Paulo",
+        "source": "ISN Online",
+        "sourceUrl": "https://isnonline.com.br",
+        "url": "https://isnonline.com.br/2026/10/05/guilherme-derrite-e-andre-do-prado-sao-eleitos-senadores-por-sao-paulo/",
+        "description": "Política – Guilherme Derrite (PP) e André do Prado (PL) foram eleitos senadores por São Paulo nas eleições deste domingo (4). O resultado foi confirmado pelo Tribunal Regional Eleitoral de São Paulo (",
+        "image": "https://isnonline.com.br/wp-content/uploads/2026/10/Guilherme-Derrite-e-Andre-do-Prado-eleitos-senadores.avif",
+        "category": "noticia",
+        "publishedAt": "2026-10-05T16:00:25.000Z"
+      },
+      {
+        "id": "reg-148ylln",
+        "title": "EUA reabrem embaixada e consulados no Brasil 1 dia após eleição",
+        "source": "ISN Online",
+        "sourceUrl": "https://isnonline.com.br",
+        "url": "https://isnonline.com.br/2026/10/05/eua-reabrem-embaixada-e-consulados-no-brasil-1-dia-apos-eleicao/",
+        "description": "Mundo – Os Estados Unidos reabriram nesta segunda-feira (5) a Embaixada em Brasília e os consulados americanos no Brasil, um dia após o primeiro turno das eleições brasileiras. As representações estav",
+        "image": "https://isnonline.com.br/wp-content/uploads/2026/10/EUA-reabrem-embaixada-no-Brasil.jpg",
+        "category": "cotidiano",
+        "publishedAt": "2026-10-05T15:30:36.000Z"
+      },
+      {
+        "id": "reg-h948gx",
+        "title": "Lesão de Arrascaeta pode render milhões em indenização ao Flamengo",
+        "source": "ISN Online",
+        "sourceUrl": "https://isnonline.com.br",
+        "url": "https://isnonline.com.br/2026/10/05/lesao-de-arrascaeta-pode-render-milhoes-em-indenizacao-ao-flamengo/",
+        "description": "O Flamengo poderá ser compensado financeiramente pela Fifa pela lesão de Arrascaeta durante a Data Fifa. O uruguaio fraturou o punho esquerdo em amistoso contra a Coreia do Sul e ficará afastado por s",
+        "image": "https://isnonline.com.br/wp-content/uploads/2026/10/arrascaeta-flamengo-cirurgia.png",
+        "category": "noticia",
+        "publishedAt": "2026-10-05T15:30:33.000Z"
+      },
+      {
+        "id": "reg-1u8na9a",
+        "title": "Pedro Pascal aparece com camiseta de Lula em foto publicada por cineasta brasileira",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/1077-fm/pedro-pascal-aparece-com-camiseta-de-lula-em-foto-publicada-por-cineasta-brasileira/",
+        "description": "Reprodução Pedro Pascal chamou atenção nas redes sociais no domingo (4), dia do primeiro turno das eleições, ao aparecer ao lado da cineasta brasileira.",
+        "image": "https://santaportal.com.br/wp-content/uploads/2026/10/snapinsta-1791212725418.jpg",
+        "category": "noticia",
+        "publishedAt": "2026-10-05T15:09:13.000Z"
+      }
+    ],
+    "routes": [
+      {
+        "id": "sp-222",
+        "name": "SP-222",
+        "condition": "MODERADO",
+        "description": "Trecho de Iguape com fluxo intenso apos enchentes. Alagamentos pontuais em areas rurais",
+        "updatedAt": "2026-09-21T12:00:00.000Z"
+      },
+      {
+        "id": "br-116",
+        "name": "BR-116 (Regis Bittencourt)",
+        "condition": "MODERADO",
+        "description": "Desvio para BR-116 pela interdicao da SP-165. Fluxo elevado de veiculos na serra",
+        "updatedAt": "2026-09-21T12:00:00.000Z"
+      },
+      {
+        "id": "sp-165",
+        "name": "SP-165",
+        "condition": "INTERROMPIDO",
+        "description": "Interditada nos km 88 (Eldorado) e 42,5 e 73 (Sete Barras) apos deslizamentos",
+        "updatedAt": "2026-09-21T12:00:00.000Z"
+      },
+      {
+        "id": "balsa-cananeia",
+        "name": "Balsa Cananeia-Ilha Comprida",
+        "condition": "OPERACIONAL",
+        "description": "Operando normalmente. Tempo de espera: 15-25 minutos",
+        "updatedAt": "2026-09-21T12:00:00.000Z"
+      },
+      {
+        "id": "sp-055",
+        "name": "SP-055",
+        "condition": "LIVRE",
+        "description": "Trafego fluindo normalmente apos normalizacao dos niveis dos rios",
+        "updatedAt": "2026-09-21T12:00:00.000Z"
+      }
+    ]
+  }
+}
