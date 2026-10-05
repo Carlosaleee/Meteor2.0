@@ -247,7 +247,7 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 
 ### Infra
 - pnpm 11.10 (monorepo)
-- Node 22 (CI) / 24+ (dev local)
+- Node 24 (CI e dev local — Nest 12 e ESM-only e o Jest 30 exige Node 24.9+ para `require(esm)`)
 - Conventional Commits
 - oxlint (frontend lint)
 - ESLint + Prettier

@@ -6,7 +6,7 @@
 
 ## Pre-requisitos
 
-- Node.js 22+ (dev local usa 24+; CI roda em Node 22 com `NODE_OPTIONS=--experimental-vm-modules`)
+- Node.js 24+ (CI e dev local — Nest 12 é ESM-only e o Jest 30 exige Node 24.9+ para `require(esm)`; a CI usa `NODE_OPTIONS=--experimental-vm-modules`)
 - pnpm 11+
 - Git
 
@@ -289,7 +289,7 @@ const CommerceMap = dynamic(() => import('./CommerceMap').then(mod => mod.Commer
 ### Erro "Must use import to load ES Module" no Jest (backend)
 **Causa:** NestJS 12 publica pacotes ESM-only; o Jest (CJS) precisa da flag `--experimental-vm-modules`.
 
-**Correcao:** Rodar os testes via `pnpm --filter backend test` (o script ja embute `node --experimental-vm-modules`). A CI usa o mesmo setup em Node 22 (`NODE_OPTIONS="--experimental-vm-modules" npx jest`).
+**Correcao:** Rodar os testes via `pnpm --filter backend test` (o script ja embute `node --experimental-vm-modules`). A CI usa o mesmo setup em Node 24 (`NODE_OPTIONS="--experimental-vm-modules" npx jest`).
 
 ### RefreshService nao atualiza dados
 **Causa:** Endpoint de refresh nao configurado ou CRON_SECRET incorreto.
@@ -654,7 +654,7 @@ Variáveis configuradas no Vercel Dashboard (Settings → Environment Variables)
 
 Pipeline ativo em `.github/workflows/ci.yml`:
 
-**Jobs:** (todos em Node 22)
+**Jobs:** (todos em Node 24)
 - `backend-test`: Jest (103 testes) — `NODE_OPTIONS="--experimental-vm-modules" npx jest`
 - `frontend-test`: Vitest (37 testes)
 - `lint`: oxlint (frontend)
