@@ -7,7 +7,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     await import("@nestjs/core");
     parts.push("dynamicImport@nestjs/core=OK");
   } catch (e) {
-    const err = e as Error;
+    const err = e as Error & { code?: string };
     parts.push(`dynamicImport@nestjs/core=FAIL(${err.code || err.name}: ${err.message.slice(0, 200)})`);
   }
 
@@ -29,7 +29,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     res.end(parts.join(" | "));
     return;
   } catch (e) {
-    const err = e as Error;
+    const err = e as Error & { code?: string };
     parts.push(`bootstrap=FAIL(${err.code || err.name}: ${err.message.slice(0, 300)})`);
     res.statusCode = 500;
     res.end(parts.join(" | "));
