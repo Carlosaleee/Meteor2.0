@@ -32,10 +32,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   }
 
   try {
-    const { NestFactory } = (await nativeImport("@nestjs/core")) as never;
-    const { ExpressAdapter } = (await nativeImport("@nestjs/platform-express")) as never;
-    const { AppModule } = (await nativeImport(pathToFileURL(join(__dirname, "../src/app.module.js")).href)) as never;
-    const express = ((await nativeImport("express")) as { default: never }).default;
+    const { NestFactory } = (await nativeImport("@nestjs/core")) as any;
+    const { ExpressAdapter } = (await nativeImport("@nestjs/platform-express")) as any;
+    const { AppModule } = (await nativeImport(pathToFileURL(join(__dirname, "../src/app.module.js")).href)) as any;
+    const express = ((await nativeImport("express")) as any).default;
 
     const app = express();
     const instance = await NestFactory.create(AppModule, new ExpressAdapter(app), {
