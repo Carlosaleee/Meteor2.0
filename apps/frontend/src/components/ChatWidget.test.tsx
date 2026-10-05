@@ -84,6 +84,10 @@ describe('ChatWidget', () => {
     fireEvent.click(screen.getByRole('button', { name: /enviar/i }));
 
     expect(screen.getByText('oi')).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText('Ok')).toBeInTheDocument();
+    });
   });
 
   it('should show error when API fails', async () => {

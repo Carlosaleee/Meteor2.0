@@ -1,5 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
+import { fetchAPI } from '@/lib/api';
 import { useComercio } from './useComercio';
 
 vi.mock('@/lib/api', () => ({
@@ -7,6 +8,11 @@ vi.mock('@/lib/api', () => ({
 }));
 
 describe('useComercio', () => {
+  beforeEach(() => {
+    vi.mocked(fetchAPI).mockReset();
+    vi.mocked(fetchAPI).mockReturnValue(new Promise(() => {}));
+  });
+
   it('should return loading state initially', () => {
     const { result } = renderHook(() => useComercio());
     expect(result.current.loading).toBe(true);

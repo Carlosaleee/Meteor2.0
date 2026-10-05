@@ -1,5 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
+import { fetchAPI } from '@/lib/api';
 import { useSwell } from './useSwell';
 
 vi.mock('@/lib/api', () => ({
@@ -7,6 +8,11 @@ vi.mock('@/lib/api', () => ({
 }));
 
 describe('useSwell', () => {
+  beforeEach(() => {
+    vi.mocked(fetchAPI).mockReset();
+    vi.mocked(fetchAPI).mockReturnValue(new Promise(() => {}));
+  });
+
   it('should return loading state initially', () => {
     const { result } = renderHook(() => useSwell());
     expect(result.current.loading).toBe(true);
