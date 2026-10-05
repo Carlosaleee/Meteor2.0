@@ -2,11 +2,10 @@
   "name": "backend",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "scripts": {
-    "build": "node scripts/write-dist-flag.cjs && nest build",
-    "dev": "node scripts/write-dist-flag.cjs && nest start --watch",
-    "start": "node scripts/write-dist-flag.cjs && node dist/main.js",
+    "build": "nest build",
+    "dev": "nest start --watch",
+    "start": "node dist/main.js",
     "lint": "eslint \"src/**/*.ts\" \"api/**/*.ts\" \"test/**/*.ts\" --no-error-on-unmatched-pattern",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch"
