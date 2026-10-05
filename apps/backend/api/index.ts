@@ -35,10 +35,18 @@ async function bootstrap(): Promise<NestApp> {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
-  const app = await bootstrap();
-  const instance = app.getHttpAdapter().getInstance() as (
-    req: VercelRequest,
-    res: VercelResponse,
-  ) => void | Promise<void>;
-  await instance(req, res);
+  try {
+    const app = await bootstrap();
+    const instance = app.getHttpAdapter().getInstance() as (
+      req: VercelRequest,
+      res: VercelResponse,
+    ) => void | Promise<void>;
+    await instance(req, res);
+  } catch (err) {
+    // diagnostico temporario: expoe a causa do crash de boot em producao
+    const e = err as Error;
+    res.statusCode = 500;
+    res.setHeader("content-type", "text/plain; charset=utf-8");
+    res.end(`BOOT_ERROR: ${e?.name}: ${e?.message}\n${(e?.stack || "").split("\n").slice(0, 6).join("\n")}`);
+  }
 }
