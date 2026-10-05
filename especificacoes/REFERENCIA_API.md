@@ -1,6 +1,6 @@
 ﻿# Referencia da API — Meteor 2.0
 
-> **Ultima atualizacao:** 24/09/2026 (review 2026-09: +4 endpoints, rate limit 60 loopback, envelope global)
+> **Ultima atualizacao:** 05/10/2026 (recuperacao: CI + typecheck + backend serverless na Vercel + dados frescos; +4 testes)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [../README.md](../README.md)
 
@@ -681,7 +681,9 @@ O backend aceita requisicoes do frontend configurado em `FRONTEND_ORIGIN` (defau
 
 Quando uma API externa falha, o sistema retorna dados do fallback diario salvo em disco. O frontend mostra o horario da ultima atualizacao para transparencia.
 
-Para forcar atualizacao do fallback, basta aguardar 24h ou reiniciar o backend (que re-busca dados na proxima requisicao).
+Para forcar atualizacao do fallback: `POST /v1/cron/refresh`, aguardar o cron (1h/6h) ou reiniciar o backend local (que re-busca dados na proxima requisicao).
+
+> **Serverless (Vercel):** a raiz do bundle e read-only — o `FallbackService` escreve em `/tmp` (persistente por instancia quente) e le em cascata (`/tmp` → cwd). Sem instancia quente, as APIs externas sao a fonte primaria.
 
 ---
 
@@ -736,9 +738,37 @@ Retorna o status do agente de refresh automatico.
 
 ---
 
+## GET /v1/cron/refresh
+
+Refresh manual/agendado via **GET** — a Vercel so dispara crons com GET (`POST` continua aceito para uso manual).
+
+**Autenticacao (qualquer uma):**
+| Fonte | Como |
+|-------|------|
+| Header | `x-cron-secret: <CRON_SECRET>` |
+| Query | `?secret=<CRON_SECRET>` |
+| Vercel Cron | header `x-vercel-cron: 1` (enviado automaticamente pela Vercel) |
+
+**Query Parameters:**
+| Parametro | Tipo | Obrigatorio | Descricao |
+|-----------|------|-------------|-----------|
+| scope | string | Nao | `news` (padrao: `all`) — `news` roda so rankings + noticias + regionais (leve) |
+
+**Exemplo:**
+```
+GET /v1/cron/refresh?scope=news
+GET /v1/cron/refresh          (refresh completo)
+```
+
+**Response:** mesmo formato do `POST /v1/cron/refresh` abaixo.
+
+**Crons na Vercel** (em `apps/backend/vercel.json`): `0 * * * *` → `?scope=news` (leve) e `0 */6 * * *` → completo. Em serverless o `RefreshService` **nao** agenda refresh no startup (o filesystem e efemero); o agendamento vem dos crons.
+
+---
+
 ## POST /v1/cron/refresh
 
-Forca refresh manual de todas as fontes de dados.
+Forca refresh manual de todas as fontes de dados. Aceita `scope=news` igual ao GET.
 
 **Headers:**
 | Header | Tipo | Obrigatorio | Descricao |

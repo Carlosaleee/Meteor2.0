@@ -1,6 +1,6 @@
 ﻿# Guia do Desenvolvedor — Meteor 2.0
 
-> **Ultima atualizacao:** 24/09/2026 (review completo: limpeza de codigo morto, 7 rotas, 136 testes)
+> **Ultima atualizacao:** 05/10/2026 (recuperacao: CI verde, typecheck frontend, backend serverless Vercel — 140 testes)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -61,10 +61,10 @@ pnpm format
 
 ## Testes
 
-**Total: 136 testes — backend Jest 30 (99) + frontend Vitest (37)**
+**Total: 140 testes — backend Jest 30 (103) + frontend Vitest (37)**
 
 ```bash
-# Backend (99 testes — o script ja embute --experimental-vm-modules)
+# Backend (103 testes — o script ja embute --experimental-vm-modules)
 pnpm --filter backend test
 
 # Frontend (37 testes — Vitest + React Testing Library)
@@ -73,7 +73,7 @@ pnpm --filter frontend test
 
 | Suite | Runner | Testes | Observacao |
 |-------|--------|--------|------------|
-| `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 99 | 20 arquivos `*.spec.ts` |
+| `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 103 | 20 arquivos `*.spec.ts` |
 | `apps/frontend` | Vitest + RTL + jsdom | 37 | 9 arquivos `*.test.{ts,tsx}` |
 
 Detalhamento por arquivo: [SYSTEM_SPEC.md §9](./SYSTEM_SPEC.md#9-cobertura-de-testes).
@@ -655,7 +655,7 @@ Variáveis configuradas no Vercel Dashboard (Settings → Environment Variables)
 Pipeline ativo em `.github/workflows/ci.yml`:
 
 **Jobs:** (todos em Node 22)
-- `backend-test`: Jest (99 testes) — `NODE_OPTIONS="--experimental-vm-modules" npx jest`
+- `backend-test`: Jest (103 testes) — `NODE_OPTIONS="--experimental-vm-modules" npx jest`
 - `frontend-test`: Vitest (37 testes)
 - `lint`: oxlint (frontend)
 - `build`: valida backend + frontend (após testes)

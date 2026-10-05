@@ -1,6 +1,6 @@
 # Especificacao Tecnica — Meteor 2.0
 
-> **Ultima atualizacao:** 24/09/2026 (review completo: limpeza de codigo morto, 7 rotas, 136 testes)
+> **Ultima atualizacao:** 05/10/2026 (recuperacao: CI verde, typecheck frontend, backend serverless Vercel, dados frescos — 140 testes)
 >
 > **Documentos relacionados:** [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -135,13 +135,15 @@
 - Fallback final: medias sazonais da regiao
 
 ### 4.9 RefreshService (Automacao)
-- **Startup:** Executa refresh de todos os módulos ao iniciar (`onModuleInit`)
+- **Startup:** Executa refresh de todos os módulos ao iniciar (`onModuleInit`) — **pulado em serverless** (`process.env.VERCEL`): filesystem efemero, o agendamento vem dos crons da Vercel
 - **Cron pesado:** a cada 6 horas (`@Cron('0 */6 * * *')`) — meteorologia, oceanografia, weather news, rankings, noticias, regionais
 - **Cron de noticias:** a cada 1 hora (`@Cron('0 * * * *')`) → `refreshNews()` — apenas rankings WSL + noticias + regionais (leve)
 - **Modulos afetados:** Meteorologia, Oceanografia, Noticias (WSL + SPSurf), Noticias Regionais (RSS)
 - **Endpoints:**
   - `GET /v1/cron/status` — Retorna ultimo refresh (`lastRefresh`, `lastNewsRefresh`) e status
   - `POST /v1/cron/refresh` — Forca refresh completo manual (autenticado via `CRON_SECRET`)
+  - `GET /v1/cron/refresh` — Mesmo refresh via GET (a Vercel so dispara crons com GET); autentica por `x-cron-secret`, `?secret=` ou header automatico `x-vercel-cron: 1`; aceita `scope=news` para o refresh leve
+- **Crons da Vercel** (`apps/backend/vercel.json`): `0 * * * *` → `?scope=news`, `0 */6 * * *` → completo
 - **Metodos novos nos repositories:**
   - `open-meteo.repository.ts`: `forceRefresh(lat, lon)`
   - `marine.repository.ts`: `forceRefresh(lat, lon)`
@@ -205,11 +207,13 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 **Arquivos de fallback:**
 - data/fallback-meteorology.json — Dados por localizacao (current + hourly + daily)
 - data/fallback-oceanography.json — Ondas, swell, marees, spots
-- data/fallback-traffic.json — Rodovias com simulacao por horario
-- data/fallback-comercio.json — 50 comercios de Ilha Comprida
+- data/fallback-traffic.json — Rodovias com simulacao por horario (estatico — sem API externa)
+- data/fallback-comercio.json — 50 comercios de Ilha Comprida (estatico — sem API externa)
 - data/fallback-noticias-regionais.json — rolling 30 noticias regionais (RSS auto) + 5 rotas de transito
 - data/fallback-news.json — Noticias WSL + SPSurf
 - data/fallback-weather-news.json — Criado em runtime pelo weather-news.repository (pode nao existir em clone novo)
+
+> **Nota:** `apps/backend/data/*.json` e **gitignored** (auto-gerado) — clones novos criam os JSONs na primeira requisicao bem-sucedida. Em serverless a escrita vai para `/tmp`.
 
 **Automacao de refresh:**
 - Startup: todos os dados sao atualizados ao iniciar o backend
@@ -267,13 +271,14 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 
 ## 9. Cobertura de Testes
 
-**Total: 136 testes (136 passam) — backend Jest 30 (99) + frontend Vitest (37)**
+**Total: 140 testes (140 passam) — backend Jest 30 (103) + frontend Vitest (37)**
 
-### Backend (Jest) — 99 testes em 20 arquivos
+### Backend (Jest) — 103 testes em 20 arquivos
 | Arquivo | Testes | Status |
 |---------|--------|--------|
 | refresh.service.spec.ts | 15 | ✅ |
 | noticias-regionais.repository.spec.ts | 11 | ✅ (RSS com mock) |
+| cron.controller.spec.ts | 8 | ✅ (POST + GET Vercel cron + scope) |
 | wsl.repository.spec.ts | 7 | ✅ (fixture WSL real) |
 | gemini-chat.repository.spec.ts | 6 | ✅ |
 | iron.service.spec.ts | 6 | ✅ |
@@ -281,7 +286,6 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 | meteorology.service.spec.ts | 5 | ✅ |
 | weather-news.repository.spec.ts | 5 | ✅ |
 | comercio.service.spec.ts | 4 | ✅ |
-| cron.controller.spec.ts | 4 | ✅ |
 | gemini.repository.spec.ts | 4 | ✅ |
 | news.service.spec.ts | 4 | ✅ |
 | noticias-regionais.service.spec.ts | 4 | ✅ |
@@ -616,16 +620,27 @@ Configurado em: `apps/frontend/.env.production`
 | `GEMINI_TEMPERATURE` | `0.7` | Temperatura Gemini |
 | `FALLBACK_DIR` | `data` | Diretório de fallback |
 
+#### Backend serverless (arquivos no repo)
+| Arquivo | Papel |
+|---------|-------|
+| `apps/backend/api/index.ts` | Handler da função — NestJS via `ExpressAdapter` + helmet + CORS |
+| `apps/backend/vercel.json` | `builds`/`routes` (todas as rotas → handler), `regions: gru1`, `maxDuration: 30`, `includeFiles: ../data/*.json`, crons 1h/6h |
+| `apps/backend/package.json` | deps `express` + `@vercel/node` |
+
+> **Validação (05/10):** handler compilado e invocado localmente com `VERCEL=1` → `/health`, `/v1/cron/status` e `/v1/comercio/commerce` retornaram 200 e o startup refresh foi pulado corretamente.
+
 ### CI/CD (GitHub Actions)
 
 Pipeline em `.github/workflows/ci.yml`:
 
 | Job | Descrição | Trigger |
 |-----|-----------|---------|
-| `backend-test` | Jest (99 testes) | push/PR |
+| `backend-test` | Jest (103 testes) | push/PR |
 | `frontend-test` | Vitest (37 testes) | push/PR |
 | `lint` | oxlint (frontend) | push/PR |
 | `build` | Valida compilação | Após testes |
+
+> **pnpm na CI:** `pnpm/action-setup@v4` sem input `version` — a versão única vem de `packageManager: pnpm@11.10.0` no `package.json` (ter os dois causava o erro *"Multiple versions of pnpm"* que deixou a CI vermelha).
 
 ### Estrutura DevOps
 

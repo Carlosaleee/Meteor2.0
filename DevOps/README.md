@@ -66,26 +66,25 @@ O backend usa filesystem para fallback (`data/*.json`), por isso Railway é a op
    - Health Check Path: `/health`
 5. Adicionar variáveis de ambiente (copiar de `DevOps/env/.env.backend.example`)
 
-### Opção 3: Vercel Serverless (Alternativa — Stateless)
+### Opção 3: Vercel Serverless (✅ IMPLEMENTADO — estado atual)
 
-> ⚠️ **Atenção:** O Vercel serverless NÃO suporta filesystem. O sistema de fallback será desabilitado.
+> **Em produção desde 05/10/2026.** Os arquivos **já existem no repo** (não é preciso copiar nada):
+> - `apps/backend/api/index.ts` — handler NestJS + `ExpressAdapter` + helmet + CORS
+> - `apps/backend/vercel.json` — routes, crons 1h/6h, `maxDuration: 30`, `includeFiles: ../data/*.json`
+> - deps `express` + `@vercel/node` no `apps/backend/package.json`
 
-1. Criar projeto `meteor2-0-backend` no Vercel
-2. Configurar build:
-   - Root Directory: `apps/backend`
-   - Build Command: `pnpm install && pnpm build`
-   - Output Directory: `dist`
-3. Copiar `DevOps/backend/vercel.json` para `apps/backend/vercel.json`
-4. Copiar `DevOps/backend/api/index.ts` para `apps/backend/api/index.ts`
-5. Instalar dependências serverless:
-   ```bash
-   cd apps/backend
-   pnpm add @nestjs/platform-fastify @vercel/node
-   ```
+**Configuração no painel Vercel:**
+1. Projeto `meteor2-0-backend` — Root Directory: `apps/backend`
+2. Build Command: `pnpm install && pnpm build` (o `@vercel/node` compila `api/index.ts`)
+3. Variáveis de ambiente: ver tabela acima (`FRONTEND_ORIGIN`, `GEMINI_API_KEY`, `CRON_SECRET`, `NODE_ENV=production`)
+
+**Comportamento em serverless:**
+- `FallbackService` escreve em `/tmp` (raiz do bundle é read-only) e lê em cascata (`/tmp` → cwd)
+- `RefreshService` **não** agenda refresh no startup; o agendamento vem dos **crons da Vercel** (definidos em `vercel.json`), que chamam `GET /v1/cron/refresh` (header automático `x-vercel-cron: 1`; `?scope=news` para o refresh leve)
+- `maxDuration: 30` cobre Gemini (`/v1/oceanography/summary`, `/v1/iron/chat`)
 
 **Limitações:**
-- Fallback desabilitado (apenas APIs externas)
-- Timeout de 10s por requisição
+- Fallback efêmero (persiste só por instância quente)
 - Cold start possível
 
 ---
@@ -155,8 +154,8 @@ cp DevOps/github-actions/ci.yml .github/workflows/ci.yml
 - Verificar CORS: o backend deve aceitar a origem do frontend
 
 ### Fallback não funciona no Vercel
-- **Esperado:** Vercel serverless é stateless
-- **Solução:** Usar Railway/Render para o backend, ou desabilitar fallback
+- **Comportamento:** em serverless o `FallbackService` grava em `/tmp` — persiste só enquanto a instância estiver quente
+- **Alternativa stateful:** Railway/Render (arquivos `railway.json`/`render.yaml` em `DevOps/backend/`)
 
 ### Build falha no Vercel
 - Verificar se `pnpm install --frozen-lockfile` funciona localmente
