@@ -3,6 +3,9 @@
 .env.local
 .env.*.local
 
+# vercel link (CLI)
+.vercel/
+
 # deps & build
 node_modules/
 dist/
