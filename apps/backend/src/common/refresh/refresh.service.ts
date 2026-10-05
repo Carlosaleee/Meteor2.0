@@ -34,6 +34,10 @@ export class RefreshService implements OnModuleInit {
   ) {}
 
   onModuleInit() {
+    if (process.env.VERCEL) {
+      this.logger.log('Serverless environment — startup refresh skipped (Vercel crons own the schedule)');
+      return;
+    }
     this.logger.log('RefreshService initialized — scheduling data refresh...');
     setTimeout(() => this.refreshAll(), 5000);
   }
