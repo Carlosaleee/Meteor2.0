@@ -1,5 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { FallbackService } from '../../common/fallback/fallback.service';
+import { fetchWithTimeout } from '../../common/http/fetch-timeout';
+import { spNowKey, hourKeyFromNaive } from '../../common/time/sp-time';
 
 const FALLBACK_FILE = 'fallback-oceanography.json';
 
@@ -38,7 +40,7 @@ export class MarineRepository {
     this.logger.log('Force refreshing oceanography data...');
     try {
       const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&current=wave_height,wave_direction,wave_period,swell_wave_height,swell_wave_direction,swell_wave_period,wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=America/Sao_Paulo`;
-      const res = await fetch(url);
+      const res = await fetchWithTimeout(url);
       if (!res.ok) throw new Error(`Open-Meteo Marine returned ${res.status}`);
       const data = await res.json();
       const raw = data.current as MarineData | undefined;
@@ -68,7 +70,7 @@ export class MarineRepository {
 
     try {
       const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&current=wave_height,wave_direction,wave_period,swell_wave_height,swell_wave_direction,swell_wave_period,wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=America/Sao_Paulo`;
-      const res = await fetch(url);
+      const res = await fetchWithTimeout(url);
       if (!res.ok) throw new Error(`Open-Meteo Marine returned ${res.status}`);
       const data = await res.json();
       const raw = data.current as MarineData | undefined;
@@ -80,7 +82,7 @@ export class MarineRepository {
           wind_direction_10m: raw.wind_direction_10m ?? 180,
           wind_gusts_10m: raw.wind_gusts_10m ?? 18,
         };
-        this.saveFallback(current);
+        await this.saveFallback(current);
         this.logger.log(`Marine data: wave=${current.wave_height}m, wind=${current.wind_speed_10m}km/h`);
         return current;
       }
@@ -99,7 +101,7 @@ export class MarineRepository {
   async getHourlyData(lat: number, lon: number): Promise<HourlyMarineData[]> {
     try {
       const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&hourly=wave_height,wave_direction,wave_period,swell_wave_height,swell_wave_direction,swell_wave_period,wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=America/Sao_Paulo&forecast_days=2`;
-      const res = await fetch(url);
+      const res = await fetchWithTimeout(url);
       if (!res.ok) throw new Error(`Open-Meteo Marine hourly returned ${res.status}`);
       const data = await res.json();
 
@@ -118,11 +120,12 @@ export class MarineRepository {
 
       if (!hourly?.time) return this.getDefaultHourly();
 
-      const now = new Date();
+      const nowKey = spNowKey();
       const result: HourlyMarineData[] = [];
       for (let i = 0; i < hourly.time.length && result.length < 12; i++) {
-        const t = new Date(hourly.time[i]);
-        if (t < now) continue;
+        // Timestamps naive de SP — comparar com a hora atual de SP, nao com o
+        // relógio UTC do processo (Vercel).
+        if (hourKeyFromNaive(hourly.time[i]) < nowKey) continue;
         const windSpeed = hourly.wind_speed_10m[i];
         const windDir = hourly.wind_direction_10m[i];
         const windGust = hourly.wind_gusts_10m[i];
@@ -171,11 +174,16 @@ export class MarineRepository {
   }
 
   private getDefaultHourly(): HourlyMarineData[] {
-    const now = new Date();
+    // Gerado em "wall clock" de SP (naive), coerente com o formato da API.
+    const [date, hour] = spNowKey().split('T');
+    const base = new Date(`${date}T${hour}:00:00`);
+    const pad = (n: number) => String(n).padStart(2, '0');
     return Array.from({ length: 12 }, (_, i) => {
-      const t = new Date(now.getTime() + (i + 1) * 3600_000);
+      const t = new Date(base.getTime());
+      t.setHours(t.getHours() + (i + 1));
+      const time = `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}T${pad(t.getHours())}`;
       return {
-        time: t.toISOString().slice(0, 16),
+        time,
         waveHeight: 0.8 + Math.sin(i / 4) * 0.4,
         wavePeriod: 8 + Math.sin(i / 3) * 2,
         waveDirection: 140 + Math.sin(i / 5) * 20,

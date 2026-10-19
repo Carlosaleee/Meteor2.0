@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { FallbackService } from '../../common/fallback/fallback.service';
+import { fetchWithTimeout } from '../../common/http/fetch-timeout';
 
 const FALLBACK_FILE = 'fallback-weather-news.json';
 
@@ -11,11 +12,15 @@ export type WeatherNewsItem = {
   type: 'alerta' | 'informe' | 'boletim';
   url: string;
   publishedAt: string;
+  /** true = item sintetico de exemplo (nunca inventar alertas reais). */
+  sample?: boolean;
 };
 
 export type WeatherNewsResponse = {
   news: WeatherNewsItem[];
   timestamp: string;
+  /** Proveniencia: live (API agora), cached (fallback em disco) ou sample (exemplo sintetico). */
+  source?: 'live' | 'cached' | 'sample';
 };
 
 @Injectable()
@@ -32,7 +37,7 @@ export class WeatherNewsRepository {
         ? cached.news.filter(n => n.cityId === cityId)
         : cached.news;
       if (filtered.length > 0) {
-        return { news: filtered, timestamp: new Date().toISOString() };
+        return { news: filtered, timestamp: new Date().toISOString(), source: 'cached' };
       }
     }
 
@@ -41,7 +46,7 @@ export class WeatherNewsRepository {
       if (news.length > 0) {
         await this.fallback.save(FALLBACK_FILE, { news });
         const filtered = cityId ? news.filter(n => n.cityId === cityId) : news;
-        return { news: filtered, timestamp: new Date().toISOString() };
+        return { news: filtered, timestamp: new Date().toISOString(), source: 'live' };
       }
     } catch (err) {
       this.logger.warn(`Failed to fetch weather news: ${err}`);
@@ -49,7 +54,7 @@ export class WeatherNewsRepository {
 
     const defaults = this.getDefault();
     const filtered = cityId ? defaults.filter(n => n.cityId === cityId) : defaults;
-    return { news: filtered, timestamp: new Date().toISOString() };
+    return { news: filtered, timestamp: new Date().toISOString(), source: 'sample' };
   }
 
   async forceRefresh(): Promise<void> {
@@ -79,7 +84,7 @@ export class WeatherNewsRepository {
 
   private async fetchFromInmet(): Promise<WeatherNewsItem[]> {
     try {
-      const res = await fetch('https://apitempo.inmet.gov.br/estacoes/T', {
+      const res = await fetchWithTimeout('https://apitempo.inmet.gov.br/estacoes/T', {
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MeteorBot/1.0)' },
       });
       if (!res.ok) throw new Error(`INMET returned ${res.status}`);
@@ -159,7 +164,7 @@ export class WeatherNewsRepository {
 
   private async fetchFromCptec(): Promise<WeatherNewsItem[]> {
     try {
-      const res = await fetch('https://www.cptec.inpe.br/', {
+      const res = await fetchWithTimeout('https://www.cptec.inpe.br/', {
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MeteorBot/1.0)' },
       });
       if (!res.ok) throw new Error(`CPTEC returned ${res.status}`);
@@ -206,7 +211,7 @@ export class WeatherNewsRepository {
 
   private async fetchFromDefesaCivil(): Promise<WeatherNewsItem[]> {
     try {
-      const res = await fetch('https://www.defesacivil.sp.gov.br/', {
+      const res = await fetchWithTimeout('https://www.defesacivil.sp.gov.br/', {
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MeteorBot/1.0)' },
       });
       if (!res.ok) throw new Error(`Defesa Civil returned ${res.status}`);
@@ -248,17 +253,19 @@ export class WeatherNewsRepository {
     }
   }
 
+  /**
+   * Itens EXEMPLO (nunca alertas reais inventados!): neutros, todos `boletim`,
+   * marcados `sample: true` e com timestamp congelado — para nunca aparecerem
+   * como "alerta ativo agora" nem passarem por dados frescos.
+   */
   private getDefault(): WeatherNewsItem[] {
-    const now = new Date();
+    const frozen = '2026-01-01T12:00:00.000Z';
     return [
-      { id: 'default-1', cityId: 'ilha-comprida', title: 'Avisos meteorológicos ativos para o litoral sul de SP', source: 'INMET', type: 'alerta', url: 'https://avisos.inmet.gov.br/', publishedAt: new Date(now.getTime() - 3600000).toISOString() },
-      { id: 'default-2', cityId: 'ilha-comprida', title: 'Previsão do tempo para Ilha Comprida — Próximos 7 dias', source: 'CPTEC/INPE', type: 'boletim', url: 'https://www.cptec.inpe.br/', publishedAt: new Date(now.getTime() - 7200000).toISOString() },
-      { id: 'default-3', cityId: 'iguape', title: 'Monitoramento de cheias no rio Iguape e estuário', source: 'Defesa Civil SP', type: 'informe', url: 'https://www.defesacivil.sp.gov.br/', publishedAt: new Date(now.getTime() - 3600000).toISOString() },
-      { id: 'default-4', cityId: 'iguape', title: 'Condições meteorológicas para Iguape — Boletim diário', source: 'INMET', type: 'boletim', url: 'https://portal.inmet.gov.br/', publishedAt: new Date(now.getTime() - 7200000).toISOString() },
-      { id: 'default-5', cityId: 'cananeia', title: 'Alerta de tempo severo para o litoral sul paulista', source: 'INMET', type: 'alerta', url: 'https://avisos.inmet.gov.br/', publishedAt: new Date(now.getTime() - 3600000).toISOString() },
-      { id: 'default-6', cityId: 'cananeia', title: 'Previsão numérica para Cananéia — Modelo COSMO', source: 'CPTEC/INPE', type: 'boletim', url: 'https://previsaonumerica.cptec.inpe.br/', publishedAt: new Date(now.getTime() - 7200000).toISOString() },
-      { id: 'default-7', cityId: 'registro', title: 'Boletim climático do Vale do Ribeira', source: 'INMET', type: 'boletim', url: 'https://portal.inmet.gov.br/', publishedAt: new Date(now.getTime() - 3600000).toISOString() },
-      { id: 'default-8', cityId: 'registro', title: 'Defesa Civil mantém monitoramento preventivo na região', source: 'Defesa Civil SP', type: 'informe', url: 'https://www.defesacivil.sp.gov.br/', publishedAt: new Date(now.getTime() - 7200000).toISOString() },
+      { id: 'default-1', cityId: 'ilha-comprida', title: 'Exemplo: fontes meteorológicas indisponíveis — consulte INMET', source: 'Meteor (exemplo)', type: 'boletim', url: 'https://portal.inmet.gov.br/', publishedAt: frozen, sample: true },
+      { id: 'default-2', cityId: 'ilha-comprida', title: 'Exemplo: previsão do tempo para Ilha Comprida — fonte CPTEC/INPE', source: 'Meteor (exemplo)', type: 'boletim', url: 'https://www.cptec.inpe.br/', publishedAt: frozen, sample: true },
+      { id: 'default-3', cityId: 'iguape', title: 'Exemplo: monitoramento do rio Iguape — fonte Defesa Civil SP', source: 'Meteor (exemplo)', type: 'boletim', url: 'https://www.defesacivil.sp.gov.br/', publishedAt: frozen, sample: true },
+      { id: 'default-4', cityId: 'cananeia', title: 'Exemplo: boletim meteorológico para Cananéia — fonte INMET', source: 'Meteor (exemplo)', type: 'boletim', url: 'https://portal.inmet.gov.br/', publishedAt: frozen, sample: true },
+      { id: 'default-5', cityId: 'registro', title: 'Exemplo: clima do Vale do Ribeira — fonte CPTEC/INPE', source: 'Meteor (exemplo)', type: 'boletim', url: 'https://www.cptec.inpe.br/', publishedAt: frozen, sample: true },
     ];
   }
 }
