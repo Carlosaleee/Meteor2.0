@@ -169,49 +169,52 @@ export class SpsurfRepository {
     return `https://www.spsurf.com.br${href.startsWith('/') ? '' : '/'}${href}`;
   }
 
+  /**
+   * Notícias de EXEMPLO com datas CONGELADas (set/2026) — nunca relativas:
+   * datas relativas passariam por frescor real e sempre passariam no filtro de 7 dias.
+   */
   private getDefaultNews(): SpsurfNewsItem[] {
-    const now = new Date();
     return [
       {
         title: 'Hang Loose Surf Attack 2026 — 288 vagas record na 33a edicao em Maresias',
         description: 'Maior premiacao da historia com R$ 50 mil. Evento de 30/09 a 03/10 na Praia de Camburi, Sao Sebastiao. Categorias Sub12 a Sub18.',
         url: 'https://www.spsurf.com.br/hangloosesurfattack',
-        publishedAt: new Date(now.getTime() - 1 * 86400000).toISOString(),
+        publishedAt: '2026-09-15T12:00:00.000Z',
         image: '',
       },
       {
         title: 'Rip Curl GromSearch Maresias 2026 reune nova geracao do surf brasileiro',
         description: 'Arthur Vilar e Isabel Meyer classificados para final internacional na Australia. Evento com excelentes condicoes de onda em Maresias.',
         url: 'https://blog.ripcurl.com.br/2026/09/10/rip-curl-gromsearch-maresias-2026-reune-a-nova-geracao-do-surf-brasileiro/',
-        publishedAt: new Date(now.getTime() - 2 * 86400000).toISOString(),
+        publishedAt: '2026-09-11T12:00:00.000Z',
         image: '',
       },
       {
         title: 'Circuito Santos de Surf 2026 coroa campeoes em nove categorias',
         description: 'Cerca de 90 surfistas disputaram titulos no Novo Quebra-Mar. Bruno Franca campeao Open Masculino, Isabelly Knut dupla campia.',
         url: 'https://jornaldaorla.com.br/noticias/circuito-santos-de-surf-2026-coroa-campeoes-em-nove-categorias/',
-        publishedAt: new Date(now.getTime() - 3 * 86400000).toISOString(),
+        publishedAt: '2026-09-08T12:00:00.000Z',
         image: '',
       },
       {
         title: 'SPSurf passa a ser nova entidade reguladora do surfe em Sao Paulo',
         description: 'Com apoio de 12 das 15 associacoes do litoral paulista, SPSurf assume a regulacao do surfe profissional e amador.',
         url: 'https://www.spsurf.com.br',
-        publishedAt: new Date(now.getTime() - 4 * 86400000).toISOString(),
+        publishedAt: '2026-09-05T12:00:00.000Z',
         image: '',
       },
       {
         title: 'Banco do Brasil Sao Sebastiao Pro — WSL chega ao litoral paulista pela 1a vez',
         description: 'Etapa do Challenger Series em Sao Sebastiao de 26/09 a 03/10 na Praia de Maresias. Evento historico para o surfe paulista.',
         url: 'https://www.terra.com.br/esportes/surfe/berco-de-gabriel-medina-litoral-de-sp-recebe-etapa-mundial-da-wsl-pela-primeira-vez',
-        publishedAt: new Date(now.getTime() - 5 * 86400000).toISOString(),
+        publishedAt: '2026-09-14T12:00:00.000Z',
         image: '',
       },
       {
         title: 'Longboard Paulista Pro 2026 sera realizado em Peruibe',
         description: 'A cidade de Peruibe recebe o Longboard Paulista Pro 2026, competicao das categorias Masculino e Feminino.',
         url: 'https://www.spsurf.com.br',
-        publishedAt: new Date(now.getTime() - 6 * 86400000).toISOString(),
+        publishedAt: '2026-09-03T12:00:00.000Z',
         image: '',
       },
     ];

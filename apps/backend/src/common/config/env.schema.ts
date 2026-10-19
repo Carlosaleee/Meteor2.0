@@ -7,7 +7,10 @@ export const envSchema = z.object({
   FALLBACK_DIR: z.string().default("data"),
   FALLBACK_MAX_AGE_HOURS: z.coerce.number().int().positive().default(24),
   GEMINI_API_KEY: z.string().optional().default(""),
-  GEMINI_MODEL: z.string().default("gemini-2.5-flash"),
+  GEMINI_MODEL: z.string().default("gemini-flash-latest"),
+  GEMINI_EMBEDDING_MODEL: z.string().default("gemini-embedding-2"),
+  /** Dimensão dos vetores do RAG — menor = índice menor; 128 basta p/ ~200 chunks. */
+  GEMINI_EMBEDDING_DIMS: z.coerce.number().int().positive().max(3072).default(128),
   GEMINI_TEMPERATURE: z.coerce.number().min(0).max(2).default(0.7),
   GEMINI_API_BASE_URL: z.string().url().default("https://generativelanguage.googleapis.com/v1beta/models"),
   STORMGLASS_API_KEY: z.string().optional().default(""),

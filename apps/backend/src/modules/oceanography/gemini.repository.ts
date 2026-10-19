@@ -1,6 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import type { Env } from '../../common/config/env.schema';
+import { Injectable } from '@nestjs/common';
+import { GeminiClientService } from '../../common/ai/gemini-client.service';
 
 type MarineSnapshot = {
   waveHeight: number;
@@ -20,56 +19,16 @@ type MarineSnapshot = {
 
 @Injectable()
 export class GeminiRepository {
-  private readonly logger = new Logger(GeminiRepository.name);
-  private genAi: unknown = null;
-
-  constructor(private readonly config: ConfigService<Env>) {}
-
-  private getClient(): unknown {
-    if (this.genAi) return this.genAi;
-
-    const apiKey = this.config.get('GEMINI_API_KEY');
-    if (!apiKey) {
-      this.logger.warn('GEMINI_API_KEY not configured');
-      return null;
-    }
-
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { GoogleGenAI } = require('@google/genai');
-      this.genAi = new GoogleGenAI({ apiKey });
-      return this.genAi;
-    } catch (err) {
-      this.logger.warn(`Failed to initialize Gemini: ${err}`);
-      return null;
-    }
-  }
+  constructor(private readonly gemini: GeminiClientService) {}
 
   async generateSummary(data: MarineSnapshot): Promise<string> {
-    const client = this.getClient();
-    if (!client) return this.getFallbackSummary(data);
+    const text = await this.gemini.generateText({
+      prompt: this.buildPrompt(data),
+      maxOutputTokens: 2500,
+    });
 
-    try {
-      const model = this.config.get('GEMINI_MODEL') ?? 'gemini-2.5-flash';
-      const prompt = this.buildPrompt(data);
-
-       
-      const response = await (client as { models: { generateContent: (opts: unknown) => Promise<unknown> } }).models.generateContent({
-        model,
-        contents: prompt,
-        config: {
-          temperature: this.config.get('GEMINI_TEMPERATURE') ?? 0.7,
-          maxOutputTokens: 2500,
-        },
-      });
-
-      const text = (response as { text?: string })?.text;
-      if (text && text.length > 10) return text;
-      return this.getFallbackSummary(data);
-    } catch (err) {
-      this.logger.warn(`Gemini API failed: ${err}`);
-      return this.getFallbackSummary(data);
-    }
+    if (text && text.length > 10) return text;
+    return this.getFallbackSummary(data);
   }
 
   private buildPrompt(data: MarineSnapshot): string {

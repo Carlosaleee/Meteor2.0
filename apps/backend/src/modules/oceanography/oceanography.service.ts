@@ -3,6 +3,7 @@ import { MarineRepository } from './marine.repository';
 import { GeminiRepository } from './gemini.repository';
 import { FallbackService } from '../../common/fallback/fallback.service';
 import { SURF_CENTER } from '../../common/config/locations';
+import { singleFlight } from '../../common/async/single-flight';
 
 const FALLBACK_FILE = 'fallback-oceanography.json';
 
@@ -66,35 +67,40 @@ export class OceanographyService {
       return { summary: this.summaryCache.text, cached: true };
     }
 
-    const marine = await this.marineRepo.getMarineData(SURF_CENTER.lat, SURF_CENTER.lon);
-    const fallbackData = await this.fallback.load<{
-      quality: { bestTime: string };
-      tides: { nextHigh: string; nextLow: string; coefficient: number };
-    }>(FALLBACK_FILE);
+    // Single-flight: N requests simultaneas -> 1 chamada Gemini (cache 1h por cima)
+    const summary = await singleFlight('oceanography:ai-summary', async () => {
+      const marine = await this.marineRepo.getMarineData(SURF_CENTER.lat, SURF_CENTER.lon);
+      const fallbackData = await this.fallback.load<{
+        quality: { bestTime: string };
+        tides: { nextHigh: string; nextLow: string; coefficient: number };
+      }>(FALLBACK_FILE);
 
-    const height = marine.wave_height ?? 1.1;
-    let qualityLabel = 'Boas';
-    if (height < 0.5) qualityLabel = 'Flat';
-    else if (height < 1.0) qualityLabel = 'Pequenas';
-    else if (height >= 1.5) qualityLabel = 'Clássico!';
+      const height = marine.wave_height ?? 1.1;
+      let qualityLabel = 'Boas';
+      if (height < 0.5) qualityLabel = 'Flat';
+      else if (height < 1.0) qualityLabel = 'Pequenas';
+      else if (height >= 1.5) qualityLabel = 'Clássico!';
 
-    const summary = await this.geminiRepo.generateSummary({
-      waveHeight: marine.wave_height,
-      wavePeriod: marine.wave_period,
-      waveDirection: marine.wave_direction,
-      swellHeight: marine.swell_wave_height,
-      swellPeriod: marine.swell_wave_period,
-      swellDirection: marine.swell_wave_direction,
-      windSpeed: marine.wind_speed_10m,
-      windDirection: marine.wind_direction_10m,
-      windGust: marine.wind_gusts_10m,
-      qualityLabel,
-      bestTime: fallbackData?.quality?.bestTime ?? '08:00 - 11:00',
-      nextTide: fallbackData?.tides?.nextHigh ?? '14:30',
-      tideCoefficient: fallbackData?.tides?.coefficient ?? 0.78,
+      const text = await this.geminiRepo.generateSummary({
+        waveHeight: marine.wave_height,
+        wavePeriod: marine.wave_period,
+        waveDirection: marine.wave_direction,
+        swellHeight: marine.swell_wave_height,
+        swellPeriod: marine.swell_wave_period,
+        swellDirection: marine.swell_wave_direction,
+        windSpeed: marine.wind_speed_10m,
+        windDirection: marine.wind_direction_10m,
+        windGust: marine.wind_gusts_10m,
+        qualityLabel,
+        bestTime: fallbackData?.quality?.bestTime ?? '08:00 - 11:00',
+        nextTide: fallbackData?.tides?.nextHigh ?? '14:30',
+        tideCoefficient: fallbackData?.tides?.coefficient ?? 0.78,
+      });
+
+      this.summaryCache = { text, ts: Date.now() };
+      return text;
     });
 
-    this.summaryCache = { text: summary, ts: Date.now() };
     return { summary, cached: false };
   }
 }

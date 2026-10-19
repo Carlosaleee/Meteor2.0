@@ -8,14 +8,17 @@ describe('parseEnv', () => {
     expect(result.FRONTEND_ORIGIN).toBe('http://localhost:3000');
     expect(result.NODE_ENV).toBe('development');
     expect(result.FALLBACK_DIR).toBe('data');
-    expect(result.GEMINI_MODEL).toBe('gemini-2.5-flash');
+    expect(result.GEMINI_MODEL).toBe('gemini-flash-latest');
+    expect(result.GEMINI_EMBEDDING_MODEL).toBe('gemini-embedding-2');
+    expect(result.GEMINI_EMBEDDING_DIMS).toBe(128);
   });
 
   it('coerces declared variables to their schema types', () => {
-    const result = parseEnv({ PORT: '4000', FALLBACK_MAX_AGE_HOURS: '12' });
+    const result = parseEnv({ PORT: '4000', FALLBACK_MAX_AGE_HOURS: '12', GEMINI_EMBEDDING_DIMS: '256' });
 
     expect(result.PORT).toBe(4000);
     expect(result.FALLBACK_MAX_AGE_HOURS).toBe(12);
+    expect(result.GEMINI_EMBEDDING_DIMS).toBe(256);
     expect(typeof result.PORT).toBe('number');
   });
 
