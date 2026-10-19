@@ -66,9 +66,16 @@ describe('ChatWidget', () => {
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: 'como esta o tempo?' }),
+        body: expect.any(String),
       },
     );
+
+    const sentBody = JSON.parse((mockFetch.mock.calls[0][1] as { body: string }).body);
+    expect(sentBody.message).toBe('como esta o tempo?');
+    expect(typeof sentBody.sessionId).toBe('string');
+    expect(sentBody.sessionId.length).toBeGreaterThan(0);
+    expect(Array.isArray(sentBody.history)).toBe(true);
+    expect(sentBody.history[0]).toEqual({ role: 'assistant', content: expect.any(String) });
   });
 
   it('should show user message immediately', async () => {
@@ -119,5 +126,61 @@ describe('ChatWidget', () => {
     await waitFor(() => {
       expect(screen.getByText(/Não consegui processar sua mensagem/)).toBeInTheDocument();
     });
+  });
+
+  it('should restart conversation and remove stored messages', () => {
+    localStorage.setItem('irons-chat-messages', JSON.stringify([{ role: 'user', text: 'Mensagem antiga' }]));
+
+    render(<ChatProvider><ChatWidget /></ChatProvider>);
+    fireEvent.click(screen.getByRole('button', { name: /abrir chat/i }));
+    expect(screen.getByText('Mensagem antiga')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Reiniciar conversa' }));
+
+    expect(screen.getByText(/Sou o/)).toBeInTheDocument();
+    expect(screen.getByText(/Rankings e eventos da WSL/)).toBeInTheDocument();
+    expect(screen.queryByText('Mensagem antiga')).not.toBeInTheDocument();
+    expect(localStorage.getItem('irons-chat-messages')).toBeNull();
+  });
+
+  it('should clear conversation when confirmation is accepted', () => {
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+    localStorage.setItem('irons-chat-messages', JSON.stringify([{ role: 'user', text: 'Mensagem antiga' }]));
+
+    render(<ChatProvider><ChatWidget /></ChatProvider>);
+    fireEvent.click(screen.getByRole('button', { name: /abrir chat/i }));
+    expect(screen.getByText('Mensagem antiga')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Apagar conversa' }));
+
+    expect(confirmSpy).toHaveBeenCalledWith('Apagar toda a conversa?');
+    expect(screen.queryByText('Mensagem antiga')).not.toBeInTheDocument();
+    expect(screen.getByText(/Nenhuma mensagem/)).toBeInTheDocument();
+    expect(localStorage.getItem('irons-chat-messages')).toBeNull();
+  });
+
+  it('should keep conversation when confirmation is cancelled', () => {
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
+    localStorage.setItem('irons-chat-messages', JSON.stringify([{ role: 'user', text: 'Mensagem antiga' }]));
+
+    render(<ChatProvider><ChatWidget /></ChatProvider>);
+    fireEvent.click(screen.getByRole('button', { name: /abrir chat/i }));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Apagar conversa' }));
+
+    expect(confirmSpy).toHaveBeenCalledWith('Apagar toda a conversa?');
+    expect(screen.getByText('Mensagem antiga')).toBeInTheDocument();
+    expect(screen.queryByText(/Nenhuma mensagem/)).not.toBeInTheDocument();
+  });
+
+  it('should announce restart in aria-live status region', () => {
+    render(<ChatProvider><ChatWidget /></ChatProvider>);
+    fireEvent.click(screen.getByRole('button', { name: /abrir chat/i }));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Reiniciar conversa' }));
+
+    const status = screen.getByRole('status');
+    expect(status).toHaveAttribute('aria-live', 'polite');
+    expect(status).toHaveTextContent('Conversa reiniciada');
   });
 });
