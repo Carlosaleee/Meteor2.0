@@ -59,7 +59,7 @@ export class NewsRepository {
         this.spsurfRepo.getNews(),
       ]);
 
-      const wslNews = this.buildWslNews();
+      const wslNews = await this.buildWslNews();
       const allNews = [...wslNews, ...this.buildSpsurfNews(spsurfNews)];
       const filtered = this.filterLast7Days(allNews);
       const finalNews = this.ensureExactly12(filtered);
@@ -85,7 +85,30 @@ export class NewsRepository {
     }
   }
 
-  private buildWslNews(): NewsItem[] {
+  private async buildWslNews(): Promise<NewsItem[]> {
+    const live = await this.wslRepo.getNews();
+    if (live.length > 0) {
+      return live.slice(0, 6).map(item => ({
+        id: `wsl-${this.idFromUrl(item.url)}`,
+        title: item.title,
+        source: 'World Surf League',
+        sourceUrl: 'https://www.worldsurfleague.com',
+        url: item.url,
+        description: item.description,
+        image: item.image,
+        category: 'WSL' as const,
+        publishedAt: item.publishedAt,
+      }));
+    }
+    return this.getStaticWslNews();
+  }
+
+  private idFromUrl(url: string): string {
+    const match = url.match(/\/posts\/(\d+)/);
+    return match ? match[1] : url.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').slice(0, 60);
+  }
+
+  private getStaticWslNews(): NewsItem[] {
     const now = new Date();
     return [
       {
@@ -281,7 +304,7 @@ export class NewsRepository {
     }
 
     return {
-      news: this.buildWslNews().slice(0, 6),
+      news: (await this.buildWslNews()).slice(0, 6),
       rankings: { men: [], women: [] },
       events: [],
       timestamp: new Date().toISOString(),
