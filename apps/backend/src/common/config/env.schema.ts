@@ -18,6 +18,15 @@ export const envSchema = z.object({
 
 export type Env = z.infer<typeof envSchema>;
 
-export function parseEnv(raw: NodeJS.ProcessEnv): Env {
-  return envSchema.parse(raw);
+/**
+ * Resultado do `validate` do @nestjs/config: schema validado + as chaves originais do
+ * env que o Zod descarta (CRON_SECRET etc.), para que sejam publicadas em process.env.
+ */
+export type ValidatedEnv = Env & { [key: string]: unknown };
+
+export function parseEnv(raw: NodeJS.ProcessEnv): ValidatedEnv {
+  // O `validate` do @nestjs/config publica SOMENTE o objeto retornado em process.env.
+  // O Zod (strip por padrao) descarta chaves fora do schema — ex.: CRON_SECRET, que o
+  // CronController le via `process.env` cru. Mesclamos o env original de volta.
+  return { ...raw, ...envSchema.parse(raw) };
 }
