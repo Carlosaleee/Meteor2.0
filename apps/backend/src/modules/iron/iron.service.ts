@@ -6,11 +6,23 @@ import { ComercioService } from '../comercio/comercio.service';
 import { NoticiasRegionaisService } from '../noticias-regionais/noticias-regionais.service';
 import { NewsRepository } from '../news/news.repository';
 import { WeatherNewsRepository } from '../meteorology/weather-news.repository';
-import { GeminiChatRepository } from './gemini-chat.repository';
+import { GeminiChatRepository, ChatTurn } from './gemini-chat.repository';
+import { RagService } from './rag/rag.service';
+import { RagHit } from './rag/rag.types';
+import { spNowKey, hourKeyFromNaive } from '../../common/time/sp-time';
+
+type ChatSource = {
+  title: string;
+  section?: string;
+  source: 'docs' | 'data';
+  snippet: string;
+};
 
 type ChatResponse = {
   reply: string;
   data?: Record<string, unknown>;
+  /** Trechos do knowledge base que fundamentaram a resposta (RAG). */
+  sources?: ChatSource[];
 };
 
 @Injectable()
@@ -26,17 +38,58 @@ export class IronService {
     private readonly newsRepo: NewsRepository,
     private readonly weatherNewsRepo: WeatherNewsRepository,
     private readonly geminiChat: GeminiChatRepository,
+    private readonly ragService: RagService,
   ) {}
 
-  async processMessage(message: string): Promise<ChatResponse> {
+  async processMessage(
+    message: string,
+    history: ChatTurn[] = [],
+    sessionId?: string,
+  ): Promise<ChatResponse> {
     try {
+      if (sessionId) {
+        this.logger.log(`chat[${sessionId}]: ${message.slice(0, 80)}`);
+      }
+
+      // Retrieval híbrido (docs + dados); falha nunca bloqueia o chat.
+      const ragHits = await this.ragService.retrieve(message).catch(() => [] as RagHit[]);
+
       const context = await this.collectContext();
-      const reply = await this.geminiChat.chat(message, context);
-      return { reply, data: { contextCollected: true } };
+      const reply = await this.geminiChat.chat(message, this.withRagContext(context, ragHits), history);
+
+      const sources: ChatSource[] = ragHits.map(h => ({
+        title: h.chunk.title,
+        section: h.chunk.section,
+        source: h.chunk.source,
+        snippet: h.chunk.text.slice(0, 160),
+      }));
+
+      return {
+        reply,
+        data: { contextCollected: true, ragHits: ragHits.length },
+        ...(sources.length > 0 ? { sources } : {}),
+      };
     } catch (err) {
       this.logger.error(`Error processing message: ${err}`);
       return { reply: '⚠️ Erro ao processar sua mensagem. Tente novamente.' };
     }
+  }
+
+  private withRagContext(
+    context: Awaited<ReturnType<IronService['collectContext']>>,
+    hits: RagHit[],
+  ) {
+    if (hits.length === 0) return context;
+    return {
+      ...context,
+      rag: {
+        chunks: hits.map(h => ({
+          title: h.chunk.title,
+          section: h.chunk.section,
+          text: h.chunk.text,
+        })),
+      },
+    };
   }
 
   private async collectContext() {
@@ -90,9 +143,11 @@ export class IronService {
   private async getHourlyForecast() {
     try {
       const data = await this.meteorologyService.getCurrentWeather('ilha-comprida');
-      const now = new Date();
+      // Timestamps naive de SP — comparar com a hora atual de SP, nao com o
+      // relógio UTC do processo (Vercel).
+      const nowKey = spNowKey();
       const next6h = (data.hourly || [])
-        .filter(h => new Date(h.time) >= now)
+        .filter(h => hourKeyFromNaive(h.time) >= nowKey)
         .slice(0, 6)
         .map(h => ({
           time: h.time,
