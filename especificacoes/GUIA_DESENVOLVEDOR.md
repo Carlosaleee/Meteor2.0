@@ -1,6 +1,6 @@
 ﻿# Guia do Desenvolvedor — Meteor 2.0
 
-> **Ultima atualizacao:** 05/10/2026 (recuperacao: CI verde, typecheck frontend, backend serverless Vercel — 140 testes)
+> **Ultima atualizacao:** 19/10/2026 (analise + dados frescos: parser WSL corrigido, noticias via Google News — 155 testes)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -61,10 +61,10 @@ pnpm format
 
 ## Testes
 
-**Total: 140 testes — backend Jest 30 (103) + frontend Vitest (37)**
+**Total: 155 testes — backend Jest 30 (118) + frontend Vitest (37)**
 
 ```bash
-# Backend (103 testes — o script ja embute --experimental-vm-modules)
+# Backend (118 testes — o script ja embute --experimental-vm-modules)
 pnpm --filter backend test
 
 # Frontend (37 testes — Vitest + React Testing Library)
@@ -73,7 +73,7 @@ pnpm --filter frontend test
 
 | Suite | Runner | Testes | Observacao |
 |-------|--------|--------|------------|
-| `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 103 | 20 arquivos `*.spec.ts` |
+| `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 118 | 22 arquivos `*.spec.ts` |
 | `apps/frontend` | Vitest + RTL + jsdom | 37 | 9 arquivos `*.test.{ts,tsx}` |
 
 Detalhamento por arquivo: [SYSTEM_SPEC.md §9](./SYSTEM_SPEC.md#9-cobertura-de-testes).
@@ -224,7 +224,7 @@ Schema validado por Zod em `apps/backend/src/common/config/env.schema.ts`.
 |----------|-------------|---------|
 | `PORT` | Porta do backend | `3001` |
 | `FRONTEND_ORIGIN` | CORS origin permitido | `http://localhost:3000` |
-| `FALLBACK_DIR` | Diretorio dos JSONs de fallback | `data` |
+| `FALLBACK_DIR` | Diretorio dos JSONs de fallback — na **Vercel (producao)**: `apps/backend/data` (cwd do lambda e a raiz do repo; em runtime a escrita vai para `/tmp`) | `data` (local) / `apps/backend/data` (Vercel) |
 | `FALLBACK_MAX_AGE_HOURS` | Idade maxima aceita do fallback | `24` |
 | `NODE_ENV` | Modo da aplicacao (`development`/`test`/`production`) | `development` |
 | `GEMINI_API_KEY` | Chave Gemini (resumo IA) — formato novo `AQ...` desde Set/2026 (antigo `AIzaSy...` descontinuado); obter em https://aistudio.google.com/apikey | *(vazio)* |
@@ -237,7 +237,6 @@ Schema validado por Zod em `apps/backend/src/common/config/env.schema.ts`.
 | `GITHUB_TOKEN` | Consumida apenas pelo MCP local (`.opencode/mcp/github-server.mjs`) | *(vazio)* |
 | `CRON_SECRET` | Auth do endpoint `POST /v1/cron/refresh` — lida via `process.env` cru, fora do schema Zod | `meteor-refresh-secret` |
 | `NODE_OPTIONS` | **Vercel (producao):** `--experimental-require-module` — habilita `require()` de deps ESM-only (Nest 12); a Vercel desativa por padrao via `--no-experimental-require-module` | *(na Vercel)* `--experimental-require-module` |
-| `FALLBACK_DIR` | **Vercel (producao):** `apps/backend/data` — caminho dos `fallback-*.json` dentro do bundle (cwd do lambda e a raiz do repo) | *(na Vercel)* `apps/backend/data` |
 
 ### Frontend (.env.local)
 
@@ -650,14 +649,15 @@ Variáveis configuradas no Vercel Dashboard (Settings → Environment Variables)
 | `GEMINI_API_KEY` | *(chave secreta — formato AQ... desde Set/2026)* | API Gemini |
 | `GEMINI_MODEL` | `gemini-2.5-flash` | Modelo Gemini |
 | `GEMINI_TEMPERATURE` | `0.7` | Temperatura |
-| `FALLBACK_DIR` | `data` | Diretório fallback |
+| `FALLBACK_DIR` | `apps/backend/data` | Caminho dos `fallback-*.json` no bundle (cwd do lambda é a raiz do repo) |
+| `NODE_OPTIONS` | `--experimental-require-module` | Habilita `require()` de deps ESM-only (Nest 12) |
 
 ### CI/CD (GitHub Actions)
 
 Pipeline ativo em `.github/workflows/ci.yml`:
 
 **Jobs:** (todos em Node 24)
-- `backend-test`: Jest (103 testes) — `NODE_OPTIONS="--experimental-vm-modules" npx jest`
+- `backend-test`: Jest (118 testes) — `NODE_OPTIONS="--experimental-vm-modules" npx jest`
 - `frontend-test`: Vitest (37 testes)
 - `lint`: oxlint (frontend)
 - `build`: valida backend + frontend (após testes)

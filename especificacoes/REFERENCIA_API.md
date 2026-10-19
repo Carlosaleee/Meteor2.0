@@ -398,7 +398,7 @@ GET /v1/news
 | events[].status | string | `Completed`, `Standby` ou `Upcoming` (Upcoming listado primeiro) |
 | timestamp | string | Momento da montagem da resposta (ISO 8601) |
 
-**Fontes:** WSL (worldsurfleague.com — parser da tabela HTML real) + SPSurf (RSS). Fallback: `data/fallback-news.json`. Refresh: cron diario 03:00 UTC (unico no plano Hobby) + `POST /v1/cron/refresh`.
+**Fontes:** WSL (worldsurfleague.com — parser da tabela HTML real do ranking/calendario + scraper de `/news`) + Google News RSS pt-BR (categoria `Paulista`; o dominio `spsurf.com.br` morreu — NXDOMAIN — e o RSS e o fallback). Fallback: `data/fallback-news.json`. Refresh: cron diario 03:00 UTC (unico no plano Hobby) + `POST /v1/cron/refresh` (header `x-cron-secret`).
 
 ---
 
