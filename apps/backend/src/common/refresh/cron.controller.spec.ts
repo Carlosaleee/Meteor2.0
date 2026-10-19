@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { UnauthorizedException } from '@nestjs/common';
 import { CronController } from './cron.controller';
 import { RefreshService } from './refresh.service';
 
@@ -32,6 +33,11 @@ describe('CronController', () => {
 
     controller = module.get<CronController>(CronController);
     jest.clearAllMocks();
+    process.env.CRON_SECRET = 'test-secret';
+  });
+
+  afterAll(() => {
+    delete process.env.CRON_SECRET;
   });
 
   it('should be defined', () => {
@@ -46,23 +52,26 @@ describe('CronController', () => {
     });
   });
 
-  describe('refresh', () => {
-    it('should trigger refresh with valid secret', async () => {
-      process.env.CRON_SECRET = 'test-secret';
+  describe('refresh (POST)', () => {
+    it('should trigger refresh with valid x-cron-secret', async () => {
       const result = await controller.refresh('test-secret') as { success: boolean };
       expect(result.success).toBe(true);
       expect(mockRefreshService.refreshAll).toHaveBeenCalled();
     });
 
-    it('should reject with invalid secret', async () => {
-      process.env.CRON_SECRET = 'test-secret';
-      const result = await controller.refresh('wrong-secret') as { error: string };
-      expect(result.error).toBe('Unauthorized');
+    it('should accept valid secret via Authorization Bearer header', async () => {
+      const result = await controller.refresh(undefined, 'Bearer test-secret') as { success: boolean };
+      expect(result.success).toBe(true);
+      expect(mockRefreshService.refreshAll).toHaveBeenCalled();
+    });
+
+    it('should reject with invalid secret (UnauthorizedException)', async () => {
+      await expect(controller.refresh('wrong-secret')).rejects.toThrow(UnauthorizedException);
+      expect(mockRefreshService.refreshAll).not.toHaveBeenCalled();
     });
 
     it('should run news-only refresh when scope=news', async () => {
-      process.env.CRON_SECRET = 'test-secret';
-      const result = await controller.refresh('test-secret', 'news') as { success: boolean };
+      const result = await controller.refresh('test-secret', undefined, 'news') as { success: boolean };
       expect(result.success).toBe(true);
       expect(mockRefreshService.refreshNews).toHaveBeenCalled();
       expect(mockRefreshService.refreshAll).not.toHaveBeenCalled();
@@ -70,21 +79,25 @@ describe('CronController', () => {
   });
 
   describe('refreshFromCron (GET — Vercel crons)', () => {
-    it('should authorize x-vercel-cron header without secret', async () => {
-      const result = await controller.refreshFromCron(undefined, '1') as { success: boolean };
+    it('should accept Authorization Bearer sent natively by Vercel crons', async () => {
+      const result = await controller.refreshFromCron(undefined, 'Bearer test-secret') as { success: boolean };
       expect(result.success).toBe(true);
       expect(mockRefreshService.refreshAll).toHaveBeenCalled();
     });
 
     it('should accept valid secret via query param', async () => {
-      process.env.CRON_SECRET = 'test-secret';
       const result = await controller.refreshFromCron(undefined, undefined, 'test-secret') as { success: boolean };
       expect(result.success).toBe(true);
     });
 
-    it('should reject without secret or vercel-cron header', async () => {
-      const result = await controller.refreshFromCron() as { error: string };
-      expect(result.error).toBe('Unauthorized');
+    it('should REJECT x-vercel-cron header without real secret (spoofable)', async () => {
+      await expect(controller.refreshFromCron(undefined, undefined, undefined)).rejects.toThrow(UnauthorizedException);
+      expect(mockRefreshService.refreshAll).not.toHaveBeenCalled();
+    });
+
+    it('should reject when CRON_SECRET is not configured', async () => {
+      delete process.env.CRON_SECRET;
+      await expect(controller.refreshFromCron('test-secret')).rejects.toThrow(UnauthorizedException);
     });
   });
 });
