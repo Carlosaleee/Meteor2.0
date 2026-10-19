@@ -8,6 +8,8 @@ import { WslRepository } from '../../modules/news/wsl.repository';
 import { SpsurfRepository } from '../../modules/news/spsurf.repository';
 import { WeatherNewsRepository } from '../../modules/meteorology/weather-news.repository';
 import { NoticiasRegionaisRepository } from '../../modules/noticias-regionais/noticias-regionais.repository';
+import { RagService } from '../../modules/iron/rag/rag.service';
+import { singleFlight } from '../async/single-flight';
 
 const LOCATIONS = [
   { id: 'ilha-comprida', lat: -24.73, lon: -47.55 },
@@ -31,6 +33,7 @@ export class RefreshService implements OnModuleInit {
     private readonly spsurfRepo: SpsurfRepository,
     private readonly weatherNewsRepo: WeatherNewsRepository,
     private readonly regionalRepo: NoticiasRegionaisRepository,
+    private readonly ragService: RagService,
   ) {}
 
   onModuleInit() {
@@ -74,6 +77,7 @@ export class RefreshService implements OnModuleInit {
 
     try {
       await this.refreshNewsSources(details);
+      await this.refreshRagIndex();
       this.lastNewsRefresh = new Date();
       const duration = Date.now() - start;
       this.logger.log(`Rankings and news refreshed in ${duration}ms`);
@@ -135,6 +139,9 @@ export class RefreshService implements OnModuleInit {
       // 4. Rankings WSL + News + Regionais
       await this.refreshNewsSources(details);
 
+      // 5. Reindexa o "conhecimento base" do Irons (RAG) com os dados frescos
+      await this.refreshRagIndex();
+
       this.lastRefresh = new Date();
       const duration = Date.now() - start;
       this.logger.log(`All data sources refreshed in ${duration}ms`);
@@ -184,6 +191,15 @@ export class RefreshService implements OnModuleInit {
     }
 
     this.lastNewsRefresh = new Date();
+  }
+
+  /** Reconstrói o índice RAG de dados após refresh; nunca derruba o refresh. */
+  private async refreshRagIndex(): Promise<void> {
+    try {
+      await singleFlight('rag:rebuild', () => this.ragService.rebuildDataIndex());
+    } catch (err) {
+      this.logger.warn(`RAG data index rebuild failed: ${err}`);
+    }
   }
 
   getStatus() {

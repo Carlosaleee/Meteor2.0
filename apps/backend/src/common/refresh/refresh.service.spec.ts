@@ -7,6 +7,7 @@ import { WslRepository } from '../../modules/news/wsl.repository';
 import { SpsurfRepository } from '../../modules/news/spsurf.repository';
 import { WeatherNewsRepository } from '../../modules/meteorology/weather-news.repository';
 import { NoticiasRegionaisRepository } from '../../modules/noticias-regionais/noticias-regionais.repository';
+import { RagService } from '../../modules/iron/rag/rag.service';
 
 describe('RefreshService', () => {
   let service: RefreshService;
@@ -44,6 +45,10 @@ describe('RefreshService', () => {
     forceRefresh: jest.fn().mockResolvedValue(undefined),
   };
 
+  const mockRagService = {
+    rebuildDataIndex: jest.fn().mockResolvedValue({ chunks: 8, embedded: 8 }),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -55,6 +60,7 @@ describe('RefreshService', () => {
         { provide: SpsurfRepository, useValue: mockSpsurfRepo },
         { provide: WeatherNewsRepository, useValue: mockWeatherNewsRepo },
         { provide: NoticiasRegionaisRepository, useValue: mockRegionalRepo },
+        { provide: RagService, useValue: mockRagService },
       ],
     }).compile();
 
@@ -132,6 +138,17 @@ describe('RefreshService', () => {
       expect(result.success).toBe(true);
       expect(result.details['meteorology']).toContain('ERROR');
     });
+
+    it('should rebuild the RAG data index after refreshing', async () => {
+      await service.refreshAll();
+      expect(mockRagService.rebuildDataIndex).toHaveBeenCalled();
+    });
+
+    it('should not fail the refresh when RAG reindex throws', async () => {
+      mockRagService.rebuildDataIndex.mockRejectedValueOnce(new Error('fs error'));
+      const result = await service.refreshAll();
+      expect(result.success).toBe(true);
+    });
   });
 
   describe('refreshNews', () => {
@@ -151,6 +168,11 @@ describe('RefreshService', () => {
       expect(status.lastNewsRefresh).toBeTruthy();
       expect(status.lastRefresh).toBeNull();
       expect(status.isRefreshing).toBe(false);
+    });
+
+    it('should rebuild the RAG data index after news refresh (cron Vercel usa scope=news)', async () => {
+      await service.refreshNews();
+      expect(mockRagService.rebuildDataIndex).toHaveBeenCalled();
     });
 
     it('should not run concurrent news refreshes', async () => {
