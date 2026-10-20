@@ -1,6 +1,6 @@
 ﻿# Referencia da API — Meteor 2.0
 
-> **Ultima atualizacao:** 05/10/2026 (recuperacao: CI + typecheck + backend serverless na Vercel + dados frescos; +4 testes)
+> **Ultima atualizacao:** 19/10/2026 (branch `feature/iron-rag`: auth real do cron, chat Iron stateful + RAG, `source`/`sample` nas respostas)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [../README.md](../README.md)
 
@@ -52,6 +52,7 @@ GET /v1/meteorology?locationId=ilha-comprida
   "location": "Ilha Comprida",
   "locationId": "ilha-comprida",
   "timestamp": "2026-09-10T14:00:00.000Z",
+  "source": "live",
   "current": {
     "temperature": 21.5,
     "apparentTemperature": 20.8,
@@ -89,9 +90,7 @@ GET /v1/meteorology?locationId=ilha-comprida
       "sunrise": "2026-09-10T06:12:00",
       "sunset": "2026-09-10T18:05:00"
     }
-  ],
-  "forecastMax": 24,
-  "forecastMin": 17
+  ]
 }
 ```
 
@@ -101,6 +100,7 @@ GET /v1/meteorology?locationId=ilha-comprida
 | location | string | Nome da localizacao |
 | locationId | string | ID da localizacao |
 | timestamp | string | Horario da resposta (ISO 8601) |
+| source | string | Proveniencia dos dados: `live` (API em tempo real), `stale` (fallback com mais de 24h) ou `sample` (fallback de exemplo deterministico) |
 | current.temperature | number | Temperatura atual (Celsius) |
 | current.apparentTemperature | number | Sensacao termica (Celsius) |
 | current.humidity | number | Umidade relativa (%) |

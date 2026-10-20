@@ -1,6 +1,6 @@
 ﻿# Guia do Desenvolvedor — Meteor 2.0
 
-> **Ultima atualizacao:** 19/10/2026 (analise + dados frescos: parser WSL corrigido, noticias via Google News — 155 testes)
+> **Ultima atualizacao:** 19/10/2026 (branch `feature/iron-rag`: auth real do cron, chat Iron stateful com RAG hibrido, dados sinteticos marcados — 193 testes)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -55,32 +55,38 @@ pnpm lint
 # Testes (todos os apps)
 pnpm test
 
+# Regenerar o indice RAG de docs (requer GEMINI_API_KEY; reusa embeddings ja existentes no arquivo)
+pnpm --filter backend rag:index
+
 # Formatacao
 pnpm format
 ```
 
 ## Testes
 
-**Total: 155 testes — backend Jest 30 (118) + frontend Vitest (37)**
+**Total: 193 testes — backend Jest 30 (152) + frontend Vitest (41)**
+
+> Contagem estatica (sem executar os testes) em 19/10/2026.
 
 ```bash
-# Backend (118 testes — o script ja embute --experimental-vm-modules)
+# Backend (152 testes — o script ja embute --experimental-vm-modules)
 pnpm --filter backend test
 
-# Frontend (37 testes — Vitest + React Testing Library)
+# Frontend (41 testes — Vitest + React Testing Library)
 pnpm --filter frontend test
 ```
 
 | Suite | Runner | Testes | Observacao |
 |-------|--------|--------|------------|
-| `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 118 | 22 arquivos `*.spec.ts` |
-| `apps/frontend` | Vitest + RTL + jsdom | 37 | 9 arquivos `*.test.{ts,tsx}` |
+| `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 152 | 25 arquivos `*.spec.ts` |
+| `apps/frontend` | Vitest + RTL + jsdom | 41 | 9 arquivos `*.test.{ts,tsx}` |
 
 Detalhamento por arquivo: [SYSTEM_SPEC.md §9](./SYSTEM_SPEC.md#9-cobertura-de-testes).
 
 ## Rate Limit (Seguranca)
 
 - `@nestjs/throttler` **60 req/min** por IP (`TTL` 60s)
+- **Throttle dedicado:** `POST /v1/iron/chat` tem **5 req/min** por IP (`@Throttle({ default: { limit: 5, ttl: 60_000 } })` — cada mensagem custa 1 chamada Gemini)
 - **Loopback isento:** `127.0.0.1`/`::1` nao contam (testes e dev locais nao sao bloqueados)
 - Respostas incluem headers `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`
 - Ao exceder: HTTP **429** com header `Retry-After`
@@ -92,9 +98,10 @@ Meteor_2.0/
   apps/
     backend/           # API NestJS
       src/
-        common/        # Servicos compartilhados (fallback, http, config, refresh)
-        modules/       # Modulos de dominio (meteorology, oceanography, traffic, noticias-regionais, comercio, iron, news)
-      data/            # JSONs de fallback
+        common/        # Servicos compartilhados (ai, async, fallback, http, config, refresh, time)
+        modules/       # Modulos de dominio (meteorology, oceanography, traffic, noticias-regionais, comercio, iron + iron/rag, news)
+      data/            # JSONs de fallback + rag-index-docs.json (versionado)
+      scripts/         # rag-index.mjs (regenera indice RAG de docs)
     frontend/          # App Next.js
       src/
         app/           # Paginas (7 rotas)
@@ -116,6 +123,7 @@ Meteor_2.0/
           Header.tsx   # Nav responsiva (7 itens) + toggle idioma pt/es
           Footer.tsx   # 4 colunas (Navegacao, Fontes, Stack, Links uteis)
           PageBanner.tsx # Hero reutilizavel (banner-meteor.jpg)
+          ChatWidget.tsx # Chat Iron: botoes Reiniciar/Apagar, aria-live, sessionId + historico (ate 10 turnos)
         hooks/         # Hooks customizados (9 hooks + 5 testes)
         lib/           # Utilitarios (api.ts, spots-data.ts)
   especificacoes/      # Documentacao do projeto
@@ -136,7 +144,10 @@ Meteor_2.0/
 - Services: logica de negocio
 - Repositories: acesso a dados (APIs externas + fallback)
 - FallbackService: compartilhado via modulo global
-- **RefreshService:** automacao de refresh (startup + cron 6h pesado + cron 1h rankings/noticias)
+- **RefreshService:** automacao de refresh (cron 6h pesado + cron 1h rankings/noticias; startup e `@Cron` pulados em `process.env.VERCEL` — os crons reais vem do `vercel.json`)
+- **GeminiClientService (`common/ai/`):** cliente unico de Gemini — texto via SDK `@google/genai`, embeddings via REST direto; usado por oceanografia, chat Iron e RAG
+- **RagModule (`modules/iron/rag/`):** retrieval hibrido (embedding Gemini 60% + BM25 40%, topK=5); indice de docs versionado (`data/rag-index-docs.json`, regenerar com `pnpm --filter backend rag:index`) + indice de dados reconstruido no refresh
+- **Single-flight (`common/async/`):** deduplica chamadas concorrentes (resumo IA, noticias, rebuild do indice RAG)
 
 ### Estilizacao
 - Tailwind CSS v4 (sem tailwind.config.js)
@@ -173,6 +184,9 @@ Arquivo de configuracao: `~/.config/opencode/opencode.jsonc`
 - "Quais sao os ultimos deploys do projeto?"
 - "Mostre os logs do deploy que falhou"
 - "Quais projetos tenho no Vercel?"
+
+### Nota de decisao — MCP do Google
+**MCP do Google NAO sera adotado em runtime** — o caminho oficial e o SDK `@google/genai` (+ REST direto para embeddings RAG, via `GeminiClientService` em `common/ai/`). Reavaliar apenas se o projeto migrar para GCP/Firebase/Workspace.
 
 ---
 
@@ -227,15 +241,17 @@ Schema validado por Zod em `apps/backend/src/common/config/env.schema.ts`.
 | `FALLBACK_DIR` | Diretorio dos JSONs de fallback — na **Vercel (producao)**: `apps/backend/data` (cwd do lambda e a raiz do repo; em runtime a escrita vai para `/tmp`) | `data` (local) / `apps/backend/data` (Vercel) |
 | `FALLBACK_MAX_AGE_HOURS` | Idade maxima aceita do fallback | `24` |
 | `NODE_ENV` | Modo da aplicacao (`development`/`test`/`production`) | `development` |
-| `GEMINI_API_KEY` | Chave Gemini (resumo IA) — formato novo `AQ...` desde Set/2026 (antigo `AIzaSy...` descontinuado); obter em https://aistudio.google.com/apikey | *(vazio)* |
-| `GEMINI_MODEL` | Modelo Gemini | `gemini-2.5-flash` |
+| `GEMINI_API_KEY` | Chave Gemini (resumo IA, chat Iron, embeddings RAG) — formato novo `AQ...` desde Set/2026 (antigo `AIzaSy...` descontinuado); obter em https://aistudio.google.com/apikey | *(vazio)* |
+| `GEMINI_MODEL` | Modelo Gemini (texto) | `gemini-flash-latest` |
+| `GEMINI_EMBEDDING_MODEL` | Modelo de embeddings do RAG | `gemini-embedding-2` |
+| `GEMINI_EMBEDDING_DIMS` | Dimensao dos vetores do RAG | `128` |
 | `GEMINI_TEMPERATURE` | Temperatura de amostragem | `0.7` |
-| `GEMINI_API_BASE_URL` | Host do SDK (declarada no schema; o SDK usa a URL padrao) | `generativelanguage.googleapis.com` |
+| `GEMINI_API_BASE_URL` | Base do REST direto de embeddings (o `generateText` do SDK usa a URL padrao do SDK) | `https://generativelanguage.googleapis.com/v1beta/models` |
 | `STORMGLASS_API_KEY` | Reservada (oceanografia avancada) | *(vazio)* |
 | `INMET_API_TOKEN` | Reservada (estacoes INMET) | *(vazio)* |
 | `INMET_BASE_URL` | Declarada no schema (repositorio usa URL direta) | `apitempo.inmet.gov.br` |
 | `GITHUB_TOKEN` | Consumida apenas pelo MCP local (`.opencode/mcp/github-server.mjs`) | *(vazio)* |
-| `CRON_SECRET` | Auth do endpoint `POST /v1/cron/refresh` — lida via `process.env` cru, fora do schema Zod | `meteor-refresh-secret` |
+| `CRON_SECRET` | Auth de `GET/POST /v1/cron/refresh` — lida via `process.env` cru, fora do schema Zod; **sem default e obrigatoria** (ausente ou errada → 401; setar no dashboard da Vercel em producao) | *(nenhuma)* |
 | `NODE_OPTIONS` | **Vercel (producao):** `--experimental-require-module` — habilita `require()` de deps ESM-only (Nest 12); a Vercel desativa por padrao via `--no-experimental-require-module` | *(na Vercel)* `--experimental-require-module` |
 
 ### Frontend (.env.local)
@@ -299,8 +315,9 @@ const CommerceMap = dynamic(() => import('./CommerceMap').then(mod => mod.Commer
 1. Verificar se `@nestjs/schedule` esta instalado: `npm ls @nestjs/schedule`
 2. Verificar se `ScheduleModule.forRoot()` esta no `app.module.ts`
 3. Verificar se `RefreshModule` esta no `app.module.ts`
-4. Testar manualmente: `curl -X POST http://localhost:3001/v1/cron/refresh -H "x-cron-secret: meteor-refresh-secret"`
-5. Verificar status: `curl http://localhost:3001/v1/cron/status`
+4. Testar manualmente: `curl -X POST http://localhost:3001/v1/cron/refresh -H "x-cron-secret: SEU_CRON_SECRET"` (ou `-H "Authorization: Bearer SEU_CRON_SECRET"`; no GET aceita tambem `?secret=SEU_CRON_SECRET`)
+5. Sem `CRON_SECRET` no `.env` (ou com valor errado) o endpoint responde **401 Unauthorized** — nao existe mais default
+6. Verificar status: `curl http://localhost:3001/v1/cron/status`
 
 ### Erro "Unable to find element with text" nos testes
 **Causa:** Componente usa Context (ex: `useChat()`) mas o teste nao fornece o Provider.
@@ -544,10 +561,10 @@ function renderMarkdown(text: string): React.ReactNode[]
 - Tooltips detalhados com todos os valores
 
 ### Gemini AI (Resumo)
-- Backend: `gemini.repository.ts` com `@google/genai`
+- Backend: `gemini.repository.ts` usando o `GeminiClientService` unico (`common/ai/`) via `@google/genai`
 - Prompt: briefing completo com 5 topicos (Ondas, Vento, Horarios, Points, Alertas)
-- Max tokens: 600
-- Cache: 1h no backend (`summaryCache`)
+- Max tokens: 2500
+- Cache: 1h no backend (`summaryCache`) + single-flight (requisicoes simultaneas compartilham a mesma chamada)
 - Fallback: resumo estatico baseado nos dados quando Gemini falha
 
 > **[LLM_CONTEXT] Gemini API Key (Set/2026):** formato novo `AQ...` (obter em https://aistudio.google.com/apikey). O SDK `@google/genai` aceita ambos os formatos — a mudança é transparente para o código. Variável de ambiente: `GEMINI_API_KEY` no backend (.env).
@@ -617,6 +634,20 @@ comercio/
 
 ---
 
+## Backlog P2 (conhecido, nao implementado)
+
+Itens ja identificados, ainda sem correcao — nao abrir issue/PR para eles sem antes conferir esta lista:
+
+1. **Trust proxy / X-Forwarded-For** — o backend nao confia no proxy: atras da Vercel o Throttler pode contar todas as requisicoes pelo mesmo IP do proxy (`app.set('trust proxy', ...)` ausente)
+2. **Paralelizar refresh das 4 cidades** — `refreshAll()` do open-meteo roda cidades sequencialmente; `Promise.allSettled` reduziria o tempo para caber no `maxDuration: 30s` da Vercel
+3. **`updatedAt` enganoso no fallback** — os JSONs de fallback anunciam `updatedAt` fresco mesmo quando os dados vem de um arquivo velho (stale)
+4. **Testes dos handlers `@Cron`** — os specs exercitam o metodo diretamente; o agendamento real do `@nestjs/schedule` continua nao coberto
+5. **`qualityFor` euristica fixa** — a qualidade "melhor horario por fatores" ainda e regra fixa, sem modelo aprendido/calibrado
+6. **Proveniencia da oceanografia estatica** — `getDefault()` do marine.repository ainda nao tem flag de proveniencia (`sample`/`source`), diferente de metereologia/news
+7. **Dedup de normalize/flatten** — logica de normalizacao do `scripts/rag-index.mjs` e do runtime (chunker) pode eventualmente ser unificada
+
+---
+
 ## Deploy em Produção
 
 ### URLs de Produção
@@ -646,8 +677,11 @@ Variáveis configuradas no Vercel Dashboard (Settings → Environment Variables)
 | Variável | Valor | Descrição |
 |----------|-------|-----------|
 | `FRONTEND_ORIGIN` | `https://meteor2-0-frontend.vercel.app` | CORS origin |
-| `GEMINI_API_KEY` | *(chave secreta — formato AQ... desde Set/2026)* | API Gemini |
-| `GEMINI_MODEL` | `gemini-2.5-flash` | Modelo Gemini |
+| `CRON_SECRET` | *(secreto — sem default; obrigatorio para `GET/POST /v1/cron/refresh`; ausente/errado → 401)* | Auth dos endpoints de cron (Vercel envia `Authorization: Bearer` automaticamente) |
+| `GEMINI_API_KEY` | *(chave secreta — formato AQ... desde Set/2026)* | API Gemini (resumo IA, chat Iron, embeddings RAG) |
+| `GEMINI_MODEL` | `gemini-flash-latest` | Modelo Gemini (texto) |
+| `GEMINI_EMBEDDING_MODEL` | `gemini-embedding-2` | Modelo de embeddings do RAG |
+| `GEMINI_EMBEDDING_DIMS` | `128` | Dimensao dos vetores do RAG |
 | `GEMINI_TEMPERATURE` | `0.7` | Temperatura |
 | `FALLBACK_DIR` | `apps/backend/data` | Caminho dos `fallback-*.json` no bundle (cwd do lambda é a raiz do repo) |
 | `NODE_OPTIONS` | `--experimental-require-module` | Habilita `require()` de deps ESM-only (Nest 12) |
@@ -657,8 +691,8 @@ Variáveis configuradas no Vercel Dashboard (Settings → Environment Variables)
 Pipeline ativo em `.github/workflows/ci.yml`:
 
 **Jobs:** (todos em Node 24)
-- `backend-test`: Jest (118 testes) — `NODE_OPTIONS="--experimental-vm-modules" npx jest`
-- `frontend-test`: Vitest (37 testes)
+- `backend-test`: Jest (152 testes) — `NODE_OPTIONS="--experimental-vm-modules" npx jest`
+- `frontend-test`: Vitest (41 testes)
 - `lint`: oxlint (frontend)
 - `build`: valida backend + frontend (após testes)
 

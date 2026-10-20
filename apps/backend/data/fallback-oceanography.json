@@ -1,15 +1,15 @@
 {
-  "updatedAt": "2026-10-19T16:52:00.627Z",
+  "updatedAt": "2026-10-20T20:29:59.345Z",
   "data": {
     "current": {
-      "time": "2026-10-19T13:45",
+      "time": "2026-10-20T17:15",
       "interval": 900,
-      "wave_height": 1.28,
-      "wave_direction": 161,
-      "wave_period": 8.85,
-      "swell_wave_height": 1.18,
-      "swell_wave_direction": 170,
-      "swell_wave_period": 7.35,
+      "wave_height": 1.1,
+      "wave_direction": 158,
+      "wave_period": 9.4,
+      "swell_wave_height": 1,
+      "swell_wave_direction": 161,
+      "swell_wave_period": 8.15,
       "wind_speed_10m": 12,
       "wind_direction_10m": 180,
       "wind_gusts_10m": 18
