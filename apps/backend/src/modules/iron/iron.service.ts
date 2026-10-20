@@ -29,7 +29,9 @@ type ChatResponse = {
 export class IronService {
   private readonly logger = new Logger(IronService.name);
 
-  constructor(
+  import { GeminiContextBuilder } from '../../common/ai/GeminiContextBuilder';
+
+constructor(
     private readonly meteorologyService: MeteorologyService,
     private readonly oceanographyService: OceanographyService,
     private readonly trafficService: TrafficService,
@@ -39,6 +41,7 @@ export class IronService {
     private readonly weatherNewsRepo: WeatherNewsRepository,
     private readonly geminiChat: GeminiChatRepository,
     private readonly ragService: RagService,
+    private readonly contextBuilder: GeminiContextBuilder,
   ) {}
 
   async processMessage(
@@ -54,7 +57,7 @@ export class IronService {
       // Retrieval híbrido (docs + dados); falha nunca bloqueia o chat.
       const ragHits = await this.ragService.retrieve(message).catch(() => [] as RagHit[]);
 
-      const context = await this.collectContext();
+      const context = await this.contextBuilder.buildContext(history);
       const reply = await this.geminiChat.chat(message, this.withRagContext(context, ragHits), history);
 
       const sources: ChatSource[] = ragHits.map(h => ({
@@ -93,7 +96,7 @@ export class IronService {
   }
 
   private async collectContext() {
-    const [weatherResult, oceanResult, trafficResult, commerceResult, newsResult, rankingsResult, hourlyResult, weatherNewsResult] = await Promise.allSettled([
+    await this.collectContext();
       this.meteorologyService.getCurrentWeather('ilha-comprida'),
       this.oceanographyService.getSwellConditions(),
       this.trafficService.getTraffic(),
