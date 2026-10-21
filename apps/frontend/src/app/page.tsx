@@ -168,14 +168,13 @@ export default function HomePage() {
                 ? `Máx ${Math.round(city.tempMax)} graus, mín ${Math.round(city.tempMin)} graus`
                 : null;
               return (
-                <Link
-                  key={id}
-                  href={`/meteorologia?city=${id}`}
-                  className="bg-slate-900/80 border border-slate-800 rounded-2xl p-3 hover:border-amber-500/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
-                  role="listitem"
-                  title={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)}°C` : 'Carregando...'}`}
-                  aria-label={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)} graus, ${weatherEmoji(city.weatherCode)}${maxMin ? `. ${maxMin}` : ''}` : 'carregando'}`}
-                >
+                <div key={id} role="listitem">
+                  <Link
+                    href={`/meteorologia?city=${id}`}
+                    className="block bg-slate-900/80 border border-slate-800 rounded-2xl p-3 hover:border-amber-500/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                    title={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)}°C` : 'Carregando...'}`}
+                    aria-label={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)} graus, ${weatherEmoji(city.weatherCode)}${maxMin ? `. ${maxMin}` : ''}` : 'carregando'}`}
+                  >
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1 truncate">
                     {city?.location ?? id.replace(/-/g, ' ')}
                   </p>
@@ -198,7 +197,8 @@ export default function HomePage() {
                       </>
                     )}
                   </div>
-                </Link>
+                  </Link>
+                </div>
               );
             })}
           </div>
@@ -478,16 +478,15 @@ export default function HomePage() {
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3" role="list">
               {surfNewsData?.news?.slice(0, 3).map(item => (
-                <a
-                  key={item.id}
-                  href={item.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title={`${item.title} — ${item.source} (abrir em nova aba)`}
-                  aria-label={`${item.title}, fonte: ${item.source}`}
-                  role="listitem"
-                  className="group rounded-xl overflow-hidden bg-slate-800/40 border border-slate-700/50 hover:bg-slate-800/80 hover:border-blue-500/30 transition-all"
-                >
+                <div key={item.id} role="listitem">
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={`${item.title} — ${item.source} (abrir em nova aba)`}
+                    aria-label={`${item.title}, fonte: ${item.source}`}
+                    className="group block rounded-xl overflow-hidden bg-slate-800/40 border border-slate-700/50 hover:bg-slate-800/80 hover:border-blue-500/30 transition-all"
+                  >
                   <div className="h-40 bg-slate-800 overflow-hidden relative">
                     <img
                       src={item.image || (item.category === 'WSL' ? 'https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67' : 'https://static.wixstatic.com/media/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.jpeg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.webp')}
@@ -514,7 +513,8 @@ export default function HomePage() {
                       {new Date(item.publishedAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
                     </p>
                   </div>
-                </a>
+                  </a>
+                </div>
               ))}
               {(!surfNewsData?.news?.length && !surfNewsLoading) && (
                 <p className="col-span-full text-center py-8 text-slate-400 text-sm">
