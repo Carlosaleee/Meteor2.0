@@ -21,6 +21,10 @@ export type TrafficRoute = {
   condition: string;
   description: string;
   updatedAt: string;
+  /** 'live' = dado ao vivo (ARTESP/Waze); 'estimated' = snapshot estatico (sem fonte real). */
+  source?: 'live' | 'estimated';
+  /** Link publico para verificar o estado da via ('' quando nao ha fonte confiavel). */
+  sourceUrl?: string;
 };
 
 export type RegionalNewsResponse = {
