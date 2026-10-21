@@ -96,16 +96,17 @@
 - API externa: Nenhuma (simulacao baseada em horario)
 - Fallback: data/fallback-traffic.json
 - Rodovias: SP-222, BR-116, Balsa Cananeia
+- **ArtspWazeRepository** (compartilhado com o NoticiasRegionaisModule): status ao vivo das rodovias estaduais (SP-222, SP-165, SP-055) via **painel Waze publico do CCM/ARTESP** (`https://ccm.artesp.sp.gov.br/rodovias/waze`, parser de `#text__tempo-viagem` + cards `data-trafego-card`, cache 10min). API oficial de ocorrencias (`/rodovias/api/ocorrencias/`, header `Authorization: Api-Key ...`, 12 req/h) usada **opcionalmente** quando `ARTESP_API_KEY` esta no env — ocorrencias ativas (`filtro_finalizada=1`) com `interdicoes` viram BLOQUEADO. BR-116 (federal/DNIT) e balsa **nao tem fonte real** e ficam marcadas `estimated`. Falha total -> null (rota estatica)
 
 ### 4.4 NoticiasRegionaisModule
 - Endpoints:
   - GET /v1/noticias-regionais — noticias + rotas
   - GET /v1/noticias-regionais/news?category= — noticias filtradas por categoria
   - GET /v1/noticias-regionais/routes — status das rodovias
-- API externa: RSS automatico — ISN Online (isnonline.com.br/feed), Santa Portal (santaportal.com.br/feed), Google News RSS ("Vale do Ribeira")
+- API externa: RSS automatico — ISN Online (isnonline.com.br/feed), Santa Portal (santaportal.com.br/feed), Google News RSS ("Vale do Ribeira") + **ARTESP/Waze** (ArtspWazeRepository) para as rotas
 - Fallback: data/fallback-noticias-regionais.json (merge: RSS fresco + base, rolling 30 noticias + 5 rotas)
-- Dados: noticias regionais do Vale do Ribeira (categorias: transito/policial/turismo/cotidiano/noticia por keyword) + status de rodovias (rotas estaticas)
-- Cache: 30min em memoria; `forceRefresh()` re-coleta todos os feeds (cron 1h + a cada 6h)
+- Dados: noticias regionais do Vale do Ribeira (categorias: transito/policial/turismo/cotidiano/noticia por keyword) + status de rodovias (SP-222/SP-165/SP-055 com dado ao vivo; demais `estimated`) — rotas trazem `source` (`live`/`estimated`) e `sourceUrl` (link de verificacao); o JSON de fallback persiste **apenas** rotas estaticas (dado ao vivo nunca e gravado em disco)
+- Cache: 30min em memoria; `forceRefresh()` limpa tambem o cache ARTESP e re-coleta todos os feeds (cron 1h + a cada 6h)
 
 ### 4.5 ComercioModule
 - Endpoints:
@@ -118,7 +119,8 @@
 ### 4.6 NewsModule
 - Endpoint: GET /v1/news
 - API externa:
-  - **WSL** (worldsurfleague.com) — ranking (`/championship-tour`), calendario (`/schedule`) e **noticias** (`/news`, cards server-rendered com `data-content-id`)
+  - **WSL Latin America** (wsllatinamerica.com/feed — **RSS oficial em pt-BR**, unica fonte de **noticias** do modulo; o scraper do site WSL em ingles foi removido)
+  - **WSL** (worldsurfleague.com) — apenas ranking (`/athletes/tour/mct|wct`) e calendario (`/events`) — dados estruturados, sem texto em ingles na UI
   - **Google News RSS (pt-BR)** — noticias "Paulista" de surfe. O dominio antigo **spsurf.com.br esta morto (NXDOMAIN)**, por isso o fluxo do `spsurf.repository` e: site legado → RSS Google News → lista padrao
 - Ranking WSL: parser de tabela HTML real (`<tr class="athlete-*">` → rank/nome/pais/pontos/trend; `<tr class="event-*">` → eventos com status; Upcoming primeiro) — fallback hardcoded se parse < 5 entradas
   - **Fix 19/10:** `class="tour-points eliminated"` nao casava com `class="tour-points">` → antes so 7 homens/5 mulheres eram parseados (rankings com lacunas). Regex atual `tour-points[^>]*>\s*([\d,]+)\s*<` retorna top 15 sem buracos
@@ -151,7 +153,7 @@
 - **Startup:** Executa refresh de todos os módulos ao iniciar (`onModuleInit`) — **pulado em serverless** (`process.env.VERCEL`): filesystem efemero, o agendamento vem dos crons da Vercel
 - **Cron pesado:** a cada 6 horas (`@Cron('0 */6 * * *')`) — meteorologia, oceanografia, weather news, rankings, noticias, regionais
 - **Cron de noticias:** a cada 1 hora (`@Cron('0 * * * *')`) → `refreshNews()` — apenas rankings WSL + noticias + regionais (leve)
-- **Modulos afetados:** Meteorologia, Oceanografia, Noticias (WSL + Google News), Noticias Regionais (RSS)
+- **Modulos afetados:** Meteorologia, Oceanografia, Noticias (WSL + Google News), Noticias Regionais (RSS + rotas ARTESP/Waze)
 - **Endpoints:**
   - `GET /v1/cron/status` — Retorna ultimo refresh (`lastRefresh`, `lastNewsRefresh`) e status
   - `POST /v1/cron/refresh` — Forca refresh completo manual; aceita `scope=news` para o refresh leve
@@ -166,7 +168,7 @@
   - `news.repository.ts`: `forceRefresh()`
   - `wsl.repository.ts`: `clearCache()`
   - `spsurf.repository.ts`: `clearCache()`
-  - `noticias-regionais.repository.ts`: `forceRefresh()` (re-coleta RSS)
+  - `noticias-regionais.repository.ts`: `forceRefresh()` (re-coleta RSS + limpa o cache do `ArtspWazeRepository`)
 
 ### 4.10 RagModule (RAG)
 - **Modulo:** `apps/backend/src/modules/iron/rag/` — `rag.module.ts`, `rag.service.ts`, `chunker.ts`, `scoring.ts`, `index.store.ts`, `rag.types.ts`
@@ -239,7 +241,7 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 - data/fallback-oceanography.json — Ondas, swell, marees, spots
 - data/fallback-traffic.json — Rodovias com simulacao por horario (estatico — sem API externa)
 - data/fallback-comercio.json — 50 comercios de Ilha Comprida (estatico — sem API externa)
-- data/fallback-noticias-regionais.json — rolling 30 noticias regionais (RSS auto) + 5 rotas de transito
+- data/fallback-noticias-regionais.json — rolling 30 noticias regionais (RSS auto) + 5 rotas de transito (estaticas; o overlay ao vivo ARTESP/Waze nunca e persistido no arquivo)
 - data/fallback-news.json — Noticias WSL + SPSurf
 - data/fallback-weather-news.json — Criado em runtime pelo weather-news.repository (pode nao existir em clone novo)
 - data/rag-index-docs.json — Indice RAG da documentacao (206 chunks / 198 embeddings; regenerar via `pnpm --filter backend rag:index`)
@@ -311,16 +313,17 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 
 ## 9. Cobertura de Testes
 
-**Total: 203 testes — backend Jest (160) + frontend Vitest (43)**
+**Total: 225 testes — backend Jest (182) + frontend Vitest (43)**
 
 > Contagem atualizada apos execucao dos testes em 21/10/2026.
 
-### Backend (Jest) — 160 testes em 26 arquivos
+### Backend (Jest) — 182 testes em 27 arquivos
 | Arquivo | Testes | Status |
 |---------|--------|--------|
 | refresh.service.spec.ts | 18 | ✅ |
-| noticias-regionais.repository.spec.ts | 11 | ✅ (RSS com mock) |
-| wsl.repository.spec.ts | 11 | ✅ (fixture WSL real + `eliminated` + sponsor + notícias) |
+| noticias-regionais.repository.spec.ts | 15 | ✅ (RSS com mock + proveniencia live/estimated das rotas ARTESP) |
+| wsl.repository.spec.ts | 14 | ✅ (fixture WSL real + `eliminated` + sponsor + noticias via RSS pt-BR) |
+| artsp-waze.repository.spec.ts | 14 | ✅ (novo — parser painel Waze + API oficial opcional + cache) |
 | cron.controller.spec.ts | 10 | ✅ (auth Bearer/`x-cron-secret`/`?secret=`, 401, scope) |
 | gemini-chat.repository.spec.ts | 10 | ✅ (persona, turns user/model, contexto 1o turno) |
 | iron.service.spec.ts | 9 | ✅ (inclui RAG no contexto; provider GeminiContextBuilder mockado) |
@@ -332,7 +335,7 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 | meteorology.service.spec.ts | 5 | ✅ |
 | weather-news.repository.spec.ts | 5 | ✅ |
 | news.repository.spec.ts | 5 | ✅ (novo — 12 notícias, fallback, persistência) |
-| env.schema.spec.ts | 5 | ✅ (novo — defaults, coerção, chaves fora do schema) |
+| env.schema.spec.ts | 6 | ✅ (defaults, coerção, chaves fora do schema) |
 | spsurf.repository.spec.ts | 5 | ✅ (inclui fallback Google News RSS) |
 | gemini.repository.spec.ts | 5 | ✅ |
 | comercio.service.spec.ts | 4 | ✅ |
@@ -380,12 +383,12 @@ Meteor_2.0/
         modules/
           meteorology/ (controller, service, repository)
           oceanography/ (controller, service, marine.repository, gemini.repository)
-          traffic/ (controller, service, repository)
+          traffic/ (controller, service, repository, artsp-waze.repository — painel Waze ARTESP + spec)
           noticias-regionais/ (controller, service, repository)
           comercio/ (controller, service, repository)
           iron/ (controller, service, gemini-chat.repository)
             rag/ (rag.module, rag.service, chunker, scoring, index.store, rag.types)
-          news/ (controller, service, wsl.repository, spsurf.repository)
+          news/ (controller, service, wsl.repository — rankings/eventos WSL + noticias via RSS pt-BR, spsurf.repository)
         app.module.ts
         main.ts
       data/ (fallback JSONs + rag-index-docs.json versionado)
