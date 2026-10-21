@@ -1,61 +1,78 @@
 {
-  "updatedAt": "2026-10-21T00:42:21.393Z",
+  "updatedAt": "2026-10-21T01:13:18.847Z",
   "data": {
     "news": [
       {
-        "id": "wsl-562076",
-        "title": "Finals Day All Set For Tomorrow At Edommo Surf Pro Razo",
+        "id": "wsl-trestles-miguel-vence",
+        "title": "Miguel Pupo vence Trestles e sobe para 4o do ranking mundial",
         "source": "World Surf League",
         "sourceUrl": "https://www.worldsurfleague.com",
-        "url": "https://www.worldsurfleague.com/posts/562076/finals-day-all-set-for-tomorrow-at-edommo-surf-pro-razo",
-        "description": "Semifinals locked in!",
-        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/9da42bc86780f823840ceabf84d4c4a0.jpg?&x=400&y=225&icq=74&sig=515e9fdd4e0e97d3728e366231a15971",
+        "url": "https://ne9.com.br/wsl-trestles-miguel-pupo-erin-brooks-ranking/",
+        "description": "Miguel Pupo derrotou Kanoa Igarashi na final por 14,77 a 14,40 em Lower Trestles. Segunda vitoria do brasileiro na temporada.",
+        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67",
         "category": "WSL",
-        "publishedAt": "2026-10-17T12:41:00.000Z"
+        "publishedAt": "2026-09-21T12:00:00.000Z",
+        "sample": true
       },
       {
-        "id": "wsl-562028",
-        "title": "Top Contenders Emerge At Edommo Surf Pro Razo",
-        "source": "World Surf League",
-        "sourceUrl": "https://www.worldsurfleague.com",
-        "url": "https://www.worldsurfleague.com/posts/562028/top-contenders-emerge-at-edommo-surf-pro-razo",
-        "description": "Moving Day Narrows Field To Men's Round of 16, Women's Quarterfinals",
-        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/68754790afed33c619cfbd2ff860b656.jpg?&x=400&y=225&icq=74&sig=be4bfa5b6aa760fc12469a5c07230ea1",
+        "id": "wsl-yago-lideranca",
+        "title": "Yago Dora assume lideranca do ranking WSL apos Trestles",
+        "source": "ge Globo",
+        "sourceUrl": "https://ge.globo.com/surfe/wsl/",
+        "url": "https://ge.globo.com/surfe/wsl/noticia/2026/09/17/yago-dora-vai-as-quartas-de-final-de-trestles-e-mantem-lideranca-provisoria-da-wsl.ghtml",
+        "description": "Atual campeao mundial vence duelo de aereos contra Kauli Vaast e assume 1a posicao com 42.780 pontos.",
+        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67",
         "category": "WSL",
-        "publishedAt": "2026-10-16T17:33:11.000Z"
+        "publishedAt": "2026-09-18T12:00:00.000Z",
+        "sample": true
       },
       {
-        "id": "wsl-561880",
-        "title": "Daily Coverage: La Marginal Surfing Pro QS 4,000 - Day 4",
+        "id": "wsl-erin-tripla",
+        "title": "Erin Brooks conquista 3o titulo consecutivo no CT feminino",
         "source": "World Surf League",
         "sourceUrl": "https://www.worldsurfleague.com",
-        "url": "https://www.worldsurfleague.com/posts/561880/daily-coverage-la-marginal-surfing-pro-qs-4-000-day-1",
-        "description": "High-Performance Spectacle Locks In Finals Day",
-        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/dad2e8c480c9267dccfaa812553dc146.jpg?&x=400&y=225&icq=74&sig=485b3442cf3da942cb03addba0ca6e9a",
+        "url": "https://ne9.com.br/wsl-trestles-miguel-pupo-erin-brooks-ranking/",
+        "description": "Canadense derrotou Gabriela Bryan na final por 13,00 a 11,90. Terceiro titulo consecutivo apos Taiti e Fiji.",
+        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/05d0c45992d04a5409e4f0752d17382f.png?&x=1440&y=513&icq=74&sig=b95e55f8d4a05ce4133bcc58ba78e486",
         "category": "WSL",
-        "publishedAt": "2026-10-16T08:15:00.000Z"
+        "publishedAt": "2026-09-21T12:00:00.000Z",
+        "sample": true
       },
       {
-        "id": "wsl-561909",
-        "title": "Edommo Surf Pro Razo QS 2,000 Off To Cracking Start",
-        "source": "World Surf League",
-        "sourceUrl": "https://www.worldsurfleague.com",
-        "url": "https://www.worldsurfleague.com/posts/561909/edommo-surf-pro-razo-qs-2-000-off-to-cracking-start",
-        "description": "Top Seeds Dominate Men's Round of 64",
-        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/4b9135c028c174bdda5773451de4c1f9.jpg?&x=400&y=225&icq=74&sig=d14b9f72a748824102fb14f7ae2730ab",
+        "id": "wsl-medina-eliminado",
+        "title": "Medina e eliminado em Trestles e complica busca pelo tetra",
+        "source": "UOL",
+        "sourceUrl": "https://www.uol.com.br/esporte/",
+        "url": "https://www.uol.com.br/esporte/colunas/guilherme-dorini/2026/09/17/eliminacao-precoce-de-medina-em-trestles-atrapalha-luta-pelo-tetra-mundial.htm",
+        "description": "Tricampeao mundial cai para Mateus Herdy na segunda rodada (11,83 a 12,00). Ja tem 3 eliminacoes no Round 2 esta temporada.",
+        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/05d0c45992d04a5409e4f0752d17382f.png?&x=1440&y=513&icq=74&sig=b95e55f8d4a05ce4133bcc58ba78e486",
         "category": "WSL",
-        "publishedAt": "2026-10-15T18:00:18.000Z"
+        "publishedAt": "2026-09-18T12:00:00.000Z",
+        "sample": true
       },
       {
-        "id": "wsl-561886",
-        "title": "WSL Fantasy LIVE Training Day | MEO Rip Curl Pro Portugal presented by Corona Cero 2026",
-        "source": "World Surf League",
-        "sourceUrl": "https://www.worldsurfleague.com",
-        "url": "https://www.worldsurfleague.com/posts/561886/wsl-fantasy-live-training-day-meo-rip-curl-pro-portugal-presented-by-corona-cero-2026",
-        "description": "Lock in your WSL Fantasy team before Round 1 gets underway and use today's training day insights to help make your final picks -",
-        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/9c2ceeb237477eaa9b24dc2caf510c17.jpg?&x=400&y=225&icq=74&sig=d045e383af0bf93dea257c69ada9d360",
+        "id": "wsl-trestles-corte",
+        "title": "Trestles define corte do CT: 22 homens e 14 mulheres seguem",
+        "source": "aos Midia",
+        "sourceUrl": "https://aosmidia.com.br",
+        "url": "https://aosmidia.com.br/2026/competicoes/wsl/miguel-pupo-vence-em-trestles-veja-ranking-e-corte/",
+        "description": "Filipe Toledo escapou do corte. Mateus Herdy e Alejo Muniz ficam fora das proximas duas etapas do CT.",
+        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67",
         "category": "WSL",
-        "publishedAt": "2026-10-15T02:45:00.000Z"
+        "publishedAt": "2026-09-19T12:00:00.000Z",
+        "sample": true
+      },
+      {
+        "id": "wsl-portugal-proximo",
+        "title": "MEO Rip Curl Pro Portugal: proxima parada do CT em Supertubos",
+        "source": "World Surf League",
+        "sourceUrl": "https://www.worldsurfleague.com/events",
+        "url": "https://www.worldsurfleague.com/events",
+        "description": "Decima etapa do CT 2026 em Peniche de 16 a 25 de outubro. Classificados pelo corte disputam penultima etapa.",
+        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67",
+        "category": "WSL",
+        "publishedAt": "2026-09-22T12:00:00.000Z",
+        "sample": true
       },
       {
         "id": "spsurf-1",
@@ -122,125 +139,64 @@
         "image": "https://static.wixstatic.com/media/71b9f8_c9f54baec703476192f96cc92fda3f5d~mv2.jpg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/71b9f8_c9f54baec703476192f96cc92fda3f5d~mv2.jpg",
         "category": "Paulista",
         "publishedAt": "2026-10-14T18:20:32.000Z"
-      },
-      {
-        "id": "wsl-fioravanti-cai",
-        "title": "Fioravanti cai na estreia e abre disputa entre Yago e Italo",
-        "source": "NSC Total",
-        "sourceUrl": "https://www.nsctotal.com.br",
-        "url": "https://www.nsctotal.com.br/esportes/reviravolta-no-ranking-da-wsl-coloca-yago-dora-na-lideranca-e-abre-espaco-para-trinca-brasileira-durante-ct-de-trestles",
-        "description": "Lider do ranking foi eliminado por Luke Thompson na segunda rodada. Italiano somou apenas 6,90 pontos.",
-        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67",
-        "category": "WSL",
-        "publishedAt": "2026-09-18T12:00:00.000Z",
-        "sample": true
       }
     ],
     "rankings": {
       "men": [
         {
           "rank": 1,
-          "name": "Yago Dora",
-          "country": "Brazil",
-          "points": 48865,
+          "name": "Leonardo Fioravanti",
+          "country": "Italy",
+          "points": 40015,
           "trend": 0
         },
         {
           "rank": 2,
           "name": "Italo Ferreira",
           "country": "Brazil",
-          "points": 46015,
-          "trend": 1
+          "points": 39930,
+          "trend": 0
         },
         {
           "rank": 3,
-          "name": "Miguel Pupo",
+          "name": "Yago Dora",
           "country": "Brazil",
-          "points": 42770,
-          "trend": 1
+          "points": 37695,
+          "trend": 0
         },
         {
           "rank": 4,
-          "name": "Leonardo Fioravanti",
-          "country": "Italy",
-          "points": 42515,
-          "trend": -2
+          "name": "Gabriel Medina",
+          "country": "Brazil",
+          "points": 35410,
+          "trend": 0
         },
         {
           "rank": 5,
-          "name": "Gabriel Medina",
+          "name": "Miguel Pupo",
           "country": "Brazil",
-          "points": 41495,
+          "points": 32770,
           "trend": 0
         },
         {
           "rank": 6,
           "name": "Griffin Colapinto",
           "country": "United States",
-          "points": 39780,
+          "points": 31375,
           "trend": 0
         },
         {
           "rank": 7,
           "name": "Ethan Ewing",
           "country": "Australia",
-          "points": 35640,
-          "trend": 1
+          "points": 28575,
+          "trend": 0
         },
         {
           "rank": 8,
-          "name": "Kanoa Igarashi",
-          "country": "Japan",
-          "points": 34410,
-          "trend": -1
-        },
-        {
-          "rank": 9,
-          "name": "Kauli Vaast",
-          "country": "France",
-          "points": 29120,
-          "trend": 2
-        },
-        {
-          "rank": 10,
           "name": "Samuel Pupo",
           "country": "Brazil",
-          "points": 28960,
-          "trend": -1
-        },
-        {
-          "rank": 11,
-          "name": "George Pittar",
-          "country": "Australia",
-          "points": 27705,
-          "trend": -1
-        },
-        {
-          "rank": 12,
-          "name": "Jack Robinson",
-          "country": "Australia",
-          "points": 27165,
-          "trend": 2
-        },
-        {
-          "rank": 13,
-          "name": "Liam O'Brien",
-          "country": "Australia",
-          "points": 27005,
-          "trend": -1
-        },
-        {
-          "rank": 14,
-          "name": "Cole Houshmand",
-          "country": "United States",
-          "points": 25830,
-          "trend": -1
-        },
-        {
-          "rank": 15,
-          "name": "Marco Mignot",
-          "country": "France",
-          "points": 24770,
+          "points": 27960,
           "trend": 0
         }
       ],
