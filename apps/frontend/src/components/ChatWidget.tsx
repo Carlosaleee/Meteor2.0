@@ -88,10 +88,13 @@ export function ChatWidget() {
     if (!input.trim()) return;
 
     const userMsg = input;
-    const history: HistoryEntry[] = messages.slice(-HISTORY_LIMIT).map(m => ({
-      role: m.role === 'user' ? 'user' : 'assistant',
-      content: m.text,
-    }));
+    const history: HistoryEntry[] = messages
+      .slice(-HISTORY_LIMIT)
+      .filter((m): m is Message => Boolean(m && typeof m.text === 'string' && m.text.trim().length > 0))
+      .map(m => ({
+        role: m.role === 'user' ? 'user' : 'assistant',
+        content: m.text,
+      }));
     setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
     setInput('');
     setIsTyping(true);
@@ -104,14 +107,32 @@ export function ChatWidget() {
         body: JSON.stringify({ message: userMsg, sessionId, history }),
       });
 
-      if (!res.ok) throw new Error(`API ${res.status}`);
+      if (!res.ok) {
+        if (res.status === 429) {
+          throw new Error('RATE_LIMIT');
+        }
+        throw new Error(`API ${res.status}`);
+      }
 
-      const { reply } = await res.json() as { reply: string };
-      setMessages(prev => [...prev, { role: 'bot', text: reply }]);
-    } catch {
+      const json = (await res.json()) as {
+        reply?: string;
+        data?: { reply?: string };
+        success?: boolean;
+      };
+
+      const replyText = json.data?.reply ?? json.reply;
+      if (!replyText || typeof replyText !== 'string') {
+        throw new Error('Formato de resposta inválido');
+      }
+
+      setMessages(prev => [...prev, { role: 'bot', text: replyText }]);
+    } catch (err: unknown) {
+      const isRateLimit = err instanceof Error && err.message === 'RATE_LIMIT';
       setMessages(prev => [...prev, {
         role: 'bot',
-        text: '⚠️ Não consegui processar sua mensagem. Verifique se o backend está rodando e tente novamente.',
+        text: isRateLimit
+          ? '⏳ Limite de mensagens atingido (máx 5 por minuto). Aguarde um instante antes de enviar outra pergunta.'
+          : '⚠️ Não consegui processar sua mensagem. Verifique se o backend está rodando e tente novamente.',
       }]);
     } finally {
       setIsTyping(false);
