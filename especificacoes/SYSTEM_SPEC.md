@@ -1,6 +1,6 @@
 # Especificacao Tecnica — Meteor 2.0
 
-> **Ultima atualizacao:** 21/10/2026 (rota `GET /`, proxy `/api` no frontend, Node 24 + actions Node 24 na CI e validação de `FRONTEND_ORIGIN` multi-origin — 203 testes)
+> **Ultima atualizacao:** 21/10/2026 (capa reestruturada — uma secao por aba + acessibilidade, `?tab=` no `/swell`, autoplay com pausa/reduced-motion — 226 testes)
 >
 > **Documentos relacionados:** [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -65,6 +65,26 @@
 | `/creditos` | Creditos & Fontes | Estatico |
 
 > **Removidas no review 2026-09:** `/mapa` e `/transito` (paginas orfas sem link no Header/Footer; `/transito` tinha apenas mocks hardcoded). Componentes `SpotMap` e `BaseLeafletMap` tambem removidos.
+
+### 3.1 Estrutura da capa (`/`) — uma secao por aba
+
+Ordem das secoes (reestruturada em 21/10/2026 — cada secao tem CTA no header apontando para a aba correspondente):
+
+| # | Secao (id) | CTA (aba de destino) |
+|---|------------|----------------------|
+| 1 | Hero Carousel (slide 1 = **Notícias do Vale**) | slide links (Noticias → Previsao → Swell → Comercio → Blog) |
+| 2 | Previsão do Tempo (`#tempo`) — atual + max/min de hoje (daily[0] via `useAllCities`) | `/meteorologia` |
+| 3 | Últimas Notícias Regionais (`#noticias`) — filtros com `aria-pressed` | `/noticias` |
+| 4 | Condições do Mar (`#mar`) | `/swell?tab=overview` |
+| 5 | Briefing Executivo IA (`#briefing`) | `/swell?tab=forecast` |
+| 6 | Status das Rodovias (`#rodovias`) | `/noticias#rodovias` |
+| 7 | Comércio em Destaque (`#comercio`) | `/comercio` |
+| 8 | Notícias de Surf (`#surf-news`) — 3 cards (`useNews`) | `/swell?tab=news` |
+| 9 | Blog & Navegação (`#blog`) | `/blog` |
+
+- **Removida:** secao "Alerta Regional" (duplicava Status das Rodovias).
+- **`/swell?tab=`:** deep-link lido na montagem (useEffect + `history.replaceState`), tab invalida cai para `overview` — nao quebra o prerender estatico.
+- **Acessibilidade:** `h1` sr-only + skip-link `#conteudo`, `aria-busy` nas secoes carregando, `focus-within:ring` nas secoes, botao Pausar/Reproduzir do carrossel (WCAG 2.2.2), autoplay desligado com `prefers-reduced-motion` (reduzido também no `globals.css`), setas ←/→ no carrossel.
 
 ---
 
@@ -313,7 +333,7 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 
 ## 9. Cobertura de Testes
 
-**Total: 225 testes — backend Jest (182) + frontend Vitest (43)**
+**Total: 226 testes — backend Jest (182) + frontend Vitest (44)**
 
 > Contagem atualizada apos execucao dos testes em 21/10/2026.
 
@@ -348,7 +368,7 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 | fallback.service.spec.ts | 2 | ✅ |
 | http-exception.filter.spec.ts | 1 | ✅ |
 
-### Frontend (Vitest + RTL) — 43 testes em 9 arquivos
+### Frontend (Vitest + RTL) — 44 testes em 9 arquivos
 | Arquivo | Testes | Status |
 |---------|--------|--------|
 | ChatWidget.test.tsx | 14 | ✅ (envelope, resposta legada, rate limit 429, reiniciar/apagar, aria-live, sessionId/historico) |
@@ -359,7 +379,7 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 | useComercio.test.ts | 3 | ✅ |
 | useMeteorology.test.ts | 3 | ✅ |
 | useSwell.test.ts | 3 | ✅ |
-| useAllCities.test.ts | 2 | ✅ |
+| useAllCities.test.ts | 3 | ✅ |
 
 > **Nota (review 2026-09):** `utils.test.ts` (11 testes) foi removido junto com `lib/utils.ts` — o teste so exercitava a propria lib morta; as paginas usam implementacoes locais mais ricas.
 
@@ -698,8 +718,8 @@ Pipeline em `.github/workflows/ci.yml`:
 
 | Job | Descrição | Trigger |
 |-----|-----------|---------|
-| `backend-test` | Jest (160 testes) | push/PR |
-| `frontend-test` | Vitest (41 testes) | push/PR |
+| `backend-test` | Jest (182 testes) | push/PR |
+| `frontend-test` | Vitest (44 testes) | push/PR |
 | `lint` | oxlint (frontend) | push/PR |
 | `build` | Valida compilação | Após testes |
 

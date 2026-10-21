@@ -64,22 +64,22 @@ pnpm format
 
 ## Testes
 
-**Total: 203 testes — backend Jest 30 (160) + frontend Vitest (43)**
+**Total: 226 testes — backend Jest 30 (182) + frontend Vitest (44)**
 
 > Contagem atualizada apos execucao dos testes em 21/10/2026.
 
 ```bash
-# Backend (160 testes — o script ja embute --experimental-vm-modules)
+# Backend (182 testes — o script ja embute --experimental-vm-modules)
 pnpm --filter backend test
 
-# Frontend (43 testes — Vitest + React Testing Library)
+# Frontend (44 testes — Vitest + React Testing Library)
 pnpm --filter frontend test
 ```
 
 | Suite | Runner | Testes | Observacao |
 |-------|--------|--------|------------|
-| `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 160 | 26 arquivos `*.spec.ts` |
-| `apps/frontend` | Vitest + RTL + jsdom | 43 | 9 arquivos `*.test.{ts,tsx}` |
+| `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 182 | 27 arquivos `*.spec.ts` |
+| `apps/frontend` | Vitest + RTL + jsdom | 44 | 9 arquivos `*.test.{ts,tsx}` |
 
 Detalhamento por arquivo: [SYSTEM_SPEC.md §9](./SYSTEM_SPEC.md#9-cobertura-de-testes).
 
@@ -409,6 +409,33 @@ render(
 
 ---
 
+## Capa — Portal Principal `/` (Guia Completo)
+
+### Ordem das secoes (uma por aba do portal)
+1. **Hero Carousel** — slide 1 = Notícias do Vale; ordem: Notícias → Previsão → Swell → Comércio → Blog
+2. **Previsão do Tempo** (`#tempo`) — 4 cidades, atual + máx/mín de hoje → CTA `/meteorologia`
+3. **Últimas Notícias Regionais** (`#noticias`) — filtros `aria-pressed` → CTA `/noticias`
+4. **Condições do Mar** (`#mar`) → CTA `/swell?tab=overview`
+5. **Briefing Executivo (IA)** (`#briefing`) → CTA `/swell?tab=forecast`
+6. **Status das Rodovias** (`#rodovias`) → CTA `/noticias#rodovias`
+7. **Comércio em Destaque** (`#comercio`) → CTA `/comercio`
+8. **Notícias de Surf** (`#surf-news`) — 3 cards via `useNews` → CTA `/swell?tab=news`
+9. **Blog & Navegação** (`#blog`) → CTA `/blog`
+
+> A secao "Alerta Regional" foi removida (duplicava Status das Rodovias).
+
+### Deep-link de aba no `/swell`
+- `?tab=overview|news|forecast|wind|spots` lido no `useEffect` de `app/swell/page.tsx` (nao usa `useSearchParams` — nao quebra o prerender estatico)
+- Tab invalida cai para `overview`; a query e limpa com `history.replaceState`
+
+### Acessibilidade da capa
+- `h1` sr-only + skip-link para `#conteudo` (o `main` global ja tem `#main-content`)
+- `aria-busy` nas secoes com carregamento; `focus-within:ring` marca a secao focada
+- Carrossel: botao **Pausar/Reproduzir** (`aria-pressed`), autoplay desligado com `prefers-reduced-motion`, setas ←/→ para navegar
+- `globals.css`: `@media (prefers-reduced-motion: reduce)` neutraliza animacoes/transicoes
+
+---
+
 ## Pagina de Previsão do Tempo (Guia Completo)
 
 ### Estrutura
@@ -710,8 +737,8 @@ Variáveis configuradas no Vercel Dashboard (Settings → Environment Variables)
 Pipeline ativo em `.github/workflows/ci.yml`:
 
 **Jobs:** (todos em Node 24 via `node-version-file: .nvmrc`)
-- `backend-test`: Jest (160 testes) — `NODE_OPTIONS="--experimental-vm-modules" npx jest`
-- `frontend-test`: Vitest (43 testes)
+- `backend-test`: Jest (182 testes) — `NODE_OPTIONS="--experimental-vm-modules" npx jest`
+- `frontend-test`: Vitest (44 testes)
 - `lint`: oxlint (frontend)
 - `build`: valida backend + frontend (após testes)
 
