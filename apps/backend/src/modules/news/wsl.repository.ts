@@ -32,6 +32,8 @@ type WslRankingsResult = {
 };
 
 const BASE_URL = 'https://www.worldsurfleague.com';
+/** RSS oficial em portugues da WSL para a America Latina — unica fonte de noticias do repo. */
+const NEWS_RSS_URL = 'https://wsllatinamerica.com/feed/';
 const FETCH_TIMEOUT_MS = 15_000;
 const MAX_NEWS = 12;
 
@@ -77,52 +79,67 @@ export class WslRepository {
     }
 
     try {
-      const res = await fetch(`${BASE_URL}/news`, {
+      const res = await fetch(NEWS_RSS_URL, {
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MeteorBot/1.0)' },
         signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
       });
-      if (!res.ok) throw new Error(`WSL news returned ${res.status}`);
-      const items = this.parseNewsHtml(await res.text());
-      if (items.length === 0) throw new Error('WSL news page had no recognizable cards');
+      if (!res.ok) throw new Error(`WSL LATAM feed returned ${res.status}`);
+      const items = this.parseNewsRss(await res.text());
+      if (items.length === 0) throw new Error('WSL LATAM feed had no recognizable items');
       this.newsCache = items;
       this.newsCacheTs = Date.now();
       return items;
     } catch (err) {
-      this.logger.warn(`Failed to fetch WSL news: ${err}`);
+      this.logger.warn(`Failed to fetch WSL LATAM news: ${err}`);
       return [];
     }
   }
 
-  private parseNewsHtml(html: string): WslNewsItem[] {
-    const chunks = html.split('data-content-id="').slice(1);
+  private parseNewsRss(xml: string): WslNewsItem[] {
     const items: WslNewsItem[] = [];
+    const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
+    let match: RegExpExecArray | null;
 
-    for (const chunk of chunks) {
-      const link = chunk.match(/href="(\/posts\/[^"]+)"><span class="truncate">([\s\S]*?)<\/span>/);
-      if (!link) continue;
+    while ((match = itemRegex.exec(xml)) !== null) {
+      const block = match[1];
+      const title = this.stripHtml(this.decodeEntities(this.getTag(block, 'title')));
+      const url = this.decodeEntities(this.getTag(block, 'link'));
+      const description = this.stripHtml(this.decodeEntities(this.getTag(block, 'description'))).substring(0, 200);
+      const pubDate = this.getTag(block, 'pubDate');
 
-      const title = this.decodeEntities(link[2].replace(/<[^>]*>/g, '')).trim();
-      if (title.length < 10) continue;
+      if (title.length < 10 || !url.startsWith('http')) continue;
 
-      const dateStr = (chunk.match(/datetime="([^"]+)"/) || [])[1] ?? '';
-      const parsedDate = new Date(dateStr.replace(' ', 'T'));
-      const image = (chunk.match(/data-img-src="([^"]+)"/) || [])[1] ?? '';
-      const descMatch = chunk.match(/<p class="content-card-description[^"]*">([\s\S]*?)<\/p>/);
-
+      const date = new Date(pubDate);
       items.push({
         title,
-        description: descMatch
-          ? this.decodeEntities(descMatch[1].replace(/<[^>]*>/g, '')).trim().substring(0, 200)
-          : '',
-        url: `${BASE_URL}${link[1]}`,
-        image,
-        publishedAt: isNaN(parsedDate.getTime()) ? new Date().toISOString() : parsedDate.toISOString(),
+        description,
+        url,
+        image: this.getImage(block),
+        publishedAt: isNaN(date.getTime()) ? new Date().toISOString() : date.toISOString(),
       });
 
       if (items.length >= MAX_NEWS) break;
     }
 
     return items;
+  }
+
+  private getTag(block: string, tag: string): string {
+    const regex = new RegExp(`<${tag}(?:\\s[^>]*)?>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?</${tag}>`, 'i');
+    const match = block.match(regex);
+    return match ? match[1].trim() : '';
+  }
+
+  private getImage(block: string): string {
+    const media =
+      block.match(/<media:content[^>]*url="([^"]+)"/i) ||
+      block.match(/<media:thumbnail[^>]*url="([^"]+)"/i) ||
+      block.match(/<enclosure[^>]*url="([^"]+)"/i);
+    return media ? this.decodeEntities(media[1]) : '';
+  }
+
+  private stripHtml(text: string): string {
+    return text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
   }
 
   private decodeEntities(text: string): string {
