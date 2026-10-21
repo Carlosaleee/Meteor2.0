@@ -1,7 +1,73 @@
 {
-  "updatedAt": "2026-10-20T21:09:00.139Z",
+  "updatedAt": "2026-10-21T00:42:21.679Z",
   "data": {
     "news": [
+      {
+        "id": "reg-33ax61",
+        "title": "Cine Roxy recebe Festival de Cinema Francês em Santos após 14 anos",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/1077-fm/cine-roxy-recebe-festival-de-cinema-frances-em-santos-apos-14-anos/",
+        "description": "Divulgação O Cine Roxy traz de volta a Santos um dos mais importantes eventos dedicados à cinematografia francesa no Brasil.",
+        "image": "https://santaportal.com.br/wp-content/uploads/2026/10/cinemafrances.jpg",
+        "category": "turismo",
+        "publishedAt": "2026-10-21T00:00:00.000Z"
+      },
+      {
+        "id": "reg-ow6tlh",
+        "title": "São Vicente inicia votação popular para escolher os bebês do Calendário 2027",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/baixada/sao-vicente-inicia-votacao-popular-para-escolher-os-bebes-do-calendario-2027/",
+        "description": "Divulgação A votação popular para escolher os 12 bebês que vão estampar o Calendário do Bebê 2027 de São Vicente começou nesta terça-feira (20).",
+        "image": "https://santaportal.com.br/wp-content/uploads/2026/10/calendario-sao-vicente-e1792530499372.jpg",
+        "category": "cotidiano",
+        "publishedAt": "2026-10-21T00:00:00.000Z"
+      },
+      {
+        "id": "reg-ud1cd2",
+        "title": "Mulher baleada durante ataque a tiros em Guarujá recebe alta",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/baixada/guaruja-baixada/mulher-baleada-durante-ataque-a-tiros-em-guaruja-recebe-alta/",
+        "description": "Divulgação A mulher que foi baleada no último domingo (18) na Enseada, em Guarujá, recebeu alta nesta segunda-feira (19).",
+        "image": "https://santaportal.com.br/wp-content/uploads/2026/10/tiros-enseada.jpg",
+        "category": "cotidiano",
+        "publishedAt": "2026-10-20T23:30:00.000Z"
+      },
+      {
+        "id": "reg-19slwqf",
+        "title": "MPF apura cobrança a caminhoneiros pela utilização de pátios no Porto de Santos",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/porto-e-negocios/mpf-apura-cobranca-a-caminhoneiros-pela-utilizacao-de-patios-no-porto-de-santos/",
+        "description": "Divulgação O requerimento foi motivado a partir de representação do Sindicato dos Transportadores Autônomos de Cargas a Granel de Santos, Guarujá e Cubatão.",
+        "image": "https://santaportal.com.br/wp-content/uploads/2026/10/portosantos.jpg",
+        "category": "noticia",
+        "publishedAt": "2026-10-20T23:00:00.000Z"
+      },
+      {
+        "id": "reg-ivqls7",
+        "title": "Milton Cunha critica Virginia Fonseca como rainha de bateria",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/1077-fm/milton-cunha-critica-virginia-fonseca-como-rainha-de-bateria/",
+        "description": "Reprodução/Instagram Milton Cunha, principal comentarista dos desfiles das escolas de samba da Globo, criticou a performance de Virginia Fonseca durante o Carnaval do Rio de Janeiro, quando ela foi ra",
+        "image": "",
+        "category": "turismo",
+        "publishedAt": "2026-10-20T21:33:22.000Z"
+      },
+      {
+        "id": "reg-1mfy6tt",
+        "title": "PSG mantém média de quatro gols por jogo e supera o Barcelona pela Champions",
+        "source": "Santa Portal",
+        "sourceUrl": "https://santaportal.com.br",
+        "url": "https://santaportal.com.br/esporte/psg-mantem-media-de-quatro-gols-por-jogo-e-supera-o-barcelona-pela-champions/",
+        "description": "Reprodução/PSG O ataque do Paris Saint-Germain manteve nesta terça-feira (20) a impressionante média superior a quatro gols por jogo na Champions League.",
+        "image": "https://santaportal.com.br/wp-content/uploads/2026/10/ouverture_barca_czckt2.avif",
+        "category": "cotidiano",
+        "publishedAt": "2026-10-20T21:32:50.000Z"
+      },
       {
         "id": "reg-1m2nc7i",
         "title": "Flávio Bolsonaro apaga posts com críticas ao Bolsa Família",
@@ -265,72 +331,6 @@
         "image": "https://isnonline.com.br/wp-content/uploads/2026/10/exposicao-de-desenhos-em-Praia-Grande.jpg",
         "category": "turismo",
         "publishedAt": "2026-10-20T13:30:11.000Z"
-      },
-      {
-        "id": "reg-9m74ok",
-        "title": "Polícia descobre imóvel utilizado para armazenamento de drogas em Ilha Comprida, Vale do Ribeira; homem é preso em flagrante (VÍDEO) - THMais",
-        "source": "THMais",
-        "sourceUrl": "https://news.google.com",
-        "url": "https://news.google.com/rss/articles/CBMiqAJBVV95cUxPZmdTd3JvcVFOTlpQUERyVlVqa2R3UU1ULUtmSWg4WFVCci02LUJ3Ykw1bkRWbXBld0pOaDZKSW0tUjhnUjJFd3BhQi1tZkpmSWhVQ3NXYkl5ODRlS0t5bWltLVdtX1RjRzRJZEhxOWVTTy1Gbl9uVTdyUzctOUVJTEhSYkVneklsRVp4RmR6QVhKVXZObzZjRi1CdFoxTUpubnJTeXd4VlEyQ2NpcUZkaF9lOWRZbl9kUThGRGpCcHJhazZVbG9JZHpfb0ZHNVlydHlKNVUteHJSdEpoQXBodFJWb0c4T3F5dnBkSGt5bHhTNlU3U2d2Z0tNM1QzVDYtcVFhQ1FnVDVYOEhyXzFIeERsLVNnLUtaZjdpU2NUWUY1eFZKb191eQ?oc=5",
-        "description": "Polícia descobre imóvel utilizado para armazenamento de drogas em Ilha Comprida, Vale do Ribeira; homem é preso em flagrante (VÍDEO) THMais",
-        "image": "",
-        "category": "noticia",
-        "publishedAt": "2026-10-20T12:36:13.000Z"
-      },
-      {
-        "id": "reg-otip6i",
-        "title": "Yuri desencanta, mas Corinthians só empata com Vitória sob olhar de Seedorf",
-        "source": "Santa Portal",
-        "sourceUrl": "https://santaportal.com.br",
-        "url": "https://santaportal.com.br/esporte/yuri-desencanta-mas-corinthians-so-empata-com-vitoria-sob-olhar-de-seedorf/",
-        "description": "Reprodução/X @ECVitoria Sob olhares do novo técnico Clarence Seedorf, o Corinthians só empatou com o Vitória por 1 a 1 na Neo Química Arena.",
-        "image": "https://santaportal.com.br/wp-content/uploads/2026/10/CORINTHIANS-VITORIA.jpg",
-        "category": "noticia",
-        "publishedAt": "2026-10-20T01:33:12.000Z"
-      },
-      {
-        "id": "reg-954zj2",
-        "title": "Briosa aprova carta de intenções para modernização do Ulrico Mursa e social",
-        "source": "Santa Portal",
-        "sourceUrl": "https://santaportal.com.br",
-        "url": "https://santaportal.com.br/esporte/briosa-aprova-carta-de-intencoes-para-modernizacao-do-ulrico-mursa-e-social/",
-        "description": "Gustavo Machado/Agência Briosa Proposta da Eixo prevê parceria comercial para valorizar espaços do clube, ampliar receitas e melhorar a infraestrutura.",
-        "image": "https://santaportal.com.br/wp-content/uploads/2026/10/WhatsApp-Image-2026-10-19-at-15.15.44-e1792433970884.jpeg",
-        "category": "noticia",
-        "publishedAt": "2026-10-20T00:30:00.000Z"
-      },
-      {
-        "id": "reg-4dwd7v",
-        "title": "TJ-SP abre concurso para escrevente com salário de R$ 6.782; Santos é sede",
-        "source": "Santa Portal",
-        "sourceUrl": "https://santaportal.com.br",
-        "url": "https://santaportal.com.br/baixada/tj-sp-abre-concurso-para-escrevente-com-salario-de-r-6-782-santos-e-sede/",
-        "description": "Reprodução O TJ-SP abriu concurso público para o cargo de escrevente técnico judiciário, com remuneração de R$ 6.782,54.",
-        "image": "https://santaportal.com.br/wp-content/uploads/2026/10/TJ-SP-e1792451705594.jpg",
-        "category": "turismo",
-        "publishedAt": "2026-10-20T00:00:00.000Z"
-      },
-      {
-        "id": "reg-1armhhj",
-        "title": "Fiscalização flagra descarte irregular em dois pontos de Santos",
-        "source": "Santa Portal",
-        "sourceUrl": "https://santaportal.com.br",
-        "url": "https://santaportal.com.br/baixada/fiscalizacao-flagra-descarte-irregular-em-dois-pontos-de-santos/",
-        "description": "Divulgação/Prefeitura de Santos Duas ocorrências de descarte irregular de resíduos em Santos, no litoral de São Paulo, foram flagradas no último sábado (17).",
-        "image": "https://santaportal.com.br/wp-content/uploads/2026/10/descarteiirregular.jpg",
-        "category": "noticia",
-        "publishedAt": "2026-10-19T23:30:00.000Z"
-      },
-      {
-        "id": "reg-55z93k",
-        "title": "Três mulheres são agredidas durante ato político do PT em Peruíbe",
-        "source": "Santa Portal",
-        "sourceUrl": "https://santaportal.com.br",
-        "url": "https://santaportal.com.br/baixada/tres-mulheres-sao-agredidas-durante-ato-politico-do-pt-em-peruibe/",
-        "description": "Reprodução Uma das vítimas estava com um bebê no colo e o caso é investigado pela Polícia Civil.",
-        "image": "https://santaportal.com.br/wp-content/uploads/2026/10/MANIFESTACAO-PT-e1792445284523.jpg",
-        "category": "noticia",
-        "publishedAt": "2026-10-19T23:00:00.000Z"
       }
     ],
     "routes": [
