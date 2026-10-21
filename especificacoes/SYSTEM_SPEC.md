@@ -1,6 +1,6 @@
 # Especificacao Tecnica — Meteor 2.0
 
-> **Ultima atualizacao:** 21/10/2026 (capa reestruturada — uma secao por aba + acessibilidade, `?tab=` no `/swell`, autoplay com pausa/reduced-motion — 226 testes)
+> **Ultima atualizacao:** 21/10/2026 (capa reestruturada — uma secao por aba + acessibilidade, `?tab=` no `/swell`, autoplay com pausa/reduced-motion — 229 testes)
 >
 > **Documentos relacionados:** [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -333,7 +333,7 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 
 ## 9. Cobertura de Testes
 
-**Total: 226 testes — backend Jest (182) + frontend Vitest (44)**
+**Total: 229 testes — backend Jest (182) + frontend Vitest (47)**
 
 > Contagem atualizada apos execucao dos testes em 21/10/2026.
 
@@ -368,7 +368,7 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 | fallback.service.spec.ts | 2 | ✅ |
 | http-exception.filter.spec.ts | 1 | ✅ |
 
-### Frontend (Vitest + RTL) — 44 testes em 9 arquivos
+### Frontend (Vitest + RTL) — 47 testes em 10 arquivos
 | Arquivo | Testes | Status |
 |---------|--------|--------|
 | ChatWidget.test.tsx | 14 | ✅ (envelope, resposta legada, rate limit 429, reiniciar/apagar, aria-live, sessionId/historico) |
@@ -379,7 +379,8 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 | useComercio.test.ts | 3 | ✅ |
 | useMeteorology.test.ts | 3 | ✅ |
 | useSwell.test.ts | 3 | ✅ |
-| useAllCities.test.ts | 3 | ✅ |
+| useAllCities.test.ts | 3 | ✅ (daily[0] -> tempMax/tempMin/forecastCode) |
+| swell/tabs.test.ts | 3 | ✅ (deep-link ?tab= do /swell) |
 
 > **Nota (review 2026-09):** `utils.test.ts` (11 testes) foi removido junto com `lib/utils.ts` — o teste so exercitava a propria lib morta; as paginas usam implementacoes locais mais ricas.
 
@@ -719,7 +720,7 @@ Pipeline em `.github/workflows/ci.yml`:
 | Job | Descrição | Trigger |
 |-----|-----------|---------|
 | `backend-test` | Jest (182 testes) | push/PR |
-| `frontend-test` | Vitest (44 testes) | push/PR |
+| `frontend-test` | Vitest (47 testes) | push/PR |
 | `lint` | oxlint (frontend) | push/PR |
 | `build` | Valida compilação | Após testes |
 

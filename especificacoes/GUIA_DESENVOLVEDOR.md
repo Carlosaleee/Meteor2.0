@@ -64,7 +64,7 @@ pnpm format
 
 ## Testes
 
-**Total: 226 testes — backend Jest 30 (182) + frontend Vitest (44)**
+**Total: 229 testes — backend Jest 30 (182) + frontend Vitest (47)**
 
 > Contagem atualizada apos execucao dos testes em 21/10/2026.
 
@@ -72,14 +72,14 @@ pnpm format
 # Backend (182 testes — o script ja embute --experimental-vm-modules)
 pnpm --filter backend test
 
-# Frontend (44 testes — Vitest + React Testing Library)
+# Frontend (47 testes — Vitest + React Testing Library)
 pnpm --filter frontend test
 ```
 
 | Suite | Runner | Testes | Observacao |
 |-------|--------|--------|------------|
 | `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 182 | 27 arquivos `*.spec.ts` |
-| `apps/frontend` | Vitest + RTL + jsdom | 44 | 9 arquivos `*.test.{ts,tsx}` |
+| `apps/frontend` | Vitest + RTL + jsdom | 47 | 10 arquivos `*.test.{ts,tsx}` |
 
 Detalhamento por arquivo: [SYSTEM_SPEC.md §9](./SYSTEM_SPEC.md#9-cobertura-de-testes).
 
@@ -738,7 +738,7 @@ Pipeline ativo em `.github/workflows/ci.yml`:
 
 **Jobs:** (todos em Node 24 via `node-version-file: .nvmrc`)
 - `backend-test`: Jest (182 testes) — `NODE_OPTIONS="--experimental-vm-modules" npx jest`
-- `frontend-test`: Vitest (44 testes)
+- `frontend-test`: Vitest (47 testes)
 - `lint`: oxlint (frontend)
 - `build`: valida backend + frontend (após testes)
 
