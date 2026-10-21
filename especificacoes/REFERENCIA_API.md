@@ -375,8 +375,8 @@ GET /v1/news
     {
       "id": "wsl-trestles-miguel-vence",
       "title": "Miguel Pupo vence Trestles e sobe para 4o do ranking mundial",
-      "source": "World Surf League",
-      "sourceUrl": "https://www.worldsurfleague.com",
+      "source": "ne9",
+      "sourceUrl": "https://ne9.com.br",
       "url": "https://ne9.com.br/wsl-trestles-miguel-pupo-erin-brooks-ranking/",
       "description": "Miguel Pupo derrotou Kanoa Igarashi na final...",
       "image": "https://d3qf8nvav5av0u.cloudfront.net/...",
@@ -415,7 +415,7 @@ GET /v1/news
 | events[].status | string | `Completed`, `Standby` ou `Upcoming` (Upcoming listado primeiro) |
 | timestamp | string | Momento da montagem da resposta (ISO 8601) |
 
-**Fontes:** WSL (worldsurfleague.com — parser da tabela HTML real do ranking/calendario + scraper de `/news`) + Google News RSS pt-BR (categoria `Paulista`; o dominio `spsurf.com.br` morreu — NXDOMAIN — e o RSS e o fallback). Fallback: `data/fallback-news.json`. Refresh: cron diario 03:00 UTC (unico no plano Hobby) + `POST /v1/cron/refresh` (header `x-cron-secret`).
+**Fontes (sempre em portugues):** **WSL Latin America** (wsllatinamerica.com/feed — RSS oficial pt-BR; categoria `WSL`) + Google News RSS pt-BR (categoria `Paulista`; o dominio `spsurf.com.br` morreu — NXDOMAIN — e o RSS e o fallback). Rankings/calendario continuam do site oficial WSL (dados estruturados, sem texto). Fallback: `data/fallback-news.json`. Refresh: cron diario 03:00 UTC (unico no plano Hobby) + `POST /v1/cron/refresh` (header `x-cron-secret`).
 
 ---
 
@@ -450,9 +450,11 @@ GET /v1/noticias-regionais
     {
       "id": "sp-222",
       "name": "SP-222",
-      "condition": "LIVRE",
-      "description": "Trafego fluindo normalmente",
-      "updatedAt": "2026-09-12T12:00:00.000Z"
+      "condition": "LENTO",
+      "description": "Lentidão de 1h 54min — 45,6 km",
+      "updatedAt": "2026-10-21T17:48:00-03:00",
+      "source": "live",
+      "sourceUrl": "https://ccm.artesp.sp.gov.br/rodovias/waze"
     }
   ],
   "timestamp": "2026-09-12T12:00:00.000Z"
@@ -474,6 +476,9 @@ GET /v1/noticias-regionais
 | routes[].name | string | Nome da rodovia |
 | routes[].condition | string | Condicao: LIVRE, MODERADO, LENTO, BLOQUEADO, OPERACIONAL, INTERROMPIDO |
 | routes[].description | string | Descricao da condicao |
+| routes[].updatedAt | string | Data/hora da coleta (ISO 8601) |
+| routes[].source | string | `live` (ARTESP/Waze em tempo real) ou `estimated` (snapshot estatico) |
+| routes[].sourceUrl | string | Link publico para verificar a via (`""` quando nao ha fonte confiavel) |
 
 ---
 
@@ -529,21 +534,27 @@ GET /v1/noticias-regionais/routes
   {
     "id": "sp-222",
     "name": "SP-222",
-    "condition": "MODERADO",
-    "description": "Trecho de Iguape com fluxo intenso apos enchentes. Alagamentos pontuais em areas rurais",
-    "updatedAt": "2026-09-21T12:00:00.000Z"
+    "condition": "LENTO",
+    "description": "Lentidão de 1h 54min — 45,6 km",
+    "updatedAt": "2026-10-21T17:48:00-03:00",
+    "source": "live",
+    "sourceUrl": "https://ccm.artesp.sp.gov.br/rodovias/waze"
   },
   {
-    "id": "sp-165",
-    "name": "SP-165",
-    "condition": "INTERROMPIDO",
-    "description": "Interditada nos km 88 (Eldorado) e 42,5 e 73 (Sete Barras) apos deslizamentos",
-    "updatedAt": "2026-09-21T12:00:00.000Z"
+    "id": "br-116",
+    "name": "BR-116 (Regis Bittencourt)",
+    "condition": "MODERADO",
+    "description": "Desvio para BR-116 pela interdicao da SP-165. Fluxo elevado de veiculos na serra",
+    "updatedAt": "2026-09-21T12:00:00.000Z",
+    "source": "estimated",
+    "sourceUrl": "https://www.gov.br/dnit/pt-br"
   }
 ]
 ```
 
-**Campos:** mesmos de `routes[]` no endpoint pai (`id`, `name`, `condition`, `description`, `updatedAt`). Rotas (5): SP-222, BR-116 (Regis Bittencourt), SP-165, Balsa Cananeia-Ilha Comprida, SP-055.
+**Campos:** mesmos de `routes[]` no endpoint pai (`id`, `name`, `condition`, `description`, `updatedAt`, `source`, `sourceUrl`). Rotas (5): SP-222, BR-116 (Regis Bittencourt), SP-165, Balsa Cananeia-Ilha Comprida, SP-055.
+
+**Proveniencia:** SP-222/SP-165/SP-055 (estaduais) recebem dado **ao vivo** do painel Waze do CCM/ARTESP (`source: "live"`). BR-116 (federal/DNIT) e a balsa nao tem fonte publica de status — ficam `source: "estimated"` com o snapshot estatico (a balsa sem `sourceUrl`). Com `ARTESP_API_KEY` configurada, ocorrencias ativas da API oficial tambem alimentam as tres estaduais (cache 10min respeita o limite de 12 req/h).
 
 ---
 

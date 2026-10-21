@@ -217,50 +217,99 @@ describe('WslRepository', () => {
   });
 
   describe('getNews', () => {
-    const newsHtml = `
-      <div class="content-card-wrap">
-        <div class="promotion-card content-card" data-content-id="562076" data-content-type="article">
-          <div class="content-card-bd link" data-href="/posts/562076/finals-day-all-set">
-            <div class="content-card-img-wrap">
-              <div class="content-card-img proxy-img" data-img-src="https://d3qf8nvav5av0u.cloudfront.net/image/abc.jpg?&x=400"></div>
-            </div>
-            <div class="content-card-text-wrap">
-              <div class="content-card-meta">
-                <time pubdate class="content-card-pubdate" datetime="2026-10-17 09:41:00">Saturday, October 17, 2026</time>
-              </div>
-              <a class="content-card-title promotion-card-title" href="/posts/562076/finals-day-all-set"><span class="truncate">Finals Day All Set For Tomorrow At Edommo Surf Pro</span></a>
-              <p class="content-card-description"> Semifinals locked in! </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
+    const newsRss = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>WSL – Latin America</title>
+    <language>pt-BR</language>
+    <item>
+      <title><![CDATA[Ryan Kainalo e Charli Hately são os grandes campeões do Banco do Brasil São Sebastião Pro]]></title>
+      <link>https://wsllatinamerica.com/ryan-kainalo-e-charli-hately/</link>
+      <description><![CDATA[<p>Dupla brasileira brilhou na final em Maresias.</p>]]></description>
+      <pubDate>Wed, 21 Oct 2026 12:00:00 +0000</pubDate>
+      <media:content url="https://wsllatinamerica.com/wp-content/uploads/2026/10/final.jpg" />
+    </item>
+    <item>
+      <title><![CDATA[Segunda notícia com imagem via enclosure]]></title>
+      <link>https://wsllatinamerica.com/outra-noticia/</link>
+      <description>Resumo sem CDATA.</description>
+      <pubDate>Tue, 20 Oct 2026 09:00:00 +0000</pubDate>
+      <enclosure url="https://wsllatinamerica.com/wp-content/uploads/2026/10/enc.jpg" type="image/jpeg" />
+    </item>
+    <item>
+      <title><![CDATA[Curta]]></title>
+      <link>https://wsllatinamerica.com/curta</link>
+    </item>
+    <item>
+      <title><![CDATA[Titulo válido mas link não é URL]]></title>
+      <link>not-a-url</link>
+    </item>
+  </channel>
+</rss>`;
 
-    it('should parse article cards from the WSL news page', async () => {
+    it('should parse Portuguese items from the WSL Latin America RSS feed', async () => {
       global.fetch = jest.fn().mockResolvedValue({
         ok: true,
-        text: jest.fn().mockResolvedValue(newsHtml),
+        text: jest.fn().mockResolvedValue(newsRss),
         json: jest.fn().mockResolvedValue([]),
       });
 
       const news = await repository.getNews();
-      expect(news).toHaveLength(1);
+
+      expect(news).toHaveLength(2);
       expect(news[0]).toEqual({
-        title: 'Finals Day All Set For Tomorrow At Edommo Surf Pro',
-        description: 'Semifinals locked in!',
-        url: 'https://www.worldsurfleague.com/posts/562076/finals-day-all-set',
-        image: 'https://d3qf8nvav5av0u.cloudfront.net/image/abc.jpg?&x=400',
+        title: 'Ryan Kainalo e Charli Hately são os grandes campeões do Banco do Brasil São Sebastião Pro',
+        description: 'Dupla brasileira brilhou na final em Maresias.',
+        url: 'https://wsllatinamerica.com/ryan-kainalo-e-charli-hately/',
+        image: 'https://wsllatinamerica.com/wp-content/uploads/2026/10/final.jpg',
         publishedAt: expect.any(String),
       });
-      expect(new Date(news[0].publishedAt).getFullYear()).toBe(2026);
+      expect(new Date(news[0].publishedAt).toISOString()).toBe('2026-10-21T12:00:00.000Z');
+      expect(news[1].image).toBe('https://wsllatinamerica.com/wp-content/uploads/2026/10/enc.jpg');
     });
 
-    it('should return an empty list when the news page has no cards', async () => {
+    it('should fetch from the pt-BR WSL Latin America feed URL', async () => {
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        text: jest.fn().mockResolvedValue(newsRss),
+        json: jest.fn().mockResolvedValue([]),
+      });
+
+      await repository.getNews();
+
+      expect(String((global.fetch as jest.Mock).mock.calls[0][0])).toBe('https://wsllatinamerica.com/feed/');
+    });
+
+    it('should cap the list at 12 items', async () => {
+      const manyItems = Array.from({ length: 15 }, (_, i) => `
+        <item>
+          <title><![CDATA[Notícia de surfe número ${i + 1} do circuito]]></title>
+          <link>https://wsllatinamerica.com/noticia-${i + 1}/</link>
+          <pubDate>Wed, 21 Oct 2026 12:00:00 +0000</pubDate>
+        </item>`).join('');
+      const xml = `<?xml version="1.0"?><rss><channel>${manyItems}</channel></rss>`;
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        text: jest.fn().mockResolvedValue(xml),
+        json: jest.fn().mockResolvedValue([]),
+      });
+
+      const news = await repository.getNews();
+      expect(news).toHaveLength(12);
+    });
+
+    it('should return an empty list when the feed has no recognizable items', async () => {
       global.fetch = jest.fn().mockResolvedValue({
         ok: true,
         text: jest.fn().mockResolvedValue('<html><body>Blocked</body></html>'),
         json: jest.fn().mockResolvedValue([]),
       });
+
+      await expect(repository.getNews()).resolves.toEqual([]);
+    });
+
+    it('should return an empty list when the feed fetch fails', async () => {
+      global.fetch = jest.fn().mockRejectedValue(new Error('network down'));
 
       await expect(repository.getNews()).resolves.toEqual([]);
     });

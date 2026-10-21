@@ -11,17 +11,17 @@ describe('NewsRepository', () => {
 
   const liveNews: WslNewsItem[] = [
     {
-      title: 'Finals Day All Set For Tomorrow At Edommo Surf Pro',
-      description: 'Semifinals locked in!',
-      url: 'https://www.worldsurfleague.com/posts/562076/finals-day',
-      image: 'https://d3qf8nvav5av0u.cloudfront.net/image/a.jpg',
+      title: 'Ryan Kainalo e Charli Hately são os grandes campeões do Banco do Brasil São Sebastião Pro',
+      description: 'Dupla brasileira brilhou na final em Maresias.',
+      url: 'https://wsllatinamerica.com/ryan-kainalo-e-charli-hately-sao-campeoes/',
+      image: 'https://wsllatinamerica.com/wp-content/uploads/a.jpg',
       publishedAt: daysAgo(1),
     },
     {
-      title: 'Top Contenders Emerge At Edommo Surf Pro',
-      description: 'Moving day narrows the field',
-      url: 'https://www.worldsurfleague.com/posts/562028/top-contenders',
-      image: 'https://d3qf8nvav5av0u.cloudfront.net/image/b.jpg',
+      title: 'Circuito Challenger Series chega ao Litoral Norte paulista',
+      description: 'Etapa decisiva do ranking mundial',
+      url: 'https://wsllatinamerica.com/challenger-series-litoral-norte/',
+      image: 'https://wsllatinamerica.com/wp-content/uploads/b.jpg',
       publishedAt: daysAgo(2),
     },
   ];
@@ -97,17 +97,17 @@ describe('NewsRepository', () => {
     expect(result.timestamp).toBeDefined();
   });
 
-  it('should prefer live WSL news over the static list', async () => {
+  it('should prefer live WSL news from the pt-BR feed over the static list', async () => {
     const result = await repository.getNewsData();
 
     expect(result.news[0].title).toBe(liveNews[0].title);
     expect(result.news[0]).toMatchObject({
-      id: 'wsl-562076',
-      source: 'World Surf League',
-      sourceUrl: 'https://www.worldsurfleague.com',
+      source: 'WSL Latin America',
+      sourceUrl: 'https://wsllatinamerica.com',
       category: 'WSL',
       publishedAt: liveNews[0].publishedAt,
     });
+    expect(result.news[0].id.startsWith('wsl-wsllatinamerica-com-')).toBe(true);
     expect(result.news.map(n => n.title)).not.toContain('Miguel Pupo vence Trestles e sobe para 4o do ranking mundial');
   });
 

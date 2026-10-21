@@ -34,6 +34,8 @@ export const envSchema = z.object({
   INMET_API_TOKEN: z.string().optional().default(""),
   INMET_BASE_URL: z.string().url().default("https://apitempo.inmet.gov.br"),
   GITHUB_TOKEN: z.string().optional().default(""),
+  /** API oficial CCM/ARTESP de ocorrencias rodoviarias (opcional; sem chave usa o painel Waze publico). */
+  ARTESP_API_KEY: z.string().optional().default(""),
 });
 
 export type Env = z.infer<typeof envSchema>;

@@ -23,12 +23,14 @@ const ROUTE_CONDITION_COLORS: Record<string, { text: string; bg: string; border:
   MODERADO: { text: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/30' },
   LENTO: { text: 'text-orange-400', bg: 'bg-orange-500/10', border: 'border-orange-500/30' },
   BLOQUEADO: { text: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/30' },
+  INTERROMPIDO: { text: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/30' },
   OPERACIONAL: { text: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/30' },
 };
 
 const ROUTE_ICONS: Record<string, string> = {
   'sp-222': '🛣️',
   'sp-055': '🛣️',
+  'sp-165': '🛣️',
   'br-116': '🚛',
   'balsa-cananeia': '⛴️',
 };
@@ -41,6 +43,13 @@ function timeAgo(dateStr: string): string {
   if (hours < 24) return `${hours}h atras`;
   const days = Math.floor(hours / 24);
   return `${days}d atras`;
+}
+
+/** "21/10 17:48" — data/hora da coleta exibida nos cards de rodovia. */
+function formatRouteTime(iso: string): string {
+  const date = new Date(iso);
+  if (isNaN(date.getTime())) return '';
+  return date.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 }
 
 export default function NoticiasPage() {
@@ -103,12 +112,38 @@ export default function NoticiasPage() {
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-lg" aria-hidden="true">{emoji}</span>
                     <span className="text-sm font-bold text-white">{route.name}</span>
+                    {route.source === 'estimated' && (
+                      <span
+                        className="ml-auto px-1.5 py-0.5 rounded text-[9px] font-semibold bg-slate-700/50 text-slate-400 border border-slate-600/50"
+                        title="Dado estimado (sem fonte ao vivo no momento)"
+                      >
+                        estimado
+                      </span>
+                    )}
                   </div>
                   <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${colors.bg} ${colors.text} border ${colors.border}`}>
                     {route.condition === 'BLOQUEADO' && <FaExclamationTriangle className="w-3 h-3" aria-hidden="true" />}
                     {route.condition}
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-2">{route.description}</p>
+                  <p className="text-[11px] text-slate-400 mt-2 truncate" title={route.description}>{route.description}</p>
+                  <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-slate-800/60 text-[10px] text-slate-500">
+                    {route.sourceUrl ? (
+                      <a
+                        href={route.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Verificar no painel oficial da fonte"
+                        className="inline-flex items-center gap-1 hover:text-amber-400 transition-colors"
+                      >
+                        Fonte <FaExternalLinkAlt className="w-2.5 h-2.5" aria-hidden="true" />
+                      </a>
+                    ) : (
+                      <span>Fonte não informada</span>
+                    )}
+                    <span title={`Última atualização: ${new Date(route.updatedAt).toLocaleString('pt-BR')}`}>
+                      {formatRouteTime(route.updatedAt)}
+                    </span>
+                  </div>
                 </div>
               );
             })}

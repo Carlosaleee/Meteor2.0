@@ -17,6 +17,7 @@ const CONDITION_COLORS: Record<string, string> = {
   MODERADO: '#f59e0b',
   LENTO: '#f97316',
   BLOQUEADO: '#ef4444',
+  INTERROMPIDO: '#ef4444',
   OPERACIONAL: '#06b6d4',
 };
 

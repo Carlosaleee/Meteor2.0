@@ -22,7 +22,6 @@ import { useSwell } from '@/hooks/useSwell';
 import { useAiSummary } from '@/hooks/useAiSummary';
 import { useRegionalNews } from '@/hooks/useRegionalNews';
 import { useComercio } from '@/hooks/useComercio';
-import { useNews } from '@/hooks/useNews';
 import { weatherEmoji } from '@/app/meteorologia/components/weather-utils';
 
 const ROUTE_CONDITION_COLORS: Record<string, { text: string; bg: string; border: string }> = {
@@ -30,12 +29,14 @@ const ROUTE_CONDITION_COLORS: Record<string, { text: string; bg: string; border:
   MODERADO: { text: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/30' },
   LENTO: { text: 'text-orange-400', bg: 'bg-orange-500/10', border: 'border-orange-500/30' },
   BLOQUEADO: { text: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/30' },
+  INTERROMPIDO: { text: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/30' },
   OPERACIONAL: { text: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/30' },
 };
 
 const ROUTE_ICONS: Record<string, string> = {
   'sp-222': '🛣️',
   'sp-055': '🛣️',
+  'sp-165': '🛣️',
   'br-116': '🚛',
   'balsa-cananeia': '⛴️',
 };
@@ -69,12 +70,30 @@ function timeAgo(dateStr: string): string {
   return `${days}d`;
 }
 
+/** "21/10 17:48" — data/hora da coleta exibida nos cards de rodovia. */
+function formatRouteTime(iso: string): string {
+  const date = new Date(iso);
+  if (isNaN(date.getTime())) return '';
+  return date.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+}
+
+/** Chip discreto de proveniencia — nunca fingir frescor de dado estimado. */
+function EstimatedBadge() {
+  return (
+    <span
+      className="ml-auto px-1.5 py-0.5 rounded text-[9px] font-semibold bg-slate-700/50 text-slate-400 border border-slate-600/50"
+      title="Dado estimado (sem fonte ao vivo no momento)"
+    >
+      estimado
+    </span>
+  );
+}
+
 export default function HomePage() {
   const { cities, loading: citiesLoading } = useAllCities();
   const { data: swellData, loading: swellLoading } = useSwell();
   const { data: aiData, loading: aiLoading } = useAiSummary();
   const { data: newsData, loading: newsLoading } = useRegionalNews();
-  const { data: surfNewsData, loading: surfNewsLoading } = useNews();
   const { data: comercioData, loading: comercioLoading } = useComercio();
 
   const [newsCategory, setNewsCategory] = useState('todas');
@@ -94,7 +113,6 @@ export default function HomePage() {
         <a href="#alerta" className="block p-2 bg-amber-600 text-white rounded-lg">Pular para Alerta Regional</a>
         <a href="#noticias" className="block p-2 bg-blue-600 text-white rounded-lg">Pular para Notícias Regionais</a>
         <a href="#mar" className="block p-2 bg-cyan-600 text-white rounded-lg">Pular para Condições do Mar</a>
-        <a href="#surf-news" className="block p-2 bg-amber-600 text-white rounded-lg">Pular para Notícias de Surf</a>
         <a href="#briefing" className="block p-2 bg-cyan-600 text-white rounded-lg">Pular para Briefing IA</a>
         <a href="#rodovias" className="block p-2 bg-amber-600 text-white rounded-lg">Pular para Rodovias</a>
         <a href="#comercio" className="block p-2 bg-orange-600 text-white rounded-lg">Pular para Comércio</a>
@@ -177,12 +195,31 @@ export default function HomePage() {
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-lg" aria-hidden="true">{emoji}</span>
                     <span className="text-sm font-bold text-white">{route.name}</span>
+                    {route.source === 'estimated' && <EstimatedBadge />}
                   </div>
                   <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${colors.bg} ${colors.text} border ${colors.border}`}>
                     {route.condition === 'BLOQUEADO' && <FaExclamationTriangle className="w-3 h-3" aria-hidden="true" />}
                     {route.condition}
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-2">{route.description}</p>
+                  <p className="text-[11px] text-slate-400 mt-2 truncate" title={route.description}>{route.description}</p>
+                  <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-slate-800/60 text-[10px] text-slate-500">
+                    {route.sourceUrl ? (
+                      <a
+                        href={route.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Verificar no painel oficial da fonte"
+                        className="inline-flex items-center gap-1 hover:text-amber-400 transition-colors"
+                      >
+                        Fonte <FaExternalLinkAlt className="w-2.5 h-2.5" aria-hidden="true" />
+                      </a>
+                    ) : (
+                      <span>Fonte não informada</span>
+                    )}
+                    <span title={`Última atualização: ${new Date(route.updatedAt).toLocaleString('pt-BR')}`}>
+                      {formatRouteTime(route.updatedAt)}
+                    </span>
+                  </div>
                 </div>
               );
             })}
@@ -311,69 +348,7 @@ export default function HomePage() {
         )}
       </ForecastSection>
 
-      {/* 6. Notícias de Surf */}
-      <ForecastSection
-        id="surf-news"
-        title="Notícias de Surf"
-        icon={<FaWater className="w-5 h-5 text-amber-400" aria-hidden="true" />}
-        ariaLabel="Notícias e competições de surf WSL e Circuito Paulista"
-      >
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {surfNewsData?.news?.slice(0, 3).map((item) => (
-            <a
-              key={item.id}
-              href={item.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              title={`${item.title} — ${item.source} (abrir em nova aba)`}
-              aria-label={`${item.title}, fonte: ${item.source}`}
-              className="group rounded-xl overflow-hidden bg-slate-800/40 border border-slate-700/50 hover:bg-slate-800/80 hover:border-blue-500/30 transition-all"
-            >
-              <div className="h-36 bg-slate-800 overflow-hidden relative">
-                <img
-                  src={item.image || (item.category === 'WSL' ? 'https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67' : 'https://static.wixstatic.com/media/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.jpeg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.webp')}
-                  alt={item.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  loading="lazy"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = item.category === 'WSL' ? 'https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67' : 'https://static.wixstatic.com/media/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.jpeg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.webp';
-                  }}
-                />
-                <span className={`absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] font-medium border ${item.category === 'WSL' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'}`}>
-                  {item.category}
-                </span>
-              </div>
-              <div className="p-3">
-                <div className="flex items-start justify-between gap-2 mb-1">
-                  <h4 className="text-sm font-bold text-white group-hover:text-blue-300 transition-colors line-clamp-2">{item.title}</h4>
-                  <FaExternalLinkAlt className="w-3 h-3 text-slate-500 group-hover:text-blue-400 shrink-0 mt-0.5" aria-hidden="true" />
-                </div>
-                <p className="text-[10px] text-blue-400 font-medium mb-1">{item.source}</p>
-                <p className="text-xs text-slate-400 leading-relaxed max-h-8 group-hover:max-h-40 overflow-hidden transition-all duration-300 ease-in-out">{item.description}</p>
-                <p className="text-[9px] text-slate-600 mt-2 font-mono">
-                  {new Date(item.publishedAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
-                </p>
-              </div>
-            </a>
-          ))}
-          {(!surfNewsData?.news?.length && !surfNewsLoading) && (
-            <div className="col-span-full text-center py-8 text-slate-500">
-              Nenhuma notícia de surf disponível no momento.
-            </div>
-          )}
-        </div>
-        <div className="mt-4 text-center">
-          <Link
-            href="/swell"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-sm font-semibold hover:bg-blue-500/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-          >
-            Ver todas as notícias <FaArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-      </ForecastSection>
-
-      {/* 7. Briefing Executivo IA */}
+      {/* 6. Briefing Executivo IA */}
       <ForecastSection
         id="briefing"
         title="Briefing Executivo (IA)"
@@ -418,17 +393,33 @@ export default function HomePage() {
               return (
                 <Link
                   key={route.id}
-                  href="/noticias"
+                  href={route.sourceUrl || '/noticias'}
+                  target={route.sourceUrl ? '_blank' : undefined}
+                  rel={route.sourceUrl ? 'noopener noreferrer' : undefined}
                   className={`bg-slate-900/80 border ${colors.border} rounded-2xl p-3 hover:scale-[1.02] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white`}
-                  title={`${route.name}: ${route.condition}`}
-                  aria-label={`${route.name}: ${route.condition} — clique para ver detalhes`}
+                  title={`${route.name}: ${route.condition} — ${route.description}`}
+                  aria-label={`${route.name}: ${route.condition} — abrir na fonte oficial`}
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-lg" aria-hidden="true">{emoji}</span>
                     <span className="text-sm font-bold text-white">{route.name}</span>
+                    {route.source === 'estimated' && <EstimatedBadge />}
                   </div>
                   <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${colors.bg} ${colors.text} border ${colors.border}`}>
                     {route.condition}
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-2 truncate" title={route.description}>{route.description}</p>
+                  <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-slate-800/60 text-[10px] text-slate-500">
+                    <span className="inline-flex items-center gap-1">
+                      {route.sourceUrl ? (
+                        <>Fonte <FaExternalLinkAlt className="w-2.5 h-2.5" aria-hidden="true" /></>
+                      ) : (
+                        'Fonte não informada'
+                      )}
+                    </span>
+                    <span title={`Última atualização: ${new Date(route.updatedAt).toLocaleString('pt-BR')}`}>
+                      {formatRouteTime(route.updatedAt)}
+                    </span>
                   </div>
                 </Link>
               );

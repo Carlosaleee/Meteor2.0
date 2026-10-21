@@ -251,6 +251,7 @@ Schema validado por Zod em `apps/backend/src/common/config/env.schema.ts`.
 | `INMET_API_TOKEN` | Reservada (estacoes INMET) | *(vazio)* |
 | `INMET_BASE_URL` | Declarada no schema (repositorio usa URL direta) | `apitempo.inmet.gov.br` |
 | `GITHUB_TOKEN` | Consumida apenas pelo MCP local (`.opencode/mcp/github-server.mjs`) | *(vazio)* |
+| `ARTESP_API_KEY` | **Opcional** — API oficial CCM/ARTESP de ocorrencias rodoviarias (header `Authorization: Api-Key ...`, ate 12 req/h; cache 10min). Sem chave, as rotas SP-222/SP-165/SP-055 usam o **painel Waze publico** (`https://ccm.artesp.sp.gov.br/rodovias/waze`) — solicitar em https://ccm.artesp.sp.gov.br/rodovias/api/docs/ | *(vazio)* |
 | `CRON_SECRET` | Auth de `GET/POST /v1/cron/refresh` — lida via `process.env` cru, fora do schema Zod; **sem default e obrigatoria** (ausente ou errada → 401; setar no dashboard da Vercel em producao) | *(nenhuma)* |
 | `NODE_OPTIONS` | **Vercel (producao):** `--experimental-require-module` — habilita `require()` de deps ESM-only (Nest 12); a Vercel desativa por padrao via `--no-experimental-require-module` | *(na Vercel)* `--experimental-require-module` |
 
@@ -290,6 +291,15 @@ Schema validado por Zod em `apps/backend/src/common/config/env.schema.ts`.
 ### Fallbacks sempre retornando dados antigos
 - Verificar se `apps/backend/data/` existe
 - Os JSONs sao criados automaticamente na primeira requisicao bem-sucedida
+
+### Status das rodovias marcado como "estimado" (nunca vira ao vivo)
+**Causa:** o `ArtspWazeRepository` nao conseguiu ler o painel Waze da ARTESP (`https://ccm.artesp.sp.gov.br/rodovias/waze`).
+
+**Verificacoes:**
+1. `curl -s https://ccm.artesp.sp.gov.br/rodovias/waze | findstr text__tempo-viagem` — o bloco precisa existir (se o painel mudar de estrutura, o parser do `artsp-waze.repository.ts` precisa ser ajustado)
+2. Logs do backend: procurar `Falha ao obter painel Waze da ARTESP`
+3. Com `ARTESP_API_KEY` setada, erros `API CCM/ARTESP retornou 403/429` indicam chave invalida ou rate limit (12 req/h) — o cache de 10min do repositorio ja respeita o limite; um `POST /v1/cron/refresh` zera os caches
+4. Rotas **BR-116 (federal/DNIT) e balsa Cananeia-Ilha Comprida ficam `estimated` por design** — nao ha fonte publica de status para elas; so SP-222/SP-165/SP-055 recebem dado ao vivo
 
 ### Erro "ReferenceError: window is not defined" no build
 **Causa:** Componente Leaflet importado diretamente sem protecao SSR.

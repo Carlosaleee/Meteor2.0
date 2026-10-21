@@ -100,8 +100,8 @@ export class NewsRepository {
       return live.slice(0, 6).map(item => ({
         id: `wsl-${this.idFromUrl(item.url)}`,
         title: item.title,
-        source: 'World Surf League',
-        sourceUrl: 'https://www.worldsurfleague.com',
+        source: 'WSL Latin America',
+        sourceUrl: 'https://wsllatinamerica.com',
         url: item.url,
         description: item.description,
         image: item.image,
@@ -113,8 +113,11 @@ export class NewsRepository {
   }
 
   private idFromUrl(url: string): string {
-    const match = url.match(/\/posts\/(\d+)/);
-    return match ? match[1] : url.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').slice(0, 60);
+    return url
+      .replace(/^https?:\/\//, '')
+      .replace(/[^a-z0-9]+/gi, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 60);
   }
 
   /** Notícias de EXEMPLO com datas CONGELADAS (set/2026) — nunca relativas. */
@@ -123,8 +126,8 @@ export class NewsRepository {
       {
         id: 'wsl-trestles-miguel-vence',
         title: 'Miguel Pupo vence Trestles e sobe para 4o do ranking mundial',
-        source: 'World Surf League',
-        sourceUrl: 'https://www.worldsurfleague.com',
+        source: 'ne9',
+        sourceUrl: 'https://ne9.com.br',
         url: 'https://ne9.com.br/wsl-trestles-miguel-pupo-erin-brooks-ranking/',
         description: 'Miguel Pupo derrotou Kanoa Igarashi na final por 14,77 a 14,40 em Lower Trestles. Segunda vitoria do brasileiro na temporada.',
         image: 'https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67',
@@ -147,8 +150,8 @@ export class NewsRepository {
       {
         id: 'wsl-erin-tripla',
         title: 'Erin Brooks conquista 3o titulo consecutivo no CT feminino',
-        source: 'World Surf League',
-        sourceUrl: 'https://www.worldsurfleague.com',
+        source: 'ne9',
+        sourceUrl: 'https://ne9.com.br',
         url: 'https://ne9.com.br/wsl-trestles-miguel-pupo-erin-brooks-ranking/',
         description: 'Canadense derrotou Gabriela Bryan na final por 13,00 a 11,90. Terceiro titulo consecutivo apos Taiti e Fiji.',
         image: 'https://d3qf8nvav5av0u.cloudfront.net/image/05d0c45992d04a5409e4f0752d17382f.png?&x=1440&y=513&icq=74&sig=b95e55f8d4a05ce4133bcc58ba78e486',
@@ -183,9 +186,9 @@ export class NewsRepository {
       {
         id: 'wsl-portugal-proximo',
         title: 'MEO Rip Curl Pro Portugal: proxima parada do CT em Supertubos',
-        source: 'World Surf League',
-        sourceUrl: 'https://www.worldsurfleague.com/events',
-        url: 'https://www.worldsurfleague.com/events',
+        source: 'WSL Latin America',
+        sourceUrl: 'https://wsllatinamerica.com',
+        url: 'https://wsllatinamerica.com',
         description: 'Decima etapa do CT 2026 em Peniche de 16 a 25 de outubro. Classificados pelo corte disputam penultima etapa.',
         image: 'https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67',
         category: 'WSL',
@@ -260,9 +263,9 @@ export class NewsRepository {
       {
         id: 'wsl-luana-top6',
         title: 'Luana Silva permanece entre as 6 melhores do ranking feminino',
-        source: 'World Surf League',
-        sourceUrl: 'https://www.worldsurfleague.com/athletes/rankings',
-        url: 'https://www.worldsurfleague.com/athletes/rankings',
+        source: 'WSL Latin America',
+        sourceUrl: 'https://wsllatinamerica.com',
+        url: 'https://wsllatinamerica.com',
         description: 'Brasileira terminou entre as 5 melhores em Trestles e ocupa 6a posicao com 36.580 pontos.',
         image: 'https://d3qf8nvav5av0u.cloudfront.net/image/05d0c45992d04a5409e4f0752d17382f.png?&x=1440&y=513&icq=74&sig=b95e55f8d4a05ce4133bcc58ba78e486',
         category: 'WSL',
@@ -308,9 +311,9 @@ export class NewsRepository {
       {
         id: 'wsl-gabriela-lidera',
         title: 'Gabriela Bryan assume lideranca do ranking feminino apos Trestles',
-        source: 'World Surf League',
-        sourceUrl: 'https://www.worldsurfleague.com/athletes/rankings',
-        url: 'https://www.worldsurfleague.com/athletes/rankings',
+        source: 'WSL Latin America',
+        sourceUrl: 'https://wsllatinamerica.com',
+        url: 'https://wsllatinamerica.com',
         description: 'Havaiana assume 1a posicao com 42.865 pontos apos final em Trestles. Erin Brooks sobe para 5a com 3 titulos seguidos.',
         image: 'https://d3qf8nvav5av0u.cloudfront.net/image/05d0c45992d04a5409e4f0752d17382f.png?&x=1440&y=513&icq=74&sig=b95e55f8d4a05ce4133bcc58ba78e486',
         category: 'WSL',

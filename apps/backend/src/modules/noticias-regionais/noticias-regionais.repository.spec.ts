@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NoticiasRegionaisRepository, RegionalNewsItem } from './noticias-regionais.repository';
 import { FallbackService } from '../../common/fallback/fallback.service';
+import { ArtspWazeRepository } from '../traffic/artsp-waze.repository';
 
 describe('NoticiasRegionaisRepository', () => {
   let repository: NoticiasRegionaisRepository;
@@ -56,9 +57,15 @@ describe('NoticiasRegionaisRepository', () => {
     save: jest.fn().mockResolvedValue(undefined),
   };
 
+  const mockArtsp = {
+    getLiveRoutes: jest.fn(),
+    clearCache: jest.fn(),
+  };
+
   beforeEach(async () => {
     mockFallback.load.mockResolvedValue({ news: [baseItem], routes: [baseRoute] });
     mockFallback.save.mockResolvedValue(undefined);
+    mockArtsp.getLiveRoutes.mockResolvedValue(null);
 
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
@@ -69,6 +76,7 @@ describe('NoticiasRegionaisRepository', () => {
       providers: [
         NoticiasRegionaisRepository,
         { provide: FallbackService, useValue: mockFallback },
+        { provide: ArtspWazeRepository, useValue: mockArtsp },
       ],
     }).compile();
 
@@ -76,6 +84,7 @@ describe('NoticiasRegionaisRepository', () => {
     jest.clearAllMocks();
     mockFallback.load.mockResolvedValue({ news: [baseItem], routes: [baseRoute] });
     mockFallback.save.mockResolvedValue(undefined);
+    mockArtsp.getLiveRoutes.mockResolvedValue(null);
   });
 
   afterEach(() => {
@@ -149,6 +158,65 @@ describe('NoticiasRegionaisRepository', () => {
       await repository.getData();
       await repository.getData();
       expect(global.fetch).toHaveBeenCalledTimes(3);
+    });
+  });
+
+  describe('routes provenance', () => {
+    it('should mark routes as estimated with a verification link when live data is unavailable', async () => {
+      const result = await repository.getData();
+
+      expect(result.routes[0]).toMatchObject({
+        id: 'sp-222',
+        source: 'estimated',
+        sourceUrl: 'https://ccm.artesp.sp.gov.br/rodovias/waze',
+      });
+    });
+
+    it('should override routes with live ARTESP/Waze status when available', async () => {
+      mockArtsp.getLiveRoutes.mockResolvedValue({
+        routes: {
+          'sp-222': {
+            condition: 'LENTO',
+            description: 'Lentidão de 1h 54min — 45,6 km',
+            updatedAt: '2026-10-21T17:48:00-03:00',
+          },
+        },
+        sourceUrl: 'https://ccm.artesp.sp.gov.br/rodovias/waze',
+      });
+
+      const result = await repository.getData();
+
+      expect(result.routes[0]).toMatchObject({
+        id: 'sp-222',
+        name: 'SP-222',
+        condition: 'LENTO',
+        description: 'Lentidão de 1h 54min — 45,6 km',
+        updatedAt: '2026-10-21T17:48:00-03:00',
+        source: 'live',
+        sourceUrl: 'https://ccm.artesp.sp.gov.br/rodovias/waze',
+      });
+    });
+
+    it('should persist only static routes to the fallback file (live data never saved)', async () => {
+      mockArtsp.getLiveRoutes.mockResolvedValue({
+        routes: {
+          'sp-222': { condition: 'LENTO', description: 'Lentidão', updatedAt: '2026-10-21T17:48:00-03:00' },
+        },
+        sourceUrl: 'https://ccm.artesp.sp.gov.br/rodovias/waze',
+      });
+
+      await repository.getData();
+
+      const call = mockFallback.save.mock.calls[0] as unknown as [string, { routes: Array<{ source?: string }> }];
+      expect(call[1].routes).toHaveLength(1);
+      expect(call[1].routes[0].source).toBeUndefined();
+    });
+
+    it('should clear the ARTESP cache on forceRefresh', async () => {
+      await repository.getData();
+      await repository.forceRefresh();
+
+      expect(mockArtsp.clearCache).toHaveBeenCalled();
     });
   });
 
