@@ -1,6 +1,6 @@
 ﻿# Guia do Desenvolvedor — Meteor 2.0
 
-> **Ultima atualizacao:** 19/10/2026 (branch `feature/iron-rag`: auth real do cron, chat Iron stateful com RAG hibrido, dados sinteticos marcados — 193 testes)
+> **Ultima atualizacao:** 20/10/2026 (branch `feature/iron-context-fix`: compilacao do Iron restaurada, timeout 45s no Gemini, RAG topK=3 + cache LRU — 201 testes)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -145,8 +145,8 @@ Meteor_2.0/
 - Repositories: acesso a dados (APIs externas + fallback)
 - FallbackService: compartilhado via modulo global
 - **RefreshService:** automacao de refresh (cron 6h pesado + cron 1h rankings/noticias; startup e `@Cron` pulados em `process.env.VERCEL` — os crons reais vem do `vercel.json`)
-- **GeminiClientService (`common/ai/`):** cliente unico de Gemini — texto via SDK `@google/genai`, embeddings via REST direto; usado por oceanografia, chat Iron e RAG
-- **RagModule (`modules/iron/rag/`):** retrieval hibrido (embedding Gemini 60% + BM25 40%, topK=5); indice de docs versionado (`data/rag-index-docs.json`, regenerar com `pnpm --filter backend rag:index`) + indice de dados reconstruido no refresh
+- **GeminiClientService (`common/ai/`):** cliente unico de Gemini — texto via SDK `@google/genai` com timeout de 45s por chamada, embeddings via REST direto (15s); usado por oceanografia, chat Iron e RAG
+- **RagModule (`modules/iron/rag/`):** retrieval hibrido (embedding Gemini 60% + BM25 40%, topK=3, cache LRU de consultas com TTL 5 min); indice de docs versionado (`data/rag-index-docs.json`, regenerar com `pnpm --filter backend rag:index`) + indice de dados reconstruido no refresh
 - **Single-flight (`common/async/`):** deduplica chamadas concorrentes (resumo IA, noticias, rebuild do indice RAG)
 
 ### Estilizacao

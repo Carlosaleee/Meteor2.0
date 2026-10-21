@@ -1,6 +1,6 @@
 # Meteor 2.0 — Tactical HUD & Regional Intelligence Hub
 
-> **Ultima atualizacao:** 05/10/2026 (recuperacao: CI verde, typecheck frontend, backend serverless Vercel, dados frescos — 140 testes)
+> **Ultima atualizacao:** 20/10/2026 (branch `feature/iron-context-fix`: timeout 45s no Gemini, RAG topK=3 + cache LRU — 201 testes)
 >
 > **Documentos relacionados:** [especificacoes/SYSTEM_SPEC.md](./especificacoes/SYSTEM_SPEC.md) · [especificacoes/GUIA_DESENVOLVEDOR.md](./especificacoes/GUIA_DESENVOLVEDOR.md) · [especificacoes/REFERENCIA_API.md](./especificacoes/REFERENCIA_API.md) · [DESIGN.md](./DESIGN.md)
 
@@ -29,7 +29,7 @@ Dashboard tactico e central de inteligencia regional focado na regiao de **Ilha 
 * **Resiliencia:** FallbackService com JSONs diarios + cache
 * **Seguranca:** Helmet, CORS, Throttler (60 req/min — loopback isento)
 * **Validacao:** Zod (env schema) + ApiEnvelope global (interceptor)
-* **Testes:** Jest (103 testes em 20 arquivos `*.spec.ts`)
+* **Testes:** Jest (160 testes em 26 arquivos `*.spec.ts`)
 
 ### Frontend (Interface & Visualizacao)
 * **Framework:** Next.js 15 (App Router) + React 19
@@ -38,7 +38,7 @@ Dashboard tactico e central de inteligencia regional focado na regiao de **Ilha 
 * **Graficos:** ApexCharts (ondas, marés, vento)
 * **Icones:** React Icons (Font Awesome)
 * **Estilizacao:** Tailwind CSS v4 (dark/light theme)
-* **Testes:** Vitest + React Testing Library (37 testes em 9 arquivos)
+* **Testes:** Vitest + React Testing Library (41 testes em 9 arquivos)
 
 ---
 
@@ -93,12 +93,12 @@ Agente conversacional inteligente que integra todos os modulos do sistema para r
 
 ## Cobertura de Testes
 
-**Total: 140 testes (140 passam) — backend Jest 103 + frontend Vitest 37**
+**Total: 201 testes (201 passam) — backend Jest 160 + frontend Vitest 41**
 
 | Suite | Runner | Testes | Arquivos |
 |-------|--------|--------|----------|
-| `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 103 | 20 `*.spec.ts` |
-| `apps/frontend` | Vitest + RTL + jsdom | 37 | 9 `*.test.{ts,tsx}` |
+| `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 160 | 26 `*.spec.ts` |
+| `apps/frontend` | Vitest + RTL + jsdom | 41 | 9 `*.test.{ts,tsx}` |
 
 Detalhamento por arquivo: [especificacoes/SYSTEM_SPEC.md §9](./especificacoes/SYSTEM_SPEC.md#9-cobertura-de-testes).
 

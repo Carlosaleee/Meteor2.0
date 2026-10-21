@@ -1,6 +1,6 @@
 # Especificacao Tecnica — Meteor 2.0
 
-> **Ultima atualizacao:** 19/10/2026 (branch `feature/iron-rag`: auth real do cron, chat Iron stateful com RAG hibrido, dados sinteticos marcados, GeminiClient unico — 193 testes)
+> **Ultima atualizacao:** 20/10/2026 (branch `feature/iron-context-fix`: compilacao do Iron restaurada, timeout 45s no Gemini, RAG topK=3 + cache LRU — 201 testes)
 >
 > **Documentos relacionados:** [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -134,6 +134,7 @@
 - Resposta (dentro do envelope global `{success, data, error}`): `data: { reply, data?: { contextCollected: true, ragHits: number }, sources?: [{ title, section?, source: 'docs'|'data', snippet }] }`
 - Rate limit dedicado: **5 req/min por IP** (`@Throttle({ default: { limit: 5, ttl: 60_000 } })`), alem do global de 60 req/min
 - IA: Gemini (`gemini-flash-latest`) via GeminiClientService unico — persona/estado persistente vem do `SYSTEM_INSTRUCTION` fixo + 1o turno de usuario com o contexto agregado; `history` do cliente vira turns estruturados `user`/`model` (max 20 turnos)
+- **Timeout de 45s** na chamada ao Gemini (`GeminiClientService.generateText`) — ao expirar, `processMessage` cai no catch e devolve mensagem de fallback curta (nunca trava o chat)
 - Validacao: Zod schema para input do usuario
 - Contexto: Coleta dados de todos os modulos (Meteorology, Oceanography, Traffic, Comercio, NoticiasRegionais) e envia como contexto para Gemini; horario de referencia em `America/Sao_Paulo`
 - RAG: consultas passam pelo RagModule (secao 4.10) — `ragHits` conta os chunks recuperados e `sources[]` devolve os trechos citados (falha de RAG nunca bloqueia a resposta; responde com `ragHits: 0`)
@@ -169,7 +170,8 @@
 
 ### 4.10 RagModule (RAG)
 - **Modulo:** `apps/backend/src/modules/iron/rag/` — `rag.module.ts`, `rag.service.ts`, `chunker.ts`, `scoring.ts`, `index.store.ts`, `rag.types.ts`
-- **Retrieval hibrido** (`RagService.retrieve`): embeddings Gemini (`GEMINI_EMBEDDING_MODEL`) + BM25 lexical, combinados com **60% semantico / 40% lexical**; topK = **5**; sem embedding (API indisponivel ou embeddings faltando) degrada para BM25 puro
+- **Retrieval hibrido** (`RagService.retrieve`): embeddings Gemini (`GEMINI_EMBEDDING_MODEL`) + BM25 lexical, combinados com **60% semantico / 40% lexical**; topK = **3**; sem embedding (API indisponivel ou embeddings faltando) degrada para BM25 puro
+- **Cache LRU de consultas:** `Map<query, {hits, expiresAt}>` — TTL de **5 min**, max **50 entradas** (re-insercao move para o fim; expiracao remove na leitura)
 - **Embeddings:** via REST direto no `GeminiClientService` (lote de 20, ate 40 chunks por rebuild); dimensoes `GEMINI_EMBEDDING_DIMS` (padrao 128)
 - **Indice de docs (versaoado):** `apps/backend/data/rag-index-docs.json` — **206 chunks / 198 embeddings**; regenerar com `pnpm --filter backend rag:index` (`apps/backend/scripts/rag-index.mjs`, reusa embeddings ja existentes no arquivo); entra no bundle da Vercel via `includeFiles: **/data/*.json` (`vercel.json`)
 - **Indice de dados (runtime):** reconstruido pelo `RefreshService` apos `refreshAll()`/`refreshNews()` (single-flight `rag:rebuild`), indexando os JSONs de fallback (metereologia, oceanografia, weather-news, noticias); gravado via `FallbackService` (`rag-index-data.json`, `/tmp` em producao)
@@ -308,11 +310,11 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 
 ## 9. Cobertura de Testes
 
-**Total: 193 testes — backend Jest 30 (152) + frontend Vitest (41)**
+**Total: 201 testes — backend Jest (160) + frontend Vitest (41)**
 
-> Contagem estatica (sem executar os testes) em 19/10/2026.
+> Contagem estatica (sem executar os testes) em 20/10/2026.
 
-### Backend (Jest) — 152 testes em 25 arquivos
+### Backend (Jest) — 160 testes em 26 arquivos
 | Arquivo | Testes | Status |
 |---------|--------|--------|
 | refresh.service.spec.ts | 18 | ✅ |
@@ -320,8 +322,9 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 | wsl.repository.spec.ts | 11 | ✅ (fixture WSL real + `eliminated` + sponsor + notícias) |
 | cron.controller.spec.ts | 10 | ✅ (auth Bearer/`x-cron-secret`/`?secret=`, 401, scope) |
 | gemini-chat.repository.spec.ts | 10 | ✅ (persona, turns user/model, contexto 1o turno) |
-| iron.service.spec.ts | 9 | ✅ (inclui RAG no contexto) |
-| rag.service.spec.ts | 8 | ✅ (novo — retrieval hibrido topK=5) |
+| iron.service.spec.ts | 9 | ✅ (inclui RAG no contexto; provider GeminiContextBuilder mockado) |
+| rag.service.spec.ts | 12 | ✅ (retrieval hibrido topK=3, cache LRU hit/expiracao) |
+| gemini-client.service.spec.ts | 4 | ✅ (novo — timeout 45s, sucesso, erro, sem API key) |
 | scoring.spec.ts | 7 | ✅ (novo — BM25 + cosseno) |
 | chunker.spec.ts | 6 | ✅ (novo — segmentacao de documentos) |
 | meteorology.controller.spec.ts | 5 | ✅ |
