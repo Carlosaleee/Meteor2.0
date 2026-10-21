@@ -1,6 +1,6 @@
 # Especificacao Tecnica — Meteor 2.0
 
-> **Ultima atualizacao:** 20/10/2026 (branch `feature/iron-context-fix`: compilacao do Iron restaurada, timeout 45s no Gemini, RAG topK=3 + cache LRU — 201 testes)
+> **Ultima atualizacao:** 20/10/2026 (merge do PR #1 em `main`: compilacao do Iron restaurada, timeout 45s no Gemini, RAG topK=3 + cache LRU — 201 testes)
 >
 > **Documentos relacionados:** [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -299,12 +299,13 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 3. Merge na main apos validacao
 4. Proibido commit direto na main
 
-**Branches ativas:**
+**Branches:**
 | Branch | Descricao |
 |--------|-----------|
-| `main` | Producao, todas as features mergeadas |
-| `feature/iron-rag` | Auth real do cron, chat Iron stateful, RAG hibrido (em andamento) |
+| `main` | Producao — todas as features mergeadas via PR (inclui a correcao do Iron, timeout 45s e RAG topK=3 + cache LRU, mergeada no PR #1) |
 | `feature/plano-recuperacao-2026-10` | Plano de recuperacao (CI, serverless, dados frescos) — merged/estavel |
+
+> Branches tematicas sao **removidas apos o merge** (limpeza pos-merge). O fluxo e sempre: branch da feature → PR → CI verde → merge na `main` → deletar branch.
 
 ---
 
@@ -691,7 +692,7 @@ Pipeline em `.github/workflows/ci.yml`:
 
 | Job | Descrição | Trigger |
 |-----|-----------|---------|
-| `backend-test` | Jest (152 testes) | push/PR |
+| `backend-test` | Jest (160 testes) | push/PR |
 | `frontend-test` | Vitest (41 testes) | push/PR |
 | `lint` | oxlint (frontend) | push/PR |
 | `build` | Valida compilação | Após testes |

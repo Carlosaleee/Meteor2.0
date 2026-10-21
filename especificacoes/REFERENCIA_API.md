@@ -1,6 +1,6 @@
 ﻿# Referencia da API — Meteor 2.0
 
-> **Ultima atualizacao:** 20/10/2026 (branch `feature/iron-context-fix`: timeout 45s no chat, RAG topK=3 + cache LRU, contrato de `POST /v1/iron/chat` atualizado)
+> **Ultima atualizacao:** 20/10/2026 (merge do PR #1 em `main`: timeout 45s no chat, RAG topK=3 + cache LRU, contrato de `POST /v1/iron/chat` atualizado — 201 testes)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [../README.md](../README.md)
 
@@ -772,12 +772,15 @@ Retorna o status do agente de refresh automatico.
 
 Refresh manual/agendado via **GET** — a Vercel so dispara crons com GET (`POST` continua aceito para uso manual).
 
-**Autenticacao (qualquer uma):**
-| Fonte | Como |
-|-------|------|
-| Header | `x-cron-secret: <CRON_SECRET>` |
-| Query | `?secret=<CRON_SECRET>` |
-| Vercel Cron | header `x-vercel-cron: 1` (enviado automaticamente pela Vercel) |
+**Autenticacao (todas exigem o valor real de `CRON_SECRET`; nao ha default):**
+
+| Fonte | Como | Aceito em |
+|-------|------|-----------|
+| Authorization | `Authorization: Bearer <CRON_SECRET>` | GET + POST |
+| Header | `x-cron-secret: <CRON_SECRET>` | GET + POST |
+| Query | `?secret=<CRON_SECRET>` | **apenas GET** |
+
+> **`x-vercel-cron: 1` NAO autoriza.** O header era aceito no passado mas e spoofavel por qualquer cliente, entao foi removido — apenas o `CRON_SECRET` real e aceito. A Vercel envia `Authorization: Bearer <CRON_SECRET>` automaticamente nos crons (basta configurar a env var `CRON_SECRET` no dashboard).
 
 **Query Parameters:**
 | Parametro | Tipo | Obrigatorio | Descricao |
@@ -831,12 +834,25 @@ Forca refresh manual de todas as fontes de dados. Aceita `scope=news` igual ao G
 | details.* | string | `OK` / `OK (n men, n women, n events)` ou `ERROR: <motivo>` por modulo |
 | duration | number | Duracao total em ms |
 
-**Response (secret invalido — HTTP 200, envelopado):**
+**Response (secret invalido ou ausente — HTTP 401):**
 ```json
-{ "success": true, "data": { "error": "Unauthorized", "message": "Invalid CRON_SECRET" }, "error": null }
+{
+  "success": false,
+  "data": null,
+  "error": { "code": "UnauthorizedException", "message": "Invalid CRON_SECRET" }
+}
 ```
 
-> **Nota:** o controller usa `@HttpCode(200)` para todos os casos, inclusive auth — verifique `data.error` (nao apenas o status HTTP).
+**Response (`CRON_SECRET` nao configurado no ambiente — HTTP 401):**
+```json
+{
+  "success": false,
+  "data": null,
+  "error": { "code": "UnauthorizedException", "message": "CRON_SECRET not configured" }
+}
+```
+
+> **Nota:** o `@HttpCode(200)` do controller vale para o caminho de sucesso; quando o `CronController` lanca `UnauthorizedException`, o `HttpExceptionFilter` intercepta e devolve **HTTP 401** com o envelope `{success, data, error}` padrao. Verifique sempre o status HTTP **e** o campo `error`.
 
 ---
 
