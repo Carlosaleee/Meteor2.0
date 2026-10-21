@@ -1,6 +1,15 @@
-export const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL ??
-  (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3001');
+const raw = process.env.NEXT_PUBLIC_API_URL?.trim();
+
+// Em produção, valores localhost/127.0.0.1 são invariavelmente um resíduo de dev
+// (env var de dashboard ou .env.local) — nunca apontam para um backend real.
+const isLocalhost = (v: string): boolean => /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?(\/|$)/.test(v);
+
+export const API_BASE: string =
+  process.env.NODE_ENV === 'production'
+    ? raw && !isLocalhost(raw)
+      ? raw
+      : '/api'
+    : raw || 'http://localhost:3001';
 
 export async function fetchAPI<T>(path: string): Promise<T> {
   const url = `${API_BASE}${path}`;
