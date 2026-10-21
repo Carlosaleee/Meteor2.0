@@ -26,6 +26,7 @@ import { WindConditionCards } from './components/WindConditionCards';
 import { WindChart } from './components/WindChart';
 import { HourlyWind } from './components/HourlyWind';
 import { ForecastSection } from './components/ForecastSection';
+import { resolveSwellTab, type SwellTab } from './tabs';
 import {
   SkeletonResumoIA,
   SkeletonWaveChart,
@@ -41,7 +42,7 @@ function waveDir(deg: number): string {
 }
 
 export default function SwellPage() {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState<SwellTab>('overview');
   const [selectedSpot, setSelectedSpot] = useState<Spot | null>(null);
   const [userPosition, setUserPosition] = useState<[number, number] | null>(null);
   const { data, loading, error, refetch } = useSwell();
@@ -57,6 +58,17 @@ export default function SwellPage() {
         { enableHighAccuracy: false, timeout: 10000 }
       );
     }
+  }, []);
+
+  // Deep-link ?tab=overview|news|forecast|wind|spots (CTAs da capa) — lido na
+  // montagem para nao depender de searchParams no prerender estatico. Tab
+  // invalida cai para 'overview' e a query e limpa da URL.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const requested = params.get('tab');
+    if (!requested) return;
+    setActiveTab(resolveSwellTab(requested, activeTab));
+    window.history.replaceState(null, '', window.location.pathname);
   }, []);
 
   const handleRefresh = () => {

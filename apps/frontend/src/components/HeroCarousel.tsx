@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaPause, FaPlay } from 'react-icons/fa';
 
 type Slide = {
   id: number;
@@ -15,9 +15,19 @@ type Slide = {
   label: string;
 };
 
+/** Ordem espelha a seção da capa: noticias primeiro, depois tempo, mar, comercio e blog. */
 const SLIDES: Slide[] = [
   {
     id: 0,
+    title: 'Notícias do Vale',
+    subtitle: 'Feed unificado de notícias, trânsito e turismo da região',
+    href: '/noticias',
+    image: '/banner-meteor.jpg',
+    gradient: 'from-slate-900/90 via-blue-900/70 to-slate-900/80',
+    label: 'Regionais',
+  },
+  {
+    id: 1,
     title: 'Previsão do Tempo',
     subtitle: 'Previsão do tempo, satélite e modelos numéricos para 4 cidades',
     href: '/meteorologia',
@@ -26,22 +36,13 @@ const SLIDES: Slide[] = [
     label: 'Clima & Tempo',
   },
   {
-    id: 1,
+    id: 2,
     title: 'Swell & Points',
     subtitle: 'Telemetria de ondas, marés e 12 points de surf em Ilha Comprida',
     href: '/swell',
     image: '/CapaMeteor.jpg',
     gradient: 'from-blue-900/90 via-blue-800/70 to-slate-900/80',
     label: 'Surf & Ondas',
-  },
-  {
-    id: 2,
-    title: 'Notícias do Vale',
-    subtitle: 'Feed unificado de notícias, trânsito e turismo da região',
-    href: '/noticias',
-    image: '/banner-meteor.jpg',
-    gradient: 'from-slate-900/90 via-blue-900/70 to-slate-900/80',
-    label: 'Regionais',
   },
   {
     id: 3,
@@ -68,6 +69,8 @@ const INTERVAL_MS = 5000;
 export function HeroCarousel() {
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [userPaused, setUserPaused] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
 
   const next = useCallback(() => {
     setCurrent(prev => (prev + 1) % SLIDES.length);
@@ -81,11 +84,25 @@ export function HeroCarousel() {
     setCurrent(index);
   }, []);
 
+  // Sem autoplay para quem prefere menos movimento (WCAG 2.2.2 / 2.3.3).
   useEffect(() => {
-    if (paused) return;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReducedMotion(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
+  useEffect(() => {
+    if (paused || userPaused || reducedMotion) return;
     const timer = setInterval(next, INTERVAL_MS);
     return () => clearInterval(timer);
-  }, [paused, next]);
+  }, [paused, userPaused, reducedMotion, next]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowLeft') prev();
+    if (e.key === 'ArrowRight') next();
+  };
 
   const slide = SLIDES[current];
 
@@ -100,6 +117,7 @@ export function HeroCarousel() {
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
+      onKeyDown={handleKeyDown}
     >
       {SLIDES.map((s, i) => (
         <div
@@ -159,6 +177,18 @@ export function HeroCarousel() {
       >
         <FaChevronRight className="w-4 h-4" />
       </button>
+
+      {/* Pausa manual exigida pela WCAG 2.2.2; escondida quando o SO ja reduz o movimento. */}
+      {!reducedMotion && (
+        <button
+          onClick={() => setUserPaused(v => !v)}
+          aria-pressed={userPaused}
+          aria-label={userPaused ? 'Reproduzir rotação automática' : 'Pausar rotação automática'}
+          className="absolute bottom-3 right-3 z-20 p-2 rounded-full bg-black/40 backdrop-blur-sm text-white/80 hover:text-white hover:bg-black/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+        >
+          {userPaused ? <FaPlay className="w-3.5 h-3.5" /> : <FaPause className="w-3.5 h-3.5" />}
+        </button>
+      )}
 
       <div
         role="tablist"

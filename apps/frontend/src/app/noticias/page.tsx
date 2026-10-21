@@ -83,7 +83,7 @@ export default function NoticiasPage() {
       )}
 
       {/* Status das Rodovias */}
-      <section aria-label="Status das rodovias">
+      <section id="rodovias" aria-label="Status das rodovias" className="scroll-mt-20">
         <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
           <FaCar className="w-5 h-5 text-amber-400" aria-hidden="true" />
           Status das Rodovias

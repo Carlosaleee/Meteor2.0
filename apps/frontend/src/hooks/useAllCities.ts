@@ -14,6 +14,11 @@ type CitySummary = {
   weatherCode: number;
   humidity: number;
   windSpeed: number;
+  /** Minima/maxima de hoje (daily[0]) — mesma resposta, sem requests extras. */
+  tempMax: number | null;
+  tempMin: number | null;
+  /** Previsao de tempo de hoje (daily[0].weatherCode). */
+  forecastCode: number | null;
 };
 
 type UseAllCitiesResult = {
@@ -42,14 +47,20 @@ export function useAllCities(): UseAllCitiesResult {
       const results = await Promise.all(
         CITY_IDS.map(id =>
           fetchAPI<MeteorologyResponse>(`/v1/meteorology?locationId=${id}`)
-            .then(data => ({
-              locationId: id,
-              location: data.location,
-              temperature: data.current.temperature,
-              weatherCode: data.current.weatherCode,
-              humidity: data.current.humidity,
-              windSpeed: data.current.windSpeed,
-            }))
+            .then(data => {
+              const daily = data.daily?.[0];
+              return {
+                locationId: id,
+                location: data.location,
+                temperature: data.current.temperature,
+                weatherCode: data.current.weatherCode,
+                humidity: data.current.humidity,
+                windSpeed: data.current.windSpeed,
+                tempMax: daily?.tempMax ?? null,
+                tempMin: daily?.tempMin ?? null,
+                forecastCode: daily?.weatherCode ?? null,
+              };
+            })
             .catch(() => null)
         )
       );
