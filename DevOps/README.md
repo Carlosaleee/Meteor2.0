@@ -77,7 +77,10 @@ O backend usa filesystem para fallback (`data/*.json`), por isso Railway é a op
 **Configuração no painel Vercel:**
 1. Projeto `meteor2-0-backend` — Root Directory: `apps/backend`
 2. Build Command: `pnpm install && pnpm build` (o `@vercel/node` compila `api/index.ts`)
-3. Variáveis de ambiente: ver tabela acima (`FRONTEND_ORIGIN`, `GEMINI_API_KEY`, `CRON_SECRET`, `NODE_ENV=production`) + `NODE_OPTIONS=--experimental-require-module` (habilita `require()` de deps ESM-only como Nest 12 — a Vercel desativa por padrão) + `FALLBACK_DIR=apps/backend/data`
+3. Variáveis de ambiente: ver tabela abaixo
+
+> ⚠️ **CORS crítico:** `FRONTEND_ORIGIN` deve ser a URL exata do frontend em produção (ex: `https://meteor2-0-frontend.vercel.app`). Se não definida, o backend bloqueia todas as requisições do browser. Aceita múltiplas origens separadas por vírgula.
+
 
 **Comportamento em serverless:**
 - `FallbackService` escreve em `/tmp` (raiz do bundle é read-only) e lê em cascata (`/tmp` → `FALLBACK_DIR` resolvido contra o cwd do bundle)

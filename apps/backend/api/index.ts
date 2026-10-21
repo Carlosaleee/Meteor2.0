@@ -19,8 +19,19 @@ async function bootstrap(): Promise<NestApp> {
 
     instance.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
 
-    const origin = process.env.FRONTEND_ORIGIN || "http://localhost:3000";
-    instance.enableCors({ origin, credentials: true });
+    // Support comma-separated list of allowed origins + Vercel preview deployments
+    const rawOrigin = process.env.FRONTEND_ORIGIN || "http://localhost:3000";
+    const allowedOrigins = rawOrigin.split(",").map((o) => o.trim()).filter(Boolean);
+    const corsOrigin = (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+      if (!origin) return callback(null, true); // allow non-browser requests (cron, health)
+      const isAllowed =
+        allowedOrigins.includes(origin) ||
+        /^https:\/\/[\w-]+-[\w-]+\.vercel\.app$/.test(origin) || // Vercel preview URLs
+        origin === "http://localhost:3000" ||
+        origin === "http://localhost:3001";
+      callback(isAllowed ? null : new Error(`CORS: origin not allowed — ${origin}`), isAllowed);
+    };
+    instance.enableCors({ origin: corsOrigin, credentials: true });
 
     await instance.init();
     nestApp = instance;
