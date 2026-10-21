@@ -1,12 +1,29 @@
 # Referencia da API — Meteor 2.0
 
-> **Ultima atualizacao:** 21/10/2026 (compatibilidade de envelope no ChatWidget, sanitizacao de historico e tratamento 429 — 203 testes)
+> **Ultima atualizacao:** 21/10/2026 (rota `GET /`, proxy `/api` no frontend e Node 24 — 203 testes)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [../README.md](../README.md)
 
-Base URL: http://localhost:3001
+**Base URL:**
+- Dev local: `http://localhost:3001`
+- Producao (backend direto): `https://meteor2-0-backend.vercel.app`
+- Producao (via frontend, mesmo origin): `https://meteor2-0-frontend.vercel.app/api` — o rewrite em `apps/frontend/vercel.json` faz proxy de `/api/*` para o backend
 
 **Envelope global:** todo response de sucesso passa pelo `EnvelopeInterceptor` e chega como `{"success": true, "data": <payload>, "error": null}`. Os exemplos deste documento mostram o payload de `data` por brevidade (exceto onde o envelope e relevante, como erros).
+
+---
+
+## GET /
+
+Raiz do servico — mesma resposta do `/health`. Existe para smoke test rapido em producao (antes respondia `NotFoundException: Cannot GET /`).
+
+**Response:**
+```json
+{
+  "status": "ok",
+  "service": "meteor-backend"
+}
+```
 
 ---
 

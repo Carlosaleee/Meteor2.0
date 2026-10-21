@@ -1,6 +1,6 @@
 # Especificacao Tecnica — Meteor 2.0
 
-> **Ultima atualizacao:** 21/10/2026 (compatibilidade de envelope no ChatWidget, sanitizacao de historico e tratamento 429 — 203 testes)
+> **Ultima atualizacao:** 21/10/2026 (rota `GET /`, proxy `/api` no frontend, Node 24 + actions Node 24 na CI e validação de `FRONTEND_ORIGIN` multi-origin — 203 testes)
 >
 > **Documentos relacionados:** [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -192,7 +192,7 @@ Schema validado com Zod em `apps/backend/src/common/config/env.schema.ts` (`pars
 | FRONTEND_ORIGIN | http://localhost:3000 | CORS origin |
 | FALLBACK_DIR | data | Diretorio dos JSONs de fallback |
 | FALLBACK_MAX_AGE_HOURS | 24 | Idade maxima do fallback |
-| NEXT_PUBLIC_API_URL | http://localhost:3001 | URL da API no frontend (frontend) |
+| NEXT_PUBLIC_API_URL | dev: `http://localhost:3001` — prod: `/api` (proxy) | URL da API no frontend. Em produção o valor localhost é **descartado** pelo guard de `API_BASE` (`lib/api.ts`) e cai no proxy `/api/*` (rewrite em `apps/frontend/vercel.json`) |
 
 ### Definidas (em uso)
 | Variavel | Default | Modulo |
@@ -646,7 +646,10 @@ Meteor_2.0/
 |---------|-----|
 | Frontend | `https://meteor2-0-frontend.vercel.app` |
 | Backend | `https://meteor2-0-backend.vercel.app` |
-| Health Check | `https://meteor2-0-backend.vercel.app/health` |
+| Health Check (direto) | `https://meteor2-0-backend.vercel.app/health` (a raiz `/` responde o mesmo) |
+| Health Check (via proxy do frontend) | `https://meteor2-0-frontend.vercel.app/api/health` |
+
+> **Smoke test de integração (out/2026):** `frontend/api/*` faz proxy para o backend pelo rewrite em `apps/frontend/vercel.json` (mesmo origin, sem CORS). Se `/api/health` responder o envelope de sucesso, frontend e backend estão conectados.
 
 ### Plataformas
 
@@ -697,7 +700,9 @@ Pipeline em `.github/workflows/ci.yml`:
 | `lint` | oxlint (frontend) | push/PR |
 | `build` | Valida compilação | Após testes |
 
-> **pnpm na CI:** `pnpm/action-setup@v4` sem input `version` — a versão única vem de `packageManager: pnpm@11.10.0` no `package.json` (ter os dois causava o erro *"Multiple versions of pnpm"* que deixou a CI vermelha).
+> **pnpm na CI:** `pnpm/action-setup@v6` sem input `version` — a versão única vem de `packageManager: pnpm@11.10.0` no `package.json` (ter os dois causava o erro *"Multiple versions of pnpm"* que deixou a CI vermelha).
+>
+> **Node 24 na CI (out/2026):** actions atualizadas para runtime Node 24 — `actions/checkout@v7`, `actions/setup-node@v7`, `pnpm/action-setup@v6`. A versão do Node vem de `node-version-file: .nvmrc` (fonte única, `24`), junto com o `engines: ^24.0.0` do `package.json` raiz. As antigas `@v4` declaravam `node20` e o GitHub passou a forçá-las em Node 24 com aviso de deprecation.
 
 ### Estrutura DevOps
 
@@ -705,7 +710,7 @@ Pipeline em `.github/workflows/ci.yml`:
 DevOps/
 +-- README.md                    # Guia completo de deploy
 +-- frontend/
-¦   +-- vercel.json              # Config Vercel (monorepo)
+¦   +-- vercel.json              # Cópia de referência (o ativo é apps/frontend/vercel.json)
 ¦   +-- .vercelignore            # Arquivos ignorados
 +-- backend/
 ¦   +-- Dockerfile               # Container (alternativa)

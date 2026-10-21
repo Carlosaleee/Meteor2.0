@@ -1,6 +1,6 @@
 # Guia do Desenvolvedor — Meteor 2.0
 
-> **Ultima atualizacao:** 21/10/2026 (compatibilidade de envelope no ChatWidget, sanitizacao de historico e tratamento 429 — 203 testes)
+> **Ultima atualizacao:** 21/10/2026 (proxy `/api` do frontend, guard de localhost no `API_BASE`, rota `GET /`, Node 24 + actions Node 24 na CI e troubleshooting de env var da Vercel — 203 testes)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -258,12 +258,12 @@ Schema validado por Zod em `apps/backend/src/common/config/env.schema.ts`.
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `NEXT_PUBLIC_API_URL` | URL da API backend (bundled no JS) | `http://localhost:3001` |
+| `NEXT_PUBLIC_API_URL` | URL da API backend (bundled no JS). **Produção:** usa `/api` (proxy) e **descarta valores localhost** (`API_BASE` em `lib/api.ts` ignora `localhost`/`127.0.0.1` quando `NODE_ENV=production`) | dev: `http://localhost:3001` · prod: `/api` |
 
 ### Logs e Depuracao (Backend)
 - Logs aparecem no terminal do `pnpm --filter backend dev`
 - Erros retornam no formato ApiEnvelope: `{ success, data, error }`
-- Health check: `GET /health`
+- Health check: `GET /health` (ou `GET /` — rota raiz responde o mesmo)
 
 ### Logs e Depuracao (Frontend)
 - Erros de compilacao aparecem no browser
@@ -279,6 +279,13 @@ Schema validado por Zod em `apps/backend/src/common/config/env.schema.ts`.
 ### Erro "NEXT_PUBLIC_API_URL is not defined"
 - Verificar se `apps/frontend/.env.local` existe
 - Conteudo: `NEXT_PUBLIC_API_URL=http://localhost:3001`
+
+### Frontend não carrega dados na Vercel (chamadas para localhost)
+**Causa clássica (out/2026):** env var `NEXT_PUBLIC_API_URL=http://localhost:3001` no **dashboard da Vercel** (projeto frontend) — variáveis de dashboard têm precedência sobre `.env.production` do repo e embutem `localhost` no bundle, fazendo o browser chamar a máquina do visitante (`ERR_CONNECTION_REFUSED`).
+- **Diagnóstico:** `curl https://meteor2-0-frontend.vercel.app/api/health` (proxy OK?) + buscar `localhost:3001` nos chunks JS servidos em `/_next/static/chunks/`
+- **Correção:** apagar/corrigir a env var no dashboard (usar `/api`) e Redeploy — `NEXT_PUBLIC_*` só é reembutida em novo build
+- **Blindagem no código:** `API_BASE` (`apps/frontend/src/lib/api.ts`) descarta valores `localhost`/`127.0.0.1` em produção e usa `/api` automaticamente
+- Nunca commitar `.env.local` (gitignoreado); `.env.production` versionado traz `NEXT_PUBLIC_API_URL=/api`
 
 ### Fallbacks sempre retornando dados antigos
 - Verificar se `apps/backend/data/` existe
@@ -692,11 +699,13 @@ Variáveis configuradas no Vercel Dashboard (Settings → Environment Variables)
 
 Pipeline ativo em `.github/workflows/ci.yml`:
 
-**Jobs:** (todos em Node 24)
+**Jobs:** (todos em Node 24 via `node-version-file: .nvmrc`)
 - `backend-test`: Jest (160 testes) — `NODE_OPTIONS="--experimental-vm-modules" npx jest`
-- `frontend-test`: Vitest (41 testes)
+- `frontend-test`: Vitest (43 testes)
 - `lint`: oxlint (frontend)
 - `build`: valida backend + frontend (após testes)
+
+**Actions (runtime Node 24 — out/2026):** `actions/checkout@v7`, `actions/setup-node@v7`, `pnpm/action-setup@v6`. As antigas `@v4` declaravam `node20` e geravam o aviso *"Node.js 20 está obsoleto... forçadas a serem executadas no Node.js 24"* em cada job.
 
 ### Fluxo de Deploy
 
@@ -712,18 +721,20 @@ Pipeline ativo em `.github/workflows/ci.yml`:
 DevOps/
 ├── README.md                    # Guia completo de deploy
 ├── frontend/
-│   ├── vercel.json              # Config Vercel (monorepo)
+│   ├── vercel.json              # Cópia de referência do rewrite /api (o ativo é apps/frontend/vercel.json)
 │   └── .vercelignore            # Arquivos ignorados
 ├── backend/
-│   ├── Dockerfile               # Container (alternativa Railway/Render)
+│   ├── Dockerfile               # Container — node:24-alpine (alternativa Railway/Render)
 │   ├── railway.json             # Deploy Railway (alternativa)
 │   └── render.yaml              # Deploy Render (alternativa)
 ├── github-actions/
-│   └── ci.yml                   # Pipeline CI/CD
+│   └── ci.yml                   # Pipeline CI/CD (referência; a ativa é .github/workflows/ci.yml)
 └── env/
     ├── .env.frontend.example    # Vars frontend
     └── .env.backend.example     # Vars backend
 ```
+
+> **Ativo no deploy:** `apps/frontend/vercel.json` (rewrite `/api/*` → backend) — o Root Directory do projeto Vercel é `apps/frontend`, então só o arquivo de dentro de `apps/` é lido.
 
 ### Documentação Completa
 
