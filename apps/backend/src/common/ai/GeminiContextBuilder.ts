@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
+import type { ChatContext, ChatTurn } from '../../modules/iron/gemini-chat.repository';
 
 @Injectable()
 export class GeminiContextBuilder {
   /**
-   * Builds a minimal context to pass to Gemini. Current implementation returns
-   * an empty context, ensuring type safety while allowing future
-   * enrichment without breaking the API contract.
+   * Builds the minimal context passed to Gemini. Current implementation
+   * returns an empty context, keeping the API contract type-safe while
+   * allowing future enrichment without breaking callers.
    */
-  async buildContext(_history: any[]): Promise<any> {
+  async buildContext(_history: ChatTurn[]): Promise<ChatContext> {
     return {};
   }
 }

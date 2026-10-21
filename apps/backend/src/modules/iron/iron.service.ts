@@ -6,14 +6,14 @@ import { ComercioService } from '../comercio/comercio.service';
 import { NoticiasRegionaisService } from '../noticias-regionais/noticias-regionais.service';
 import { NewsRepository } from '../news/news.repository';
 import { WeatherNewsRepository } from '../meteorology/weather-news.repository';
-import { GeminiChatRepository, ChatTurn } from './gemini-chat.repository';
+import { GeminiChatRepository, ChatTurn, ChatContext } from './gemini-chat.repository';
 
 import { GeminiContextBuilder } from '../../common/ai/GeminiContextBuilder';
 import { RagService } from './rag/rag.service';
 import { RagHit } from './rag/rag.types';
 import { spNowKey, hourKeyFromNaive } from '../../common/time/sp-time';
 
- type ChatSource = {
+type ChatSource = {
   title: string;
   section?: string;
   source: 'docs' | 'data';
@@ -25,6 +25,14 @@ type ChatResponse = {
   data?: Record<string, unknown>;
   /** Trechos do knowledge base que fundamentaram a resposta (RAG). */
   sources?: ChatSource[];
+};
+
+/**
+ * Contexto coletado dos serviços da aplicação. Estende o `ChatContext` do
+ * Gemini com dados brutos adicionais (ex.: notícias regionais completas).
+ */
+type CollectedContext = ChatContext & {
+  regionalNews?: { news: Array<{ title: string }> };
 };
 
 @Injectable()
@@ -99,7 +107,7 @@ export class IronService {
     };
   }
 
-  private async collectContext(): Promise<any> {
+  private async collectContext(): Promise<CollectedContext> {
     const [
       weatherResult,
       oceanResult,

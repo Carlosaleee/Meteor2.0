@@ -8,7 +8,7 @@ import { NoticiasRegionaisService } from '../noticias-regionais/noticias-regiona
 import { NewsRepository } from '../news/news.repository';
 import { WeatherNewsRepository } from '../meteorology/weather-news.repository';
 import { GeminiContextBuilder } from '../../common/ai/GeminiContextBuilder';
-import { GeminiChatRepository, ChatTurn } from './gemini-chat.repository';
+import { GeminiChatRepository } from './gemini-chat.repository';
 import { RagService } from './rag/rag.service';
 
 describe('IronService', () => {

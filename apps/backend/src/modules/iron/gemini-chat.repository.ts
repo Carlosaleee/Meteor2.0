@@ -8,7 +8,7 @@ export type ChatTurn = {
   content: string;
 };
 
-type ChatContext = {
+export type ChatContext = {
   weather?: { temperature: number; humidity: number; windSpeed: number; description: string };
   ocean?: { waveHeight: number; qualityLabel: string; bestTime: string; nextTide: string };
   traffic?: { routes: Array<{ name: string; condition: string }> };
