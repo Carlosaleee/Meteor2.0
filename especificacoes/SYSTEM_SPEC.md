@@ -1,6 +1,6 @@
 # Especificacao Tecnica — Meteor 2.0
 
-> **Ultima atualizacao:** 20/10/2026 (merge do PR #1 em `main`: compilacao do Iron restaurada, timeout 45s no Gemini, RAG topK=3 + cache LRU — 201 testes)
+> **Ultima atualizacao:** 21/10/2026 (compatibilidade de envelope no ChatWidget, sanitizacao de historico e tratamento 429 — 203 testes)
 >
 > **Documentos relacionados:** [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -138,7 +138,7 @@
 - Validacao: Zod schema para input do usuario
 - Contexto: Coleta dados de todos os modulos (Meteorology, Oceanography, Traffic, Comercio, NoticiasRegionais) e envia como contexto para Gemini; horario de referencia em `America/Sao_Paulo`
 - RAG: consultas passam pelo RagModule (secao 4.10) — `ragHits` conta os chunks recuperados e `sources[]` devolve os trechos citados (falha de RAG nunca bloqueia a resposta; responde com `ragHits: 0`)
-- Frontend (ChatWidget): envia `{ message, sessionId, history }` com ate 10 turnos de historico; botoes Reiniciar (rotaciona `sessionId`) e Apagar (limpa a conversa), desabilitados durante digitacao; status anunciado em regiao `aria-live` (sr-only)
+- Frontend (ChatWidget): envia `{ message, sessionId, history }` com ate 10 turnos de historico (filtrando entradas vazias para evitar 400 no Zod); desempacota o envelope global (`json.data?.reply ?? json.reply`); trata status 429 de forma dedicada (aviso amigável de limite de requisições); botoes Reiniciar (rotaciona `sessionId`) e Apagar (limpa a conversa), desabilitados durante digitacao; status anunciado em regiao `aria-live` (sr-only)
 
 ### 4.8 FallbackService (Global)
 - Servico compartilhado entre todos os modulos
@@ -311,9 +311,9 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 
 ## 9. Cobertura de Testes
 
-**Total: 201 testes — backend Jest (160) + frontend Vitest (41)**
+**Total: 203 testes — backend Jest (160) + frontend Vitest (43)**
 
-> Contagem estatica (sem executar os testes) em 20/10/2026.
+> Contagem atualizada apos execucao dos testes em 21/10/2026.
 
 ### Backend (Jest) — 160 testes em 26 arquivos
 | Arquivo | Testes | Status |
@@ -345,10 +345,10 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 | fallback.service.spec.ts | 2 | ✅ |
 | http-exception.filter.spec.ts | 1 | ✅ |
 
-### Frontend (Vitest + RTL) — 41 testes em 9 arquivos
+### Frontend (Vitest + RTL) — 43 testes em 9 arquivos
 | Arquivo | Testes | Status |
 |---------|--------|--------|
-| ChatWidget.test.tsx | 12 | ✅ (reiniciar/apagar, aria-live, sessionId/historico) |
+| ChatWidget.test.tsx | 14 | ✅ (envelope, resposta legada, rate limit 429, reiniciar/apagar, aria-live, sessionId/historico) |
 | ResumoIA.test.tsx | 6 | ✅ |
 | useWeatherNews.test.ts | 5 | ✅ |
 | api.test.ts | 4 | ✅ |

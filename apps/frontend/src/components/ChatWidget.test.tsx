@@ -45,10 +45,14 @@ describe('ChatWidget', () => {
     expect(screen.getByText('Teste')).toBeInTheDocument();
   });
 
-  it('should send message to API and display reply', async () => {
+  it('should send message to API and display reply from enveloped response', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ reply: 'Resposta do Irons via API' }),
+      json: async () => ({
+        success: true,
+        data: { reply: 'Resposta do Irons via API' },
+        error: null,
+      }),
     });
 
     render(<ChatProvider><ChatWidget /></ChatProvider>);
@@ -76,6 +80,40 @@ describe('ChatWidget', () => {
     expect(sentBody.sessionId.length).toBeGreaterThan(0);
     expect(Array.isArray(sentBody.history)).toBe(true);
     expect(sentBody.history[0]).toEqual({ role: 'assistant', content: expect.any(String) });
+  });
+
+  it('should support legacy non-enveloped reply from API', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ reply: 'Resposta legada' }),
+    });
+
+    render(<ChatProvider><ChatWidget /></ChatProvider>);
+    fireEvent.click(screen.getByRole('button', { name: /abrir chat/i }));
+
+    fireEvent.change(screen.getByPlaceholderText(/pergunte/i), { target: { value: 'ola' } });
+    fireEvent.click(screen.getByRole('button', { name: /enviar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Resposta legada')).toBeInTheDocument();
+    });
+  });
+
+  it('should show specific rate limit message on 429 status', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 429,
+    });
+
+    render(<ChatProvider><ChatWidget /></ChatProvider>);
+    fireEvent.click(screen.getByRole('button', { name: /abrir chat/i }));
+
+    fireEvent.change(screen.getByPlaceholderText(/pergunte/i), { target: { value: 'msg rápida' } });
+    fireEvent.click(screen.getByRole('button', { name: /enviar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Limite de mensagens atingido/)).toBeInTheDocument();
+    });
   });
 
   it('should show user message immediately', async () => {

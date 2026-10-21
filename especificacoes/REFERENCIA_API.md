@@ -1,6 +1,6 @@
-﻿# Referencia da API — Meteor 2.0
+# Referencia da API — Meteor 2.0
 
-> **Ultima atualizacao:** 20/10/2026 (merge do PR #1 em `main`: timeout 45s no chat, RAG topK=3 + cache LRU, contrato de `POST /v1/iron/chat` atualizado — 201 testes)
+> **Ultima atualizacao:** 21/10/2026 (compatibilidade de envelope no ChatWidget, sanitizacao de historico e tratamento 429 — 203 testes)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [../README.md](../README.md)
 
@@ -743,6 +743,8 @@ Rota para envio de mensagens ao agente IA (Irons / MeteorBot).
 - **Timeout de 45s** na chamada ao Gemini — ao expirar, a rota devolve uma mensagem de fallback curta em vez de travar o chat.
 - Falha do RAG nunca bloqueia o chat (resposta segue sem `sources`).
 - Retrieval RAG: hibrido (embedding Gemini 60% + BM25 40%), **topK=3**, com cache LRU por 5 min.
+- **Envelope no cliente:** A resposta de sucesso chega encapsulada pelo `EnvelopeInterceptor` (`{ success: true, data: <payload>, error: null }`). O frontend (`ChatWidget`) desempacota com fallback (`json.data?.reply ?? json.reply`) e sanitiza o `history` (removendo entradas vazias para garantir cumprimento do Zod no backend).
+- **Tratamento de Rate Limit (HTTP 429):** Ao exceder o limite de 5 req/min, o frontend exibe mensagem amigável específica sobre o limite temporal.
 
 ---
 
