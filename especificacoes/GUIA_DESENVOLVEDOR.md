@@ -1,6 +1,6 @@
-﻿# Guia do Desenvolvedor — Meteor 2.0
+# Guia do Desenvolvedor — Meteor 2.0
 
-> **Ultima atualizacao:** 20/10/2026 (merge do PR #1 em `main`: compilacao do Iron restaurada, timeout 45s no Gemini, RAG topK=3 + cache LRU — 201 testes)
+> **Ultima atualizacao:** 21/10/2026 (compatibilidade de envelope no ChatWidget, sanitizacao de historico e tratamento 429 — 203 testes)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -64,22 +64,22 @@ pnpm format
 
 ## Testes
 
-**Total: 201 testes — backend Jest 30 (160) + frontend Vitest (41)**
+**Total: 203 testes — backend Jest 30 (160) + frontend Vitest (43)**
 
-> Contagem estatica (sem executar os testes) em 20/10/2026.
+> Contagem atualizada apos execucao dos testes em 21/10/2026.
 
 ```bash
 # Backend (160 testes — o script ja embute --experimental-vm-modules)
 pnpm --filter backend test
 
-# Frontend (41 testes — Vitest + React Testing Library)
+# Frontend (43 testes — Vitest + React Testing Library)
 pnpm --filter frontend test
 ```
 
 | Suite | Runner | Testes | Observacao |
 |-------|--------|--------|------------|
 | `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 160 | 26 arquivos `*.spec.ts` |
-| `apps/frontend` | Vitest + RTL + jsdom | 41 | 9 arquivos `*.test.{ts,tsx}` |
+| `apps/frontend` | Vitest + RTL + jsdom | 43 | 9 arquivos `*.test.{ts,tsx}` |
 
 Detalhamento por arquivo: [SYSTEM_SPEC.md §9](./SYSTEM_SPEC.md#9-cobertura-de-testes).
 
@@ -123,7 +123,7 @@ Meteor_2.0/
           Header.tsx   # Nav responsiva (7 itens) + toggle idioma pt/es
           Footer.tsx   # 4 colunas (Navegacao, Fontes, Stack, Links uteis)
           PageBanner.tsx # Hero reutilizavel (banner-meteor.jpg)
-          ChatWidget.tsx # Chat Iron: botoes Reiniciar/Apagar, aria-live, sessionId + historico (ate 10 turnos)
+          ChatWidget.tsx # Chat Iron: desempacota envelope, sanitiza historico, trata 429, botoes Reiniciar/Apagar, aria-live, sessionId + historico (ate 10 turnos)
         hooks/         # Hooks customizados (9 hooks + 5 testes)
         lib/           # Utilitarios (api.ts, spots-data.ts)
   especificacoes/      # Documentacao do projeto
