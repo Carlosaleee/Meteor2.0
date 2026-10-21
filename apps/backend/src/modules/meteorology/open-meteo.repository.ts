@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { FallbackService } from '../../common/fallback/fallback.service';
+import { fetchWithTimeout } from '../../common/http/fetch-timeout';
 
 const FALLBACK_FILE = 'fallback-meteorology.json';
 
@@ -43,6 +44,8 @@ export type AtmosphereData = {
   current: CurrentData;
   hourly: HourlyData;
   daily: DailyData;
+  /** Proveniencia dos dados — 'sample' = sintetico (nunca apresentar como real). */
+  meta?: { source: 'live' | 'stale' | 'sample' };
 };
 
 @Injectable()
@@ -51,15 +54,15 @@ export class OpenMeteoRepository {
 
   constructor(private readonly fallback: FallbackService) {}
 
-  async forceRefresh(lat: number, lon: number): Promise<AtmosphereData | null> {
-    this.logger.log(`Force refreshing meteorology for (${lat}, ${lon})...`);
+  async forceRefresh(lat: number, lon: number, locationId = 'ilha-comprida'): Promise<AtmosphereData | null> {
+    this.logger.log(`Force refreshing meteorology for ${locationId} (${lat}, ${lon})...`);
     try {
       const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
         + `&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,surface_pressure`
         + `&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m,cloud_cover,visibility`
         + `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,weather_code,sunrise,sunset,uv_index_max`
         + `&forecast_days=7&timezone=America/Sao_Paulo`;
-      const res = await fetch(url);
+      const res = await fetchWithTimeout(url);
       if (!res.ok) throw new Error(`Open-Meteo returned ${res.status}`);
       const data = await res.json();
       if (!data.current || typeof data.current.temperature_2m !== 'number') {
@@ -69,22 +72,14 @@ export class OpenMeteoRepository {
         current: data.current as CurrentData,
         hourly: data.hourly as HourlyData,
         daily: data.daily as DailyData,
+        meta: { source: 'live' },
       };
-      const locationId = this.getIdFromCoords(lat, lon);
       await this.saveFallback(locationId, result);
       return result;
     } catch (err) {
       this.logger.warn(`Force refresh meteorology failed: ${err}`);
       return null;
     }
-  }
-
-  private getIdFromCoords(lat: number, lon: number): string {
-    if (Math.abs(lat - (-24.73)) < 0.1 && Math.abs(lon - (-47.55)) < 0.1) return 'ilha-comprida';
-    if (Math.abs(lat - (-24.70)) < 0.1 && Math.abs(lon - (-47.55)) < 0.1) return 'iguape';
-    if (Math.abs(lat - (-25.01)) < 0.1 && Math.abs(lon - (-47.92)) < 0.1) return 'cananeia';
-    if (Math.abs(lat - (-24.48)) < 0.1 && Math.abs(lon - (-47.84)) < 0.1) return 'registro';
-    return 'ilha-comprida';
   }
 
   async getAtmosphereData(lat: number, lon: number, locationId: string): Promise<AtmosphereData> {
@@ -103,7 +98,7 @@ export class OpenMeteoRepository {
         + `&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m,cloud_cover,visibility`
         + `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,weather_code,sunrise,sunset,uv_index_max`
         + `&forecast_days=7&timezone=America/Sao_Paulo`;
-      const res = await fetch(url);
+      const res = await fetchWithTimeout(url);
       if (!res.ok) throw new Error(`Open-Meteo returned ${res.status}`);
       const data = await res.json();
 
@@ -115,9 +110,10 @@ export class OpenMeteoRepository {
         current: data.current as CurrentData,
         hourly: data.hourly as HourlyData,
         daily: data.daily as DailyData,
+        meta: { source: 'live' },
       };
 
-      this.saveFallback(locationId, result);
+      await this.saveFallback(locationId, result);
       this.logger.log(`Fresh data for ${locationId}: temp=${data.current.temperature_2m}°C, precip=${data.current.precipitation}mm`);
       return result;
     } catch (err) {
@@ -126,7 +122,7 @@ export class OpenMeteoRepository {
 
     if (cached?.locations?.[locationId]) {
       this.logger.warn(`Using stale fallback for ${locationId}`);
-      return cached.locations[locationId];
+      return { ...cached.locations[locationId], meta: { source: 'stale' } };
     }
 
     this.logger.warn(`No cached data for ${locationId}, using defaults`);
@@ -140,6 +136,10 @@ export class OpenMeteoRepository {
     await this.fallback.save(FALLBACK_FILE, { locations });
   }
 
+  /**
+   * Dados SINTETICOS (media sazonal da regiao) — deterministicos (sem Math.random)
+   * e marcados com meta.source='sample' para que UI/LLM nunca os apresentem como reais.
+   */
   private getDefault(locationId: string): AtmosphereData {
     const now = new Date();
     const hours = Array.from({ length: 24 }, (_, i) => {
@@ -178,31 +178,37 @@ export class OpenMeteoRepository {
 
     const current = defaults[locationId] ?? defaults['ilha-comprida'];
 
+    // Curvas deterministicas (oscilacao simples por indice) — nada de Math.random:
+    // um "forecast" sintetico aleatorio passaria por dado real em qualquer tela.
+    const wobble = (base: number, amp: number, i: number): number =>
+      +(base + Math.sin(i * 0.9) * amp).toFixed(1);
+
     return {
       current,
       hourly: {
         time: hours,
-        temperature_2m: hours.map(() => current.temperature_2m + (Math.random() * 4 - 2)),
-        relative_humidity_2m: hours.map(() => Math.min(100, Math.max(30, current.relative_humidity_2m + (Math.random() * 20 - 10)))),
-        precipitation_probability: hours.map(() => Math.round(Math.random() * 60)),
-        precipitation: hours.map(() => +(Math.random() * 2).toFixed(1)),
+        temperature_2m: hours.map((_, i) => wobble(current.temperature_2m, 2, i)),
+        relative_humidity_2m: hours.map((_, i) => Math.min(100, Math.max(30, Math.round(current.relative_humidity_2m + Math.sin(i * 0.7) * 10)))),
+        precipitation_probability: hours.map((_, i) => Math.round(Math.abs(Math.sin(i * 0.5)) * 40)),
+        precipitation: hours.map((_, i) => Math.abs(Math.sin(i * 0.6)) < 0.3 ? 0 : +(Math.abs(Math.sin(i * 0.6))).toFixed(1)),
         weather_code: hours.map(() => current.weather_code),
-        wind_speed_10m: hours.map(() => +(current.wind_speed_10m + (Math.random() * 6 - 3)).toFixed(1)),
-        cloud_cover: hours.map(() => Math.round(Math.random() * 80 + 10)),
-        visibility: hours.map(() => Math.round(8000 + Math.random() * 12000)),
+        wind_speed_10m: hours.map((_, i) => wobble(current.wind_speed_10m, 3, i)),
+        cloud_cover: hours.map((_, i) => Math.round(Math.abs(Math.sin(i * 0.4)) * 70 + 10)),
+        visibility: hours.map((_, i) => Math.round(9000 + Math.abs(Math.sin(i * 0.3)) * 10000)),
       },
       daily: {
         time: days,
-        temperature_2m_max: days.map(() => +(current.temperature_2m + 4 + Math.random() * 3).toFixed(1)),
-        temperature_2m_min: days.map(() => +(current.temperature_2m - 4 - Math.random() * 2).toFixed(1)),
-        precipitation_sum: days.map(() => +(Math.random() * 15).toFixed(1)),
-        precipitation_probability_max: days.map(() => Math.round(Math.random() * 80)),
-        wind_speed_10m_max: days.map(() => +(current.wind_speed_10m + Math.random() * 10).toFixed(1)),
+        temperature_2m_max: days.map((_, i) => wobble(current.temperature_2m + 4, 1.5, i)),
+        temperature_2m_min: days.map((_, i) => wobble(current.temperature_2m - 4, 1, i)),
+        precipitation_sum: days.map((_, i) => +(Math.abs(Math.sin(i * 0.8)) * 10).toFixed(1)),
+        precipitation_probability_max: days.map((_, i) => Math.round(Math.abs(Math.sin(i * 0.6)) * 60)),
+        wind_speed_10m_max: days.map((_, i) => wobble(current.wind_speed_10m + 5, 2, i)),
         weather_code: days.map(() => current.weather_code),
         sunrise: days.map(d => `${d}T06:15`),
         sunset: days.map(d => `${d}T18:05`),
-        uv_index_max: days.map(() => +(Math.random() * 8 + 2).toFixed(1)),
+        uv_index_max: days.map(() => 5),
       },
+      meta: { source: 'sample' },
     };
   }
 }

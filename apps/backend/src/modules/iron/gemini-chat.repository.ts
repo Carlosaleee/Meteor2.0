@@ -1,8 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Env } from '../../common/config/env.schema';
+import { GeminiClientService, GeminiChatTurn } from '../../common/ai/gemini-client.service';
 
-type ChatContext = {
+export type ChatTurn = {
+  role: 'user' | 'assistant';
+  content: string;
+};
+
+export type ChatContext = {
   weather?: { temperature: number; humidity: number; windSpeed: number; description: string };
   ocean?: { waveHeight: number; qualityLabel: string; bestTime: string; nextTide: string };
   traffic?: { routes: Array<{ name: string; condition: string }> };
@@ -19,123 +25,19 @@ type ChatContext = {
   weatherNews?: {
     alerts: Array<{ title: string; source: string; type: string }>;
   };
+  /** Knowledge base recuperado via RAG (documentação + dados do Meteor). */
+  rag?: {
+    chunks: Array<{ title: string; section?: string; text: string }>;
+  };
 };
 
-@Injectable()
-export class GeminiChatRepository {
-  private readonly logger = new Logger(GeminiChatRepository.name);
-  private genAi: unknown = null;
+const MAX_HISTORY_TURNS = 20;
 
-  constructor(private readonly config: ConfigService<Env>) {}
-
-  private getClient(): unknown {
-    if (this.genAi) return this.genAi;
-
-    const apiKey = this.config.get('GEMINI_API_KEY');
-    if (!apiKey) {
-      this.logger.warn('GEMINI_API_KEY not configured for chat');
-      return null;
-    }
-
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { GoogleGenAI } = require('@google/genai');
-      this.genAi = new GoogleGenAI({ apiKey });
-      return this.genAi;
-    } catch (err) {
-      this.logger.warn(`Failed to initialize Gemini for chat: ${err}`);
-      return null;
-    }
-  }
-
-  async chat(userMessage: string, context: ChatContext): Promise<string> {
-    const client = this.getClient();
-    if (!client) return this.getFallbackResponse(userMessage, context);
-
-    try {
-      const model = this.config.get('GEMINI_MODEL') ?? 'gemini-2.5-flash';
-      const prompt = this.buildPrompt(userMessage, context);
-
-       
-      const response = await (client as { models: { generateContent: (opts: unknown) => Promise<unknown> } }).models.generateContent({
-        model,
-        contents: prompt,
-        config: {
-          temperature: this.config.get('GEMINI_TEMPERATURE') ?? 0.7,
-          maxOutputTokens: 1500,
-        },
-      });
-
-      const text = (response as { text?: string })?.text;
-      if (text && text.length > 10) return text;
-      return this.getFallbackResponse(userMessage, context);
-    } catch (err) {
-      this.logger.warn(`Gemini chat failed: ${err}`);
-      return this.getFallbackResponse(userMessage, context);
-    }
-  }
-
-  private buildPrompt(userMessage: string, context: ChatContext): string {
-    const contextParts: string[] = [];
-
-    if (context.weather) {
-      const w = context.weather;
-      contextParts.push(`🌤️ CLIMA ATUAL (Ilha Comprida):
-- Temperatura: ${w.temperature}°C
-- Umidade: ${w.humidity}%
-- Vento: ${w.windSpeed}km/h
-- Condição: ${w.description}`);
-    }
-
-    if (context.hourly?.next6h) {
-      const hourlyLines = context.hourly.next6h.map(h => {
-        const time = new Date(h.time).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-        return `  ${time}: ${h.temperature}°C, vento ${h.windSpeed}km/h, chuva ${h.precipitationProbability}%`;
-      }).join('\n');
-      contextParts.push(`⏰ PREVISÃO HORÁRIA (próximas 6h):\n${hourlyLines}`);
-    }
-
-    if (context.ocean) {
-      const o = context.ocean;
-      contextParts.push(`🌊 MAR E SURF:
-- Ondas: ${o.waveHeight}m
-- Qualidade: ${o.qualityLabel}
-- Melhor horário: ${o.bestTime}
-- Próxima maré: ${o.nextTide}`);
-    }
-
-    if (context.traffic) {
-      const routes = context.traffic.routes.map(r => `- ${r.name}: ${r.condition}`).join('\n');
-      contextParts.push(`🚗 TRÂNSITO:\n${routes}`);
-    }
-
-    if (context.commerce) {
-      contextParts.push(`🏪 COMÉRCIO: ${context.commerce.total} estabelecimentos nos setores: ${context.commerce.sectors.join(', ')}`);
-    }
-
-    if (context.rankings) {
-      const menTop3 = context.rankings.men.slice(0, 3).map(r => `  ${r.rank}º ${r.name} (${r.country}) — ${r.points} pts`).join('\n');
-      const womenTop3 = context.rankings.women.slice(0, 3).map(r => `  ${r.rank}º ${r.name} (${r.country}) — ${r.points} pts`).join('\n');
-      const events = context.rankings.events.slice(0, 3).map(e => `  ${e.name} — ${e.dates} (${e.status})`).join('\n');
-      contextParts.push(`🏆 RANKING WSL:
-Masculino:
-${menTop3}
-Feminino:
-${womenTop3}
-Próximos eventos:
-${events}`);
-    }
-
-    if (context.news) {
-      contextParts.push(`📰 NOTÍCIAS: ${context.news.headlines.slice(0, 3).join('; ')}`);
-    }
-
-    if (context.weatherNews?.alerts) {
-      const alerts = context.weatherNews.alerts.slice(0, 3).map(a => `- [${a.type}] ${a.title} (${a.source})`).join('\n');
-      contextParts.push(`⚠️ ALERTAS METEOROLÓGICOS:\n${alerts}`);
-    }
-
-    return `# IRONS — ASSISTENTE TÁTICO DO METEOR 2.0
+/**
+ * Persona do Irons — fixa em `systemInstruction` (não vai mais embutida no
+ * prompt a cada turno; economiza tokens e melhora a fidelidade da persona).
+ */
+const SYSTEM_INSTRUCTION = `# IRONS — ASSISTENTE TÁTICO DO METEOR 2.0
 
 ## 1. IDENTIDADE
 
@@ -257,14 +159,118 @@ Preciso, objetivo, analítico, rápido, confiável, contextual, discreto. Estilo
 
 ## 14. REGRA PRINCIPAL
 
-Antes de responder: "Qual informação do Meteor 2.0 é necessária para responder exatamente ao que o usuário perguntou?"
+Antes de responder: "Qual informação do Meteor 2.0 é necessária para responder exatamente ao que o usuário perguntou?"`;
 
----
+@Injectable()
+export class GeminiChatRepository {
+  private readonly logger = new Logger(GeminiChatRepository.name);
 
-DADOS EM TEMPO REAL DISPONÍVEIS:
-${contextParts.join('\n\n') || 'Nenhum dado disponível no momento.'}
+  constructor(
+    private readonly gemini: GeminiClientService,
+    private readonly config: ConfigService<Env>,
+  ) {}
 
-PERGUNTA DO USUÁRIO: ${userMessage}`;
+  /**
+   * Chat stateful: persona no systemInstruction, dados da aplicação no primeiro
+   * turno do usuário, histórico convertido em turns estruturados (user/model).
+   */
+  async chat(
+    userMessage: string,
+    context: ChatContext,
+    history: ChatTurn[] = [],
+  ): Promise<string> {
+    const contents: GeminiChatTurn[] = [
+      { role: 'user', parts: [{ text: this.buildContextBlock(context) }] },
+      ...history
+        .slice(-MAX_HISTORY_TURNS)
+        .filter(t => t.content?.trim())
+        .map(t => ({
+          role: (t.role === 'assistant' ? 'model' : 'user') as 'user' | 'model',
+          parts: [{ text: t.content }],
+        })),
+      { role: 'user', parts: [{ text: userMessage }] },
+    ];
+
+    const text = await this.gemini.generateText({
+      contents,
+      systemInstruction: SYSTEM_INSTRUCTION,
+      temperature: this.config.get('GEMINI_TEMPERATURE') ?? 0.7,
+      maxOutputTokens: 1500,
+    });
+
+    if (text && text.length > 10) return text;
+    return this.getFallbackResponse(userMessage, context);
+  }
+
+  private buildContextBlock(context: ChatContext): string {
+    const contextParts: string[] = [];
+
+    if (context.weather) {
+      const w = context.weather;
+      contextParts.push(`🌤️ CLIMA ATUAL (Ilha Comprida):
+- Temperatura: ${w.temperature}°C
+- Umidade: ${w.humidity}%
+- Vento: ${w.windSpeed}km/h
+- Condição: ${w.description}`);
+    }
+
+    if (context.hourly?.next6h) {
+      const hourlyLines = context.hourly.next6h.map(h => {
+        const time = new Date(h.time).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        return `  ${time}: ${h.temperature}°C, vento ${h.windSpeed}km/h, chuva ${h.precipitationProbability}%`;
+      }).join('\n');
+      contextParts.push(`⏰ PREVISÃO HORÁRIA (próximas 6h):\n${hourlyLines}`);
+    }
+
+    if (context.ocean) {
+      const o = context.ocean;
+      contextParts.push(`🌊 MAR E SURF:
+- Ondas: ${o.waveHeight}m
+- Qualidade: ${o.qualityLabel}
+- Melhor horário: ${o.bestTime}
+- Próxima maré: ${o.nextTide}`);
+    }
+
+    if (context.traffic) {
+      const routes = context.traffic.routes.map(r => `- ${r.name}: ${r.condition}`).join('\n');
+      contextParts.push(`🚗 TRÂNSITO:\n${routes}`);
+    }
+
+    if (context.commerce) {
+      contextParts.push(`🏪 COMÉRCIO: ${context.commerce.total} estabelecimentos nos setores: ${context.commerce.sectors.join(', ')}`);
+    }
+
+    if (context.rankings) {
+      const menTop3 = context.rankings.men.slice(0, 3).map(r => `  ${r.rank}º ${r.name} (${r.country}) — ${r.points} pts`).join('\n');
+      const womenTop3 = context.rankings.women.slice(0, 3).map(r => `  ${r.rank}º ${r.name} (${r.country}) — ${r.points} pts`).join('\n');
+      const events = context.rankings.events.slice(0, 3).map(e => `  ${e.name} — ${e.dates} (${e.status})`).join('\n');
+      contextParts.push(`🏆 RANKING WSL:
+Masculino:
+${menTop3}
+Feminino:
+${womenTop3}
+Próximos eventos:
+${events}`);
+    }
+
+    if (context.news) {
+      contextParts.push(`📰 NOTÍCIAS: ${context.news.headlines.slice(0, 3).join('; ')}`);
+    }
+
+    if (context.weatherNews?.alerts) {
+      const alerts = context.weatherNews.alerts.slice(0, 3).map(a => `- [${a.type}] ${a.title} (${a.source})`).join('\n');
+      contextParts.push(`⚠️ ALERTAS METEOROLÓGICOS:\n${alerts}`);
+    }
+
+    if (context.rag?.chunks?.length) {
+      const ragLines = context.rag.chunks
+        .map(c => `- [${c.title}${c.section ? ` › ${c.section}` : ''}] ${c.text}`)
+        .join('\n');
+      contextParts.push(`📚 CONHECIMENTO BASE (documentação e dados do Meteor 2.0 — cite a fonte quando usar):\n${ragLines}`);
+    }
+
+    return `CONTEXTO EM TEMPO REAL DO METEOR 2.0 (coletado agora):
+${contextParts.join('\n\n') || 'Nenhum dado disponível no momento.'}`;
   }
 
   private getFallbackResponse(userMessage: string, context: ChatContext): string {

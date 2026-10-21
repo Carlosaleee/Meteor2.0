@@ -2,9 +2,11 @@ import { Module } from "@nestjs/common";
 import type { ExecutionContext } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { ScheduleModule } from "@nestjs/schedule";
+import { ThrottlerModule, ThrottlerGuard } from "@nestjs/throttler";
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from "@nestjs/core";
 import { parseEnv } from "./common/config/env.schema";
 import { FallbackModule } from "./common/fallback/fallback.module";
+import { AiModule } from "./common/ai/ai.module";
 import { EnvelopeInterceptor } from "./common/http/envelope.interceptor";
 import { HttpExceptionFilter } from "./common/http/http-exception.filter";
 import { HealthController } from "./health.controller";
@@ -17,24 +19,13 @@ import { NoticiasRegionaisModule } from "./modules/noticias-regionais/noticias-r
 import { OceanographyModule } from "./modules/oceanography/oceanography.module";
 import { TrafficModule } from "./modules/traffic/traffic.module";
 
-// Throttler 60 req/min — opcional, requires `pnpm install` of @nestjs/throttler; fallback no-op if missing
-// Loopback (dev local: 127.0.0.1 / ::1) e sempre isento para nunca 429 em localhost
-let throttlerImports: unknown[] = [];
-let throttlerProviders: unknown[] = [];
-try {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const throttler = require("@nestjs/throttler");
-  const isLoopback = (context: ExecutionContext): boolean => {
-    const req = context.switchToHttp().getRequest<{ ip?: string; socket?: { remoteAddress?: string } }>();
-    const ip = req.ip ?? req.socket?.remoteAddress ?? "";
-    return ip === "127.0.0.1" || ip === "::1" || ip === "::ffff:127.0.0.1" || ip.startsWith("127.");
-  };
-  throttlerImports = [throttler.ThrottlerModule.forRoot([{ ttl: 60_000, limit: 60, skipIf: isLoopback }])];
-  throttlerProviders = [{ provide: APP_GUARD, useClass: throttler.ThrottlerGuard }];
-} catch {
-  throttlerImports = [];
-  throttlerProviders = [];
-}
+// Throttler 60 req/min global — @nestjs/throttler é dependência fixa do projeto.
+// Loopback (dev local: 127.0.0.1 / ::1) sempre isento para nunca 429 em localhost.
+const isLoopback = (context: ExecutionContext): boolean => {
+  const req = context.switchToHttp().getRequest<{ ip?: string; socket?: { remoteAddress?: string } }>();
+  const ip = req.ip ?? req.socket?.remoteAddress ?? "";
+  return ip === "127.0.0.1" || ip === "::1" || ip === "::ffff:127.0.0.1" || ip.startsWith("127.");
+};
 
 @Module({
   imports: [
@@ -44,8 +35,9 @@ try {
       validate: parseEnv,
     }),
     ScheduleModule.forRoot(),
-    ...(throttlerImports as never[]),
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 60, skipIf: isLoopback }]),
     FallbackModule,
+    AiModule,
     ComercioModule,
     IronModule,
     MeteorologyModule,
@@ -59,7 +51,7 @@ try {
   providers: [
     { provide: APP_FILTER, useClass: HttpExceptionFilter },
     { provide: APP_INTERCEPTOR, useClass: EnvelopeInterceptor },
-    ...(throttlerProviders as never[]),
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })
 export class AppModule {}

@@ -33,6 +33,8 @@ Thumbs.db
 # fallback data (auto-generated)
 apps/backend/data/*.json
 !apps/backend/data/fallback-*.json
+# índice RAG dos docs (gerado por `pnpm --filter backend rag:index`)
+!apps/backend/data/rag-index-docs.json
 
 # test
 .vitest/

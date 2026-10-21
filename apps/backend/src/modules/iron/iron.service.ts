@@ -6,11 +6,33 @@ import { ComercioService } from '../comercio/comercio.service';
 import { NoticiasRegionaisService } from '../noticias-regionais/noticias-regionais.service';
 import { NewsRepository } from '../news/news.repository';
 import { WeatherNewsRepository } from '../meteorology/weather-news.repository';
-import { GeminiChatRepository } from './gemini-chat.repository';
+import { GeminiChatRepository, ChatTurn, ChatContext } from './gemini-chat.repository';
+
+import { GeminiContextBuilder } from '../../common/ai/GeminiContextBuilder';
+import { RagService } from './rag/rag.service';
+import { RagHit } from './rag/rag.types';
+import { spNowKey, hourKeyFromNaive } from '../../common/time/sp-time';
+
+type ChatSource = {
+  title: string;
+  section?: string;
+  source: 'docs' | 'data';
+  snippet: string;
+};
 
 type ChatResponse = {
   reply: string;
   data?: Record<string, unknown>;
+  /** Trechos do knowledge base que fundamentaram a resposta (RAG). */
+  sources?: ChatSource[];
+};
+
+/**
+ * Contexto coletado dos serviços da aplicação. Estende o `ChatContext` do
+ * Gemini com dados brutos adicionais (ex.: notícias regionais completas).
+ */
+type CollectedContext = ChatContext & {
+  regionalNews?: { news: Array<{ title: string }> };
 };
 
 @Injectable()
@@ -26,21 +48,76 @@ export class IronService {
     private readonly newsRepo: NewsRepository,
     private readonly weatherNewsRepo: WeatherNewsRepository,
     private readonly geminiChat: GeminiChatRepository,
+    private readonly ragService: RagService,
+    private readonly contextBuilder: GeminiContextBuilder,
   ) {}
 
-  async processMessage(message: string): Promise<ChatResponse> {
+  async processMessage(
+    message: string,
+    history: ChatTurn[] = [],
+    sessionId?: string,
+  ): Promise<ChatResponse> {
     try {
-      const context = await this.collectContext();
-      const reply = await this.geminiChat.chat(message, context);
-      return { reply, data: { contextCollected: true } };
+      if (sessionId) {
+        this.logger.log(`chat[${sessionId}]: ${message.slice(0, 80)}`);
+      }
+
+      // Retrieval híbrido (docs + dados); falha nunca bloqueia o chat.
+      const ragHits = await this.ragService.retrieve(message).catch(() => [] as RagHit[]);
+
+      // Coleta de dados em tempo real dos serviços + contexto do builder
+      // (o builder pode enriquecer/curtir o contexto; hoje retorna {}).
+      const liveContext = await this.collectContext();
+      const extraContext = await this.contextBuilder.buildContext(history);
+      const context = { ...liveContext, ...extraContext };
+      const reply = await this.geminiChat.chat(message, this.withRagContext(context, ragHits), history);
+
+      const sources: ChatSource[] = ragHits.map(h => ({
+        title: h.chunk.title,
+        section: h.chunk.section,
+        source: h.chunk.source,
+        snippet: h.chunk.text.slice(0, 160),
+      }));
+
+      return {
+        reply,
+        data: { contextCollected: true, ragHits: ragHits.length },
+        ...(sources.length > 0 ? { sources } : {}),
+      };
     } catch (err) {
       this.logger.error(`Error processing message: ${err}`);
       return { reply: '⚠️ Erro ao processar sua mensagem. Tente novamente.' };
     }
   }
 
-  private async collectContext() {
-    const [weatherResult, oceanResult, trafficResult, commerceResult, newsResult, rankingsResult, hourlyResult, weatherNewsResult] = await Promise.allSettled([
+  private withRagContext(
+    context: Awaited<ReturnType<IronService['collectContext']>>,
+    hits: RagHit[],
+  ) {
+    if (hits.length === 0) return context;
+    return {
+      ...context,
+      rag: {
+        chunks: hits.map(h => ({
+          title: h.chunk.title,
+          section: h.chunk.section,
+          text: h.chunk.text,
+        })),
+      },
+    };
+  }
+
+  private async collectContext(): Promise<CollectedContext> {
+    const [
+      weatherResult,
+      oceanResult,
+      trafficResult,
+      commerceResult,
+      noticiasResult,
+      newsResult,
+      hourlyResult,
+      weatherNewsResult,
+    ] = await Promise.allSettled([
       this.meteorologyService.getCurrentWeather('ilha-comprida'),
       this.oceanographyService.getSwellConditions(),
       this.trafficService.getTraffic(),
@@ -77,11 +154,7 @@ export class IronService {
       news: newsResult.status === 'fulfilled' ? {
         headlines: newsResult.value.news.slice(0, 3).map(n => n.title),
       } : undefined,
-      rankings: rankingsResult.status === 'fulfilled' ? {
-        men: rankingsResult.value.rankings.men.slice(0, 5),
-        women: rankingsResult.value.rankings.women.slice(0, 5),
-        events: rankingsResult.value.events.slice(0, 3),
-      } : undefined,
+      regionalNews: noticiasResult.status === 'fulfilled' ? noticiasResult.value : undefined,
       hourly: hourlyResult.status === 'fulfilled' ? hourlyResult.value : undefined,
       weatherNews: weatherNewsResult.status === 'fulfilled' ? weatherNewsResult.value : undefined,
     };
@@ -90,9 +163,11 @@ export class IronService {
   private async getHourlyForecast() {
     try {
       const data = await this.meteorologyService.getCurrentWeather('ilha-comprida');
-      const now = new Date();
+      // Timestamps naive de SP — comparar com a hora atual de SP, nao com o
+      // relógio UTC do processo (Vercel).
+      const nowKey = spNowKey();
       const next6h = (data.hourly || [])
-        .filter(h => new Date(h.time) >= now)
+        .filter(h => hourKeyFromNaive(h.time) >= nowKey)
         .slice(0, 6)
         .map(h => ({
           time: h.time,

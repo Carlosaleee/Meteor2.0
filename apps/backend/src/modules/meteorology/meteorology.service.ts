@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { OpenMeteoRepository } from './open-meteo.repository';
+import { spNowKey, hourKeyFromNaive } from '../../common/time/sp-time';
 
 @Injectable()
 export class MeteorologyService {
@@ -27,10 +28,10 @@ export class MeteorologyService {
 
     let startIdx = 0;
     if (hasHourly) {
-      const currentHourIndex = hourly.time.findIndex(t => {
-        const d = new Date(t);
-        return d.getHours() === now.getHours();
-      });
+      // Os timestamps do Open-Meteo sao "wall clock" de SP. Comparar com getHours()
+      // do processo (UTC na Vercel) desalinhava 3h — usar a hora atual em SP.
+      const nowKey = spNowKey(now);
+      const currentHourIndex = hourly.time.findIndex(t => hourKeyFromNaive(t) === nowKey);
       startIdx = Math.max(0, currentHourIndex >= 0 ? currentHourIndex : 0);
     }
 
@@ -38,6 +39,7 @@ export class MeteorologyService {
       location: loc.name,
       locationId,
       timestamp: now.toISOString(),
+      source: raw.meta?.source ?? 'live',
       current: {
         temperature: current.temperature_2m,
         apparentTemperature: current.apparent_temperature,

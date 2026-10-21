@@ -1,6 +1,6 @@
 ﻿# Referencia da API — Meteor 2.0
 
-> **Ultima atualizacao:** 05/10/2026 (recuperacao: CI + typecheck + backend serverless na Vercel + dados frescos; +4 testes)
+> **Ultima atualizacao:** 20/10/2026 (branch `feature/iron-context-fix`: timeout 45s no chat, RAG topK=3 + cache LRU, contrato de `POST /v1/iron/chat` atualizado)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [../README.md](../README.md)
 
@@ -52,6 +52,7 @@ GET /v1/meteorology?locationId=ilha-comprida
   "location": "Ilha Comprida",
   "locationId": "ilha-comprida",
   "timestamp": "2026-09-10T14:00:00.000Z",
+  "source": "live",
   "current": {
     "temperature": 21.5,
     "apparentTemperature": 20.8,
@@ -89,9 +90,7 @@ GET /v1/meteorology?locationId=ilha-comprida
       "sunrise": "2026-09-10T06:12:00",
       "sunset": "2026-09-10T18:05:00"
     }
-  ],
-  "forecastMax": 24,
-  "forecastMin": 17
+  ]
 }
 ```
 
@@ -101,6 +100,7 @@ GET /v1/meteorology?locationId=ilha-comprida
 | location | string | Nome da localizacao |
 | locationId | string | ID da localizacao |
 | timestamp | string | Horario da resposta (ISO 8601) |
+| source | string | Proveniencia dos dados: `live` (API em tempo real), `stale` (fallback com mais de 24h) ou `sample` (fallback de exemplo deterministico) |
 | current.temperature | number | Temperatura atual (Celsius) |
 | current.apparentTemperature | number | Sensacao termica (Celsius) |
 | current.humidity | number | Umidade relativa (%) |
@@ -398,7 +398,7 @@ GET /v1/news
 | events[].status | string | `Completed`, `Standby` ou `Upcoming` (Upcoming listado primeiro) |
 | timestamp | string | Momento da montagem da resposta (ISO 8601) |
 
-**Fontes:** WSL (worldsurfleague.com — parser da tabela HTML real) + SPSurf (RSS). Fallback: `data/fallback-news.json`. Refresh: cron diario 03:00 UTC (unico no plano Hobby) + `POST /v1/cron/refresh`.
+**Fontes:** WSL (worldsurfleague.com — parser da tabela HTML real do ranking/calendario + scraper de `/news`) + Google News RSS pt-BR (categoria `Paulista`; o dominio `spsurf.com.br` morreu — NXDOMAIN — e o RSS e o fallback). Fallback: `data/fallback-news.json`. Refresh: cron diario 03:00 UTC (unico no plano Hobby) + `POST /v1/cron/refresh` (header `x-cron-secret`).
 
 ---
 
@@ -689,7 +689,7 @@ Para forcar atualizacao do fallback: `POST /v1/cron/refresh`, aguardar o cron di
 
 ## POST /v1/iron/chat
 
-Rota para envio de mensagens ao agente IA (MeteorBot).
+Rota para envio de mensagens ao agente IA (Irons / MeteorBot).
 
 **Headers:**
 | Header | Tipo | Obrigatorio | Descricao |
@@ -699,20 +699,50 @@ Rota para envio de mensagens ao agente IA (MeteorBot).
 **Request Body:**
 ```json
 {
-  "message": "Qual a previsão do tempo amanhã?"
+  "message": "Qual a previsão do tempo amanhã?",
+  "history": [
+    { "role": "user", "content": "Como está o mar?" },
+    { "role": "assistant", "content": "O swell está em 1,2 m..." }
+  ],
+  "sessionId": "abc123"
 }
 ```
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|-------|------|-------------|-----------|
+| message | string | Sim | Mensagem do usuario (1-500 chars) |
+| history | array | Nao | Historico recente (max 20 turns `{role, content}`) — o cliente mantem o estado; backend e stateless |
+| sessionId | string | Nao | Identificador do cliente, apenas para logs (max 64) |
+
+**Limite:** 5 requisicoes/min por IP (throttle dedicado, mais restritivo que o global).
 
 **Response:**
 ```json
 {
-  "success": true,
-  "data": {
-    "reply": "Amanhã em Ilha Comprida...",
-    "timestamp": "2026-09-10T14:00:00.000Z"
-  }
+  "reply": "Amanhã em Ilha Comprida...",
+  "data": { "contextCollected": true, "ragHits": 3 },
+  "sources": [
+    {
+      "title": "SYSTEM_SPEC.md",
+      "section": "Clima",
+      "source": "docs",
+      "snippet": "previsão do tempo com ondas swell vento..."
+    }
+  ]
 }
 ```
+
+| Campo | Tipo | Descricao |
+|-------|------|-----------|
+| reply | string | Resposta do Irons (persona em `systemInstruction`, dados da app no 1º turno) |
+| data.contextCollected | boolean | Se true, contexto dos serviços foi coletado com sucesso |
+| data.ragHits | number | Quantidade de trechos do knowledge base injetados no contexto |
+| sources | array | **Opcional** — trechos RAG que fundamentaram a resposta (`source: docs \\| data`); ausente quando o retrieval nao retorna nada |
+
+**Comportamento:**
+- **Timeout de 45s** na chamada ao Gemini — ao expirar, a rota devolve uma mensagem de fallback curta em vez de travar o chat.
+- Falha do RAG nunca bloqueia o chat (resposta segue sem `sources`).
+- Retrieval RAG: hibrido (embedding Gemini 60% + BM25 40%), **topK=3**, com cache LRU por 5 min.
 
 ---
 

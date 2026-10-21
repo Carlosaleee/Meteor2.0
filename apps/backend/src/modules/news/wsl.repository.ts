@@ -16,6 +16,14 @@ export type WslEvent = {
   tour: string;
 };
 
+export type WslNewsItem = {
+  title: string;
+  description: string;
+  url: string;
+  image: string;
+  publishedAt: string;
+};
+
 type WslRankingsResult = {
   men: WslRankingEntry[];
   women: WslRankingEntry[];
@@ -23,14 +31,22 @@ type WslRankingsResult = {
   fetchedAt: string;
 };
 
+const BASE_URL = 'https://www.worldsurfleague.com';
+const FETCH_TIMEOUT_MS = 15_000;
+const MAX_NEWS = 12;
+
 @Injectable()
 export class WslRepository {
   private readonly logger = new Logger(WslRepository.name);
   private cache: WslRankingsResult | null = null;
+  private newsCache: WslNewsItem[] | null = null;
+  private newsCacheTs = 0;
   private readonly CACHE_TTL_MS = 30 * 60 * 1000;
 
   clearCache(): void {
     this.cache = null;
+    this.newsCache = null;
+    this.newsCacheTs = 0;
   }
 
   async getRankings(): Promise<WslRankingsResult> {
@@ -55,10 +71,77 @@ export class WslRepository {
     return result;
   }
 
+  async getNews(): Promise<WslNewsItem[]> {
+    if (this.newsCache && Date.now() - this.newsCacheTs < this.CACHE_TTL_MS) {
+      return this.newsCache;
+    }
+
+    try {
+      const res = await fetch(`${BASE_URL}/news`, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MeteorBot/1.0)' },
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+      });
+      if (!res.ok) throw new Error(`WSL news returned ${res.status}`);
+      const items = this.parseNewsHtml(await res.text());
+      if (items.length === 0) throw new Error('WSL news page had no recognizable cards');
+      this.newsCache = items;
+      this.newsCacheTs = Date.now();
+      return items;
+    } catch (err) {
+      this.logger.warn(`Failed to fetch WSL news: ${err}`);
+      return [];
+    }
+  }
+
+  private parseNewsHtml(html: string): WslNewsItem[] {
+    const chunks = html.split('data-content-id="').slice(1);
+    const items: WslNewsItem[] = [];
+
+    for (const chunk of chunks) {
+      const link = chunk.match(/href="(\/posts\/[^"]+)"><span class="truncate">([\s\S]*?)<\/span>/);
+      if (!link) continue;
+
+      const title = this.decodeEntities(link[2].replace(/<[^>]*>/g, '')).trim();
+      if (title.length < 10) continue;
+
+      const dateStr = (chunk.match(/datetime="([^"]+)"/) || [])[1] ?? '';
+      const parsedDate = new Date(dateStr.replace(' ', 'T'));
+      const image = (chunk.match(/data-img-src="([^"]+)"/) || [])[1] ?? '';
+      const descMatch = chunk.match(/<p class="content-card-description[^"]*">([\s\S]*?)<\/p>/);
+
+      items.push({
+        title,
+        description: descMatch
+          ? this.decodeEntities(descMatch[1].replace(/<[^>]*>/g, '')).trim().substring(0, 200)
+          : '',
+        url: `${BASE_URL}${link[1]}`,
+        image,
+        publishedAt: isNaN(parsedDate.getTime()) ? new Date().toISOString() : parsedDate.toISOString(),
+      });
+
+      if (items.length >= MAX_NEWS) break;
+    }
+
+    return items;
+  }
+
+  private decodeEntities(text: string): string {
+    return text
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&#x27;/g, "'")
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&#(\d+);/g, (_, code: string) => String.fromCharCode(parseInt(code, 10)));
+  }
+
   private async fetchMenRanking(): Promise<WslRankingEntry[]> {
     try {
-      const res = await fetch('https://www.worldsurfleague.com/athletes/tour/mct', {
+      const res = await fetch(`${BASE_URL}/athletes/tour/mct`, {
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MeteorBot/1.0)' },
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
       });
       if (!res.ok) throw new Error(`WSL men ranking returned ${res.status}`);
       const html = await res.text();
@@ -71,8 +154,9 @@ export class WslRepository {
 
   private async fetchWomenRanking(): Promise<WslRankingEntry[]> {
     try {
-      const res = await fetch('https://www.worldsurfleague.com/athletes/tour/wct', {
+      const res = await fetch(`${BASE_URL}/athletes/tour/wct`, {
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MeteorBot/1.0)' },
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
       });
       if (!res.ok) throw new Error(`WSL women ranking returned ${res.status}`);
       const html = await res.text();
@@ -85,8 +169,9 @@ export class WslRepository {
 
   private async fetchEvents(): Promise<WslEvent[]> {
     try {
-      const res = await fetch('https://www.worldsurfleague.com/events', {
+      const res = await fetch(`${BASE_URL}/events`, {
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MeteorBot/1.0)' },
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
       });
       if (!res.ok) throw new Error(`WSL events returned ${res.status}`);
       const html = await res.text();
@@ -107,7 +192,7 @@ export class WslRepository {
         block.match(/avatar-text-primary[^>]*>[\s\S]*?<a[^>]*>([^<]+)<\/a>/) ||
         block.match(/aria-label='([^']+)'/);
       const countryMatch = block.match(/athlete-country-name">([^<]+)</);
-      const pointsMatch = block.match(/tour-points">([\d,]+)</);
+      const pointsMatch = block.match(/tour-points[^>]*>\s*([\d,]+)\s*</);
 
       if (!rankMatch || !nameMatch || !pointsMatch) continue;
 
@@ -144,7 +229,7 @@ export class WslRepository {
 
     for (const block of rows) {
       const dateMatch = block.match(/event-date-range[^>]*>([^<]+)</);
-      const nameMatch = block.match(/event-schedule-details__event-name[^>]*>([^<]+)<\/a>/);
+      const nameMatch = block.match(/event-schedule-details__event-name[^>]*>([^<]+)/);
       const locationMatch = block.match(/event-schedule-details__location">([^<]+)</);
       const tourMatch = block.match(/event-tour-details__tour-name">([^<]+)</);
       const statusMatch = block.match(/event-status[^>]*><span>(Completed|Standby|Upcoming)<\/span>/);

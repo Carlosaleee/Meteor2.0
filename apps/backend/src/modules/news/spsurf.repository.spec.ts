@@ -41,6 +41,38 @@ describe('SpsurfRepository', () => {
       const result2 = await repository.getNews();
       expect(result1).toBe(result2);
     });
+
+    it('should fall back to Google News RSS when the primary source is unreachable', async () => {
+      const rss = `
+        <rss><channel>
+          <item>
+            <title>Surfe: Yago Dora e Italo Ferreira avancam em Peniche - Agencia Brasil</title>
+            <link>https://news.google.com/rss/articles/abc123?oc=5</link>
+            <pubDate>Fri, 16 Oct 2026 22:12:00 GMT</pubDate>
+            <description>&lt;a href="https://news.google.com/rss/articles/abc123"&gt;Surfe&lt;/a&gt;Agencia Brasil</description>
+            <source url="https://agenciabrasil.ebc.com.br">Agencia Brasil</source>
+          </item>
+          <item>
+            <title>Surf diz que rede propria servira para ampliar servicos de MVNOs parceiras - TeleSintese</title>
+            <link>https://news.google.com/rss/articles/def456?oc=5</link>
+            <pubDate>Wed, 14 Oct 2026 21:55:00 GMT</pubDate>
+            <source url="https://telesintese.com.br">TeleSintese</source>
+          </item>
+        </channel></rss>
+      `;
+
+      global.fetch = jest.fn().mockImplementation((url: string) =>
+        String(url).includes('news.google.com')
+          ? Promise.resolve({ ok: true, text: () => Promise.resolve(rss) })
+          : Promise.reject(new Error('Could not resolve host: www.spsurf.com.br')),
+      );
+
+      const result = await repository.getNews();
+      expect(result).toHaveLength(1);
+      expect(result[0].title).toBe('Surfe: Yago Dora e Italo Ferreira avancam em Peniche');
+      expect(result[0].url).toBe('https://news.google.com/rss/articles/abc123?oc=5');
+      expect(result[0].publishedAt).toBe('2026-10-16T22:12:00.000Z');
+    });
   });
 
   describe('clearCache', () => {

@@ -1,30 +1,26 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
 import { GeminiRepository } from './gemini.repository';
+import { GeminiClientService } from '../../common/ai/gemini-client.service';
 
 describe('GeminiRepository', () => {
   let repository: GeminiRepository;
 
-  const mockConfigService = {
-    get: jest.fn((key: string) => {
-      const config: Record<string, string> = {
-        GEMINI_API_KEY: '',
-        GEMINI_MODEL: 'gemini-2.5-flash',
-        GEMINI_TEMPERATURE: '0.7',
-      };
-      return config[key];
-    }),
+  const mockGeminiClient = {
+    generateText: jest.fn().mockResolvedValue(null),
+    embed: jest.fn().mockResolvedValue(null),
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         GeminiRepository,
-        { provide: ConfigService, useValue: mockConfigService },
+        { provide: GeminiClientService, useValue: mockGeminiClient },
       ],
     }).compile();
 
     repository = module.get<GeminiRepository>(GeminiRepository);
+    jest.clearAllMocks();
+    mockGeminiClient.generateText.mockResolvedValue(null);
   });
 
   it('should be defined', () => {
@@ -48,7 +44,7 @@ describe('GeminiRepository', () => {
       tideCoefficient: 0.78,
     };
 
-    it('should return fallback summary when no API key', async () => {
+    it('should return fallback summary when Gemini unavailable', async () => {
       const result = await repository.generateSummary(mockData);
       expect(result).toContain('Condições');
       expect(result).toContain('Vento');
@@ -62,6 +58,15 @@ describe('GeminiRepository', () => {
     it('should include wind analysis in fallback', async () => {
       const result = await repository.generateSummary(mockData);
       expect(result).toContain('ONSHORE');
+    });
+
+    it('should use Gemini when it returns a valid summary', async () => {
+      mockGeminiClient.generateText.mockResolvedValueOnce('Resposta tática completa do Gemini sobre as condições marítimas.');
+      const result = await repository.generateSummary(mockData);
+      expect(result).toBe('Resposta tática completa do Gemini sobre as condições marítimas.');
+      expect(mockGeminiClient.generateText).toHaveBeenCalledWith(
+        expect.objectContaining({ maxOutputTokens: 2500 }),
+      );
     });
   });
 });

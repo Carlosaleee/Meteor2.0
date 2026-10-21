@@ -1,13 +1,25 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { FaTimes, FaPaperPlane, FaWater } from 'react-icons/fa';
+import { FaTimes, FaPaperPlane, FaWater, FaRedo, FaTrashAlt } from 'react-icons/fa';
 import { useChat } from './ChatContext';
 
 type Message = { role: 'user' | 'bot'; text: string };
+type ChatRole = 'user' | 'assistant';
+type HistoryEntry = { role: ChatRole; content: string };
 
 const STORAGE_KEY = 'irons-chat-messages';
 const MAX_MESSAGES = 50;
+const HISTORY_LIMIT = 10;
+
+function newSessionId(): string {
+  try {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+  } catch {}
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
 
 const WELCOME: Message = {
   role: 'bot',
@@ -40,17 +52,30 @@ export function ChatWidget() {
   const [messages, setMessages] = useState<Message[]>([WELCOME]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [sessionId, setSessionId] = useState<string>(() => newSessionId());
+  const [status, setStatus] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const skipSaveRef = useRef(false);
 
   useEffect(() => {
     setMessages(loadMessages());
   }, []);
 
   useEffect(() => {
+    if (skipSaveRef.current) {
+      skipSaveRef.current = false;
+      return;
+    }
     saveMessages(messages);
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    if (!status) return;
+    const t = setTimeout(() => setStatus(''), 2000);
+    return () => clearTimeout(t);
+  }, [status]);
 
   useEffect(() => {
     if (isChatOpen) {
@@ -63,6 +88,10 @@ export function ChatWidget() {
     if (!input.trim()) return;
 
     const userMsg = input;
+    const history: HistoryEntry[] = messages.slice(-HISTORY_LIMIT).map(m => ({
+      role: m.role === 'user' ? 'user' : 'assistant',
+      content: m.text,
+    }));
     setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
     setInput('');
     setIsTyping(true);
@@ -72,7 +101,7 @@ export function ChatWidget() {
       const res = await fetch(`${apiBase}/v1/iron/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMsg }),
+        body: JSON.stringify({ message: userMsg, sessionId, history }),
       });
 
       if (!res.ok) throw new Error(`API ${res.status}`);
@@ -87,6 +116,28 @@ export function ChatWidget() {
     } finally {
       setIsTyping(false);
     }
+  };
+
+  const handleRestart = () => {
+    skipSaveRef.current = true;
+    setMessages([WELCOME]);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {}
+    setSessionId(newSessionId());
+    setStatus('Conversa reiniciada');
+    inputRef.current?.focus();
+  };
+
+  const handleClear = () => {
+    if (!window.confirm('Apagar toda a conversa?')) return;
+    skipSaveRef.current = true;
+    setMessages([]);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {}
+    setStatus('Conversa apagada');
+    inputRef.current?.focus();
   };
 
   return (
@@ -109,6 +160,8 @@ export function ChatWidget() {
           role="dialog"
           aria-label="Chat com Irons"
         >
+          <div className="sr-only" role="status" aria-live="polite">{status}</div>
+
           {/* Header */}
           <div className="p-4 bg-gradient-to-r from-amber-900/40 via-slate-800 to-slate-800 border-b border-slate-700/50 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -120,17 +173,44 @@ export function ChatWidget() {
                 <p className="text-[10px] text-amber-400/80 font-mono">ASSISTENTE TÁTICO</p>
               </div>
             </div>
-            <button
-              onClick={() => setChatOpen(false)}
-              className="text-slate-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-slate-700/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
-              aria-label="Fechar chat"
-            >
-              <FaTimes className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={handleRestart}
+                disabled={isTyping}
+                className="text-slate-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-slate-700/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 disabled:opacity-40 disabled:cursor-not-allowed"
+                aria-label="Reiniciar conversa"
+                title="Reiniciar conversa"
+              >
+                <FaRedo className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleClear}
+                disabled={isTyping}
+                className="text-slate-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-slate-700/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 disabled:opacity-40 disabled:cursor-not-allowed"
+                aria-label="Apagar conversa"
+                title="Apagar conversa"
+              >
+                <FaTrashAlt className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setChatOpen(false)}
+                className="text-slate-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-slate-700/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                aria-label="Fechar chat"
+              >
+                <FaTimes className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           {/* Messages */}
           <div className="flex-1 p-4 overflow-y-auto space-y-3 text-xs scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+            {messages.length === 0 && (
+              <div className="h-full min-h-[200px] flex items-center justify-center">
+                <p className="text-slate-500 text-xs text-center px-4">
+                  Nenhuma mensagem — pergunte sobre clima, ondas, trânsito...
+                </p>
+              </div>
+            )}
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2 fade-in duration-150`}>
                 <div

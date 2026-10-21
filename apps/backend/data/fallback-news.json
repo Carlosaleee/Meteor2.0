@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-05T20:00:03.894Z",
+  "updatedAt": "2026-10-21T01:13:18.847Z",
   "data": {
     "news": [
       {
@@ -11,7 +11,8 @@
         "description": "Miguel Pupo derrotou Kanoa Igarashi na final por 14,77 a 14,40 em Lower Trestles. Segunda vitoria do brasileiro na temporada.",
         "image": "https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67",
         "category": "WSL",
-        "publishedAt": "2026-10-03T20:00:03.868Z"
+        "publishedAt": "2026-09-21T12:00:00.000Z",
+        "sample": true
       },
       {
         "id": "wsl-yago-lideranca",
@@ -22,7 +23,8 @@
         "description": "Atual campeao mundial vence duelo de aereos contra Kauli Vaast e assume 1a posicao com 42.780 pontos.",
         "image": "https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67",
         "category": "WSL",
-        "publishedAt": "2026-10-01T20:00:03.868Z"
+        "publishedAt": "2026-09-18T12:00:00.000Z",
+        "sample": true
       },
       {
         "id": "wsl-erin-tripla",
@@ -33,7 +35,8 @@
         "description": "Canadense derrotou Gabriela Bryan na final por 13,00 a 11,90. Terceiro titulo consecutivo apos Taiti e Fiji.",
         "image": "https://d3qf8nvav5av0u.cloudfront.net/image/05d0c45992d04a5409e4f0752d17382f.png?&x=1440&y=513&icq=74&sig=b95e55f8d4a05ce4133bcc58ba78e486",
         "category": "WSL",
-        "publishedAt": "2026-10-03T20:00:03.868Z"
+        "publishedAt": "2026-09-21T12:00:00.000Z",
+        "sample": true
       },
       {
         "id": "wsl-medina-eliminado",
@@ -44,7 +47,8 @@
         "description": "Tricampeao mundial cai para Mateus Herdy na segunda rodada (11,83 a 12,00). Ja tem 3 eliminacoes no Round 2 esta temporada.",
         "image": "https://d3qf8nvav5av0u.cloudfront.net/image/05d0c45992d04a5409e4f0752d17382f.png?&x=1440&y=513&icq=74&sig=b95e55f8d4a05ce4133bcc58ba78e486",
         "category": "WSL",
-        "publishedAt": "2026-10-01T20:00:03.868Z"
+        "publishedAt": "2026-09-18T12:00:00.000Z",
+        "sample": true
       },
       {
         "id": "wsl-trestles-corte",
@@ -55,7 +59,8 @@
         "description": "Filipe Toledo escapou do corte. Mateus Herdy e Alejo Muniz ficam fora das proximas duas etapas do CT.",
         "image": "https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67",
         "category": "WSL",
-        "publishedAt": "2026-10-02T20:00:03.868Z"
+        "publishedAt": "2026-09-19T12:00:00.000Z",
+        "sample": true
       },
       {
         "id": "wsl-portugal-proximo",
@@ -66,320 +71,244 @@
         "description": "Decima etapa do CT 2026 em Peniche de 16 a 25 de outubro. Classificados pelo corte disputam penultima etapa.",
         "image": "https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67",
         "category": "WSL",
-        "publishedAt": "2026-10-04T20:00:03.868Z"
+        "publishedAt": "2026-09-22T12:00:00.000Z",
+        "sample": true
       },
       {
         "id": "spsurf-1",
-        "title": "Longboard Paulista Pro 2026 será realizado em Peruíbe",
+        "title": "Surfe: Yago Dora, Ítalo Ferreira e Medina vão às quartas em Peniche",
         "source": "SPSurf",
         "sourceUrl": "https://www.spsurf.com.br",
-        "url": "https://www.spsurf.com.br",
-        "description": "",
+        "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxQakpHRDRHRkhFYmNpcF9fWDF1NkVNaWI2bWtZZnJ6bHdUNkJtcGtyVFFIeU5YTGxzc0RXNVlodE1ZaGNDWGFzMUJvMjc1THBQY3JTOUVtc2d1M0c3M0VsLTJuUlVxWS12RUQ0WTBJdm1qYXBMMVVDckRzMFNnQjZMTmN3UFd4M1hVdTMzSFJFeWg1NXJjcHAzc3dOZk1XVW5sY0VvcjB0d3kzQldZWS1JbFJReWtrTFM4Vnp0OA?oc=5",
+        "description": "Surfe: Yago Dora, Ítalo Ferreira e Medina vão às quartas em Peniche Agência Brasil",
         "image": "https://static.wixstatic.com/media/690598_cf6012b3a7aa4ffd8b88893077d96484~mv2.jpeg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/690598_cf6012b3a7aa4ffd8b88893077d96484~mv2.webp",
         "category": "Paulista",
-        "publishedAt": "2026-10-05T20:00:03.867Z"
+        "publishedAt": "2026-10-16T22:12:00.000Z"
       },
       {
         "id": "spsurf-2",
-        "title": "Ondas pesadas e novos talentos marcam o Hang Loose Surf Attack 2026 no Guarujá",
+        "title": "ISA segue WSL e suspende Alan Cleland após caso com adolescente investigado pela polícia",
         "source": "SPSurf",
         "sourceUrl": "https://www.spsurf.com.br",
-        "url": "https://www.spsurf.com.br",
-        "description": "",
+        "url": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxPMUZUdjh4VUJOUDR4VlBZczBvMlloQllIQ29OY25rcFcxQkJLWEtwM3IwSkdkQ2J5WDNnUi10V3NQS2Y1Ui16OThPVlJud3JYMko4RERjMXhrUlpwZUZVNlE0TDhUQW03RTVqeEJTUkYwY0lXUkRJaU1lY2RUdkZiMUlfWEJmVDhIc3JDUU9GRWROZjZRVXVxNHJJQlg3aHpFeHlTZ3JjbENlVnhtWjBqRndiNmEtSGhFeTFSVGxLWVJaV09zUjFkaWM4QzJPMzd5S2xodkRnWHhheFRtQ1NmU9IB7wFBVV95cUxQN2lvOFNaRzM1Wm1wTS0wZVFBc0ZkMmlpWkItZi1ZN2xwcVVEdUhsMElfUk10VXhMd2FfOU05bTJFM1hBTTh5NTY2Z1B6Y2lkRDNYNkx6bUtKOXRrOTdjSGlhRThWTFVtczBLMlBXWHg3NnhNaUlyVW1oNWxycHJzSDM2ZkY4dlRhUHNDdFN3dFlQUUVJYzZ1U1V0ejhBejFDYnBBTUNmanRMM3ZSU1NicjR2ei1xUUZtZWlJLXMwaUFhWC1vNFptVldDaVJveEZWZUJSNExpbHVoNjFTakltUXFDcEJQenpwR09XZHhXdw?oc=5",
+        "description": "ISA segue WSL e suspende Alan Cleland após caso com adolescente investigado pela polícia ge",
         "image": "https://static.wixstatic.com/media/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.jpeg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.webp",
         "category": "Paulista",
-        "publishedAt": "2026-10-05T20:00:03.867Z"
+        "publishedAt": "2026-10-15T00:22:22.000Z"
       },
       {
         "id": "spsurf-3",
-        "title": "Vini Palma e Eduarda Stefani vencem e dominam as ondas da Praia da Baleia",
+        "title": "Atleta do Corinthians, Ryan Kainalo garante vaga na elite do surfe mundial",
         "source": "SPSurf",
         "sourceUrl": "https://www.spsurf.com.br",
-        "url": "https://www.spsurf.com.br",
-        "description": "",
+        "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPQXZ5MFhDTEZWZlZYR3RQM3pKTlZtdWhVQ05qTDVvbHUyQU1yeWFOWkRvNFA2Zl9PT281YmJuZDg5UUNHYWxpUlQxVmdFWWo0TUc3TUQ3bVBLbTVBQkNLVk1Ram9mX1VqQkVTbVhxUGs1YlBjbWtwMV9NcDI2QVA5LXFlT3lpWmZiNzlJT1l2UHZiYUtqUE5jUEV2YnFzRVlCLUpjbHFtVWpoOFZhazZJcTZzbw?oc=5",
+        "description": "Atleta do Corinthians, Ryan Kainalo garante vaga na elite do surfe mundial Corinthians | Site Oficial",
         "image": "https://static.wixstatic.com/media/71b9f8_d53b9f235c844cb09ce5789c48052bf6~mv2.jpg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/71b9f8_d53b9f235c844cb09ce5789c48052bf6~mv2.jpg",
         "category": "Paulista",
-        "publishedAt": "2026-10-05T20:00:03.867Z"
+        "publishedAt": "2026-10-15T18:25:00.000Z"
       },
       {
         "id": "spsurf-4",
-        "title": "Melhores momentos!",
+        "title": "Veja indícios de que Paolla Oliveira vive novo affair com surfista",
         "source": "SPSurf",
         "sourceUrl": "https://www.spsurf.com.br",
-        "url": "https://www.spsurf.com.br/vídeos",
-        "description": "",
+        "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPbGtvUno3b2J6dG9UbmZWVmszbjY3SlJQZ3NWVFBId1VOdzY1eE5GWU5OUWNlMGRoNzU5T21wc3VKblFjWElKMDNvNWI0czlFWmZveHVCRGViUXNDVHRXWFphdUJDS1Y1M0FEbkZFaFBSaWR3a1I1aHRJcVM3ZmRTa2txQUNYNjZaRk9fTEpZM0IyQ294cnNDNXBrVE9rU09jdEhyZEN6ZXB0U3dNZDNSRmRDTQ?oc=5",
+        "description": "Veja indícios de que Paolla Oliveira vive novo affair com surfista Metrópoles",
         "image": "https://static.wixstatic.com/media/71b9f8_d47f44af83e043a590507fe765bd2d32~mv2.jpg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/71b9f8_d47f44af83e043a590507fe765bd2d32~mv2.jpg",
         "category": "Paulista",
-        "publishedAt": "2026-10-05T20:00:03.867Z"
+        "publishedAt": "2026-10-20T18:54:00.000Z"
       },
       {
         "id": "spsurf-5",
-        "title": "Galeria de fotos",
+        "title": "Aos 62 anos, surfista conquista ouro e planeja disputar novas competições",
         "source": "SPSurf",
         "sourceUrl": "https://www.spsurf.com.br",
-        "url": "https://www.spsurf.com.br/galeria-de-fotos",
-        "description": "",
+        "url": "https://news.google.com/rss/articles/CBMixgFBVV95cUxOV1A5Mnk5azJtaFowRTBkYTBfVDdDUVBRYjhTZDU1MDByMHp2S0FHZWdHc05IMGI1d21Gd1UzNTlON3g0SnpxWTNoQUVySG9uZWppdWw2YzJjR1NnUk5GNl9yTkpnOV9RdE5UeUlYc1czNzJoQzl1dVhQc1gxc1k1Ym1wQ0JlQUZrcWJxWmhxaFc0SWNvdFBpc2FYaGpibmppSVBZajVfcVJIaTZwbmp6TGs2WW85dEdtemN6ZU9icGNDQkowdFE?oc=5",
+        "description": "Aos 62 anos, surfista conquista ouro e planeja disputar novas competições CNN Brasil",
         "image": "https://static.wixstatic.com/media/71b9f8_1f4cfb108dfd43299fb87ae66da9782c~mv2.jpg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/71b9f8_1f4cfb108dfd43299fb87ae66da9782c~mv2.jpg",
         "category": "Paulista",
-        "publishedAt": "2026-10-05T20:00:03.867Z"
+        "publishedAt": "2026-10-17T06:00:42.000Z"
       },
       {
         "id": "spsurf-6",
-        "title": "Chegou a sua hora",
+        "title": "Surfe e crise climática: o futuro das ondas em risco",
         "source": "SPSurf",
         "sourceUrl": "https://www.spsurf.com.br",
-        "url": "https://www.spsurf.com.br",
-        "description": "",
-        "image": "https://static.wixstatic.com/media/b7060dede1e849e483cc931023aec49f.jpg/v1/fill/w_118,h_78,al_c,q_80,usm_0.66_1.00_0.01,blur_2,enc_avif,quality_auto/b7060dede1e849e483cc931023aec49f.jpg",
+        "url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxQTjJTVWVTcUFDLXpadGxITkJ4YWVwUnlVVXY4eU5TTWIwbjZJbXlnM1ZZYUxxSVZnWUdpQU1mUnBJNnpnR1ZvNm10VXpVZl9rdk9BS3dwUTJRZXBiaVlHSGRGZEdrUGZnaERkOXRhMUxmUjBNdm9idXNPSVJSN0lZS2hBONIBiAFBVV95cUxNc1RFRF83S2pTdGthcU8yS08xN29xT0E4cWJpT1k2Z3FKOVBvV2huUC1jeGQtaHlRd2NWOTU2ZVk4bGI3VF9ON09OcnlQb29rbWhqZHBkem1VREEwR3FOallYSHVpeldrOWJfd0w4bjdpVUFxbWU5SGMzLTVzX0dsNExjZXhCM2I0?oc=5",
+        "description": "Surfe e crise climática: o futuro das ondas em risco Mar Sem Fim",
+        "image": "https://static.wixstatic.com/media/71b9f8_c9f54baec703476192f96cc92fda3f5d~mv2.jpg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/71b9f8_c9f54baec703476192f96cc92fda3f5d~mv2.jpg",
         "category": "Paulista",
-        "publishedAt": "2026-10-05T20:00:03.868Z"
+        "publishedAt": "2026-10-14T18:20:32.000Z"
       }
     ],
     "rankings": {
       "men": [
         {
           "rank": 1,
-          "name": "Yago Dora",
-          "country": "Brazil",
-          "points": 42780,
-          "trend": 2
-        },
-        {
-          "rank": 2,
           "name": "Leonardo Fioravanti",
           "country": "Italy",
           "points": 40015,
-          "trend": -1
+          "trend": 0
         },
         {
-          "rank": 3,
+          "rank": 2,
           "name": "Italo Ferreira",
           "country": "Brazil",
           "points": 39930,
-          "trend": -1
+          "trend": 0
+        },
+        {
+          "rank": 3,
+          "name": "Yago Dora",
+          "country": "Brazil",
+          "points": 37695,
+          "trend": 0
         },
         {
           "rank": 4,
-          "name": "Miguel Pupo",
-          "country": "Brazil",
-          "points": 39450,
-          "trend": 1
-        },
-        {
-          "rank": 5,
           "name": "Gabriel Medina",
           "country": "Brazil",
           "points": 35410,
-          "trend": -1
+          "trend": 0
+        },
+        {
+          "rank": 5,
+          "name": "Miguel Pupo",
+          "country": "Brazil",
+          "points": 32770,
+          "trend": 0
         },
         {
           "rank": 6,
           "name": "Griffin Colapinto",
           "country": "United States",
-          "points": 33695,
+          "points": 31375,
           "trend": 0
         },
         {
           "rank": 7,
-          "name": "Kanoa Igarashi",
-          "country": "Japan",
-          "points": 31910,
-          "trend": 3
+          "name": "Ethan Ewing",
+          "country": "Australia",
+          "points": 28575,
+          "trend": 0
         },
         {
           "rank": 8,
-          "name": "Ethan Ewing",
-          "country": "Australia",
-          "points": 30895,
-          "trend": -1
-        },
-        {
-          "rank": 9,
           "name": "Samuel Pupo",
           "country": "Brazil",
           "points": 27960,
-          "trend": -1
-        },
-        {
-          "rank": 10,
-          "name": "George Pittar",
-          "country": "Australia",
-          "points": 26705,
-          "trend": -1
-        },
-        {
-          "rank": 11,
-          "name": "Kauli Vaast",
-          "country": "France",
-          "points": 26620,
-          "trend": 0
-        },
-        {
-          "rank": 12,
-          "name": "Liam O'Brien",
-          "country": "Australia",
-          "points": 26005,
-          "trend": 0
-        },
-        {
-          "rank": 13,
-          "name": "Cole Houshmand",
-          "country": "United States",
-          "points": 24830,
-          "trend": 4
-        },
-        {
-          "rank": 14,
-          "name": "Jack Robinson",
-          "country": "Australia",
-          "points": 24665,
-          "trend": -1
-        },
-        {
-          "rank": 15,
-          "name": "Marco Mignot",
-          "country": "France",
-          "points": 23770,
           "trend": 0
         }
       ],
       "women": [
         {
           "rank": 1,
-          "name": "Gabriela Bryan",
+          "name": "Carissa Moore",
           "country": "Hawaii",
-          "points": 42865,
+          "points": 47065,
           "trend": 1
         },
         {
           "rank": 2,
-          "name": "Carissa Moore",
-          "country": "Hawaii",
-          "points": 42320,
-          "trend": -1
+          "name": "Molly Picklum",
+          "country": "Australia",
+          "points": 45035,
+          "trend": 2
         },
         {
           "rank": 3,
-          "name": "Sawyer Lindblad",
-          "country": "United States",
-          "points": 40055,
-          "trend": 0
+          "name": "Gabriela Bryan",
+          "country": "Hawaii",
+          "points": 44865,
+          "trend": -2
         },
         {
           "rank": 4,
-          "name": "Molly Picklum",
-          "country": "Australia",
-          "points": 38950,
-          "trend": 0
+          "name": "Erin Brooks",
+          "country": "Canada",
+          "points": 42745,
+          "trend": 1
         },
         {
           "rank": 5,
-          "name": "Erin Brooks",
-          "country": "Canada",
-          "points": 38000,
-          "trend": 3
+          "name": "Sawyer Lindblad",
+          "country": "United States",
+          "points": 42055,
+          "trend": -2
         },
         {
           "rank": 6,
           "name": "Luana Silva",
           "country": "Brazil",
-          "points": 36580,
-          "trend": -1
+          "points": 38580,
+          "trend": 0
         },
         {
           "rank": 7,
           "name": "Caitlin Simmers",
           "country": "United States",
-          "points": 31810,
-          "trend": -1
+          "points": 37895,
+          "trend": 0
         },
         {
           "rank": 8,
           "name": "Lakey Peterson",
           "country": "United States",
-          "points": 30235,
-          "trend": -1
+          "points": 36320,
+          "trend": 0
         },
         {
           "rank": 9,
           "name": "Isabella Nichols",
           "country": "Australia",
-          "points": 27970,
+          "points": 28970,
           "trend": 0
         },
         {
           "rank": 10,
-          "name": "Caroline Marks",
-          "country": "United States",
-          "points": 26320,
-          "trend": 0
+          "name": "Bettylou Sakura Johnson",
+          "country": "Hawaii",
+          "points": 28660,
+          "trend": 2
         },
         {
           "rank": 11,
-          "name": "Nadia Erostarbe",
-          "country": "Spain",
-          "points": 23915,
-          "trend": 0
+          "name": "Caroline Marks",
+          "country": "United States",
+          "points": 28320,
+          "trend": -1
         },
         {
           "rank": 12,
-          "name": "Bettylou Sakura Johnson",
-          "country": "Hawaii",
-          "points": 22575,
-          "trend": 0
+          "name": "Nadia Erostarbe",
+          "country": "Spain",
+          "points": 25915,
+          "trend": -1
         },
         {
           "rank": 13,
           "name": "Tyler Wright",
           "country": "Australia",
-          "points": 20545,
+          "points": 22545,
           "trend": 0
         },
         {
           "rank": 14,
           "name": "Yolanda Hopkins",
           "country": "Portugal",
-          "points": 19830,
+          "points": 21830,
           "trend": 0
         },
         {
           "rank": 15,
           "name": "Anat Lelior",
           "country": "Israel",
-          "points": 18545,
+          "points": 19545,
           "trend": 0
         }
       ]
     },
     "events": [
-      {
-        "name": "Tokunoshima Town Pro QS 2,000",
-        "location": "Kedokubama Beach, Tokunoshima, Japan",
-        "dates": "Oct 8 - 10",
-        "status": "Upcoming",
-        "tour": "Qualifying Series"
-      },
-      {
-        "name": "Surfing For Hope Longboard Classic",
-        "location": "Pismo Beach,California, United States",
-        "dates": "Oct 9 - 11",
-        "status": "Upcoming",
-        "tour": "Longboard Tour"
-      },
-      {
-        "name": "La Marginal Surfing Pro",
-        "location": "Arecibo, , Puerto Rico",
-        "dates": "Oct 14 - 18",
-        "status": "Upcoming",
-        "tour": "Qualifying Series"
-      },
-      {
-        "name": "Edommo Pro Razo",
-        "location": "Coruña, Galicia, Spain",
-        "dates": "Oct 15 - 18",
-        "status": "Upcoming",
-        "tour": "Qualifying Series"
-      },
       {
         "name": "HTA Sunset Pro",
         "location": "Sunset Beach, Oahu,  Hawaii",
@@ -395,11 +324,60 @@
         "tour": "Junior Tour"
       },
       {
+        "name": "Philippines Pro",
+        "location": "Cloud 9, Siargao Island, Philippines",
+        "dates": "Oct 31 - Nov 10",
+        "status": "Upcoming",
+        "tour": "Championship Tour"
+      },
+      {
+        "name": "MEO Rip Curl Pro Portugal",
+        "location": "Supertubos, Peniche, Portugal",
+        "dates": "Oct 16 - 25",
+        "status": "Standby",
+        "tour": "Championship Tour"
+      },
+      {
         "name": "Banco do Brasil São Sebastião Pro",
         "location": "São Sebastião, São Paulo, Brazil",
         "dates": "Sep 26 - Oct 3",
         "status": "Completed",
         "tour": "Challenger Series"
+      },
+      {
+        "name": "EDP Ericeira Pro",
+        "location": "Ribeira D'Ilhas, Ericeira, Portugal",
+        "dates": "Oct 6 - 12",
+        "status": "Completed",
+        "tour": "Challenger Series"
+      },
+      {
+        "name": "Tokunoshima Town Pro QS 2,000",
+        "location": "Kedokubama Beach, Tokunoshima, Japan",
+        "dates": "Oct 8 - 10",
+        "status": "Completed",
+        "tour": "Qualifying Series"
+      },
+      {
+        "name": "Surfing For Hope Longboard Classic",
+        "location": "Pismo Beach,California, United States",
+        "dates": "Oct 9 - 11",
+        "status": "Completed",
+        "tour": "Longboard Tour"
+      },
+      {
+        "name": "La Marginal Surfing Pro",
+        "location": "La Marginal, Arecibo, Puerto Rico",
+        "dates": "Oct 14 - 18",
+        "status": "Completed",
+        "tour": "Qualifying Series"
+      },
+      {
+        "name": "Edommo Surf Pro Razo",
+        "location": "Coruña, Galicia, Spain",
+        "dates": "Oct 15 - 18",
+        "status": "Completed",
+        "tour": "Qualifying Series"
       }
     ]
   }

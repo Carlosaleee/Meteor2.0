@@ -7,7 +7,9 @@ import { ComercioService } from '../comercio/comercio.service';
 import { NoticiasRegionaisService } from '../noticias-regionais/noticias-regionais.service';
 import { NewsRepository } from '../news/news.repository';
 import { WeatherNewsRepository } from '../meteorology/weather-news.repository';
+import { GeminiContextBuilder } from '../../common/ai/GeminiContextBuilder';
 import { GeminiChatRepository } from './gemini-chat.repository';
+import { RagService } from './rag/rag.service';
 
 describe('IronService', () => {
   let service: IronService;
@@ -96,6 +98,21 @@ describe('IronService', () => {
     chat: jest.fn().mockResolvedValue('Resposta do Irons via Gemini'),
   };
 
+  const mockRagService = {
+    retrieve: jest.fn().mockResolvedValue([
+      {
+        chunk: {
+          id: 'docs:SYSTEM_SPEC.md:12',
+          title: 'SYSTEM_SPEC.md',
+          section: 'Chat',
+          text: 'O Irons responde com dados em tempo real.',
+          source: 'docs',
+        },
+        score: 0.9,
+      },
+    ]),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -108,6 +125,8 @@ describe('IronService', () => {
         { provide: NewsRepository, useValue: mockNewsRepo },
         { provide: WeatherNewsRepository, useValue: mockWeatherNewsRepo },
         { provide: GeminiChatRepository, useValue: mockGeminiChat },
+        { provide: RagService, useValue: mockRagService },
+        { provide: GeminiContextBuilder, useValue: { buildContext: jest.fn().mockResolvedValue({}) } },
       ],
     }).compile();
 
@@ -142,6 +161,41 @@ describe('IronService', () => {
     it('should collect weather news alerts', async () => {
       await service.processMessage('tem algum alerta?');
       expect(mockWeatherNewsRepo.getWeatherNews).toHaveBeenCalled();
+    });
+
+    it('should forward history to the chat repository', async () => {
+      const history = [
+        { role: 'user' as const, content: 'como estão as ondas?' },
+        { role: 'assistant' as const, content: 'Ondas de 1,2m.' },
+      ];
+      await service.processMessage('e amanhã?', history, 'session-123');
+      expect(mockGeminiChat.chat).toHaveBeenCalledWith(
+        'e amanhã?',
+        expect.any(Object),
+        history,
+      );
+    });
+
+    it('should include RAG sources in the response and rag chunks in the prompt context', async () => {
+      const result = await service.processMessage('como funciona o chat?');
+      expect(mockRagService.retrieve).toHaveBeenCalledWith('como funciona o chat?');
+      expect(result.sources).toEqual([
+        {
+          title: 'SYSTEM_SPEC.md',
+          section: 'Chat',
+          source: 'docs',
+          snippet: expect.any(String),
+        },
+      ]);
+      const context = mockGeminiChat.chat.mock.calls.at(-1)?.[1];
+      expect(context.rag.chunks[0].title).toBe('SYSTEM_SPEC.md');
+    });
+
+    it('should proceed without sources when RAG retrieval fails', async () => {
+      mockRagService.retrieve.mockRejectedValueOnce(new Error('index gone'));
+      const result = await service.processMessage('tempo?');
+      expect(result.reply).toBe('Resposta do Irons via Gemini');
+      expect(result.sources).toBeUndefined();
     });
 
     it('should handle errors gracefully', async () => {

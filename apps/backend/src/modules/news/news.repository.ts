@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { FallbackService } from '../../common/fallback/fallback.service';
+import { singleFlight } from '../../common/async/single-flight';
 import { WslRepository, WslRankingEntry, WslEvent } from './wsl.repository';
 import { SpsurfRepository, SpsurfNewsItem } from './spsurf.repository';
 
@@ -15,6 +16,8 @@ export type NewsItem = {
   image: string;
   category: 'WSL' | 'Paulista';
   publishedAt: string;
+  /** true = item de exemplo (datas congeladas, fallback quando a fonte cai). */
+  sample?: boolean;
 };
 
 export type NewsResponse = {
@@ -53,13 +56,19 @@ export class NewsRepository {
       return this.cache;
     }
 
+    // Single-flight: cold start gera N requests simultaneos; 1 pipeline de fetch
+    // (WSL rankings + noticias + SPSurf + Google News) para todos.
+    return singleFlight('news:data', () => this.fetchNewsData());
+  }
+
+  private async fetchNewsData(): Promise<NewsResponse> {
     try {
       const [wslRankings, spsurfNews] = await Promise.all([
         this.wslRepo.getRankings(),
         this.spsurfRepo.getNews(),
       ]);
 
-      const wslNews = this.buildWslNews();
+      const wslNews = await this.buildWslNews();
       const allNews = [...wslNews, ...this.buildSpsurfNews(spsurfNews)];
       const filtered = this.filterLast7Days(allNews);
       const finalNews = this.ensureExactly12(filtered);
@@ -85,8 +94,31 @@ export class NewsRepository {
     }
   }
 
-  private buildWslNews(): NewsItem[] {
-    const now = new Date();
+  private async buildWslNews(): Promise<NewsItem[]> {
+    const live = await this.wslRepo.getNews();
+    if (live.length > 0) {
+      return live.slice(0, 6).map(item => ({
+        id: `wsl-${this.idFromUrl(item.url)}`,
+        title: item.title,
+        source: 'World Surf League',
+        sourceUrl: 'https://www.worldsurfleague.com',
+        url: item.url,
+        description: item.description,
+        image: item.image,
+        category: 'WSL' as const,
+        publishedAt: item.publishedAt,
+      }));
+    }
+    return this.getStaticWslNews();
+  }
+
+  private idFromUrl(url: string): string {
+    const match = url.match(/\/posts\/(\d+)/);
+    return match ? match[1] : url.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').slice(0, 60);
+  }
+
+  /** Notícias de EXEMPLO com datas CONGELADAS (set/2026) — nunca relativas. */
+  private getStaticWslNews(): NewsItem[] {
     return [
       {
         id: 'wsl-trestles-miguel-vence',
@@ -97,7 +129,8 @@ export class NewsRepository {
         description: 'Miguel Pupo derrotou Kanoa Igarashi na final por 14,77 a 14,40 em Lower Trestles. Segunda vitoria do brasileiro na temporada.',
         image: 'https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67',
         category: 'WSL',
-        publishedAt: new Date(now.getTime() - 2 * 86400000).toISOString(),
+        publishedAt: '2026-09-21T12:00:00.000Z',
+        sample: true,
       },
       {
         id: 'wsl-yago-lideranca',
@@ -108,7 +141,8 @@ export class NewsRepository {
         description: 'Atual campeao mundial vence duelo de aereos contra Kauli Vaast e assume 1a posicao com 42.780 pontos.',
         image: 'https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67',
         category: 'WSL',
-        publishedAt: new Date(now.getTime() - 4 * 86400000).toISOString(),
+        publishedAt: '2026-09-18T12:00:00.000Z',
+        sample: true,
       },
       {
         id: 'wsl-erin-tripla',
@@ -119,7 +153,8 @@ export class NewsRepository {
         description: 'Canadense derrotou Gabriela Bryan na final por 13,00 a 11,90. Terceiro titulo consecutivo apos Taiti e Fiji.',
         image: 'https://d3qf8nvav5av0u.cloudfront.net/image/05d0c45992d04a5409e4f0752d17382f.png?&x=1440&y=513&icq=74&sig=b95e55f8d4a05ce4133bcc58ba78e486',
         category: 'WSL',
-        publishedAt: new Date(now.getTime() - 2 * 86400000).toISOString(),
+        publishedAt: '2026-09-21T12:00:00.000Z',
+        sample: true,
       },
       {
         id: 'wsl-medina-eliminado',
@@ -130,7 +165,8 @@ export class NewsRepository {
         description: 'Tricampeao mundial cai para Mateus Herdy na segunda rodada (11,83 a 12,00). Ja tem 3 eliminacoes no Round 2 esta temporada.',
         image: 'https://d3qf8nvav5av0u.cloudfront.net/image/05d0c45992d04a5409e4f0752d17382f.png?&x=1440&y=513&icq=74&sig=b95e55f8d4a05ce4133bcc58ba78e486',
         category: 'WSL',
-        publishedAt: new Date(now.getTime() - 4 * 86400000).toISOString(),
+        publishedAt: '2026-09-18T12:00:00.000Z',
+        sample: true,
       },
       {
         id: 'wsl-trestles-corte',
@@ -141,7 +177,8 @@ export class NewsRepository {
         description: 'Filipe Toledo escapou do corte. Mateus Herdy e Alejo Muniz ficam fora das proximas duas etapas do CT.',
         image: 'https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67',
         category: 'WSL',
-        publishedAt: new Date(now.getTime() - 3 * 86400000).toISOString(),
+        publishedAt: '2026-09-19T12:00:00.000Z',
+        sample: true,
       },
       {
         id: 'wsl-portugal-proximo',
@@ -152,7 +189,8 @@ export class NewsRepository {
         description: 'Decima etapa do CT 2026 em Peniche de 16 a 25 de outubro. Classificados pelo corte disputam penultima etapa.',
         image: 'https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67',
         category: 'WSL',
-        publishedAt: new Date(now.getTime() - 1 * 86400000).toISOString(),
+        publishedAt: '2026-09-22T12:00:00.000Z',
+        sample: true,
       },
     ];
   }
@@ -185,7 +223,9 @@ export class NewsRepository {
 
   private filterLast7Days(news: NewsItem[]): NewsItem[] {
     const sevenDaysAgo = new Date(Date.now() - 7 * 86400000);
-    return news.filter(item => new Date(item.publishedAt) >= sevenDaysAgo);
+    // Itens sample (datas congeladas) ficam visíveis mesmo antigos — são
+    // explicitamente de exemplo, não devem passar por notícia fresca.
+    return news.filter(item => item.sample || new Date(item.publishedAt) >= sevenDaysAgo);
   }
 
   private ensureExactly12(news: NewsItem[]): NewsItem[] {
@@ -202,8 +242,8 @@ export class NewsRepository {
     return combined.slice(0, 12);
   }
 
+  /** Itens de EXEMPLO com datas CONGELADAS (set/2026) — nunca relativas. */
   private getExtraNews(): NewsItem[] {
-    const now = new Date();
     return [
       {
         id: 'wsl-fioravanti-cai',
@@ -214,7 +254,8 @@ export class NewsRepository {
         description: 'Lider do ranking foi eliminado por Luke Thompson na segunda rodada. Italiano somou apenas 6,90 pontos.',
         image: 'https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67',
         category: 'WSL',
-        publishedAt: new Date(now.getTime() - 4 * 86400000).toISOString(),
+        publishedAt: '2026-09-18T12:00:00.000Z',
+        sample: true,
       },
       {
         id: 'wsl-luana-top6',
@@ -225,7 +266,8 @@ export class NewsRepository {
         description: 'Brasileira terminou entre as 5 melhores em Trestles e ocupa 6a posicao com 36.580 pontos.',
         image: 'https://d3qf8nvav5av0u.cloudfront.net/image/05d0c45992d04a5409e4f0752d17382f.png?&x=1440&y=513&icq=74&sig=b95e55f8d4a05ce4133bcc58ba78e486',
         category: 'WSL',
-        publishedAt: new Date(now.getTime() - 2 * 86400000).toISOString(),
+        publishedAt: '2026-09-21T12:00:00.000Z',
+        sample: true,
       },
       {
         id: 'spsurf-saosebastiao-pro',
@@ -236,7 +278,8 @@ export class NewsRepository {
         description: 'Etapa do Challenger Series em Sao Sebastiao de 26/09 a 03/10 na Praia de Maresias. Evento historico.',
         image: 'https://static.wixstatic.com/media/690598_cf6012b3a7aa4ffd8b88893077d96484~mv2.jpeg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/690598_cf6012b3a7aa4ffd8b88893077d96484~mv2.webp',
         category: 'Paulista',
-        publishedAt: new Date(now.getTime() - 5 * 86400000).toISOString(),
+        publishedAt: '2026-09-16T12:00:00.000Z',
+        sample: true,
       },
       {
         id: 'spsurf-surf-attack-maresias',
@@ -247,7 +290,8 @@ export class NewsRepository {
         description: '36a edicao do Surf Attack em Maresias de 17 a 19 de setembro. Etapa decisiva do Ranking Paulista.',
         image: 'https://static.wixstatic.com/media/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.jpeg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.webp',
         category: 'Paulista',
-        publishedAt: new Date(now.getTime() - 4 * 86400000).toISOString(),
+        publishedAt: '2026-09-17T12:00:00.000Z',
+        sample: true,
       },
       {
         id: 'spsurf-sunset-reggae',
@@ -258,7 +302,8 @@ export class NewsRepository {
         description: 'Pela primeira vez no Litoral Norte paulista, WSL Sunset une surfe, musica e cultura em 26 de setembro.',
         image: 'https://static.wixstatic.com/media/71b9f8_d47f44af83e043a590507fe765bd2d32~mv2.jpg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/71b9f8_d47f44af83e043a590507fe765bd2d32~mv2.jpg',
         category: 'Paulista',
-        publishedAt: new Date(now.getTime() - 5 * 86400000).toISOString(),
+        publishedAt: '2026-09-14T12:00:00.000Z',
+        sample: true,
       },
       {
         id: 'wsl-gabriela-lidera',
@@ -269,7 +314,8 @@ export class NewsRepository {
         description: 'Havaiana assume 1a posicao com 42.865 pontos apos final em Trestles. Erin Brooks sobe para 5a com 3 titulos seguidos.',
         image: 'https://d3qf8nvav5av0u.cloudfront.net/image/05d0c45992d04a5409e4f0752d17382f.png?&x=1440&y=513&icq=74&sig=b95e55f8d4a05ce4133bcc58ba78e486',
         category: 'WSL',
-        publishedAt: new Date(now.getTime() - 2 * 86400000).toISOString(),
+        publishedAt: '2026-09-21T12:00:00.000Z',
+        sample: true,
       },
     ];
   }
@@ -281,7 +327,7 @@ export class NewsRepository {
     }
 
     return {
-      news: this.buildWslNews().slice(0, 6),
+      news: (await this.buildWslNews()).slice(0, 6),
       rankings: { men: [], women: [] },
       events: [],
       timestamp: new Date().toISOString(),
