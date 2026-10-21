@@ -59,6 +59,18 @@ export default function SwellPage() {
     }
   }, []);
 
+  // Deep-link ?tab=overview|news|forecast|wind|spots (CTAs da capa) — lido na
+  // montagem para nao depender de searchParams no prerender estatico. Tab
+  // invalida cai para 'overview' e a query e limpa da URL.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const requested = params.get('tab');
+    if (!requested) return;
+    const valid = ['overview', 'news', 'forecast', 'wind', 'spots'];
+    setActiveTab(valid.includes(requested) ? requested : 'overview');
+    window.history.replaceState(null, '', window.location.pathname);
+  }, []);
+
   const handleRefresh = () => {
     refetch();
     refetchHourly();

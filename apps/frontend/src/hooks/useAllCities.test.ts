@@ -13,7 +13,20 @@ describe('useAllCities', () => {
       locationId: 'ilha-comprida',
       current: { temperature: 25, humidity: 70, windSpeed: 12, weatherCode: 1 },
       hourly: [],
-      daily: [],
+      daily: [
+        {
+          date: '2026-10-21',
+          tempMax: 29,
+          tempMin: 18,
+          precipitationSum: 0,
+          precipitationProbabilityMax: 10,
+          windSpeedMax: 20,
+          weatherCode: 2,
+          sunrise: '2026-10-21T05:40:00-03:00',
+          sunset: '2026-10-21T18:20:00-03:00',
+          uvIndexMax: 7,
+        },
+      ],
     };
     const { fetchAPI } = await import('@/lib/api');
     vi.mocked(fetchAPI).mockResolvedValue(mockResponse);
@@ -31,6 +44,33 @@ describe('useAllCities', () => {
       weatherCode: 1,
       humidity: 70,
       windSpeed: 12,
+      tempMax: 29,
+      tempMin: 18,
+      forecastCode: 2,
+    });
+  });
+
+  it('should return null daily fields when daily is empty', async () => {
+    const mockResponse = {
+      location: 'Iguape',
+      locationId: 'iguape',
+      current: { temperature: 22, humidity: 60, windSpeed: 8, weatherCode: 3 },
+      hourly: [],
+      daily: [],
+    };
+    const { fetchAPI } = await import('@/lib/api');
+    vi.mocked(fetchAPI).mockResolvedValue(mockResponse);
+
+    const { result } = renderHook(() => useAllCities());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.cities['iguape']).toMatchObject({
+      tempMax: null,
+      tempMin: null,
+      forecastCode: null,
     });
   });
 
