@@ -1,6 +1,6 @@
 ﻿# Guia do Desenvolvedor — Meteor 2.0
 
-> **Ultima atualizacao:** 20/10/2026 (branch `feature/iron-context-fix`: compilacao do Iron restaurada, timeout 45s no Gemini, RAG topK=3 + cache LRU — 201 testes)
+> **Ultima atualizacao:** 20/10/2026 (merge do PR #1 em `main`: compilacao do Iron restaurada, timeout 45s no Gemini, RAG topK=3 + cache LRU — 201 testes)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -64,12 +64,12 @@ pnpm format
 
 ## Testes
 
-**Total: 193 testes — backend Jest 30 (152) + frontend Vitest (41)**
+**Total: 201 testes — backend Jest 30 (160) + frontend Vitest (41)**
 
-> Contagem estatica (sem executar os testes) em 19/10/2026.
+> Contagem estatica (sem executar os testes) em 20/10/2026.
 
 ```bash
-# Backend (152 testes — o script ja embute --experimental-vm-modules)
+# Backend (160 testes — o script ja embute --experimental-vm-modules)
 pnpm --filter backend test
 
 # Frontend (41 testes — Vitest + React Testing Library)
@@ -78,7 +78,7 @@ pnpm --filter frontend test
 
 | Suite | Runner | Testes | Observacao |
 |-------|--------|--------|------------|
-| `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 152 | 25 arquivos `*.spec.ts` |
+| `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 160 | 26 arquivos `*.spec.ts` |
 | `apps/frontend` | Vitest + RTL + jsdom | 41 | 9 arquivos `*.test.{ts,tsx}` |
 
 Detalhamento por arquivo: [SYSTEM_SPEC.md §9](./SYSTEM_SPEC.md#9-cobertura-de-testes).
@@ -691,7 +691,7 @@ Variáveis configuradas no Vercel Dashboard (Settings → Environment Variables)
 Pipeline ativo em `.github/workflows/ci.yml`:
 
 **Jobs:** (todos em Node 24)
-- `backend-test`: Jest (152 testes) — `NODE_OPTIONS="--experimental-vm-modules" npx jest`
+- `backend-test`: Jest (160 testes) — `NODE_OPTIONS="--experimental-vm-modules" npx jest`
 - `frontend-test`: Vitest (41 testes)
 - `lint`: oxlint (frontend)
 - `build`: valida backend + frontend (após testes)
