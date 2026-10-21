@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { FallbackService } from '../../common/fallback/fallback.service';
+import { ArtspWazeRepository } from '../traffic/artsp-waze.repository';
 
 const FALLBACK_FILE = 'fallback-noticias-regionais.json';
 
@@ -21,6 +22,10 @@ export type TrafficRoute = {
   condition: string;
   description: string;
   updatedAt: string;
+  /** 'live' = dado ao vivo (ARTESP/Waze); 'estimated' = snapshot estatico (sem fonte real). */
+  source: 'live' | 'estimated';
+  /** Link publico para verificar o estado da via ('' quando nao ha fonte confiavel). */
+  sourceUrl: string;
 };
 
 export type RegionalNewsResponse = {
@@ -29,7 +34,18 @@ export type RegionalNewsResponse = {
   timestamp: string;
 };
 
-type FileData = { news: RegionalNewsItem[]; routes: TrafficRoute[] };
+/** Forma persistida no arquivo de fallback — proveniencia e adicionada no merge. */
+type BaseTrafficRoute = Omit<TrafficRoute, 'source' | 'sourceUrl'>;
+
+type FileData = { news: RegionalNewsItem[]; routes: BaseTrafficRoute[] };
+
+/** Onde o usuario pode verificar uma via quando nao temos dado ao vivo (badge "estimado"). */
+const ESTIMATED_SOURCE_URLS: Record<string, string> = {
+  'sp-222': 'https://ccm.artesp.sp.gov.br/rodovias/waze',
+  'sp-165': 'https://ccm.artesp.sp.gov.br/rodovias/waze',
+  'sp-055': 'https://ccm.artesp.sp.gov.br/rodovias/waze',
+  'br-116': 'https://www.gov.br/dnit/pt-br',
+};
 
 type RssSource = {
   name: string;
@@ -57,11 +73,15 @@ export class NoticiasRegionaisRepository {
   private cacheTs = 0;
   private readonly CACHE_TTL_MS = 30 * 60 * 1000;
 
-  constructor(private readonly fallback: FallbackService) {}
+  constructor(
+    private readonly fallback: FallbackService,
+    private readonly artspRepo: ArtspWazeRepository,
+  ) {}
 
   async forceRefresh(): Promise<void> {
     this.logger.log('Force refreshing regional news...');
     this.cache = null;
+    this.artspRepo.clearCache();
     await this.getData();
   }
 
@@ -71,16 +91,20 @@ export class NoticiasRegionaisRepository {
     }
 
     const base = await this.loadFile();
-    const scraped = await this.fetchAllSources();
+    const [scraped, routes] = await Promise.all([
+      this.fetchAllSources(),
+      this.buildRoutes(base.routes),
+    ]);
     const news = this.mergeNews(scraped, base.news);
 
+    // Persiste apenas as rotas base (estaticas) — dados ao vivo nunca entram no arquivo.
     if (scraped.length > 0) {
       await this.fallback.save(FALLBACK_FILE, { news, routes: base.routes });
     }
 
     const result: RegionalNewsResponse = {
       news,
-      routes: base.routes,
+      routes,
       timestamp: new Date().toISOString(),
     };
     this.cache = result;
@@ -106,6 +130,33 @@ export class NoticiasRegionaisRepository {
     } catch {
       return { news: [], routes: [] };
     }
+  }
+
+  /** Mescla dados ao vivo da ARTESP/Waze sobre as rotas base; sem vivo -> 'estimated'. */
+  private async buildRoutes(baseRoutes: BaseTrafficRoute[]): Promise<TrafficRoute[]> {
+    const live = await this.artspRepo.getLiveRoutes().catch(err => {
+      this.logger.warn(`ARTESP/Waze indisponivel, usando rotas estimadas: ${err}`);
+      return null;
+    });
+
+    return baseRoutes.map(route => {
+      const liveStatus = live?.routes[route.id];
+      if (liveStatus) {
+        return {
+          ...route,
+          condition: liveStatus.condition,
+          description: liveStatus.description,
+          updatedAt: liveStatus.updatedAt,
+          source: 'live' as const,
+          sourceUrl: live!.sourceUrl,
+        };
+      }
+      return {
+        ...route,
+        source: 'estimated' as const,
+        sourceUrl: ESTIMATED_SOURCE_URLS[route.id] ?? '',
+      };
+    });
   }
 
   private async fetchAllSources(): Promise<RegionalNewsItem[]> {
