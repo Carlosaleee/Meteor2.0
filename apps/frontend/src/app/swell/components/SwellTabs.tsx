@@ -1,9 +1,10 @@
 'use client';
 
 import { FaWater, FaWind, FaMapMarkerAlt, FaNewspaper, FaThLarge } from 'react-icons/fa';
+import { type SwellTab } from '../tabs';
 
 type Tab = {
-  id: string;
+  id: SwellTab;
   label: string;
   icon: React.ElementType;
   tip: string;
@@ -18,8 +19,8 @@ const TABS: Tab[] = [
 ];
 
 type SwellTabsProps = {
-  activeTab: string;
-  onTabChange: (tabId: string) => void;
+  activeTab: SwellTab;
+  onTabChange: (tabId: SwellTab) => void;
 };
 
 export function SwellTabs({ activeTab, onTabChange }: SwellTabsProps) {
