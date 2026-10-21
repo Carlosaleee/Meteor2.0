@@ -7,7 +7,8 @@ import { ComercioService } from '../comercio/comercio.service';
 import { NoticiasRegionaisService } from '../noticias-regionais/noticias-regionais.service';
 import { NewsRepository } from '../news/news.repository';
 import { WeatherNewsRepository } from '../meteorology/weather-news.repository';
-import { GeminiChatRepository } from './gemini-chat.repository';
+import { GeminiContextBuilder } from '../../common/ai/GeminiContextBuilder';
+import { GeminiChatRepository, ChatTurn } from './gemini-chat.repository';
 import { RagService } from './rag/rag.service';
 
 describe('IronService', () => {
@@ -125,6 +126,7 @@ describe('IronService', () => {
         { provide: WeatherNewsRepository, useValue: mockWeatherNewsRepo },
         { provide: GeminiChatRepository, useValue: mockGeminiChat },
         { provide: RagService, useValue: mockRagService },
+        { provide: GeminiContextBuilder, useValue: { buildContext: jest.fn().mockResolvedValue({}) } },
       ],
     }).compile();
 

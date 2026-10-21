@@ -7,11 +7,13 @@ import { NoticiasRegionaisService } from '../noticias-regionais/noticias-regiona
 import { NewsRepository } from '../news/news.repository';
 import { WeatherNewsRepository } from '../meteorology/weather-news.repository';
 import { GeminiChatRepository, ChatTurn } from './gemini-chat.repository';
+
+import { GeminiContextBuilder } from '../../common/ai/GeminiContextBuilder';
 import { RagService } from './rag/rag.service';
 import { RagHit } from './rag/rag.types';
 import { spNowKey, hourKeyFromNaive } from '../../common/time/sp-time';
 
-type ChatSource = {
+ type ChatSource = {
   title: string;
   section?: string;
   source: 'docs' | 'data';
@@ -29,9 +31,7 @@ type ChatResponse = {
 export class IronService {
   private readonly logger = new Logger(IronService.name);
 
-  import { GeminiContextBuilder } from '../../common/ai/GeminiContextBuilder';
-
-constructor(
+  constructor(
     private readonly meteorologyService: MeteorologyService,
     private readonly oceanographyService: OceanographyService,
     private readonly trafficService: TrafficService,
@@ -57,7 +57,11 @@ constructor(
       // Retrieval híbrido (docs + dados); falha nunca bloqueia o chat.
       const ragHits = await this.ragService.retrieve(message).catch(() => [] as RagHit[]);
 
-      const context = await this.contextBuilder.buildContext(history);
+      // Coleta de dados em tempo real dos serviços + contexto do builder
+      // (o builder pode enriquecer/curtir o contexto; hoje retorna {}).
+      const liveContext = await this.collectContext();
+      const extraContext = await this.contextBuilder.buildContext(history);
+      const context = { ...liveContext, ...extraContext };
       const reply = await this.geminiChat.chat(message, this.withRagContext(context, ragHits), history);
 
       const sources: ChatSource[] = ragHits.map(h => ({
@@ -95,8 +99,17 @@ constructor(
     };
   }
 
-  private async collectContext() {
-    await this.collectContext();
+  private async collectContext(): Promise<any> {
+    const [
+      weatherResult,
+      oceanResult,
+      trafficResult,
+      commerceResult,
+      noticiasResult,
+      newsResult,
+      hourlyResult,
+      weatherNewsResult,
+    ] = await Promise.allSettled([
       this.meteorologyService.getCurrentWeather('ilha-comprida'),
       this.oceanographyService.getSwellConditions(),
       this.trafficService.getTraffic(),
@@ -133,11 +146,7 @@ constructor(
       news: newsResult.status === 'fulfilled' ? {
         headlines: newsResult.value.news.slice(0, 3).map(n => n.title),
       } : undefined,
-      rankings: rankingsResult.status === 'fulfilled' ? {
-        men: rankingsResult.value.rankings.men.slice(0, 5),
-        women: rankingsResult.value.rankings.women.slice(0, 5),
-        events: rankingsResult.value.events.slice(0, 3),
-      } : undefined,
+      regionalNews: noticiasResult.status === 'fulfilled' ? noticiasResult.value : undefined,
       hourly: hourlyResult.status === 'fulfilled' ? hourlyResult.value : undefined,
       weatherNews: weatherNewsResult.status === 'fulfilled' ? weatherNewsResult.value : undefined,
     };
