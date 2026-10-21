@@ -3,8 +3,24 @@ import { z } from "zod";
 export const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(3001),
-  // Accepts single URL or comma-separated list of URLs for multi-origin CORS support
-  FRONTEND_ORIGIN: z.string().min(1).default("http://localhost:3000"),
+  // Accepts single URL or comma-separated list of URLs for multi-origin CORS support.
+  // Every entry must be a valid URL — "not-a-url" or "a.com,,b.com" are rejected.
+  FRONTEND_ORIGIN: z
+    .string()
+    .min(1)
+    .superRefine((value, ctx) => {
+      const origins = value.split(",").map((o) => o.trim());
+      const invalid =
+        origins.some((o) => o === "") ||
+        !origins.every((o) => z.string().url().safeParse(o).success);
+      if (invalid) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "FRONTEND_ORIGIN deve ser uma URL ou lista separada por virgulas de URLs",
+        });
+      }
+    })
+    .default("http://localhost:3000"),
   FALLBACK_DIR: z.string().default("data"),
   FALLBACK_MAX_AGE_HOURS: z.coerce.number().int().positive().default(24),
   GEMINI_API_KEY: z.string().optional().default(""),

@@ -660,7 +660,7 @@ Meteor_2.0/
 #### Frontend (Vercel)
 | Variável | Valor | Descrição |
 |----------|-------|-----------|
-| `NEXT_PUBLIC_API_URL` | `https://meteor2-0-backend.vercel.app` | URL da API backend (bundled no JS) |
+| `NEXT_PUBLIC_API_URL` | `/api` (proxy → backend) | URL da API backend (bundled no JS) |
 
 Configurado em: `apps/frontend/.env.production`
 

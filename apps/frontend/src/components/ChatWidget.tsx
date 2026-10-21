@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { FaTimes, FaPaperPlane, FaWater, FaRedo, FaTrashAlt } from 'react-icons/fa';
 import { useChat } from './ChatContext';
+import { API_BASE } from '../lib/api';
 
 type Message = { role: 'user' | 'bot'; text: string };
 type ChatRole = 'user' | 'assistant';
@@ -100,7 +101,7 @@ export function ChatWidget() {
     setIsTyping(true);
 
     try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+      const apiBase = API_BASE;
       const res = await fetch(`${apiBase}/v1/iron/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

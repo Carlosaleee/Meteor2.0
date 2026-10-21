@@ -23,17 +23,17 @@ DevOps/
 ### Configuração
 
 1. **Importar repositório** no Vercel
-2. **Configurar variáveis de ambiente** em Settings > Environment Variables:
-   ```
-   NEXT_PUBLIC_API_URL=https://meteor2-0-backend.vercel.app
-   ```
+2. **Variáveis de ambiente** — nenhuma obrigatória: o proxy `/api` está configurado em `apps/frontend/vercel.json` e o fallback de produção usa `/api` automaticamente. (Opcional: `NEXT_PUBLIC_API_URL=/api` em Settings > Environment Variables)
 3. **Configurar build**:
    - Root Directory: `apps/frontend`
    - Build Command: `pnpm build`
    - Output Directory: `.next`
 
+> **Importante:** após qualquer mudança em env vars `NEXT_PUBLIC_*`, fazer **Redeploy** — elas são embutidas no bundle durante o build.
+
 ### Arquivos de referência
-- `DevOps/frontend/vercel.json` — Configuração Vercel
+- `apps/frontend/vercel.json` — rewrite de proxy `/api/*` → backend (arquivo ativo no deploy)
+- `DevOps/frontend/vercel.json` — cópia de referência/documentação
 - `DevOps/frontend/.vercelignore` — Arquivos ignorados
 
 ---
@@ -123,7 +123,7 @@ cp DevOps/github-actions/ci.yml .github/workflows/ci.yml
 
 | Variável | Valor | Descrição |
 |----------|-------|-----------|
-| `NEXT_PUBLIC_API_URL` | `https://meteor2-0-backend.vercel.app` | URL da API backend |
+| `NEXT_PUBLIC_API_URL` | `/api` (proxy → backend via `apps/frontend/vercel.json`) | URL da API backend |
 
 ### Backend (Railway/Render)
 
@@ -163,7 +163,7 @@ cp DevOps/github-actions/ci.yml .github/workflows/ci.yml
 
 ### Build falha no Vercel
 - Verificar se `pnpm install --frozen-lockfile` funciona localmente
-- Verificar se a versão do Node.js é 22+
+- Verificar se a versão do Node.js é 24+ (`.nvmrc` no root)
 - Verificar logs do build no painel Vercel
 
 ### CI/CD não roda

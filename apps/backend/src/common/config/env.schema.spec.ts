@@ -48,9 +48,20 @@ describe('parseEnv', () => {
     expect(published.CRON_SECRET).toBe('publish-me');
   });
 
+  it('accepts a comma-separated list of origins', () => {
+    const result = parseEnv({
+      FRONTEND_ORIGIN: 'https://meteor2-0-frontend.vercel.app,https://preview-abc123.vercel.app',
+    });
+
+    expect(result.FRONTEND_ORIGIN).toBe(
+      'https://meteor2-0-frontend.vercel.app,https://preview-abc123.vercel.app',
+    );
+  });
+
   it('rejects invalid declared values', () => {
     expect(() => parseEnv({ PORT: '-1' })).toThrow();
     expect(() => parseEnv({ FRONTEND_ORIGIN: 'not-a-url' })).toThrow();
+    expect(() => parseEnv({ FRONTEND_ORIGIN: 'https://ok.example.com,,https://bad.example.com' })).toThrow();
     expect(() => parseEnv({ NODE_ENV: 'staging' })).toThrow();
   });
 });

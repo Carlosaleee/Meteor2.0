@@ -665,8 +665,10 @@ Itens ja identificados, ainda sem correcao — nao abrir issue/PR para eles sem 
 A variável `NEXT_PUBLIC_API_URL` está configurada no arquivo `apps/frontend/.env.production`:
 
 ```
-NEXT_PUBLIC_API_URL=https://meteor2-0-backend.vercel.app
+NEXT_PUBLIC_API_URL=/api
 ```
+
+As chamadas `/api/*` são proxyadas pelo rewrite em `apps/frontend/vercel.json` para `https://meteor2-0-backend.vercel.app/*` (mesmo origin — sem problemas de CORS).
 
 **Não é necessário configurar no Vercel Dashboard** — o Next.js usa automaticamente `.env.production` em builds de produção.
 

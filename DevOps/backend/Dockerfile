@@ -1,4 +1,4 @@
-FROM node:22-alpine AS base
+FROM node:24-alpine AS base
 
 RUN npm install -g pnpm@11
 
@@ -20,7 +20,7 @@ COPY apps/backend/ apps/backend/
 RUN cd apps/backend && pnpm build
 
 # Production stage
-FROM node:22-alpine AS production
+FROM node:24-alpine AS production
 
 RUN npm install -g pnpm@11
 
