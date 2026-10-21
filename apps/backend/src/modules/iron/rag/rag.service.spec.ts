@@ -104,6 +104,66 @@ describe('RagService', () => {
       const hits = await service.retrieve('maré');
       expect(hits.length).toBe(2);
     });
+
+    it('should limit results to the default topK of 3 chunks', async () => {
+      mockStore.loadDocsIndex.mockResolvedValue({
+        version: 1, builtAt: '', source: 'docs',
+        chunks: Array.from({ length: 6 }, (_, i) => ({
+          id: `docs:${i}`,
+          title: `Doc ${i}`,
+          text: `maré e swell na praia ${i}`,
+          source: 'docs' as const,
+        })),
+      });
+
+      const hits = await service.retrieve('maré swell');
+      expect(hits.length).toBe(3);
+    });
+
+    it('should accept an explicit topK smaller than the default', async () => {
+      mockStore.loadDocsIndex.mockResolvedValue({
+        version: 1, builtAt: '', source: 'docs',
+        chunks: Array.from({ length: 5 }, (_, i) => ({
+          id: `docs:${i}`,
+          title: `Doc ${i}`,
+          text: `maré swell vento ${i}`,
+          source: 'docs' as const,
+        })),
+      });
+
+      const hits = await service.retrieve('maré swell', 2);
+      expect(hits.length).toBe(2);
+    });
+
+    it('should cache retrieve results and not recompute on repeat query', async () => {
+      mockStore.loadDocsIndex.mockResolvedValue(docsIndex);
+
+      const first = await service.retrieve('ondas swell');
+      const second = await service.retrieve('  Ondas SWELL '); // mesma query normalizada
+
+      expect(second).toEqual(first);
+      // Segunda chamada veio do cache: store/embed não foram consultados de novo.
+      expect(mockStore.loadDocsIndex).toHaveBeenCalledTimes(1);
+      expect(mockGemini.embed).toHaveBeenCalledTimes(1);
+    });
+
+    it('should expire cached results after the 5 min TTL', async () => {
+      jest.useFakeTimers();
+      try {
+        mockStore.loadDocsIndex.mockResolvedValue(docsIndex);
+
+        await service.retrieve('ondas swell');
+        expect(mockStore.loadDocsIndex).toHaveBeenCalledTimes(1);
+
+        // Avança além do TTL (5 min) — próxima consulta recomputa.
+        jest.advanceTimersByTime(5 * 60_000 + 1);
+        await service.retrieve('ondas swell');
+
+        expect(mockStore.loadDocsIndex).toHaveBeenCalledTimes(2);
+      } finally {
+        jest.useRealTimers();
+      }
+    });
   });
 
   describe('rebuildDataIndex', () => {

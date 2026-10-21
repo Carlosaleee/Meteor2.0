@@ -18,6 +18,12 @@ export type GenerateTextOptions = {
   temperature?: number;
 };
 
+/** Timeout padrão de 45s para chamadas de texto (evita travar o chat). */
+const GEMINI_TEXT_TIMEOUT_MS = 45_000;
+
+/** Sentinela interna: indica que o timeout estourou antes da resposta. */
+const TIMEOUT_SENTINEL = Symbol('gemini-timeout');
+
 /**
  * Cliente Gemini compartilhado (resumo tático, chat Iron e embeddings do RAG).
  * Init lazy via require() — o SDK @google/genai é ESM-only.
@@ -53,7 +59,7 @@ export class GeminiClientService {
     }
   }
 
-  /** Gera texto; retorna null quando o cliente não existe, falha ou volta vazio. */
+  /** Gera texto; retorna null quando o cliente não existe, falha, esvazia ou estoura o timeout de 45s. */
   async generateText(options: GenerateTextOptions): Promise<string | null> {
     const client = this.getClient();
     if (!client) return null;
@@ -62,7 +68,7 @@ export class GeminiClientService {
     if (!contents) return null;
 
     try {
-      const response = await (client as {
+      const request = (client as {
         models: {
           generateContent: (opts: unknown) => Promise<unknown>;
         };
@@ -78,11 +84,44 @@ export class GeminiClientService {
         },
       });
 
+      // Timeout de 45s — se a API não responder, aborta e devolve null
+      // (o chamador usa uma resposta de fallback).
+      const response = await this.withTimeout(
+        request,
+        GEMINI_TEXT_TIMEOUT_MS,
+        'generateText',
+      );
+      if (response === TIMEOUT_SENTINEL) return null;
+
       const text = (response as { text?: string })?.text?.trim();
       return text ? text : null;
     } catch (err) {
       this.logger.warn(`Gemini generateContent failed: ${err}`);
       return null;
+    }
+  }
+
+  /**
+   * Envoltre com timeout via Promise.race; registra warning quando expira.
+   * Retorna `TIMEOUT_SENTINEL` para o caller distinguir de uma falha comum.
+   */
+  private async withTimeout<T>(
+    promise: Promise<T>,
+    ms: number,
+    label: string,
+  ): Promise<T | typeof TIMEOUT_SENTINEL> {
+    let timer: NodeJS.Timeout | undefined;
+    const timeout = new Promise<typeof TIMEOUT_SENTINEL>(resolve => {
+      timer = setTimeout(() => {
+        this.logger.warn(`Gemini ${label} timeout após ${ms}ms`);
+        resolve(TIMEOUT_SENTINEL);
+      }, ms);
+      timer.unref?.();
+    });
+    try {
+      return await Promise.race([promise, timeout]);
+    } finally {
+      if (timer) clearTimeout(timer);
     }
   }
 

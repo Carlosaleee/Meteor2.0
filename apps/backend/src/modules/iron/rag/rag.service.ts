@@ -6,10 +6,14 @@ import { tokenize, bm25Score, cosineSimilarity } from './scoring';
 import { IndexStore } from './index.store';
 import type { RagChunk, RagIndex, RagHit } from './rag.types';
 
-const TOP_K = 5;
+const TOP_K = 3;
 const EMBEDDING_BATCH_LIMIT = 40;
 const EMBEDDING_BATCH_SIZE = 20;
 const MAX_CHUNKS_PER_DATA_SOURCE = 12;
+
+// Cache LRU de consultas RAG — evita reprocessar perguntas repetidas.
+const RETRIEVE_CACHE_TTL_MS = 5 * 60_000; // 5 min
+const RETRIEVE_CACHE_MAX_ENTRIES = 50;
 
 // Fallback files que viram "conhecimento base" do Irons.
 const DATA_SOURCES = [
@@ -48,6 +52,15 @@ export class RagService {
 
   private dataIndex: RagIndex | null = null;
 
+  /**
+   * Cache LRU (query -> { hits, expiresAt }).
+   * Map preserva ordem de inserção: re-inserção move para o fim (mais recente).
+   */
+  private readonly retrieveCache = new Map<
+    string,
+    { hits: RagHit[]; expiresAt: number }
+  >();
+
   constructor(
     private readonly store: IndexStore,
     private readonly fallback: FallbackService,
@@ -57,8 +70,37 @@ export class RagService {
   /**
    * Retrieval híbrido: BM25 (lexical, sempre funciona) + embeddings Gemini
    * (semântico, degrada para BM25 puro quando indisponível).
+   * Resultado cacheado em LRU por 5 min.
    */
   async retrieve(query: string, topK = TOP_K): Promise<RagHit[]> {
+    const key = `${topK}::${query.trim().toLowerCase()}`;
+    const cached = this.retrieveCache.get(key);
+    if (cached && cached.expiresAt > Date.now()) {
+      // Recoloca no fim (mais recente) e devolve cópia.
+      this.retrieveCache.delete(key);
+      this.retrieveCache.set(key, cached);
+      return cached.hits;
+    }
+    if (cached) this.retrieveCache.delete(key);
+
+    const hits = await this.retrieveUncached(query, topK);
+
+    this.retrieveCache.set(key, { hits, expiresAt: Date.now() + RETRIEVE_CACHE_TTL_MS });
+    this.evictRetrieveCache();
+    return hits;
+  }
+
+  /** Remove entradas mais antigas quando o cache excede o limite. */
+  private evictRetrieveCache(): void {
+    while (this.retrieveCache.size > RETRIEVE_CACHE_MAX_ENTRIES) {
+      const oldest = this.retrieveCache.keys().next().value;
+      if (oldest === undefined) break;
+      this.retrieveCache.delete(oldest);
+    }
+  }
+
+  /** Cálculo real de retrieval (sem passar pelo cache). */
+  private async retrieveUncached(query: string, topK: number): Promise<RagHit[]> {
     const [docs, data] = await Promise.all([
       this.store.loadDocsIndex(),
       this.getDataIndex(),
