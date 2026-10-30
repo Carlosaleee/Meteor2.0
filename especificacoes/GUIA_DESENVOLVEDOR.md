@@ -1,6 +1,6 @@
 # Guia do Desenvolvedor — Meteor 2.0
 
-> **Ultima atualizacao:** 21/10/2026 (proxy `/api` do frontend, guard de localhost no `API_BASE`, rota `GET /`, Node 24 + actions Node 24 na CI e troubleshooting de env var da Vercel — 203 testes)
+> **Ultima atualizacao:** 30/10/2026 (dados de fallback sincronizados com as APIs — 229 testes)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 

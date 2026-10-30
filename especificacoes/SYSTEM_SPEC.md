@@ -1,6 +1,6 @@
 # Especificacao Tecnica — Meteor 2.0
 
-> **Ultima atualizacao:** 21/10/2026 (capa reestruturada — uma secao por aba + acessibilidade, `?tab=` no `/swell`, autoplay com pausa/reduced-motion — 229 testes)
+> **Ultima atualizacao:** 30/10/2026 (dados de fallback sincronizados com as APIs em 30/10 — 229 testes)
 >
 > **Documentos relacionados:** [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
