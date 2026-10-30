@@ -171,7 +171,7 @@ Ordem das secoes (reestruturada em 21/10/2026 — cada secao tem CTA no header a
 
 ### 4.9 RefreshService (Automacao)
 - **Startup:** Executa refresh de todos os módulos ao iniciar (`onModuleInit`) — **pulado em serverless** (`process.env.VERCEL`): filesystem efemero, o agendamento vem dos crons da Vercel
-- **Cron pesado:** a cada 6 horas (`@Cron('0 */6 * * *')`) — meteorologia, oceanografia, weather news, rankings, noticias, regionais
+- **Cron pesado:** a cada 6 horas (`@Cron('0 */6 * * *')`) — meteorologia, oceanografia, weather news, rankings, noticias, regionais — **fontes pesadas em paralelo** (`Promise.allSettled`: meteorologia x4 cidades + oceanografia + weather-news), com `details.meteorology` reportando **por cidade** (`OK (4/4)` ou `ERROR parcial (3/4 OK): ...`); escrita do JSON de meteorologia serializada por `writeLock` no repositorio
 - **Cron de noticias:** a cada 1 hora (`@Cron('0 * * * *')`) → `refreshNews()` — apenas rankings WSL + noticias + regionais (leve)
 - **Modulos afetados:** Meteorologia, Oceanografia, Noticias (WSL + Google News), Noticias Regionais (RSS + rotas ARTESP/Waze)
 - **Endpoints:**

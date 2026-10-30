@@ -75,6 +75,12 @@ function buildForecastUrl(lat: number, lon: number): string {
 @Injectable()
 export class OpenMeteoRepository {
   private readonly logger = new Logger(OpenMeteoRepository.name);
+  /**
+   * Serializa o read-modify-write do fallback-meteorology.json: com o refresh
+   * paralelo (Fase 3), 4 cidades lendo e gravando o mesmo arquivo ao mesmo
+   * tempo perdiam atualizacoes (last-writer-wins).
+   */
+  private writeLock: Promise<void> = Promise.resolve();
 
   constructor(private readonly fallback: FallbackService) {}
 
@@ -169,6 +175,17 @@ export class OpenMeteoRepository {
   }
 
   private async saveFallback(locationId: string, data: AtmosphereData): Promise<void> {
+    // Fila FIFO: cada escrita espera a anterior terminar (o metodo inteiro,
+    // incluindo o load, roda sob a trava — read-modify-write atomico por processo).
+    const run = this.writeLock.then(() => this.doSaveFallback(locationId, data));
+    this.writeLock = run.then(
+      () => undefined,
+      () => undefined,
+    );
+    await run;
+  }
+
+  private async doSaveFallback(locationId: string, data: AtmosphereData): Promise<void> {
     const { data: existing, contentAt: existingContentAt } = await this.fallback.loadWithTimestamp<{
       locations: Record<string, AtmosphereData>;
     }>(FALLBACK_FILE);
