@@ -103,7 +103,7 @@ describe('OpenMeteoRepository — getAtmosphereData (ciclo de vida do fallback)'
   });
 
   it('cenario 1: cache fresco NAO chama a API (evita rate-limit)', async () => {
-    const { repo, fallback } = makeRepo({
+    const { repo } = makeRepo({
       load: async () => ({ data: { locations: { 'ilha-comprida': staleLoc } }, updatedAt: 'x', contentAt: 'x', isStale: false }),
       isStale: () => false,
     });
