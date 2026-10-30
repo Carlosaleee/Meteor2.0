@@ -11,6 +11,8 @@ export type CurrentData = {
   precipitation: number;
   weather_code: number;
   wind_speed_10m: number;
+  /** Rajada (km/h) — opcional em caches antigos gravados antes do campo existir. */
+  wind_gusts_10m?: number;
   wind_direction_10m: number;
   surface_pressure: number;
 };
@@ -23,6 +25,8 @@ export type HourlyData = {
   precipitation: number[];
   weather_code: number[];
   wind_speed_10m: number[];
+  /** Rajada por hora (km/h) — opcional em caches antigos. */
+  wind_gusts_10m?: number[];
   cloud_cover: number[];
   visibility: number[];
 };
@@ -44,9 +48,29 @@ export type AtmosphereData = {
   current: CurrentData;
   hourly: HourlyData;
   daily: DailyData;
-  /** Proveniencia dos dados — 'sample' = sintetico (nunca apresentar como real). */
-  meta?: { source: 'live' | 'stale' | 'sample' };
+  meta?: {
+    /** Frescor do conteudo — 'sample' = sintetico (nunca apresentar como real). */
+    source: 'live' | 'stale' | 'sample';
+    /** Momento em que o backend coletou o conteudo da API (mantido em caches/stale). */
+    fetchedAt?: string;
+    /** Natureza do dado: previsao de modelo, observacao ou sintetico. */
+    dataKind?: 'forecast' | 'sample';
+    provider?: string;
+    model?: string;
+  };
 };
+
+/** Modelo efetivamente pedido ao Open-Meteo (Fase 4 torna configuravel via OPEN_METEO_MODELS). */
+const OPEN_METEO_MODEL = process.env.OPEN_METEO_MODELS ?? 'best_match';
+
+/** Query compartilhada por forceRefresh e getAtmosphereData (inclui rajadas). */
+function buildForecastUrl(lat: number, lon: number): string {
+  return `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
+    + `&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure`
+    + `&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,cloud_cover,visibility`
+    + `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,weather_code,sunrise,sunset,uv_index_max`
+    + `&forecast_days=7&timezone=America/Sao_Paulo`;
+}
 
 @Injectable()
 export class OpenMeteoRepository {
@@ -54,14 +78,20 @@ export class OpenMeteoRepository {
 
   constructor(private readonly fallback: FallbackService) {}
 
+  private liveMeta(): AtmosphereData['meta'] {
+    return {
+      source: 'live',
+      fetchedAt: new Date().toISOString(),
+      dataKind: 'forecast',
+      provider: 'Open-Meteo',
+      model: OPEN_METEO_MODEL,
+    };
+  }
+
   async forceRefresh(lat: number, lon: number, locationId = 'ilha-comprida'): Promise<AtmosphereData | null> {
     this.logger.log(`Force refreshing meteorology for ${locationId} (${lat}, ${lon})...`);
     try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
-        + `&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,surface_pressure`
-        + `&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m,cloud_cover,visibility`
-        + `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,weather_code,sunrise,sunset,uv_index_max`
-        + `&forecast_days=7&timezone=America/Sao_Paulo`;
+      const url = buildForecastUrl(lat, lon);
       const res = await fetchWithTimeout(url);
       if (!res.ok) throw new Error(`Open-Meteo returned ${res.status}`);
       const data = await res.json();
@@ -72,7 +102,7 @@ export class OpenMeteoRepository {
         current: data.current as CurrentData,
         hourly: data.hourly as HourlyData,
         daily: data.daily as DailyData,
-        meta: { source: 'live' },
+        meta: this.liveMeta(),
       };
       await this.saveFallback(locationId, result);
       return result;
@@ -93,11 +123,7 @@ export class OpenMeteoRepository {
     }
 
     try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
-        + `&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,surface_pressure`
-        + `&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m,cloud_cover,visibility`
-        + `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,weather_code,sunrise,sunset,uv_index_max`
-        + `&forecast_days=7&timezone=America/Sao_Paulo`;
+      const url = buildForecastUrl(lat, lon);
       const res = await fetchWithTimeout(url);
       if (!res.ok) throw new Error(`Open-Meteo returned ${res.status}`);
       const data = await res.json();
@@ -110,7 +136,7 @@ export class OpenMeteoRepository {
         current: data.current as CurrentData,
         hourly: data.hourly as HourlyData,
         daily: data.daily as DailyData,
-        meta: { source: 'live' },
+        meta: this.liveMeta(),
       };
 
       await this.saveFallback(locationId, result);
@@ -122,7 +148,13 @@ export class OpenMeteoRepository {
 
     if (cached?.locations?.[locationId]) {
       this.logger.warn(`Using stale fallback for ${locationId}`);
-      return { ...cached.locations[locationId], meta: { source: 'stale' } };
+      const old = cached.locations[locationId];
+      // Preserva fetchedAt/dataKind originais: o frescor do conteudo nao muda
+      // so porque a leitura aconteceu agora (ver Backlog P2 "updatedAt enganoso").
+      return {
+        ...old,
+        meta: { ...old.meta, source: 'stale' as const, dataKind: old.meta?.dataKind ?? 'forecast' },
+      };
     }
 
     this.logger.warn(`No cached data for ${locationId}, using defaults`);
@@ -176,7 +208,9 @@ export class OpenMeteoRepository {
       },
     };
 
-    const current = defaults[locationId] ?? defaults['ilha-comprida'];
+    const base = defaults[locationId] ?? defaults['ilha-comprida'];
+    // Rajada sintetica deterministica (~1.4x vento medio), ja que o campo existe no contrato.
+    const current: CurrentData = { ...base, wind_gusts_10m: +(base.wind_speed_10m * 1.4).toFixed(1) };
 
     // Curvas deterministicas (oscilacao simples por indice) — nada de Math.random:
     // um "forecast" sintetico aleatorio passaria por dado real em qualquer tela.
@@ -193,6 +227,7 @@ export class OpenMeteoRepository {
         precipitation: hours.map((_, i) => Math.abs(Math.sin(i * 0.6)) < 0.3 ? 0 : +(Math.abs(Math.sin(i * 0.6))).toFixed(1)),
         weather_code: hours.map(() => current.weather_code),
         wind_speed_10m: hours.map((_, i) => wobble(current.wind_speed_10m, 3, i)),
+        wind_gusts_10m: hours.map((_, i) => wobble(current.wind_speed_10m * 1.4, 4, i)),
         cloud_cover: hours.map((_, i) => Math.round(Math.abs(Math.sin(i * 0.4)) * 70 + 10)),
         visibility: hours.map((_, i) => Math.round(9000 + Math.abs(Math.sin(i * 0.3)) * 10000)),
       },
@@ -208,7 +243,7 @@ export class OpenMeteoRepository {
         sunset: days.map(d => `${d}T18:05`),
         uv_index_max: days.map(() => 5),
       },
-      meta: { source: 'sample' },
+      meta: { source: 'sample', dataKind: 'sample', provider: 'synthetic' },
     };
   }
 }

@@ -36,6 +36,8 @@ export type HourlyForecast = {
   precipitation: number;
   weatherCode: number;
   windSpeed: number;
+  /** Rajada (km/h) — null em caches antigos do backend. */
+  windGust?: number | null;
   cloudCover: number;
   visibility: number;
 };
@@ -56,12 +58,25 @@ export type DailyForecast = {
 export type MeteorologyResponse = {
   location: string;
   locationId: string;
+  /** Instante da resposta (UTC) — nao e a coleta nem a validade. */
   timestamp: string;
+  source?: 'live' | 'stale' | 'sample';
+  /** Fuso de hourly[].time / daily[].date (wall-clock SP). */
+  timezone?: string;
+  /** Momento da coleta real dos dados (UTC); null em caches antigos. */
+  fetchedAt?: string | null;
+  meta?: {
+    dataKind?: 'forecast' | 'sample';
+    provider?: string;
+    model?: string | null;
+  };
   current: {
     temperature: number;
     apparentTemperature: number;
     humidity: number;
     windSpeed: number;
+    /** Rajada (km/h) — null em caches antigos. */
+    windGust?: number | null;
     windDirection: number;
     pressure: number;
     precipitation: number;

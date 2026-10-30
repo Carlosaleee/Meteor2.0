@@ -68,13 +68,21 @@ GET /v1/meteorology?locationId=ilha-comprida
 {
   "location": "Ilha Comprida",
   "locationId": "ilha-comprida",
-  "timestamp": "2026-09-10T14:00:00.000Z",
+  "timestamp": "2026-10-30T14:14:22.682Z",
   "source": "live",
+  "timezone": "America/Sao_Paulo",
+  "fetchedAt": "2026-10-30T14:14:20.123Z",
+  "meta": {
+    "dataKind": "forecast",
+    "provider": "Open-Meteo",
+    "model": "best_match"
+  },
   "current": {
     "temperature": 21.5,
     "apparentTemperature": 20.8,
     "humidity": 82,
     "windSpeed": 14.3,
+    "windGust": 24.1,
     "windDirection": 110,
     "pressure": 1018.2,
     "precipitation": 0,
@@ -86,7 +94,7 @@ GET /v1/meteorology?locationId=ilha-comprida
       "temperature": 22,
       "humidity": 80,
       "windSpeed": 15,
-      "windDirection": 115,
+      "windGust": 26,
       "weatherCode": 2,
       "precipitationProbability": 10,
       "precipitation": 0,
@@ -116,44 +124,76 @@ GET /v1/meteorology?locationId=ilha-comprida
 |-------|------|-----------|
 | location | string | Nome da localizacao |
 | locationId | string | ID da localizacao |
-| timestamp | string | Horario da resposta (ISO 8601) |
-| source | string | Proveniencia dos dados: `live` (API em tempo real), `stale` (fallback com mais de 24h) ou `sample` (fallback de exemplo deterministico) |
-| current.temperature | number | Temperatura atual (Celsius) |
+| timestamp | string | Horario da **resposta** da API (ISO 8601 UTC) — nao e o instante de coleta nem de validade |
+| source | string | Frescor do conteudo: `live` (coletado da API agora), `stale` (fallback com mais de 24h) ou `sample` (fallback de exemplo deterministico) — **nao** significa "observacao em tempo real" |
+| timezone | string | Fuso dos campos temporais `hourly[].time`, `daily[].date`, `sunrise` e `sunset` (wall-clock, sem offset) |
+| fetchedAt | string \| null | Momento em que o backend coletou o conteudo da API (ISO 8601 UTC); `null` em caches antigos sem o campo |
+| meta.dataKind | string | Natureza do dado: `forecast` (previsao de modelo meteorologico) ou `sample` (sintetico) |
+| meta.provider | string | Provedor dos dados (`Open-Meteo` ou `synthetic`) |
+| meta.model | string \| null | Modelo efetivamente pedido ao provedor (padrao `best_match`) |
+| current.temperature | number | Temperatura do ar a 2m (Celsius) |
 | current.apparentTemperature | number | Sensacao termica (Celsius) |
 | current.humidity | number | Umidade relativa (%) |
-| current.windSpeed | number | Velocidade do vento (km/h) |
-| current.windDirection | number | Direcao do vento (graus) |
-| current.pressure | number | Pressao atmosferica (hPa) |
-| current.precipitation | number | Precipitacao (mm) |
+| current.windSpeed | number | Velocidade media do vento a 10m (km/h) |
+| current.windGust | number \| null | Rajada maxima do vento a 10m (km/h); `null` em caches antigos sem o campo |
+| current.windDirection | number | Direcao do vento (graus, 0=N/360=N) |
+| current.pressure | number | Pressao atmosferica de superficie (hPa) |
+| current.precipitation | number | Precipitacao do intervalo corrente (mm/h) |
 | current.weatherCode | number | Codigo WMO do tempo |
 
-**Campos do response — Hourly (array de 24h):**
+**Campos do response — Hourly (array de ate 24h a partir da hora atual em SP):**
 | Campo | Tipo | Descricao |
 |-------|------|-----------|
-| hourly[].time | string | Horario (ISO 8601) |
+| hourly[].time | string | Horario local de SP sem offset (YYYY-MM-DDTHH:MM) — interpretar com `timezone` |
 | hourly[].temperature | number | Temperatura (Celsius) |
 | hourly[].humidity | number | Umidade (%) |
 | hourly[].windSpeed | number | Velocidade do vento (km/h) |
-| hourly[].windDirection | number | Direcao do vento (graus) |
+| hourly[].windGust | number \| null | Rajada (km/h); `null` em caches antigos |
 | hourly[].weatherCode | number | Codigo WMO do tempo |
-| hourly[].precipitationProbability | number | Probabilidade de chuva (%) |
-| hourly[].precipitation | number | Precipitacao (mm) |
+| hourly[].precipitationProbability | number | Probabilidade de chuva na hora (%) |
+| hourly[].precipitation | number | Precipitacao prevista na hora (mm/h) |
 | hourly[].cloudCover | number | Cobertura de nuvens (%) |
 | hourly[].visibility | number | Visibilidade (metros) |
 
 **Campos do response — Daily (array de 7 dias):**
 | Campo | Tipo | Descricao |
 |-------|------|-----------|
-| daily[].date | string | Data (YYYY-MM-DD) |
+| daily[].date | string | Data local de SP (YYYY-MM-DD) |
 | daily[].tempMax | number | Temperatura maxima (Celsius) |
 | daily[].tempMin | number | Temperatura minima (Celsius) |
 | daily[].weatherCode | number | Codigo WMO do tempo |
-| daily[].precipitationSum | number | Precipitacao acumulada (mm) |
-| daily[].precipitationProbabilityMax | number | Probabilidade maxima de chuva (%) |
-| daily[].windSpeedMax | number | Velocidade maxima do vento (km/h) |
+| daily[].precipitationSum | number | Precipitacao **acumulada no dia** (mm/dia) |
+| daily[].precipitationProbabilityMax | number | **Maior probabilidade horaria** do dia (%) — nao e probabilidade integrada do dia todo |
+| daily[].windSpeedMax | number | Maior velocidade media horaria do vento (km/h) |
 | daily[].uvIndexMax | number | Indice UV maximo |
-| daily[].sunrise | string | Nascer do sol (ISO 8601) |
-| daily[].sunset | string | Por do sol (ISO 8601) |
+| daily[].sunrise | string | Nascer do sol (local SP, sem offset) |
+| daily[].sunset | string | Por do sol (local SP, sem offset) |
+
+---
+
+## Dicionario de Dados — GET /v1/meteorology
+
+Natureza do dado: **previsao de modelo meteorologico** (Open-Meteo agrega modelos como best_match) — nao e observacao de estacao. A validade de cada valor e a hora local de SP indicada em `hourly[].time` / `daily[].date` (complementada por `timezone`).
+
+| Campo | Unidade | Acumulacao / janela | Fuso | Ausencia |
+|---|---|---|---|---|
+| temperature / tempMax / tempMin | °C | instantaneo / max-min do dia | SP | nunca null em `current` |
+| apparentTemperature | °C | instantaneo | SP | — |
+| humidity | % | instantaneo | SP | — |
+| windSpeed / windSpeedMax | km/h | media 10m / max horario | SP | — |
+| windGust | km/null | pico da janela | SP | `null` em cache antigo |
+| windDirection | graus (0/360 = N) | instantaneo | SP | — |
+| pressure | hPa | superficie, instantaneo | SP | so em `current` |
+| precipitation (current/hourly) | mm | **por hora** | SP | — |
+| precipitationSum | mm | **por dia** | SP | — |
+| precipitationProbability / Max | % | hora / maximo das horas do dia | SP | — |
+| cloudCover / visibility | % / m | horario | SP | so em `hourly` |
+| uvIndexMax | indice UV | maximo do dia | SP | — |
+| sunrise / sunset | ISO local | dia | SP | sem offset |
+| timestamp | ISO UTC | instante da **resposta** | UTC | — |
+| fetchedAt | ISO UTC | instante da **coleta** | UTC | `null` em cache antigo |
+
+**Tratamento de nulos/ausentes:** `hourly`/`daily` podem ter menos registros que 24/7 quando a fonte falha parcialmente (o backend corta do indice da hora atual em SP); `fetchedAt`/`windGust` sao `null` em caches gravados antes da adicao dos campos; `source: 'sample'` marca conteudo sintetico que **nunca** deve ser apresentado como dado real.
 
 ---
 
