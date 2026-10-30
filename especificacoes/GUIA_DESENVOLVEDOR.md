@@ -1,6 +1,6 @@
 # Guia do Desenvolvedor — Meteor 2.0
 
-> **Ultima atualizacao:** 30/10/2026 (revisao tecnica do modulo de meteorologia aplicada — 275 testes)
+> **Ultima atualizacao:** 30/10/2026 (revisao tecnica do modulo de meteorologia aplicada — 276 testes; checklist pre-merge `pnpm verify`)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -64,7 +64,7 @@ pnpm format
 
 ## Testes
 
-**Total: 275 testes — backend Jest (211) + frontend Vitest (64)**
+**Total: 276 testes — backend Jest (211) + frontend Vitest (65)**
 
 > Contagem atualizada apos execucao completa em 30/10/2026 (28 arquivos backend + 12 frontend, todos verdes).
 
@@ -72,16 +72,26 @@ pnpm format
 # Backend (211 testes — o script ja embute --experimental-vm-modules)
 pnpm --filter backend test
 
-# Frontend (64 testes — Vitest + React Testing Library)
+# Frontend (65 testes — Vitest + React Testing Library)
 pnpm --filter frontend test
 ```
 
 | Suite | Runner | Testes | Observacao |
 |-------|--------|--------|------------|
 | `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 211 | 28 arquivos `*.spec.ts` |
-| `apps/frontend` | Vitest + RTL + jsdom | 64 | 12 arquivos `*.test.{ts,tsx}` |
+| `apps/frontend` | Vitest + RTL + jsdom | 65 | 12 arquivos `*.test.{ts,tsx}` |
 
 Detalhamento por arquivo: [SYSTEM_SPEC.md §9](./SYSTEM_SPEC.md#9-cobertura-de-testes).
+
+### Checklist pre-merge (obrigatorio)
+
+O **type-check so roda no `next build`** — `vitest` (runtime) e `oxlint` (sem type-aware) nao pegam erros de tipo. Em 30/10/2026 isso quebrou 7 deploys de producao seguidos (erro de tipo invisivel aos testes e ao lint). Antes de merge na `main`:
+
+```bash
+pnpm verify   # lint + test + build — espelho local da CI
+```
+
+Minimo aceitavel se o tempo apertar: `pnpm --filter frontend build` (exit 0) + `pnpm lint`. Alternativa: empurrar a branch `feature/*` **antes** do merge — a CI (`ci.yml`) roda em `push` para `feature/*` e falha antes de chegar na `main`.
 
 ## Rate Limit (Seguranca)
 
@@ -741,7 +751,7 @@ Pipeline ativo em `.github/workflows/ci.yml`:
 
 **Jobs:** (todos em Node 24 via `node-version-file: .nvmrc`)
 - `backend-test`: Jest (211 testes) — `NODE_OPTIONS="--experimental-vm-modules" npx jest`
-- `frontend-test`: Vitest (64 testes)
+- `frontend-test`: Vitest (65 testes)
 - `lint`: oxlint (frontend)
 - `build`: valida backend + frontend (após testes)
 

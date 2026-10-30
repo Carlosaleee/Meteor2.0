@@ -1,6 +1,6 @@
 # Meteor 2.0 — Tactical HUD & Regional Intelligence Hub
 
-> **Ultima atualizacao:** 30/10/2026 (revisao tecnica do modulo de meteorologia aplicada em 275 testes)
+> **Ultima atualizacao:** 30/10/2026 (revisao tecnica do modulo de meteorologia aplicada em 276 testes)
 >
 > **Documentos relacionados:** [especificacoes/SYSTEM_SPEC.md](./especificacoes/SYSTEM_SPEC.md) · [especificacoes/GUIA_DESENVOLVEDOR.md](./especificacoes/GUIA_DESENVOLVEDOR.md) · [especificacoes/REFERENCIA_API.md](./especificacoes/REFERENCIA_API.md) · [DESIGN.md](./DESIGN.md)
 
@@ -38,7 +38,7 @@ Dashboard tactico e central de inteligencia regional focado na regiao de **Ilha 
 * **Graficos:** ApexCharts (ondas, marés, vento)
 * **Icones:** React Icons (Font Awesome)
 * **Estilizacao:** Tailwind CSS v4 (dark/light theme)
-* **Testes:** Vitest + React Testing Library (64 testes em 12 arquivos)
+* **Testes:** Vitest + React Testing Library (65 testes em 12 arquivos)
 
 ---
 
@@ -93,12 +93,12 @@ Agente conversacional inteligente que integra todos os modulos do sistema para r
 
 ## Cobertura de Testes
 
-**Total: 275 testes (275 passam) — backend Jest 211 + frontend Vitest 64**
+**Total: 276 testes (276 passam) — backend Jest 211 + frontend Vitest 65**
 
 | Suite | Runner | Testes | Arquivos |
 |-------|--------|--------|----------|
 | `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 211 | 28 `*.spec.ts` |
-| `apps/frontend` | Vitest + RTL + jsdom | 64 | 12 `*.test.{ts,tsx}` |
+| `apps/frontend` | Vitest + RTL + jsdom | 65 | 12 `*.test.{ts,tsx}` |
 
 Detalhamento por arquivo: [especificacoes/SYSTEM_SPEC.md §9](./especificacoes/SYSTEM_SPEC.md#9-cobertura-de-testes).
 
@@ -125,7 +125,7 @@ Meteor_2.0/
 │           └── lib/           # api.ts, spots-data.ts
 ├── especificacoes/            # Documentacao tecnica (SYSTEM_SPEC, GUIA, REFERENCIA_API)
 ├── DESIGN.md                  # Paleta, tipografia, componentes
-├── package.json               # Scripts: dev, test, lint, build, format
+├── package.json               # Scripts: dev, test, lint, build, verify (lint+test+build), format
 └── .env                       # GEMINI_API_KEY configurada
 ```
 
