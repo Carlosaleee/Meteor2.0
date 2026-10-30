@@ -1,127 +1,72 @@
 {
-  "updatedAt": "2026-10-21T17:41:34.781Z",
+  "updatedAt": "2026-10-30T13:11:05.272Z",
   "data": {
     "news": [
       {
-        "id": "wsl-562076",
-        "title": "Finals Day All Set For Tomorrow At Edommo Surf Pro Razo",
-        "source": "World Surf League",
-        "sourceUrl": "https://www.worldsurfleague.com",
-        "url": "https://www.worldsurfleague.com/posts/562076/finals-day-all-set-for-tomorrow-at-edommo-surf-pro-razo",
-        "description": "Semifinals locked in!",
-        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/9da42bc86780f823840ceabf84d4c4a0.jpg?&x=400&y=225&icq=74&sig=515e9fdd4e0e97d3728e366231a15971",
-        "category": "WSL",
-        "publishedAt": "2026-10-17T12:41:00.000Z"
-      },
-      {
-        "id": "wsl-562028",
-        "title": "Top Contenders Emerge At Edommo Surf Pro Razo",
-        "source": "World Surf League",
-        "sourceUrl": "https://www.worldsurfleague.com",
-        "url": "https://www.worldsurfleague.com/posts/562028/top-contenders-emerge-at-edommo-surf-pro-razo",
-        "description": "Moving Day Narrows Field To Men's Round of 16, Women's Quarterfinals",
-        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/68754790afed33c619cfbd2ff860b656.jpg?&x=400&y=225&icq=74&sig=be4bfa5b6aa760fc12469a5c07230ea1",
-        "category": "WSL",
-        "publishedAt": "2026-10-16T17:33:11.000Z"
-      },
-      {
-        "id": "wsl-561880",
-        "title": "Daily Coverage: La Marginal Surfing Pro QS 4,000 - Day 4",
-        "source": "World Surf League",
-        "sourceUrl": "https://www.worldsurfleague.com",
-        "url": "https://www.worldsurfleague.com/posts/561880/daily-coverage-la-marginal-surfing-pro-qs-4-000-day-1",
-        "description": "High-Performance Spectacle Locks In Finals Day",
-        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/dad2e8c480c9267dccfaa812553dc146.jpg?&x=400&y=225&icq=74&sig=485b3442cf3da942cb03addba0ca6e9a",
-        "category": "WSL",
-        "publishedAt": "2026-10-16T08:15:00.000Z"
-      },
-      {
-        "id": "wsl-561909",
-        "title": "Edommo Surf Pro Razo QS 2,000 Off To Cracking Start",
-        "source": "World Surf League",
-        "sourceUrl": "https://www.worldsurfleague.com",
-        "url": "https://www.worldsurfleague.com/posts/561909/edommo-surf-pro-razo-qs-2-000-off-to-cracking-start",
-        "description": "Top Seeds Dominate Men's Round of 64",
-        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/4b9135c028c174bdda5773451de4c1f9.jpg?&x=400&y=225&icq=74&sig=d14b9f72a748824102fb14f7ae2730ab",
-        "category": "WSL",
-        "publishedAt": "2026-10-15T18:00:18.000Z"
-      },
-      {
-        "id": "wsl-561886",
-        "title": "WSL Fantasy LIVE Training Day | MEO Rip Curl Pro Portugal presented by Corona Cero 2026",
-        "source": "World Surf League",
-        "sourceUrl": "https://www.worldsurfleague.com",
-        "url": "https://www.worldsurfleague.com/posts/561886/wsl-fantasy-live-training-day-meo-rip-curl-pro-portugal-presented-by-corona-cero-2026",
-        "description": "Lock in your WSL Fantasy team before Round 1 gets underway and use today's training day insights to help make your final picks -",
-        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/9c2ceeb237477eaa9b24dc2caf510c17.jpg?&x=400&y=225&icq=74&sig=d045e383af0bf93dea257c69ada9d360",
-        "category": "WSL",
-        "publishedAt": "2026-10-15T02:45:00.000Z"
-      },
-      {
         "id": "spsurf-1",
-        "title": "Surfe: Yago Dora, Ítalo Ferreira e Medina vão às quartas em Peniche",
+        "title": "Morre Dadá Figueiredo, ícone do surfe brasileiro, aos 61 anos",
         "source": "SPSurf",
         "sourceUrl": "https://www.spsurf.com.br",
-        "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxQakpHRDRHRkhFYmNpcF9fWDF1NkVNaWI2bWtZZnJ6bHdUNkJtcGtyVFFIeU5YTGxzc0RXNVlodE1ZaGNDWGFzMUJvMjc1THBQY3JTOUVtc2d1M0c3M0VsLTJuUlVxWS12RUQ0WTBJdm1qYXBMMVVDckRzMFNnQjZMTmN3UFd4M1hVdTMzSFJFeWg1NXJjcHAzc3dOZk1XVW5sY0VvcjB0d3kzQldZWS1JbFJReWtrTFM4Vnp0OA?oc=5",
-        "description": "Surfe: Yago Dora, Ítalo Ferreira e Medina vão às quartas em Peniche Agência Brasil",
+        "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPeGFuN3ROcnpvMkNJZFd0VGZ3WjR1ekxKV3R2WEwtdmlSX2xlaTEyOUxOT2IzdDlWbXdqR29qYk9VNENENlQ3Z1FicmR3TzctekliUWI2TlVWZkcwS3pLaXJzNkJIektpN190NkhjdkZiS2hLcUxVc0k0eUZsUlZCQ1JGRmhHcGdVWXQ4MmczOThkYkFzOWlyaGlRVmNET0toVm1wUWtQdDZiUzRiWHF5bNIBvwFBVV95cUxPYXRjblFUb1FMRkVwUU9Rd3RRUmhVUlVMMU9ZZTBvY1BoTDQ1NDZQM0xOOGVZTExDQnJkR3B4Z2pTblpFOWg3dHNEYzNMYVlneU4yalYwVm9Ed19UdVdQNzlQUjgtS2piN3hkOGZCR2dQaERZaW5BWEpXM1JkQWNXcFRWSHB2VFJVbXRUSnJ3Wl9zOVh0SGJlTnVyTnQtV18xYUZHQXNDQjN1aWhZS0xhM0RXbVBsT1d3VG96U3dESQ?oc=5",
+        "description": "Morre Dadá Figueiredo, ícone do surfe brasileiro, aos 61 anos ge",
         "image": "https://static.wixstatic.com/media/690598_cf6012b3a7aa4ffd8b88893077d96484~mv2.jpeg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/690598_cf6012b3a7aa4ffd8b88893077d96484~mv2.webp",
         "category": "Paulista",
-        "publishedAt": "2026-10-16T22:12:00.000Z"
+        "publishedAt": "2026-10-25T01:51:43.000Z"
       },
       {
         "id": "spsurf-2",
-        "title": "ISA segue WSL e suspende Alan Cleland após caso com adolescente investigado pela polícia",
+        "title": "Surfe: Medina é vice-campeão em Peniche e sobe para 4º no ranking",
         "source": "SPSurf",
         "sourceUrl": "https://www.spsurf.com.br",
-        "url": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxPMUZUdjh4VUJOUDR4VlBZczBvMlloQllIQ29OY25rcFcxQkJLWEtwM3IwSkdkQ2J5WDNnUi10V3NQS2Y1Ui16OThPVlJud3JYMko4RERjMXhrUlpwZUZVNlE0TDhUQW03RTVqeEJTUkYwY0lXUkRJaU1lY2RUdkZiMUlfWEJmVDhIc3JDUU9GRWROZjZRVXVxNHJJQlg3aHpFeHlTZ3JjbENlVnhtWjBqRndiNmEtSGhFeTFSVGxLWVJaV09zUjFkaWM4QzJPMzd5S2xodkRnWHhheFRtQ1NmU9IB7wFBVV95cUxQN2lvOFNaRzM1Wm1wTS0wZVFBc0ZkMmlpWkItZi1ZN2xwcVVEdUhsMElfUk10VXhMd2FfOU05bTJFM1hBTTh5NTY2Z1B6Y2lkRDNYNkx6bUtKOXRrOTdjSGlhRThWTFVtczBLMlBXWHg3NnhNaUlyVW1oNWxycHJzSDM2ZkY4dlRhUHNDdFN3dFlQUUVJYzZ1U1V0ejhBejFDYnBBTUNmanRMM3ZSU1NicjR2ei1xUUZtZWlJLXMwaUFhWC1vNFptVldDaVJveEZWZUJSNExpbHVoNjFTakltUXFDcEJQenpwR09XZHhXdw?oc=5",
-        "description": "ISA segue WSL e suspende Alan Cleland após caso com adolescente investigado pela polícia ge",
+        "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPMWk3bFE2RUN5dnVtOEhxRXRZbE1heTNJM0tVOGg2MGpSWUVzMjl2VERydXJXWFNQWjdWZEo5cXA0M3A5MzRJMm1NNldpYjRXSE9fcW5TekN1cV82XzMxYy1vMTdTNWFCeGxFN1V3WGhubVFuWnRyb202YU95X0VBU2dDb05fN3FMUmlYY3BXQmRzYjI4WF9xcHVybHU5S2VQbk4tRFM3MVQtT2d2UWo2MUdjbVFBWkRDdUFjZ1FnZw?oc=5",
+        "description": "Surfe: Medina é vice-campeão em Peniche e sobe para 4º no ranking Agência Brasil",
         "image": "https://static.wixstatic.com/media/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.jpeg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.webp",
         "category": "Paulista",
-        "publishedAt": "2026-10-15T00:22:22.000Z"
+        "publishedAt": "2026-10-23T20:46:00.000Z"
       },
       {
         "id": "spsurf-3",
-        "title": "Atleta do Corinthians, Ryan Kainalo garante vaga na elite do surfe mundial",
+        "title": "Morre Dadá Figueiredo, ícone que levou a atitude punk ao surfe brasileiro, aos 61 anos",
         "source": "SPSurf",
         "sourceUrl": "https://www.spsurf.com.br",
-        "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPQXZ5MFhDTEZWZlZYR3RQM3pKTlZtdWhVQ05qTDVvbHUyQU1yeWFOWkRvNFA2Zl9PT281YmJuZDg5UUNHYWxpUlQxVmdFWWo0TUc3TUQ3bVBLbTVBQkNLVk1Ram9mX1VqQkVTbVhxUGs1YlBjbWtwMV9NcDI2QVA5LXFlT3lpWmZiNzlJT1l2UHZiYUtqUE5jUEV2YnFzRVlCLUpjbHFtVWpoOFZhazZJcTZzbw?oc=5",
-        "description": "Atleta do Corinthians, Ryan Kainalo garante vaga na elite do surfe mundial Corinthians | Site Oficial",
+        "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxOOWc1dHlTZXV6UHhiQXM3SHVvblI2UU1OS1JteXUzYmhFb1gxeFQ3b1VhM3hlZHhCcjB5VThHY1JDOTkxVDgzZzlUUktraFYtZXBVNkRoYS1aREhRRDFPZzRXWERJRnNWQ0VRaVkyVkFST2xUUEwyVkVFR0d4YzNtb1ByQUswY0pVMERpLVNCQ2kyUW9Hdy1sZlpGVk5ja1dwUDVyX0g1Z01kbkhZeVJ4QzFQT2ZSeWpWZ3hadE9B0gHDAUFVX3lxTE0tMEswRE1rODhOMFdwVDdRT3pKTlFNVXVOUFFueVZ2aV9zRHo4OUR5aUVYU2lDVmtyUUZ3SHpSWUY5elVoMHdBeUV6UkFuMGJjZGtzVjlfWER4U1dUdjFoc2xmU3pXRnEtbnZMVi1hdWdrNndzUUtZSzdqQ0ZjekZGTnZVUVBlUUYxV2tvcFJVZGpORS15aGFKaDdZSFVqSDZRV2ROdEdpWno2U1B0WVgwN2lvMGxJOTVJZW1Nd1NsaThNOA?oc=5",
+        "description": "Morre Dadá Figueiredo, ícone que levou a atitude punk ao surfe brasileiro, aos 61 anos Estadão",
         "image": "https://static.wixstatic.com/media/71b9f8_d53b9f235c844cb09ce5789c48052bf6~mv2.jpg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/71b9f8_d53b9f235c844cb09ce5789c48052bf6~mv2.jpg",
         "category": "Paulista",
-        "publishedAt": "2026-10-15T18:25:00.000Z"
+        "publishedAt": "2026-10-26T00:20:00.000Z"
       },
       {
         "id": "spsurf-4",
-        "title": "Veja indícios de que Paolla Oliveira vive novo affair com surfista",
+        "title": "Dadá Figueiredo, referência do surfe brasileiro, morre aos 61 anos",
         "source": "SPSurf",
         "sourceUrl": "https://www.spsurf.com.br",
-        "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPbGtvUno3b2J6dG9UbmZWVmszbjY3SlJQZ3NWVFBId1VOdzY1eE5GWU5OUWNlMGRoNzU5T21wc3VKblFjWElKMDNvNWI0czlFWmZveHVCRGViUXNDVHRXWFphdUJDS1Y1M0FEbkZFaFBSaWR3a1I1aHRJcVM3ZmRTa2txQUNYNjZaRk9fTEpZM0IyQ294cnNDNXBrVE9rU09jdEhyZEN6ZXB0U3dNZDNSRmRDTQ?oc=5",
-        "description": "Veja indícios de que Paolla Oliveira vive novo affair com surfista Metrópoles",
+        "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOMXZLenBUVEFCdElFb0FkU0k3ckMzNzBuT2c4a1pzWW5sOTJRbEpXMEV3anJPa1R3Q0FqeTdNWFhpVm0yX0gyYW9QNG93Nm9aNnRHcWY3THZDenFKVVN1NnVRZjJhdnJ1Z293dkhrNERaT3JwSGJ3RGtfZ1pRRTMtbXlaZkZnSGF4OWtxMWJXUklpQnJvUC1oQVlITWxBTTh0WExFRmxvbjRDNVV3RTJiOUs3TnVWMVBvb0Zz?oc=5",
+        "description": "Dadá Figueiredo, referência do surfe brasileiro, morre aos 61 anos CNN Brasil",
         "image": "https://static.wixstatic.com/media/71b9f8_d47f44af83e043a590507fe765bd2d32~mv2.jpg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/71b9f8_d47f44af83e043a590507fe765bd2d32~mv2.jpg",
         "category": "Paulista",
-        "publishedAt": "2026-10-20T18:54:00.000Z"
+        "publishedAt": "2026-10-25T13:52:36.000Z"
       },
       {
         "id": "spsurf-5",
-        "title": "Web teoriza sobre romance de Paolla Oliveira com surfista 18 anos mais novo",
+        "title": "Santos comemora novo prêmio no surfe como “Cidade Mais Inclusiva”",
         "source": "SPSurf",
         "sourceUrl": "https://www.spsurf.com.br",
-        "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxNaDJNRmJMSmZIbUJPNE0yTVRWc1A1dUxqR1dXSnk2TUdNeUNJTVN5V1ZBR0FNRHotUmd0TDNfYVZNenlZUXJQVWRYdEwwQVlqSmtlOU1sSkFBaDNUSy10dVZLM1RETm16bnd6YVFJYVdRVEZ0MERXT0dvTVN4RUpTOG1HbzlobURDRXBfNnZuNU9JTWwySm01RmlnT2lNdDE0VFVDRHpUa0p6ejJ4SEtsRGY3ZFBQdTFL?oc=5",
-        "description": "Web teoriza sobre romance de Paolla Oliveira com surfista 18 anos mais novo CNN Brasil",
+        "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxNcVpmcjM1T3l6RV9QS1hQTmc1UlMwU0JqTEczLXB0V3drQkQ3ZUxfWktrQTlIeE9XR1lTR0NpYk84WFJuMWk1ZlNKMTVEcVNTZk1WdEdxamt3T1FGU0VoUV9VTXBWRFY1VnhfcnBzUUVSZHFSR05iRkcwaklWa0FTY2JQb01UZEVqZmtqREplbEZPSmc4aHBfTm9yU1lwcXFzcVFRSzdB?oc=5",
+        "description": "Santos comemora novo prêmio no surfe como “Cidade Mais Inclusiva” Prefeitura de Santos |",
         "image": "https://static.wixstatic.com/media/71b9f8_1f4cfb108dfd43299fb87ae66da9782c~mv2.jpg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/71b9f8_1f4cfb108dfd43299fb87ae66da9782c~mv2.jpg",
         "category": "Paulista",
-        "publishedAt": "2026-10-21T12:16:11.000Z"
+        "publishedAt": "2026-10-28T12:40:00.000Z"
       },
       {
         "id": "spsurf-6",
-        "title": "Quem é João Chumbinho, surfista apontado como novo affair de Paolla Oliveira",
+        "title": "Surfista da Serra garante vaga no Pan-Americano 2027",
         "source": "SPSurf",
         "sourceUrl": "https://www.spsurf.com.br",
-        "url": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxPNXowQ0JTYkppNlZuWk9KbE91U29iNFJZdWJtVnV2UXhCZ05mRS1DandvQ0VMZEtodHpfZkZPTExGNEtldTBfbUdXWnEzU2Zab3dGZGtvdkJLMmtWTHZDWmlsNmlZekFDNmZjcTdMUU1VUW9UN3ZTcVo4UmlFWXJ6QU42SWs5dFYyaWpFZWFwSEpBYzd4QkZVcTZ4Q2JPQlVjN25OT0t6aHZRY1R2UWc1X0RjWV9Fd3pFcHliTUdzck54UWJsczI0RHFzV0plUnBES2ZwTW9jTWZQWnFFZ2FSZUJYTU9rRjBPaF94QUhwWHZxdw?oc=5",
-        "description": "Quem é João Chumbinho, surfista apontado como novo affair de Paolla Oliveira GZH",
+        "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNdVRMSXNZYS03cl82MEk5NEVkdmNMOFNPNnFyQ0NGTFFWcV9OWnN6c0ktdGp1NFpxbXN4T1pGY0VycFNhelptTmY4QkZLRFN6Nk5xZlEtcDVQcG1oNURCRXY5T2daeTh6R2RvS1NDNW1MTXJua3h3TTQ0Vm5PcGlpdks2c2ZRZHQ5cUxuSVRCNXFaT0hvTGh0cnVfb1hvR1JCekE?oc=5",
+        "description": "Surfista da Serra garante vaga no Pan-Americano 2027 Prefeitura da Serra",
         "image": "https://static.wixstatic.com/media/71b9f8_c9f54baec703476192f96cc92fda3f5d~mv2.jpg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/71b9f8_c9f54baec703476192f96cc92fda3f5d~mv2.jpg",
         "category": "Paulista",
-        "publishedAt": "2026-10-21T16:04:59.000Z"
+        "publishedAt": "2026-10-24T20:00:00.000Z"
       },
       {
         "id": "wsl-fioravanti-cai",
@@ -133,6 +78,66 @@
         "image": "https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67",
         "category": "WSL",
         "publishedAt": "2026-09-18T12:00:00.000Z",
+        "sample": true
+      },
+      {
+        "id": "wsl-luana-top6",
+        "title": "Luana Silva permanece entre as 6 melhores do ranking feminino",
+        "source": "WSL Latin America",
+        "sourceUrl": "https://wsllatinamerica.com",
+        "url": "https://wsllatinamerica.com",
+        "description": "Brasileira terminou entre as 5 melhores em Trestles e ocupa 6a posicao com 36.580 pontos.",
+        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/05d0c45992d04a5409e4f0752d17382f.png?&x=1440&y=513&icq=74&sig=b95e55f8d4a05ce4133bcc58ba78e486",
+        "category": "WSL",
+        "publishedAt": "2026-09-21T12:00:00.000Z",
+        "sample": true
+      },
+      {
+        "id": "spsurf-saosebastiao-pro",
+        "title": "Banco do Brasil Sao Sebastiao Pro: WSL chega a SP pela primeira vez",
+        "source": "Terra",
+        "sourceUrl": "https://www.terra.com.br",
+        "url": "https://www.terra.com.br/esportes/surfe/berco-de-gabriel-medina-litoral-de-sp-recebe-etapa-mundial-da-wsl-pela-primeira-vez",
+        "description": "Etapa do Challenger Series em Sao Sebastiao de 26/09 a 03/10 na Praia de Maresias. Evento historico.",
+        "image": "https://static.wixstatic.com/media/690598_cf6012b3a7aa4ffd8b88893077d96484~mv2.jpeg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/690598_cf6012b3a7aa4ffd8b88893077d96484~mv2.webp",
+        "category": "Paulista",
+        "publishedAt": "2026-09-16T12:00:00.000Z",
+        "sample": true
+      },
+      {
+        "id": "spsurf-surf-attack-maresias",
+        "title": "Hang Loose Surf Attack 2026: etapa decisiva em Maresias",
+        "source": "SPSurf",
+        "sourceUrl": "https://www.spsurf.com.br",
+        "url": "https://litoralempauta.com.br/sao-sebastiao-recebe-ultima-etapa-do-circuito-hang-loose-surf-attack-em-maresias-nesta-quinta-feira/",
+        "description": "36a edicao do Surf Attack em Maresias de 17 a 19 de setembro. Etapa decisiva do Ranking Paulista.",
+        "image": "https://static.wixstatic.com/media/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.jpeg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.webp",
+        "category": "Paulista",
+        "publishedAt": "2026-09-17T12:00:00.000Z",
+        "sample": true
+      },
+      {
+        "id": "spsurf-sunset-reggae",
+        "title": "WSL Sunset Reggae Edition chega a Maresias com Maneva e Planta & Raiz",
+        "source": "WSL Latin America",
+        "sourceUrl": "https://wsllatinamerica.com",
+        "url": "https://wsllatinamerica.com/wsl-sunset-chega-a-sao-sebastiao-com-reggae-edition-e-shows-de-maneva-planta-raiz-e-gabriel-elias/",
+        "description": "Pela primeira vez no Litoral Norte paulista, WSL Sunset une surfe, musica e cultura em 26 de setembro.",
+        "image": "https://static.wixstatic.com/media/71b9f8_d47f44af83e043a590507fe765bd2d32~mv2.jpg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/71b9f8_d47f44af83e043a590507fe765bd2d32~mv2.jpg",
+        "category": "Paulista",
+        "publishedAt": "2026-09-14T12:00:00.000Z",
+        "sample": true
+      },
+      {
+        "id": "wsl-gabriela-lidera",
+        "title": "Gabriela Bryan assume lideranca do ranking feminino apos Trestles",
+        "source": "WSL Latin America",
+        "sourceUrl": "https://wsllatinamerica.com",
+        "url": "https://wsllatinamerica.com",
+        "description": "Havaiana assume 1a posicao com 42.865 pontos apos final em Trestles. Erin Brooks sobe para 5a com 3 titulos seguidos.",
+        "image": "https://d3qf8nvav5av0u.cloudfront.net/image/05d0c45992d04a5409e4f0752d17382f.png?&x=1440&y=513&icq=74&sig=b95e55f8d4a05ce4133bcc58ba78e486",
+        "category": "WSL",
+        "publishedAt": "2026-09-21T12:00:00.000Z",
         "sample": true
       }
     ],
@@ -154,31 +159,31 @@
         },
         {
           "rank": 3,
-          "name": "Miguel Pupo",
-          "country": "Brazil",
-          "points": 42770,
-          "trend": 1
+          "name": "Griffin Colapinto",
+          "country": "United States",
+          "points": 43695,
+          "trend": 3
         },
         {
           "rank": 4,
-          "name": "Leonardo Fioravanti",
-          "country": "Italy",
-          "points": 42515,
-          "trend": -2
+          "name": "Gabriel Medina",
+          "country": "Brazil",
+          "points": 43210,
+          "trend": 1
         },
         {
           "rank": 5,
-          "name": "Gabriel Medina",
+          "name": "Miguel Pupo",
           "country": "Brazil",
-          "points": 41495,
-          "trend": 0
+          "points": 42770,
+          "trend": -1
         },
         {
           "rank": 6,
-          "name": "Griffin Colapinto",
-          "country": "United States",
-          "points": 39780,
-          "trend": 0
+          "name": "Leonardo Fioravanti",
+          "country": "Italy",
+          "points": 42515,
+          "trend": -4
         },
         {
           "rank": 7,
@@ -247,17 +252,17 @@
       "women": [
         {
           "rank": 1,
-          "name": "Carissa Moore",
-          "country": "Hawaii",
-          "points": 47065,
-          "trend": 1
+          "name": "Molly Picklum",
+          "country": "Australia",
+          "points": 48950,
+          "trend": 3
         },
         {
           "rank": 2,
-          "name": "Molly Picklum",
-          "country": "Australia",
-          "points": 45035,
-          "trend": 2
+          "name": "Carissa Moore",
+          "country": "Hawaii",
+          "points": 47065,
+          "trend": 0
         },
         {
           "rank": 3,
@@ -282,17 +287,17 @@
         },
         {
           "rank": 6,
-          "name": "Luana Silva",
-          "country": "Brazil",
-          "points": 38580,
-          "trend": 0
+          "name": "Caitlin Simmers",
+          "country": "United States",
+          "points": 39610,
+          "trend": 1
         },
         {
           "rank": 7,
-          "name": "Caitlin Simmers",
-          "country": "United States",
-          "points": 37895,
-          "trend": 0
+          "name": "Luana Silva",
+          "country": "Brazil",
+          "points": 38580,
+          "trend": -1
         },
         {
           "rank": 8,
@@ -357,27 +362,20 @@
         "name": "HTA Sunset Pro",
         "location": "Sunset Beach, Oahu,  Hawaii",
         "dates": "Oct 26 - Nov 2",
-        "status": "Upcoming",
+        "status": "Standby",
         "tour": "Qualifying Series"
       },
       {
         "name": "whitebuffalo OMAEZAKI PRO",
         "location": "Omaezaki City, Shizuoka, Japan",
         "dates": "Oct 28 - Nov 1",
-        "status": "Upcoming",
+        "status": "Standby",
         "tour": "Junior Tour"
       },
       {
         "name": "Philippines Pro",
         "location": "Cloud 9, Siargao Island, Philippines",
         "dates": "Oct 31 - Nov 10",
-        "status": "Upcoming",
-        "tour": "Championship Tour"
-      },
-      {
-        "name": "MEO Rip Curl Pro Portugal",
-        "location": "Supertubos, Peniche, Portugal",
-        "dates": "Oct 16 - 25",
         "status": "Standby",
         "tour": "Championship Tour"
       },
@@ -422,6 +420,13 @@
         "dates": "Oct 15 - 18",
         "status": "Completed",
         "tour": "Qualifying Series"
+      },
+      {
+        "name": "MEO Rip Curl Pro Portugal",
+        "location": "Supertubos, Peniche, Portugal",
+        "dates": "Oct 16 - 25",
+        "status": "Completed",
+        "tour": "Championship Tour"
       }
     ]
   }
