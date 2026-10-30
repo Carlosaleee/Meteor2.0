@@ -50,4 +50,52 @@ describe('useMeteorology', () => {
 
     expect(result.current.error).toBe('Network error');
   });
+
+  it('should preserve stale payload with real age (MET-03: badge precisa dos campos)', async () => {
+    const staleData = {
+      location: 'Iguape',
+      locationId: 'iguape',
+      timestamp: '2026-10-30T14:00:00.000Z',
+      source: 'stale' as const,
+      timezone: 'America/Sao_Paulo',
+      fetchedAt: '2026-10-27T10:00:00.000Z',
+      ageHours: 76,
+      meta: { dataKind: 'forecast' as const, provider: 'Open-Meteo', model: 'best_match' },
+      current: { temperature: 20, humidity: 80, windSpeed: 10, weatherCode: 1 },
+      hourly: [],
+      daily: [],
+    };
+    const { fetchAPI } = await import('@/lib/api');
+    vi.mocked(fetchAPI).mockResolvedValueOnce(staleData);
+
+    const { result } = renderHook(() => useMeteorology('iguape'));
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    // o hook entrega o payload como veio — fonte de proveniencia intacta
+    expect(result.current.data?.source).toBe('stale');
+    expect(result.current.data?.ageHours).toBe(76);
+    expect(result.current.data?.fetchedAt).toBe('2026-10-27T10:00:00.000Z');
+  });
+
+  it('should refetch when locationId changes', async () => {
+    const { fetchAPI } = await import('@/lib/api');
+    vi.mocked(fetchAPI).mockResolvedValue({
+      location: 'Registro', locationId: 'registro',
+      current: { temperature: 23, humidity: 75, windSpeed: 13, weatherCode: 1 },
+      hourly: [], daily: [],
+    });
+
+    const { result, rerender } = renderHook(
+      ({ id }: { id: string }) => useMeteorology(id),
+      { initialProps: { id: 'ilha-comprida' } },
+    );
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    rerender({ id: 'registro' });
+    await waitFor(() => expect(result.current.data?.locationId).toBe('registro'));
+    expect(vi.mocked(fetchAPI).mock.calls.length).toBeGreaterThanOrEqual(2);
+  });
 });
