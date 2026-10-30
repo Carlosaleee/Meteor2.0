@@ -1,6 +1,6 @@
 # Especificacao Tecnica — Meteor 2.0
 
-> **Ultima atualizacao:** 30/10/2026 (dados de fallback sincronizados com as APIs em 30/10 — 229 testes)
+> **Ultima atualizacao:** 30/10/2026 (revisao tecnica do modulo de meteorologia aplicada — 275 testes)
 >
 > **Documentos relacionados:** [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -334,14 +334,16 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 
 ## 9. Cobertura de Testes
 
-**Total: 229 testes — backend Jest (182) + frontend Vitest (47)**
+**Total: 275 testes — backend Jest (211) + frontend Vitest (64)**
 
-> Contagem atualizada apos execucao dos testes em 21/10/2026.
+> Contagem atualizada apos execucao completa dos testes em 30/10/2026 (211 backend em 28 arquivos + 64 frontend em 12 arquivos — todas verdes).
 
-### Backend (Jest) — 182 testes em 27 arquivos
+### Backend (Jest) — 211 testes em 28 arquivos
 | Arquivo | Testes | Status |
 |---------|--------|--------|
-| refresh.service.spec.ts | 18 | ✅ |
+| refresh.service.spec.ts | 21 | ✅ (inclui barreira de paralelismo, falha parcial e total por cidade) |
+| meteorology.service.spec.ts | 14 | ✅ (contrato + cenarios stale/sample/WMO 99/hourly curto/locationId invalido) |
+| open-meteo.repository.spec.ts | 13 | ✅ (novo — ciclo de vida do fallback: 7 cenarios + forceRefresh + writeLock) |
 | noticias-regionais.repository.spec.ts | 15 | ✅ (RSS com mock + proveniencia live/estimated das rotas ARTESP) |
 | wsl.repository.spec.ts | 14 | ✅ (fixture WSL real + `eliminated` + sponsor + noticias via RSS pt-BR) |
 | artsp-waze.repository.spec.ts | 14 | ✅ (novo — parser painel Waze + API oficial opcional + cache) |
@@ -353,10 +355,9 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 | scoring.spec.ts | 7 | ✅ (novo — BM25 + cosseno) |
 | chunker.spec.ts | 6 | ✅ (novo — segmentacao de documentos) |
 | meteorology.controller.spec.ts | 5 | ✅ |
-| meteorology.service.spec.ts | 5 | ✅ |
 | weather-news.repository.spec.ts | 5 | ✅ |
 | news.repository.spec.ts | 5 | ✅ (novo — 12 notícias, fallback, persistência) |
-| env.schema.spec.ts | 6 | ✅ (defaults, coerção, chaves fora do schema) |
+| env.schema.spec.ts | 6 | ✅ (defaults, coercao, chaves fora do schema — inclui OPEN_METEO_MODELS) |
 | spsurf.repository.spec.ts | 5 | ✅ (inclui fallback Google News RSS) |
 | gemini.repository.spec.ts | 5 | ✅ |
 | comercio.service.spec.ts | 4 | ✅ |
@@ -366,19 +367,21 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 | traffic.service.spec.ts | 4 | ✅ |
 | api-health.spec.ts | 2 | ✅ |
 | envelope.interceptor.spec.ts | 2 | ✅ |
-| fallback.service.spec.ts | 2 | ✅ |
+| fallback.service.spec.ts | 6 | ✅ (contentAt: derivacao legado, preservacao ao reaproveitar, isStale) |
 | http-exception.filter.spec.ts | 1 | ✅ |
 
-### Frontend (Vitest + RTL) — 47 testes em 10 arquivos
+### Frontend (Vitest + RTL) — 64 testes em 12 arquivos
 | Arquivo | Testes | Status |
 |---------|--------|--------|
 | ChatWidget.test.tsx | 14 | ✅ (envelope, resposta legada, rate limit 429, reiniciar/apagar, aria-live, sessionId/historico) |
+| weather-utils.test.ts | 11 | ✅ (novo — codigos WMO extremos/bordas, vento 360/-1 graus, datas invalidas) |
 | ResumoIA.test.tsx | 6 | ✅ |
 | useWeatherNews.test.ts | 5 | ✅ |
+| useMeteorology.test.ts | 5 | ✅ (sucesso/erro/loading + stale preservado + refetch ao trocar local) |
 | api.test.ts | 4 | ✅ |
+| SourceBadge.test.tsx | 4 | ✅ (novo — badge live/stale/sample + hora da coleta) |
 | Footer.test.tsx | 3 | ✅ |
 | useComercio.test.ts | 3 | ✅ |
-| useMeteorology.test.ts | 3 | ✅ |
 | useSwell.test.ts | 3 | ✅ |
 | useAllCities.test.ts | 3 | ✅ (daily[0] -> tempMax/tempMin/forecastCode) |
 | swell/tabs.test.ts | 3 | ✅ (deep-link ?tab= do /swell) |
@@ -720,8 +723,8 @@ Pipeline em `.github/workflows/ci.yml`:
 
 | Job | Descrição | Trigger |
 |-----|-----------|---------|
-| `backend-test` | Jest (182 testes) | push/PR |
-| `frontend-test` | Vitest (47 testes) | push/PR |
+| `backend-test` | Jest (211 testes) | push/PR |
+| `frontend-test` | Vitest (64 testes) | push/PR |
 | `lint` | oxlint (frontend) | push/PR |
 | `build` | Valida compilação | Após testes |
 

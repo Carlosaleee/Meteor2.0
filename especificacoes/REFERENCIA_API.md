@@ -1,6 +1,6 @@
 # Referencia da API — Meteor 2.0
 
-> **Ultima atualizacao:** 30/10/2026 (dados de fallback sincronizados com as APIs — 229 testes)
+> **Ultima atualizacao:** 30/10/2026 (revisao tecnica do modulo de meteorologia aplicada — 275 testes)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [../README.md](../README.md)
 
