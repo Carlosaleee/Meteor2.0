@@ -10,6 +10,7 @@ import { LocationSelector } from './components/LocationSelector';
 import { MeteorologyTabs } from './components/MeteorologyTabs';
 import { PrevisaoTab } from './components/PrevisaoTab';
 import { AvisosTab } from './components/AvisosTab';
+import { SourceBadge } from './components/SourceBadge';
 import { weatherEmoji } from './components/weather-utils';
 
 const SatelliteTab = dynamic(
@@ -118,9 +119,10 @@ export default function MeteorologiaPage() {
       </div>
 
       {/* Footer info */}
-      <div className="px-6 pb-5">
+      <div className="px-6 pb-5 flex flex-col items-end gap-1">
+        <SourceBadge data={data} />
         <p className="text-[10px] text-slate-600 text-right" aria-live="polite">
-          Última atualização: {data?.timestamp ? new Date(data.timestamp).toLocaleString('pt-BR') : '--'}
+          Resposta gerada em: {data?.timestamp ? new Date(data.timestamp).toLocaleString('pt-BR') : '--'}
         </p>
       </div>
 

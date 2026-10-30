@@ -65,6 +65,8 @@ export type MeteorologyResponse = {
   timezone?: string;
   /** Momento da coleta real dos dados (UTC); null em caches antigos. */
   fetchedAt?: string | null;
+  /** Idade do conteudo em horas na hora da resposta; null sem registro de coleta. */
+  ageHours?: number | null;
   meta?: {
     dataKind?: 'forecast' | 'sample';
     provider?: string;

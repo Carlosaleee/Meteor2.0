@@ -96,6 +96,8 @@ describe('MeteorologyService', () => {
       const result = await service.getCurrentWeather();
       expect(result.timezone).toBe('America/Sao_Paulo');
       expect(result.fetchedAt).toBe('2026-10-30T12:00:00.000Z');
+      expect(typeof result.ageHours).toBe('number');
+      expect(result.ageHours).toBeGreaterThanOrEqual(0);
       expect(result.meta).toEqual({
         dataKind: 'forecast',
         provider: 'Open-Meteo',
