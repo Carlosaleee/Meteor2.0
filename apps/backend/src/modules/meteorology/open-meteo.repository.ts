@@ -117,9 +117,16 @@ export class OpenMeteoRepository {
       locations: Record<string, AtmosphereData>;
     }>(FALLBACK_FILE);
 
-    if (!isStale && cached?.locations?.[locationId]) {
-      this.logger.debug(`Using fresh fallback for ${locationId}`);
-      return cached.locations[locationId];
+    const cachedLoc = cached?.locations?.[locationId];
+    if (cachedLoc) {
+      // Frescor POR LOCALIDADE (meta.fetchedAt), nao do arquivo como um todo:
+      // salvar 4 cidades num unico JSON nao pode mascarar a idade de uma delas.
+      const fetchedAt = cachedLoc.meta?.fetchedAt ?? null;
+      const locStale = fetchedAt ? this.fallback.isStale(fetchedAt) : isStale;
+      if (!locStale) {
+        this.logger.debug(`Using fresh fallback for ${locationId}`);
+        return cachedLoc;
+      }
     }
 
     try {
@@ -162,10 +169,27 @@ export class OpenMeteoRepository {
   }
 
   private async saveFallback(locationId: string, data: AtmosphereData): Promise<void> {
-    const existing = await this.fallback.load<{ locations: Record<string, AtmosphereData> }>(FALLBACK_FILE);
+    const { data: existing, contentAt: existingContentAt } = await this.fallback.loadWithTimestamp<{
+      locations: Record<string, AtmosphereData>;
+    }>(FALLBACK_FILE);
     const locations = existing?.locations ?? {};
     locations[locationId] = data;
-    await this.fallback.save(FALLBACK_FILE, { locations });
+
+    // contentAt do arquivo = coleta MAIS ANTIGA entre as localidades presentes.
+    // Localidades legadas sem meta.fetchedAt herdam o contentAt anterior (melhor esforco),
+    // de modo que o arquivo nunca anuncia frescor maior que o conteudo mais velho que guarda.
+    const times = Object.values(locations).map(
+      l => l.meta?.fetchedAt ?? existingContentAt ?? undefined,
+    );
+    const contentAt = times.find(t => typeof t === 'string')
+      ? times.reduce<string | undefined>((a, b) => {
+          if (!a) return b;
+          if (!b) return a;
+          return a < b ? a : b;
+        }, undefined)
+      : undefined;
+
+    await this.fallback.save(FALLBACK_FILE, { locations }, contentAt);
   }
 
   /**

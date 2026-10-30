@@ -5,7 +5,14 @@ import * as path from 'path';
 import type { Env } from '../config/env.schema';
 
 export type FallbackData<T> = {
+  /** Instante da escrita do arquivo. NAO indica a idade do conteudo (ver contentAt). */
   updatedAt: string;
+  /**
+   * Instante em que o conteudo foi efetivamente coletado — preservado quando o
+   * conteudo e reaproveitado de arquivo antigo (corrige o "updatedAt enganoso"
+   * do Backlog P2). Ausente em arquivos antigos: usar updatedAt como melhor esforco.
+   */
+  contentAt?: string;
   data: T;
 };
 
@@ -58,26 +65,36 @@ export class FallbackService {
     }
   }
 
-  async loadWithTimestamp<T>(filename: string): Promise<{ data: T | null; updatedAt: string | null; isStale: boolean }> {
+  async loadWithTimestamp<T>(
+    filename: string,
+  ): Promise<{ data: T | null; updatedAt: string | null; contentAt: string | null; isStale: boolean }> {
     const raw = await this.readFirst(filename);
     if (raw === null) {
-      return { data: null, updatedAt: null, isStale: true };
+      return { data: null, updatedAt: null, contentAt: null, isStale: true };
     }
     try {
       const parsed = JSON.parse(raw) as FallbackData<T>;
       const updatedAt = parsed.updatedAt ?? null;
-      return { data: parsed.data ?? null, updatedAt, isStale: this.isStale(updatedAt) };
+      const contentAt = parsed.contentAt ?? updatedAt;
+      return { data: parsed.data ?? null, updatedAt, contentAt, isStale: this.isStale(contentAt) };
     } catch {
-      return { data: null, updatedAt: null, isStale: true };
+      return { data: null, updatedAt: null, contentAt: null, isStale: true };
     }
   }
 
-  async save<T>(filename: string, data: T): Promise<void> {
+  /**
+   * @param contentAt Instante real de coleta do conteudo. Quando omitido, o conteudo
+   *   e considerado fresco (escrita agora). Ao reaproveitar conteudo antigo, passe o
+   *   contentAt original para nao mascarar a idade real.
+   */
+  async save<T>(filename: string, data: T, contentAt?: string): Promise<void> {
     const filePath = path.join(this.writeDir, filename);
     try {
       await fs.mkdir(this.writeDir, { recursive: true });
+      const now = new Date().toISOString();
       const payload: FallbackData<T> = {
-        updatedAt: new Date().toISOString(),
+        updatedAt: now,
+        ...(contentAt ? { contentAt } : {}),
         data,
       };
       await fs.writeFile(filePath, JSON.stringify(payload, null, 2), 'utf-8');
@@ -87,9 +104,9 @@ export class FallbackService {
     }
   }
 
-  isStale(updatedAt: string | null): boolean {
-    if (!updatedAt) return true;
-    const diff = Date.now() - new Date(updatedAt).getTime();
+  isStale(contentAt: string | null): boolean {
+    if (!contentAt) return true;
+    const diff = Date.now() - new Date(contentAt).getTime();
     return diff > this.maxAgeMs;
   }
 }

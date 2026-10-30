@@ -95,7 +95,7 @@ Ordem das secoes (reestruturada em 21/10/2026 — cada secao tem CTA no header a
 - API externa: Open-Meteo Forecast (gratuita, sem chave; fetch com timeout 10s — `common/http/fetch-timeout.ts`)
 - Dados expandidos: current + hourly (24h) + daily (7 dias)
 - Horario de referencia em `America/Sao_Paulo` (`common/time/sp-time.ts`) — corrige deslocamento de dia em serverless UTC
-- Proveniencia: resposta inclui `source: 'live' | 'stale' | 'sample'` (repassado de `meta.source` do fallback)
+- Proveniencia: resposta inclui `source: 'live' | 'stale' | 'sample'` (repassado de `meta.source` do fallback) + `timezone`, `fetchedAt`, `ageHours` e `meta {dataKind, provider, model}` — frescor calculado **por localidade** (`meta.fetchedAt`); badge `SourceBadge` na UI distingue previsao fresca, stale e sample
 - Fallback: data/fallback-meteorology.json (atualizado a cada 24h)
 - Localizacoes: Ilha Comprida, Iguape, Cananeia, Registro
 - `forceRefresh(lat, lon, locationId)` para refresh forcado por localizacao

@@ -44,6 +44,10 @@ export class MeteorologyService {
       // e em que fuso 'hourly[].time'/'daily[].date' estao.
       timezone: 'America/Sao_Paulo',
       fetchedAt: raw.meta?.fetchedAt ?? null,
+      // Idade real do conteudo (h) — derivada da coleta, nunca da escrita do arquivo.
+      ageHours: raw.meta?.fetchedAt
+        ? Math.round(((now.getTime() - new Date(raw.meta.fetchedAt).getTime()) / 3600000) * 10) / 10
+        : null,
       meta: {
         dataKind: raw.meta?.dataKind ?? 'forecast',
         provider: raw.meta?.provider ?? 'Open-Meteo',

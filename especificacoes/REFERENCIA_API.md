@@ -128,6 +128,7 @@ GET /v1/meteorology?locationId=ilha-comprida
 | source | string | Frescor do conteudo: `live` (coletado da API agora), `stale` (fallback com mais de 24h) ou `sample` (fallback de exemplo deterministico) — **nao** significa "observacao em tempo real" |
 | timezone | string | Fuso dos campos temporais `hourly[].time`, `daily[].date`, `sunrise` e `sunset` (wall-clock, sem offset) |
 | fetchedAt | string \| null | Momento em que o backend coletou o conteudo da API (ISO 8601 UTC); `null` em caches antigos sem o campo |
+| ageHours | number \| null | Idade do conteudo em horas no instante da resposta (derivada de `fetchedAt`, nunca da escrita do arquivo) |
 | meta.dataKind | string | Natureza do dado: `forecast` (previsao de modelo meteorologico) ou `sample` (sintetico) |
 | meta.provider | string | Provedor dos dados (`Open-Meteo` ou `synthetic`) |
 | meta.model | string \| null | Modelo efetivamente pedido ao provedor (padrao `best_match`) |
