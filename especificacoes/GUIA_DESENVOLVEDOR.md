@@ -1,6 +1,6 @@
 # Guia do Desenvolvedor — Meteor 2.0
 
-> **Ultima atualizacao:** 30/10/2026 (dados de fallback sincronizados com as APIs — 229 testes)
+> **Ultima atualizacao:** 30/10/2026 (revisao tecnica do modulo de meteorologia aplicada — 275 testes)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -64,22 +64,22 @@ pnpm format
 
 ## Testes
 
-**Total: 229 testes — backend Jest 30 (182) + frontend Vitest (47)**
+**Total: 275 testes — backend Jest (211) + frontend Vitest (64)**
 
-> Contagem atualizada apos execucao dos testes em 21/10/2026.
+> Contagem atualizada apos execucao completa em 30/10/2026 (28 arquivos backend + 12 frontend, todos verdes).
 
 ```bash
-# Backend (182 testes — o script ja embute --experimental-vm-modules)
+# Backend (211 testes — o script ja embute --experimental-vm-modules)
 pnpm --filter backend test
 
-# Frontend (47 testes — Vitest + React Testing Library)
+# Frontend (64 testes — Vitest + React Testing Library)
 pnpm --filter frontend test
 ```
 
 | Suite | Runner | Testes | Observacao |
 |-------|--------|--------|------------|
-| `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 182 | 27 arquivos `*.spec.ts` |
-| `apps/frontend` | Vitest + RTL + jsdom | 47 | 10 arquivos `*.test.{ts,tsx}` |
+| `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 211 | 28 arquivos `*.spec.ts` |
+| `apps/frontend` | Vitest + RTL + jsdom | 64 | 12 arquivos `*.test.{ts,tsx}` |
 
 Detalhamento por arquivo: [SYSTEM_SPEC.md §9](./SYSTEM_SPEC.md#9-cobertura-de-testes).
 
@@ -690,6 +690,8 @@ Itens ja identificados, ainda sem correcao — nao abrir issue/PR para eles sem 
 5. **`qualityFor` euristica fixa** — a qualidade "melhor horario por fatores" ainda e regra fixa, sem modelo aprendido/calibrado
 6. **Proveniencia da oceanografia estatica** — `getDefault()` do marine.repository ainda nao tem flag de proveniencia (`sample`/`source`), diferente de metereologia/news
 7. **Dedup de normalize/flatten** — logica de normalizacao do `scripts/rag-index.mjs` e do runtime (chunker) pode eventualmente ser unificada
+8. **`windGust` na UI** — o campo ja existe no contrato (`current.windGust` + `hourly[].windGust`, `null` em cache antigo) mas ainda nao e exibido nos cards de `/meteorologia` — exibir rajada junto do vento e opcional
+9. **`hourly[].windDirection`** — removido da REFERENCIA_API na revisao 30/10 (o backend nunca o retornou; a doc estava errada). Se for necessario, adicionar `wind_direction_10m` ao `hourly=` da query do Open-Meteo e mapear no service
 
 ---
 
@@ -738,8 +740,8 @@ Variáveis configuradas no Vercel Dashboard (Settings → Environment Variables)
 Pipeline ativo em `.github/workflows/ci.yml`:
 
 **Jobs:** (todos em Node 24 via `node-version-file: .nvmrc`)
-- `backend-test`: Jest (182 testes) — `NODE_OPTIONS="--experimental-vm-modules" npx jest`
-- `frontend-test`: Vitest (47 testes)
+- `backend-test`: Jest (211 testes) — `NODE_OPTIONS="--experimental-vm-modules" npx jest`
+- `frontend-test`: Vitest (64 testes)
 - `lint`: oxlint (frontend)
 - `build`: valida backend + frontend (após testes)
 
