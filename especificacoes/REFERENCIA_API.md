@@ -58,6 +58,8 @@ Dados meteorologicos em tempo real para uma localizacao, incluindo previsao hora
 | cananeia | Cananeia | -25.01, -47.92 |
 | registro | Registro | -24.48, -47.84 |
 
+> **Resolucao/modelo (MET-04):** os pontos acima sao as **sedes municipais** (IBGE/GeoNames) e as coordenadas vao na query do Open-Meteo — nao sao coordenadas de estacao. A resolucao efetiva e a **do modelo escolhido** (grade do provedor, interpolada para o ponto; nao ha estacao propria). O modelo e configuravel via env `OPEN_METEO_MODELS` (padrao `best_match`, selecao automatica do provedor) e ecoado em `meta.model`. Detalhe: Ilha Comprida (-24.73) e Iguape (-24.70) sao sedes vizinhas (~4 km) — previsoes muito proximas entre as duas sao esperadas, nao e bug de cache.
+
 **Exemplo de Request:**
 ```
 GET /v1/meteorology?locationId=ilha-comprida

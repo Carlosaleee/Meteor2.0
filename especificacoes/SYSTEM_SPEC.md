@@ -214,6 +214,7 @@ Schema validado com Zod em `apps/backend/src/common/config/env.schema.ts` (`pars
 | FRONTEND_ORIGIN | http://localhost:3000 | CORS origin |
 | FALLBACK_DIR | data | Diretorio dos JSONs de fallback |
 | FALLBACK_MAX_AGE_HOURS | 24 | Idade maxima do fallback |
+| OPEN_METEO_MODELS | best_match | Modelo meteorologico pedido ao Open-Meteo (MET-04) — ecoado em `meta.model`; ex.: `icon_dwd`, `ecmwf_ifs04` |
 | NEXT_PUBLIC_API_URL | dev: `http://localhost:3001` — prod: `/api` (proxy) | URL da API no frontend. Em produção o valor localhost é **descartado** pelo guard de `API_BASE` (`lib/api.ts`) e cai no proxy `/api/*` (rewrite em `apps/frontend/vercel.json`) |
 
 ### Definidas (em uso)

@@ -23,6 +23,8 @@ export const envSchema = z.object({
     .default("http://localhost:3000"),
   FALLBACK_DIR: z.string().default("data"),
   FALLBACK_MAX_AGE_HOURS: z.coerce.number().int().positive().default(24),
+  /** Modelo Open-Meteo pedido na query (MET-04): padrao best_match do provedor; ex.: icon_dwd, ecmwf_ifs04. */
+  OPEN_METEO_MODELS: z.string().min(1).default("best_match"),
   GEMINI_API_KEY: z.string().optional().default(""),
   GEMINI_MODEL: z.string().default("gemini-flash-latest"),
   GEMINI_EMBEDDING_MODEL: z.string().default("gemini-embedding-2"),
