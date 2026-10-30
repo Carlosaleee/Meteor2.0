@@ -1,6 +1,6 @@
 # Especificacao Tecnica — Meteor 2.0
 
-> **Ultima atualizacao:** 30/10/2026 (revisao tecnica do modulo de meteorologia aplicada — 275 testes)
+> **Ultima atualizacao:** 30/10/2026 (revisao tecnica do modulo de meteorologia aplicada — 276 testes; checklist pre-merge `pnpm verify`)
 >
 > **Documentos relacionados:** [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -334,9 +334,9 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 
 ## 9. Cobertura de Testes
 
-**Total: 275 testes — backend Jest (211) + frontend Vitest (64)**
+**Total: 276 testes — backend Jest (211) + frontend Vitest (65)**
 
-> Contagem atualizada apos execucao completa dos testes em 30/10/2026 (211 backend em 28 arquivos + 64 frontend em 12 arquivos — todas verdes).
+> Contagem atualizada apos execucao completa dos testes em 30/10/2026 (211 backend em 28 arquivos + 65 frontend em 12 arquivos — todas verdes; verificacao pre-merge = `pnpm verify`).
 
 ### Backend (Jest) — 211 testes em 28 arquivos
 | Arquivo | Testes | Status |
@@ -370,7 +370,7 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 | fallback.service.spec.ts | 6 | ✅ (contentAt: derivacao legado, preservacao ao reaproveitar, isStale) |
 | http-exception.filter.spec.ts | 1 | ✅ |
 
-### Frontend (Vitest + RTL) — 64 testes em 12 arquivos
+### Frontend (Vitest + RTL) — 65 testes em 12 arquivos
 | Arquivo | Testes | Status |
 |---------|--------|--------|
 | ChatWidget.test.tsx | 14 | ✅ (envelope, resposta legada, rate limit 429, reiniciar/apagar, aria-live, sessionId/historico) |
@@ -379,7 +379,7 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 | useWeatherNews.test.ts | 5 | ✅ |
 | useMeteorology.test.ts | 5 | ✅ (sucesso/erro/loading + stale preservado + refetch ao trocar local) |
 | api.test.ts | 4 | ✅ |
-| SourceBadge.test.tsx | 4 | ✅ (novo — badge live/stale/sample + hora da coleta) |
+| SourceBadge.test.tsx | 5 | ✅ (badge live/stale/sample + hora da coleta + loading null/undefined) |
 | Footer.test.tsx | 3 | ✅ |
 | useComercio.test.ts | 3 | ✅ |
 | useSwell.test.ts | 3 | ✅ |
@@ -724,7 +724,7 @@ Pipeline em `.github/workflows/ci.yml`:
 | Job | Descrição | Trigger |
 |-----|-----------|---------|
 | `backend-test` | Jest (211 testes) | push/PR |
-| `frontend-test` | Vitest (64 testes) | push/PR |
+| `frontend-test` | Vitest (65 testes) | push/PR |
 | `lint` | oxlint (frontend) | push/PR |
 | `build` | Valida compilação | Após testes |
 

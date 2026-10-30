@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { SourceBadge } from './SourceBadge';
 import type { MeteorologyResponse } from '@/lib/api';
@@ -51,8 +52,15 @@ describe('SourceBadge', () => {
     expect(screen.getByText(/Coleta:/)).toHaveTextContent('--');
   });
 
-  it('does not crash without data (loading state)', () => {
+  it('renders neutral loading state when data is null (antes da 1a resposta)', () => {
+    render(<SourceBadge data={null} />);
+    expect(screen.getByTestId('source-badge')).toHaveTextContent('Carregando…');
+    // nunca anuncia frescor sem dados
+    expect(screen.queryByText('Previsão atualizada')).not.toBeInTheDocument();
+  });
+
+  it('renders loading state when data is undefined (sem props)', () => {
     render(<SourceBadge />);
-    expect(screen.getByTestId('source-badge')).toBeInTheDocument();
+    expect(screen.getByTestId('source-badge')).toHaveTextContent('Carregando…');
   });
 });

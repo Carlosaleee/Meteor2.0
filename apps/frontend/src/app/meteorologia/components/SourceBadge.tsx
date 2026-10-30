@@ -3,7 +3,8 @@
 import type { MeteorologyResponse } from '@/lib/api';
 
 type Props = {
-  data?: MeteorologyResponse;
+  /** `null`/ausente = ainda carregando (hook devolve null antes do primeiro resultado). */
+  data?: MeteorologyResponse | null;
 };
 
 const STYLES: Record<string, { label: string; className: string; title: string }> = {
@@ -27,17 +28,32 @@ const STYLES: Record<string, { label: string; className: string; title: string }
 /**
  * Badge de proveniencia do dado meteorologico (MET-01/MET-03):
  * distingue previsao fresca, fallback antigo e conteudo sintetico.
+ * Sem dados ainda (loading) mostra estado neutro — nunca anuncia frescor antes da resposta.
  */
 export function SourceBadge({ data }: Props) {
-  const source = data?.source ?? 'live';
-  const style = STYLES[source] ?? STYLES.live;
-  const kind = data?.meta?.dataKind === 'sample' ? 'Sintético' : 'Previsão (modelo)';
+  if (!data) {
+    return (
+      <div className="flex flex-wrap items-center justify-end gap-2" aria-live="polite">
+        <span
+          className="px-2 py-0.5 rounded-full border bg-slate-500/10 text-slate-400 border-slate-500/30 text-[10px] font-semibold uppercase tracking-wider"
+          title="Aguardando a primeira resposta do backend"
+          data-testid="source-badge"
+        >
+          Carregando…
+        </span>
+      </div>
+    );
+  }
 
-  const coleta = data?.fetchedAt ?? null;
+  const source = data.source ?? 'live';
+  const style = STYLES[source] ?? STYLES.live;
+  const kind = data.meta?.dataKind === 'sample' ? 'Sintético' : 'Previsão (modelo)';
+
+  const coleta = data.fetchedAt ?? null;
   const hora = coleta
     ? new Date(coleta).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
     : null;
-  const idadeHoras = data?.ageHours;
+  const idadeHoras = data.ageHours;
 
   return (
     <div className="flex flex-wrap items-center justify-end gap-2" aria-live="polite">
@@ -50,7 +66,7 @@ export function SourceBadge({ data }: Props) {
       </span>
       <span
         className="px-2 py-0.5 rounded-full border bg-slate-500/10 text-slate-400 border-slate-500/30 text-[10px] font-medium"
-        title={`Natureza do dado: ${kind}${data?.meta?.provider ? ` — ${data.meta.provider}` : ''}${data?.meta?.model ? ` (${data.meta.model})` : ''}`}
+        title={`Natureza do dado: ${kind}${data.meta?.provider ? ` — ${data.meta.provider}` : ''}${data.meta?.model ? ` (${data.meta.model})` : ''}`}
       >
         {kind}
       </span>
