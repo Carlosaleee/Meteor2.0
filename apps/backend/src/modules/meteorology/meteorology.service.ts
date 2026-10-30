@@ -40,11 +40,21 @@ export class MeteorologyService {
       locationId,
       timestamp: now.toISOString(),
       source: raw.meta?.source ?? 'live',
+      // Contrato de tempo explicito (MET-02): o que e 'timestamp' vs 'fetchedAt'
+      // e em que fuso 'hourly[].time'/'daily[].date' estao.
+      timezone: 'America/Sao_Paulo',
+      fetchedAt: raw.meta?.fetchedAt ?? null,
+      meta: {
+        dataKind: raw.meta?.dataKind ?? 'forecast',
+        provider: raw.meta?.provider ?? 'Open-Meteo',
+        model: raw.meta?.model ?? null,
+      },
       current: {
         temperature: current.temperature_2m,
         apparentTemperature: current.apparent_temperature,
         humidity: current.relative_humidity_2m,
         windSpeed: current.wind_speed_10m,
+        windGust: current.wind_gusts_10m ?? null,
         windDirection: current.wind_direction_10m,
         pressure: current.surface_pressure,
         precipitation: current.precipitation,
@@ -59,6 +69,7 @@ export class MeteorologyService {
             precipitation: hourly.precipitation[startIdx + i],
             weatherCode: hourly.weather_code[startIdx + i],
             windSpeed: hourly.wind_speed_10m[startIdx + i],
+            windGust: hourly.wind_gusts_10m?.[startIdx + i] ?? null,
             cloudCover: hourly.cloud_cover[startIdx + i],
             visibility: hourly.visibility[startIdx + i],
           }))
