@@ -13,7 +13,7 @@ describe('RefreshService', () => {
   let service: RefreshService;
 
   const mockOpenMeteoRepo = {
-    forceRefresh: jest.fn().mockResolvedValue(null),
+    forceRefresh: jest.fn().mockResolvedValue({ current: {}, meta: { source: 'live' } }),
   };
 
   const mockMarineRepo = {
@@ -76,7 +76,7 @@ describe('RefreshService', () => {
     it('should refresh all data sources', async () => {
       const result = await service.refreshAll();
       expect(result.success).toBe(true);
-      expect(result.details['meteorology']).toBe('OK');
+      expect(result.details['meteorology']).toBe('OK (4/4)');
       expect(result.details['oceanography']).toBe('OK');
       expect(result.details['weather-news']).toBe('OK');
       expect(result.details['rankings']).toContain('OK');
@@ -87,6 +87,43 @@ describe('RefreshService', () => {
     it('should call forceRefresh for meteorology', async () => {
       await service.refreshAll();
       expect(mockOpenMeteoRepo.forceRefresh).toHaveBeenCalledTimes(4);
+    });
+
+    it('should refresh the 4 cities in parallel (barrier: so resolve se as 4 rodarem juntas)', async () => {
+      let calls = 0;
+      let release!: () => void;
+      const barrier = new Promise<void>(resolve => { release = resolve; });
+      mockOpenMeteoRepo.forceRefresh.mockImplementation(async () => {
+        calls += 1;
+        if (calls === 4) release();
+        // Em execucao sequencial a barreira nunca libera -> timeout do Jest.
+        await barrier;
+        return { current: {} };
+      });
+      const result = await service.refreshAll();
+      expect(result.details['meteorology']).toBe('OK (4/4)');
+      mockOpenMeteoRepo.forceRefresh.mockResolvedValue({ current: {}, meta: { source: 'live' } });
+    });
+
+    it('should report partial failure per city without discarding valid cities', async () => {
+      mockOpenMeteoRepo.forceRefresh
+        .mockResolvedValueOnce(null) // 1a chamada (ilha-comprida) sem dados
+        .mockResolvedValue({ current: {} });
+      const result = await service.refreshAll();
+      expect(result.success).toBe(true);
+      expect(result.details['meteorology']).toContain('ERROR parcial (3/4 OK)');
+      expect(result.details['meteorology']).toContain('ilha-comprida: sem dados');
+      // as demais fontes continuam OK
+      expect(result.details['oceanography']).toBe('OK');
+      expect(result.details['news']).toBe('OK');
+    });
+
+    it('should report total meteorology failure when all cities fail', async () => {
+      mockOpenMeteoRepo.forceRefresh.mockResolvedValue(null);
+      const result = await service.refreshAll();
+      expect(result.success).toBe(true);
+      expect(result.details['meteorology']).toContain('ERROR (4/4 falharam)');
+      mockOpenMeteoRepo.forceRefresh.mockResolvedValue({ current: {}, meta: { source: 'live' } });
     });
 
     it('should call forceRefresh for oceanography', async () => {

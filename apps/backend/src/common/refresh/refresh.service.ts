@@ -101,39 +101,38 @@ export class RefreshService implements OnModuleInit {
     const details: Record<string, string> = {};
 
     try {
-      // 1. Meteorologia (4 cidades)
-      this.logger.log('Refreshing meteorology data...');
-      try {
-        for (const loc of LOCATIONS) {
-          await this.openMeteoRepo.forceRefresh(loc.lat, loc.lon, loc.id);
+      // 1+2+3. Fontes pesadas em paralelo (grupos independentes escritam em
+      // arquivos distintos; dentro de meteorologia o saveFallback e serializado
+      // no proprio repositorio para evitar last-writer-wins entre as 4 cidades).
+      // Promise.allSettled: falha de um grupo nunca derruba os demais.
+      this.logger.log('Refreshing heavy sources in parallel (meteorology x4, oceanography, weather news)...');
+      const heavy = await Promise.allSettled([
+        this.refreshMeteorology(details),
+        (async () => {
+          try {
+            await this.marineRepo.forceRefresh(LOCATIONS[0].lat, LOCATIONS[0].lon);
+            details['oceanography'] = 'OK';
+            this.logger.log('Oceanography refreshed successfully');
+          } catch (err) {
+            details['oceanography'] = `ERROR: ${err}`;
+            this.logger.error(`Oceanography refresh failed: ${err}`);
+          }
+        })(),
+        (async () => {
+          try {
+            await this.weatherNewsRepo.forceRefresh();
+            details['weather-news'] = 'OK';
+            this.logger.log('Weather news refreshed successfully');
+          } catch (err) {
+            details['weather-news'] = `ERROR: ${err}`;
+            this.logger.error(`Weather news refresh failed: ${err}`);
+          }
+        })(),
+      ]);
+      for (const r of heavy) {
+        if (r.status === 'rejected') {
+          this.logger.error(`Unexpected error in heavy refresh group: ${r.reason}`);
         }
-        details['meteorology'] = 'OK';
-        this.logger.log('Meteorology refreshed successfully');
-      } catch (err) {
-        details['meteorology'] = `ERROR: ${err}`;
-        this.logger.error(`Meteorology refresh failed: ${err}`);
-      }
-
-      // 2. Oceanografia
-      this.logger.log('Refreshing oceanography data...');
-      try {
-        await this.marineRepo.forceRefresh(LOCATIONS[0].lat, LOCATIONS[0].lon);
-        details['oceanography'] = 'OK';
-        this.logger.log('Oceanography refreshed successfully');
-      } catch (err) {
-        details['oceanography'] = `ERROR: ${err}`;
-        this.logger.error(`Oceanography refresh failed: ${err}`);
-      }
-
-      // 3. Weather News (INMET/CPTEC/Defesa Civil)
-      this.logger.log('Refreshing weather news...');
-      try {
-        await this.weatherNewsRepo.forceRefresh();
-        details['weather-news'] = 'OK';
-        this.logger.log('Weather news refreshed successfully');
-      } catch (err) {
-        details['weather-news'] = `ERROR: ${err}`;
-        this.logger.error(`Weather news refresh failed: ${err}`);
       }
 
       // 4. Rankings WSL + News + Regionais
@@ -151,6 +150,36 @@ export class RefreshService implements OnModuleInit {
       return { success: false, details, duration: Date.now() - start };
     } finally {
       this.isRefreshing = false;
+    }
+  }
+
+  private async refreshMeteorology(details: Record<string, string>): Promise<void> {
+    this.logger.log('Refreshing meteorology data (4 cities in parallel)...');
+    const results = await Promise.allSettled(
+      LOCATIONS.map(loc => this.openMeteoRepo.forceRefresh(loc.lat, loc.lon, loc.id)),
+    );
+
+    const failed: string[] = [];
+    results.forEach((r, i) => {
+      if (r.status === 'rejected') {
+        failed.push(`${LOCATIONS[i].id}: ${r.reason}`);
+        this.logger.error(`Meteorology refresh failed for ${LOCATIONS[i].id}: ${r.reason}`);
+      } else if (r.value === null) {
+        // forceRefresh devolve null quando a fonte falhou (catch interno) —
+        // reportar por cidade em vez de "OK" generico.
+        failed.push(`${LOCATIONS[i].id}: sem dados`);
+        this.logger.warn(`Meteorology refresh returned no data for ${LOCATIONS[i].id}`);
+      }
+    });
+
+    const total = LOCATIONS.length;
+    if (failed.length === 0) {
+      details['meteorology'] = `OK (${total}/${total})`;
+      this.logger.log('Meteorology refreshed successfully (4/4)');
+    } else if (failed.length === total) {
+      details['meteorology'] = `ERROR (${total}/${total} falharam): ${failed.join(' | ')}`;
+    } else {
+      details['meteorology'] = `ERROR parcial (${total - failed.length}/${total} OK): ${failed.join(' | ')}`;
     }
   }
 

@@ -683,7 +683,7 @@ comercio/
 Itens ja identificados, ainda sem correcao — nao abrir issue/PR para eles sem antes conferir esta lista:
 
 1. **Trust proxy / X-Forwarded-For** — o backend nao confia no proxy: atras da Vercel o Throttler pode contar todas as requisicoes pelo mesmo IP do proxy (`app.set('trust proxy', ...)` ausente)
-2. **Paralelizar refresh das 4 cidades** — `refreshAll()` do open-meteo roda cidades sequencialmente; `Promise.allSettled` reduziria o tempo para caber no `maxDuration: 30s` da Vercel
+2. **Paralelizar refresh das 4 cidades** — **FECHADO (30/10)**: `refreshAll()` usa `Promise.allSettled` (meteorologia x4 + oceanografia + weather-news em paralelo) com resultado **por cidade** no `details` (`OK (4/4)` / `ERROR parcial (3/4 OK): ...`); o `saveFallback` do open-meteo serializa o read-modify-write do JSON via `writeLock` (evita last-writer-wins)
 3. **`updatedAt` enganoso no fallback** — **FECHADO (30/10, modulo de meteorologia)**: `FallbackService` agora grava `contentAt` (coleta real, preservada ao reaproveitar conteudo) e `isStale` passou a considerar `contentAt`; em meteorologia o staleness e **por localidade** (`meta.fetchedAt`). Os demais modulos nao mesclam conteudo antigo no save — se passarem a fazer, devem repassar o `contentAt` ao `save()`
 4. **Testes dos handlers `@Cron`** — os specs exercitam o metodo diretamente; o agendamento real do `@nestjs/schedule` continua nao coberto
 5. **`qualityFor` euristica fixa** — a qualidade "melhor horario por fatores" ainda e regra fixa, sem modelo aprendido/calibrado

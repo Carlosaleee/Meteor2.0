@@ -886,7 +886,7 @@ Forca refresh manual de todas as fontes de dados. Aceita `scope=news` igual ao G
   "data": {
     "success": true,
     "details": {
-      "meteorology": "OK",
+      "meteorology": "OK (4/4)",
       "oceanography": "OK",
       "weather-news": "OK",
       "rankings": "OK (15 men, 15 women, 7 events)",
@@ -902,8 +902,8 @@ Forca refresh manual de todas as fontes de dados. Aceita `scope=news` igual ao G
 | Campo (em `data`) | Tipo | Descricao |
 |-------|------|-----------|
 | success | boolean | `false` se um refresh ja estava em andamento (retorna `details: {}`, `duration: 0`) |
-| details.* | string | `OK` / `OK (n men, n women, n events)` ou `ERROR: <motivo>` por modulo |
-| duration | number | Duracao total em ms |
+| details.* | string | `OK` / `OK (n men, n women, n events)` ou `ERROR: <motivo>` por modulo; meteorologia reporta **por cidade**: `OK (4/4)`, `ERROR parcial (3/4 OK): iguape: sem dados` ou `ERROR (4/4 falharam): ...` |
+| duration | number | Duracao total em ms — fontes pesadas rodam em paralelo (`Promise.allSettled`) |
 
 **Response (secret invalido ou ausente — HTTP 401):**
 ```json
