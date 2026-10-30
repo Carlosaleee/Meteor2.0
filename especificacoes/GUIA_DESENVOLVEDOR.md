@@ -240,6 +240,7 @@ Schema validado por Zod em `apps/backend/src/common/config/env.schema.ts`.
 | `FRONTEND_ORIGIN` | CORS origin permitido | `http://localhost:3000` |
 | `FALLBACK_DIR` | Diretorio dos JSONs de fallback — na **Vercel (producao)**: `apps/backend/data` (cwd do lambda e a raiz do repo; em runtime a escrita vai para `/tmp`) | `data` (local) / `apps/backend/data` (Vercel) |
 | `FALLBACK_MAX_AGE_HOURS` | Idade maxima aceita do fallback | `24` |
+| `OPEN_METEO_MODELS` | Modelo meteorologico pedido ao Open-Meteo (query `models=`; ecoado em `meta.model`) | `best_match` |
 | `NODE_ENV` | Modo da aplicacao (`development`/`test`/`production`) | `development` |
 | `GEMINI_API_KEY` | Chave Gemini (resumo IA, chat Iron, embeddings RAG) — formato novo `AQ...` desde Set/2026 (antigo `AIzaSy...` descontinuado); obter em https://aistudio.google.com/apikey | *(vazio)* |
 | `GEMINI_MODEL` | Modelo Gemini (texto) | `gemini-flash-latest` |

@@ -8,16 +8,18 @@ describe('parseEnv', () => {
     expect(result.FRONTEND_ORIGIN).toBe('http://localhost:3000');
     expect(result.NODE_ENV).toBe('development');
     expect(result.FALLBACK_DIR).toBe('data');
+    expect(result.OPEN_METEO_MODELS).toBe('best_match');
     expect(result.GEMINI_MODEL).toBe('gemini-flash-latest');
     expect(result.GEMINI_EMBEDDING_MODEL).toBe('gemini-embedding-2');
     expect(result.GEMINI_EMBEDDING_DIMS).toBe(128);
   });
 
   it('coerces declared variables to their schema types', () => {
-    const result = parseEnv({ PORT: '4000', FALLBACK_MAX_AGE_HOURS: '12', GEMINI_EMBEDDING_DIMS: '256' });
+    const result = parseEnv({ PORT: '4000', FALLBACK_MAX_AGE_HOURS: '12', OPEN_METEO_MODELS: 'icon_dwd', GEMINI_EMBEDDING_DIMS: '256' });
 
     expect(result.PORT).toBe(4000);
     expect(result.FALLBACK_MAX_AGE_HOURS).toBe(12);
+    expect(result.OPEN_METEO_MODELS).toBe('icon_dwd');
     expect(result.GEMINI_EMBEDDING_DIMS).toBe(256);
     expect(typeof result.PORT).toBe('number');
   });

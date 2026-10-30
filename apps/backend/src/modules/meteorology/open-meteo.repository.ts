@@ -1,6 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { FallbackService } from '../../common/fallback/fallback.service';
 import { fetchWithTimeout } from '../../common/http/fetch-timeout';
+import type { Env } from '../../common/config/env.schema';
 
 const FALLBACK_FILE = 'fallback-meteorology.json';
 
@@ -60,16 +62,17 @@ export type AtmosphereData = {
   };
 };
 
-/** Modelo efetivamente pedido ao Open-Meteo (Fase 4 torna configuravel via OPEN_METEO_MODELS). */
-const OPEN_METEO_MODEL = process.env.OPEN_METEO_MODELS ?? 'best_match';
+/** Modelo efetivamente pedido ao Open-Meteo (env OPEN_METEO_MODELS, padrao best_match). */
+const DEFAULT_METEO_MODEL = 'best_match';
 
-/** Query compartilhada por forceRefresh e getAtmosphereData (inclui rajadas). */
-function buildForecastUrl(lat: number, lon: number): string {
+/** Query compartilhada por forceRefresh e getAtmosphereData (inclui rajadas). Exportada para teste. */
+export function buildForecastUrl(lat: number, lon: number, model: string): string {
   return `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
     + `&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure`
     + `&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,cloud_cover,visibility`
     + `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,weather_code,sunrise,sunset,uv_index_max`
-    + `&forecast_days=7&timezone=America/Sao_Paulo`;
+    + `&forecast_days=7&timezone=America/Sao_Paulo`
+    + `&models=${encodeURIComponent(model)}`;
 }
 
 @Injectable()
@@ -82,7 +85,14 @@ export class OpenMeteoRepository {
    */
   private writeLock: Promise<void> = Promise.resolve();
 
-  constructor(private readonly fallback: FallbackService) {}
+  constructor(
+    private readonly fallback: FallbackService,
+    private readonly config: ConfigService<Env, true>,
+  ) {}
+
+  private get model(): string {
+    return this.config.get('OPEN_METEO_MODELS', { infer: true }) || DEFAULT_METEO_MODEL;
+  }
 
   private liveMeta(): AtmosphereData['meta'] {
     return {
@@ -90,14 +100,14 @@ export class OpenMeteoRepository {
       fetchedAt: new Date().toISOString(),
       dataKind: 'forecast',
       provider: 'Open-Meteo',
-      model: OPEN_METEO_MODEL,
+      model: this.model,
     };
   }
 
   async forceRefresh(lat: number, lon: number, locationId = 'ilha-comprida'): Promise<AtmosphereData | null> {
-    this.logger.log(`Force refreshing meteorology for ${locationId} (${lat}, ${lon})...`);
+    this.logger.log(`Force refreshing meteorology for ${locationId} (${lat}, ${lon}, model=${this.model})...`);
     try {
-      const url = buildForecastUrl(lat, lon);
+      const url = buildForecastUrl(lat, lon, this.model);
       const res = await fetchWithTimeout(url);
       if (!res.ok) throw new Error(`Open-Meteo returned ${res.status}`);
       const data = await res.json();
@@ -136,7 +146,7 @@ export class OpenMeteoRepository {
     }
 
     try {
-      const url = buildForecastUrl(lat, lon);
+      const url = buildForecastUrl(lat, lon, this.model);
       const res = await fetchWithTimeout(url);
       if (!res.ok) throw new Error(`Open-Meteo returned ${res.status}`);
       const data = await res.json();
