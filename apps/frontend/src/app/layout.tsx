@@ -21,6 +21,8 @@ const mono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Meteor 2.0 — Dashboard Tático",
   description: "Dashboard tático de telemetria para Ilha Comprida e Vale do Ribeira",
+  // Sem metadataBase, URLs relativas do OG resolviam para localhost:3000 em produção
+  metadataBase: new URL("https://meteor2-0-frontend.vercel.app"),
   openGraph: {
     title: "Meteor 2.0 — Dashboard Tático",
     description: "Dashboard tático de telemetria para Ilha Comprida e Vale do Ribeira",
