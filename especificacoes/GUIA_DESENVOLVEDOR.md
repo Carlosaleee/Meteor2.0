@@ -93,6 +93,16 @@ pnpm verify   # lint + test + build — espelho local da CI
 
 Minimo aceitavel se o tempo apertar: `pnpm --filter frontend build` (exit 0) + `pnpm lint`. Alternativa: empurrar a branch `feature/*` **antes** do merge — a CI (`ci.yml`) roda em `push` para `feature/*` e falha antes de chegar na `main`.
 
+### Identidade git (obrigatorio antes do push)
+
+O Vercel **bloqueia o deploy de producao** quando o e-mail do commit nao pode ser associado a uma conta GitHub. Em 30/10/2026 isso bloqueou **9 deploys seguidos** do backend: `user.name`/`user.email` estavam com aspas curvas (`“Carlos` / `“alexandregularte013@gmail.com”`) — e-mail invalido, impossivel de associar. A producao do backend ficou **presa em 21/10 por 13 dias**, sem as Fases 1-6, mesmo com a CI verde.
+
+```bash
+git var GIT_AUTHOR_IDENT   # deve imprimir: Carlos Alexandre <86754119+Carlosaleee@users.noreply.github.com>
+```
+
+Use o **noreply da conta** (`<id>+<login>@users.noreply.github.com`): a associacao e intrinseca (o id 86754119 e o proprio `Carlosaleee`) e nao depende de e-mail verificado. Desconfie de aspas tipograficas — o PowerShell as introduz ao colar texto formatado.
+
 ## Rate Limit (Seguranca)
 
 - `@nestjs/throttler` **60 req/min** por IP (`TTL` 60s)
