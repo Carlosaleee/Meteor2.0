@@ -163,7 +163,7 @@ export type WslEvent = {
   name: string;
   location: string;
   dates: string;
-  status: 'Completed' | 'Standby' | 'Upcoming';
+  status: 'Completed' | 'Standby' | 'Upcoming' | 'Live';
   tour: string;
 };
 

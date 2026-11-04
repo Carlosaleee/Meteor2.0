@@ -11,8 +11,10 @@ type UpcomingEventsProps = {
 function StatusBadge({ status }: { status: string }) {
   const colors: Record<string, string> = {
     Active: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+    Live: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
     Standby: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
     Upcoming: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+    Completed: 'bg-slate-500/20 text-slate-400 border-slate-500/30',
   };
   return (
     <span className={`px-2 py-0.5 rounded-full text-[9px] font-medium border ${colors[status] ?? colors.Upcoming}`}>

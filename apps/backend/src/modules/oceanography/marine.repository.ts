@@ -17,7 +17,7 @@ type MarineData = {
   wind_gusts_10m: number;
 };
 
-export type HourlyMarineData = {
+type HourlyMarineData = {
   time: string;
   waveHeight: number;
   wavePeriod: number;

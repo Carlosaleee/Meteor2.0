@@ -1,15 +1,18 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { fetchWithTimeout } from '../../common/http/fetch-timeout';
+import { readFile, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
-export type RouteCondition = 'LIVRE' | 'MODERADO' | 'LENTO' | 'BLOQUEADO';
+type RouteCondition = 'LIVRE' | 'MODERADO' | 'LENTO' | 'BLOQUEADO';
 
-export type LiveRouteStatus = {
+type LiveRouteStatus = {
   condition: RouteCondition;
   description: string;
   updatedAt: string;
 };
 
-export type LiveRoutesResult = {
+type LiveRoutesResult = {
   /** Status por id de rota (ex.: 'sp-222'), apenas rodovias estaduais cobertas. */
   routes: Record<string, LiveRouteStatus>;
   /** Link publico para o usuario verificar os dados (painel CCM/ARTESP). */
@@ -30,6 +33,9 @@ const PANEL_URL = 'https://ccm.artesp.sp.gov.br/rodovias/waze';
 const API_URL = 'https://ccm.artesp.sp.gov.br/rodovias/api/ocorrencias/';
 const FETCH_TIMEOUT_MS = 10_000;
 const CACHE_TTL_MS = 10 * 60 * 1000;
+/** Snapshot em disco (Backlog P2 #4): falha transitória do painel por até 30min não rebaixa live→estimated. */
+const SNAPSHOT_TTL_MS = 30 * 60 * 1000;
+const SNAPSHOT_FILENAME = 'artsp-live-routes.json';
 
 /** Rodovias estaduais do Vale do Ribeira cobertas pelo CCM/ARTESP (BR-116 e balsa nao sao). */
 const TRACKED: Record<string, { code: string; slug: string }> = {
@@ -74,8 +80,50 @@ export class ArtspWazeRepository {
     if (result) {
       this.cache = result;
       this.cacheTs = Date.now();
+      await this.saveSnapshot(result);
+      return result;
     }
-    return result;
+
+    // Painel e API falharam: snapshot recente mantém `live` numa falha transitória
+    // (ex.: markup mudou ou rede caiu) em vez de rebaixar tudo para `estimated`.
+    const snapshot = await this.loadSnapshot();
+    if (snapshot) {
+      this.cache = snapshot;
+      this.cacheTs = Date.now();
+    }
+    return snapshot;
+  }
+
+  /** Dir do snapshot: /tmp no serverless (Vercel), sobrescrevível em teste via ARTSP_SNAPSHOT_DIR. */
+  private snapshotPath(): string {
+    const dir = process.env.ARTSP_SNAPSHOT_DIR?.trim() || tmpdir();
+    return join(dir, SNAPSHOT_FILENAME);
+  }
+
+  private async loadSnapshot(): Promise<LiveRoutesResult | null> {
+    try {
+      const raw = await readFile(this.snapshotPath(), 'utf8');
+      const snap = JSON.parse(raw) as { savedAt?: number; result?: LiveRoutesResult };
+      if (
+        typeof snap.savedAt === 'number' &&
+        Date.now() - snap.savedAt < SNAPSHOT_TTL_MS &&
+        snap.result?.routes
+      ) {
+        this.logger.log('Painel CCM/ARTESP indisponível — usando snapshot em disco (<30min)');
+        return snap.result;
+      }
+    } catch {
+      // Sem snapshot ou JSON inválido — comportamento antigo (null -> fallback estático).
+    }
+    return null;
+  }
+
+  private async saveSnapshot(result: LiveRoutesResult): Promise<void> {
+    try {
+      await writeFile(this.snapshotPath(), JSON.stringify({ savedAt: Date.now(), result }), 'utf8');
+    } catch (err) {
+      this.logger.warn(`Falha ao gravar snapshot do painel ARTESP: ${err}`);
+    }
   }
 
   private mergeSources(
@@ -136,18 +184,29 @@ export class ArtspWazeRepository {
     }
   }
 
+  /**
+   * Multi-estratégia (Backlog P2 #4) — o parser anterior dependia 100% do seletor
+   * `#text__tempo-viagem`; se o id sumisse do markup, tudo virava `estimated`:
+   * 1) bloco `#text__tempo-viagem` (formato original) + cards `data-trafego-card`;
+   * 2) se o id sumir ou as entradas não casarem, ancora as entradas `*SP 222*: ...`
+   *    em TODO o HTML (mesmo texto, divs renomeadas, `<br>` virou `<p>`);
+   * 3) cards sozinhos também contam como sinal.
+   * `null` apenas quando nenhuma estratégia encontra sinal algum.
+   */
   private parsePanelHtml(html: string): Partial<Record<string, LiveRouteStatus>> | null {
-    const summary = html.match(/id="text__tempo-viagem">([\s\S]*?)<\/div>/)?.[1];
-    if (!summary) return null;
+    const summary = html.match(/id="text__tempo-viagem">([\s\S]*?)<\/div>/)?.[1] ?? null;
 
-    const collected = summary.match(/Coletado em (\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})/);
+    const collected = html.match(/Coletado em (\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})/);
     // Horario do painel em horario de Sao Paulo (UTC-3; Brasil sem DST desde 2019).
     const updatedAt = collected
       ? `${collected[3]}-${collected[2]}-${collected[1]}T${collected[4]}:${collected[5]}:00-03:00`
       : new Date().toISOString();
 
-    const summaryEntries = this.parseSummaryEntries(summary);
+    const strictEntries = summary ? this.parseSummaryEntries(summary) : new Map<string, { delay: string; extent: string }>();
+    const summaryEntries = strictEntries.size > 0 ? strictEntries : this.parseLooseEntries(html);
     const cardLevels = this.parseCardLevels(html);
+
+    if (!summary && summaryEntries.size === 0 && cardLevels.size === 0) return null;
 
     const routes: Partial<Record<string, LiveRouteStatus>> = {};
     for (const [id, { code }] of Object.entries(TRACKED)) {
@@ -178,6 +237,25 @@ export class ArtspWazeRepository {
       entries.set(match[1].trim(), {
         delay: match[2].trim().replace(/_/g, ''),
         extent: (match[3] ?? '').trim(),
+      });
+    }
+    return entries;
+  }
+
+  /**
+   * Fallback quando o formato estrito não casa (id da div mudou, `<br>` virou `<p>`,
+   * ou as entradas aparecem fora do bloco original): busca `*SP 222*: <atraso> | <extensão>`
+   * diretamente no HTML para cada rodovia rastreada.
+   */
+  private parseLooseEntries(html: string): Map<string, { delay: string; extent: string }> {
+    const entries = new Map<string, { delay: string; extent: string }>();
+    for (const { code } of Object.values(TRACKED)) {
+      const esc = code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const match = html.match(new RegExp(`\\*?${esc}\\*?\\s*:\\s*([^|<\\n]+)(?:\\|\\s*_?([^_\\n<]+)_?)?`, 'i'));
+      if (!match) continue;
+      entries.set(code, {
+        delay: match[1].replace(/[_*]/g, '').trim(),
+        extent: (match[2] ?? '').replace(/[_*]/g, '').trim(),
       });
     }
     return entries;

@@ -22,6 +22,7 @@ import { useAiSummary } from '@/hooks/useAiSummary';
 import { useRegionalNews } from '@/hooks/useRegionalNews';
 import { useNews } from '@/hooks/useNews';
 import { useComercio } from '@/hooks/useComercio';
+import { FALLBACK_IMAGES } from '@/lib/fallback-images';
 import { weatherEmoji } from '@/app/meteorologia/components/weather-utils';
 
 const ROUTE_CONDITION_COLORS: Record<string, { text: string; bg: string; border: string }> = {
@@ -49,15 +50,17 @@ const CATEGORY_CONFIG: Record<string, { label: string; emoji: string; color: str
   cotidiano: { label: 'Cotidiano', emoji: '🏠', color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
 };
 
+// Chaves normalizadas como a API realmente devolve (ex.: "alimentacao" —
+// antes, chaves acentuadas ("Alimentação") nunca casavam e sempre caíam no 🏪).
 const SECTOR_ICONS: Record<string, string> = {
-  Alimentação: '🍔',
-  Hospedagem: '🏨',
-  Serviços: '🔧',
-  Comércio: '🛒',
-  Lazer: '🎭',
-  Saúde: '🏥',
-  Educação: '📚',
-  Automotivo: '🚗',
+  alimentacao: '🍔',
+  hospedagem: '🏨',
+  servicos: '🔧',
+  comercio: '🛒',
+  lazer: '🎭',
+  saude: '🏥',
+  educacao: '📚',
+  automotivo: '🚗',
 };
 
 /** CTA padrao do header de cada secao — uma secao por aba do portal. */
@@ -144,7 +147,7 @@ export default function HomePage() {
         <a href="#briefing" className="block p-2 bg-cyan-600 text-white rounded-lg">Pular para Briefing IA</a>
         <a href="#rodovias" className="block p-2 bg-amber-600 text-white rounded-lg">Pular para Rodovias</a>
         <a href="#comercio" className="block p-2 bg-orange-600 text-white rounded-lg">Pular para Comércio</a>
-        <a href="#surf-news" className="block p-2 bg-amber-600 text-white rounded-lg">Pular para Notícias de Surf</a>
+        <a href="#surf-news" className="block p-2 bg-amber-600 text-white rounded-lg">Pular para Esporte</a>
         <a href="#blog" className="block p-2 bg-emerald-600 text-white rounded-lg">Pular para Blog</a>
       </nav>
 
@@ -354,8 +357,8 @@ export default function HomePage() {
           action={<SectionCta href="/noticias#rodovias" tone="amber">Ver em Notícias</SectionCta>}
         >
           {newsLoading ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3" aria-busy="true">
-              {[1, 2, 3, 4].map(i => (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3" aria-busy="true">
+              {[1, 2, 3, 4, 5].map(i => (
                 <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-3 animate-pulse">
                   <div className="h-4 bg-slate-800 rounded w-24 mb-3" />
                   <div className="h-6 bg-slate-800 rounded w-20" />
@@ -363,7 +366,7 @@ export default function HomePage() {
               ))}
             </div>
           ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
               {routes.map(route => {
                 const colors = ROUTE_CONDITION_COLORS[route.condition] ?? ROUTE_CONDITION_COLORS.LIVRE;
                 const emoji = ROUTE_ICONS[route.id] ?? '🚗';
@@ -456,10 +459,10 @@ export default function HomePage() {
           )}
         </ForecastSection>
 
-        {/* 8. Notícias de Surf (WSL e Circuito Paulista em pt-BR) */}
+        {/* 8. Esporte (WSL e Circuito Paulista em pt-BR) */}
         <ForecastSection
           id="surf-news"
-          title="Notícias de Surf"
+          title="Esporte"
           icon={<FaWater className="w-5 h-5 text-amber-400" aria-hidden="true" />}
           ariaLabel="Notícias e competições de surf WSL e Circuito Paulista"
           ariaBusy={surfNewsLoading}
@@ -489,13 +492,13 @@ export default function HomePage() {
                   >
                   <div className="h-40 bg-slate-800 overflow-hidden relative">
                     <img
-                      src={item.image || (item.category === 'WSL' ? 'https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67' : 'https://static.wixstatic.com/media/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.jpeg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.webp')}
+                      src={item.image || FALLBACK_IMAGES[item.category] || FALLBACK_IMAGES.WSL}
                       alt=""
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       loading="lazy"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = item.category === 'WSL' ? 'https://d3qf8nvav5av0u.cloudfront.net/image/36f55b820cedc83386660b0b8607bbd8.png?&x=767&y=431&icq=74&sig=2ae59a9e95734d205f05906468df7b67' : 'https://static.wixstatic.com/media/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.jpeg/v1/fill/w_333,h_250,fp_0.50_0.50,q_90,enc_avif,quality_auto/690598_47f1e0412d094a85b18f742a3ef4d9be~mv2.webp';
+                        target.src = FALLBACK_IMAGES[item.category] || FALLBACK_IMAGES.WSL;
                       }}
                     />
                     <span className={`absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] font-medium border ${item.category === 'WSL' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'}`}>

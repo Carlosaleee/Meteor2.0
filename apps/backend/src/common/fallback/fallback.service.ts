@@ -4,7 +4,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import type { Env } from '../config/env.schema';
 
-export type FallbackData<T> = {
+type FallbackData<T> = {
   /** Instante da escrita do arquivo. NAO indica a idade do conteudo (ver contentAt). */
   updatedAt: string;
   /**

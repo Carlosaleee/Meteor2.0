@@ -7,6 +7,8 @@ import express from "express";
 import helmet from "helmet";
 
 const app = express();
+// Backlog P2 #1: 1 hop de proxy na Vercel — permite throttler por IP real do cliente.
+app.set('trust proxy', 1);
 
 type NestApp = Awaited<ReturnType<typeof NestFactory.create>>;
 let nestApp: NestApp | null = null;

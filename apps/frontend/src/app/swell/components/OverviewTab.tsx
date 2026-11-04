@@ -1,7 +1,7 @@
 'use client';
 
 import { FaWater, FaWind, FaMapMarkerAlt, FaNewspaper } from 'react-icons/fa';
-import type { OceanographyResponse, HourlyMarinePoint, AiSummaryResponse, NewsResponse } from '@/lib/api';
+import type { OceanographyResponse, HourlyMarinePoint, AiSummaryResponse, NewsResponse, NewsItem } from '@/lib/api';
 import { SPOTS, LEVEL_CONFIG } from '@/lib/spots-data';
 import { ResumoIA } from './ResumoIA';
 import { ConditionCards } from './ConditionCards';
@@ -25,6 +25,19 @@ type OverviewTabProps = {
   newsLoading: boolean;
 };
 
+/**
+ * Seleciona 3 notícias WSL + 3 Paulista, independentemente da ordem do feed.
+ * O corte anterior (slice(0,4) + filtro category="WSL") renderizava 0 cards
+ * quando os 4 primeiros itens eram Paulista — caso real do feed de produção.
+ */
+export function pickOverviewNews(news: NewsItem[] | undefined): NewsItem[] {
+  if (!news) return [];
+  return [
+    ...news.filter(n => n.category === 'WSL').slice(0, 3),
+    ...news.filter(n => n.category === 'Paulista').slice(0, 3),
+  ];
+}
+
 export function OverviewTab({
   data,
   hourlyData,
@@ -34,7 +47,7 @@ export function OverviewTab({
   aiLoading,
   newsLoading,
 }: OverviewTabProps) {
-  const latestNews = newsData?.news?.slice(0, 4) ?? [];
+  const latestNews = pickOverviewNews(newsData?.news);
 
   return (
     <div role="tabpanel" id="panel-overview" aria-labelledby="tab-overview" className="space-y-6">
@@ -138,7 +151,7 @@ export function OverviewTab({
         icon={<FaNewspaper className="w-4 h-4 text-orange-400" aria-hidden="true" />}
         ariaLabel="Últimas notícias de surf"
       >
-        <SurfNews news={latestNews} loading={newsLoading} category="WSL" title="" />
+        <SurfNews news={latestNews} loading={newsLoading} title="" />
       </ForecastSection>
 
       {/* 7. Dica do Dia — full width */}

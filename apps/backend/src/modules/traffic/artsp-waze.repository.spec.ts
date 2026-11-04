@@ -1,4 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { ArtspWazeRepository } from './artsp-waze.repository';
 
 describe('ArtspWazeRepository', () => {
@@ -48,6 +51,8 @@ describe('ArtspWazeRepository', () => {
 
   beforeEach(async () => {
     delete process.env.ARTESP_API_KEY;
+    // Isola o snapshot em disco por teste (arquivo vazio -> sem interferência entre testes).
+    process.env.ARTSP_SNAPSHOT_DIR = mkdtempSync(join(tmpdir(), 'artsp-spec-'));
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [ArtspWazeRepository],
@@ -58,6 +63,9 @@ describe('ArtspWazeRepository', () => {
 
   afterEach(() => {
     delete process.env.ARTESP_API_KEY;
+    const dir = process.env.ARTSP_SNAPSHOT_DIR;
+    delete process.env.ARTSP_SNAPSHOT_DIR;
+    if (dir) rmSync(dir, { recursive: true, force: true });
     jest.restoreAllMocks();
   });
 
@@ -214,6 +222,80 @@ describe('ArtspWazeRepository', () => {
         description: 'Sem ocorrência ativa registrada no CCM/ARTESP',
         updatedAt: expect.any(String),
       });
+    });
+  });
+
+  // Backlog P2 #4: o painel CCM/ARTESP é HTML de terceiros — o parser não pode
+  // depender de UM seletor (#text__tempo-viagem) nem perder `live` numa falha transitória.
+  describe('robustez do parser (Backlog P2 #4)', () => {
+    it('should parse entries when the summary div id changes (loose anchor no HTML)', async () => {
+      const html = `
+        <html><body>
+        <section class="painel-tempo">
+            _Coletado em 04/11/2026 10:45_
+            📍*SP 222*: interd. ou sem inf. | _206 m_
+            📍*SP 165*: _1h 10min_ | _52,4 km_
+        </section>
+        </body></html>`;
+      mockFetchByRoute({ ok: true, text: jest.fn().mockResolvedValue(html) });
+
+      const result = await repository.getLiveRoutes();
+
+      expect(result).not.toBeNull();
+      expect(result!.routes['sp-222'].condition).toBe('BLOQUEADO');
+      expect(result!.routes['sp-222'].updatedAt).toBe('2026-11-04T10:45:00-03:00');
+      expect(result!.routes['sp-165'].condition).toBe('LENTO');
+      expect(result!.routes['sp-055'].condition).toBe('LIVRE');
+    });
+
+    it('should use data-trafego-card levels alone when the summary block is gone', async () => {
+      const html = `
+        <div class="painel">
+          <div data-trafego-card data-rodovia="SP 165" data-local="ELDORADO" data-nivel="5">N5</div>
+          <div data-trafego-card data-rodovia="SP 222" data-local="JOSÉ REDIS" data-nivel="2">N2</div>
+        </div>`;
+      mockFetchByRoute({ ok: true, text: jest.fn().mockResolvedValue(html) });
+
+      const result = await repository.getLiveRoutes();
+
+      expect(result).not.toBeNull();
+      expect(result!.routes['sp-165'].condition).toBe('BLOQUEADO');
+      expect(result!.routes['sp-165'].description).toBe('Via bloqueada (N5) — ELDORADO');
+      expect(result!.routes['sp-222'].condition).toBe('LIVRE');
+      expect(result!.routes['sp-055'].condition).toBe('LIVRE');
+    });
+
+    it('should keep serving the recent snapshot when both sources fail transiently', async () => {
+      mockFetchByRoute(panelResponse);
+      const first = await repository.getLiveRoutes();
+      expect(first).not.toBeNull();
+
+      repository.clearCache();
+      global.fetch = jest.fn().mockRejectedValue(new Error('network down'));
+
+      const second = await repository.getLiveRoutes();
+
+      expect(second).not.toBeNull();
+      expect(second!.sourceUrl).toBe(first!.sourceUrl);
+      expect(second!.routes['sp-222']).toEqual(first!.routes['sp-222']);
+    });
+
+    it('should ignore snapshots older than 30 minutes and return null', async () => {
+      const file = join(process.env.ARTSP_SNAPSHOT_DIR!, 'artsp-live-routes.json');
+      writeFileSync(
+        file,
+        JSON.stringify({
+          savedAt: Date.now() - 31 * 60 * 1000,
+          result: {
+            routes: { 'sp-222': { condition: 'LENTO', description: 'antigo', updatedAt: '2026-10-21T17:48:00-03:00' } },
+            sourceUrl: 'https://ccm.artesp.sp.gov.br/rodovias/waze',
+          },
+        }),
+        'utf8',
+      );
+      global.fetch = jest.fn().mockRejectedValue(new Error('network down'));
+
+      await expect(repository.getLiveRoutes()).resolves.toBeNull();
     });
   });
 });

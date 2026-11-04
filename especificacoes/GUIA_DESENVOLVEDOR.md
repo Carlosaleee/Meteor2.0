@@ -1,6 +1,6 @@
 # Guia do Desenvolvedor — Meteor 2.0
 
-> **Ultima atualizacao:** 30/10/2026 (revisao tecnica do modulo de meteorologia aplicada — 276 testes; checklist pre-merge `pnpm verify`)
+> **Ultima atualizacao:** 04/11/2026 (branch `feature/noticias-esporte-limpeza`: noticias do Philippines Pro, secao "Esporte", grid de rodovias 5 colunas, trust proxy, docs parity `pnpm docs:check`, workflow refresh-cron — 286 testes; checklist pre-merge `pnpm verify`)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -64,22 +64,25 @@ pnpm format
 
 ## Testes
 
-**Total: 276 testes — backend Jest (211) + frontend Vitest (65)**
+**Total: 286 testes — backend Jest (217) + frontend Vitest (69)**
 
-> Contagem atualizada apos execucao completa em 30/10/2026 (28 arquivos backend + 12 frontend, todos verdes).
+> Contagem atualizada apos execucao completa em 04/11/2026 (28 arquivos backend + 13 frontend, todos verdes).
 
 ```bash
-# Backend (211 testes — o script ja embute --experimental-vm-modules)
+# Backend (217 testes — o script ja embute --experimental-vm-modules)
 pnpm --filter backend test
 
-# Frontend (65 testes — Vitest + React Testing Library)
+# Frontend (69 testes — Vitest + React Testing Library)
 pnpm --filter frontend test
+
+# Paridade docs x controllers (Backlog P2 #2)
+pnpm docs:check
 ```
 
 | Suite | Runner | Testes | Observacao |
 |-------|--------|--------|------------|
-| `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 211 | 28 arquivos `*.spec.ts` |
-| `apps/frontend` | Vitest + RTL + jsdom | 65 | 12 arquivos `*.test.{ts,tsx}` |
+| `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 217 | 28 arquivos `*.spec.ts` |
+| `apps/frontend` | Vitest + RTL + jsdom | 69 | 13 arquivos `*.test.{ts,tsx}` |
 
 Detalhamento por arquivo: [SYSTEM_SPEC.md §9](./SYSTEM_SPEC.md#9-cobertura-de-testes).
 
@@ -314,13 +317,16 @@ Schema validado por Zod em `apps/backend/src/common/config/env.schema.ts`.
 - Os JSONs sao criados automaticamente na primeira requisicao bem-sucedida
 
 ### Status das rodovias marcado como "estimado" (nunca vira ao vivo)
-**Causa:** o `ArtspWazeRepository` nao conseguiu ler o painel Waze da ARTESP (`https://ccm.artesp.sp.gov.br/rodovias/waze`).
+**Causa:** o `ArtspWazeRepository` nao conseguiu ler o painel Waze da ARTESP (`https://ccm.artesp.sp.gov.br/rodovias/waze`) nem a API de ocorrencias.
+
+**Parser multi-estrategia (04/11, Backlog P2 #4):** o parser nao depende mais so do seletor `#text__tempo-viagem` — tenta (1) o bloco original, (2) ancora `*SP 222*: <atraso> | <extensao>` em TODO o HTML, (3) os cards `data-trafego-card` sozinhos. Alem disso, um **snapshot em disco** (`artsp-live-routes.json` no tmpdir, TTL 30min; dir sobrescrevivel via `ARTSP_SNAPSHOT_DIR`) mantem `live` numa falha transitoria em vez de rebaixar para `estimated`.
 
 **Verificacoes:**
-1. `curl -s https://ccm.artesp.sp.gov.br/rodovias/waze | findstr text__tempo-viagem` — o bloco precisa existir (se o painel mudar de estrutura, o parser do `artsp-waze.repository.ts` precisa ser ajustado)
-2. Logs do backend: procurar `Falha ao obter painel Waze da ARTESP`
-3. Com `ARTESP_API_KEY` setada, erros `API CCM/ARTESP retornou 403/429` indicam chave invalida ou rate limit (12 req/h) — o cache de 10min do repositorio ja respeita o limite; um `POST /v1/cron/refresh` zera os caches
-4. Rotas **BR-116 (federal/DNIT) e balsa Cananeia-Ilha Comprida ficam `estimated` por design** — nao ha fonte publica de status para elas; so SP-222/SP-165/SP-055 recebem dado ao vivo
+1. `curl -s https://ccm.artesp.sp.gov.br/rodovias/waze | findstr "Coletado em"` — as entradas `*SP 222*:` precisam existir em algum lugar do HTML (se a ARTESP mudar o formato das entradas, ajustar `parseLooseEntries`/`parseSummaryEntries` no `artsp-waze.repository.ts`)
+2. Logs do backend: procurar `Falha ao obter painel Waze da ARTESP` (e `usando snapshot em disco` — sinal de que o snapshot esta compensando)
+3. Se o snapshot expirar (>30min sem sucesso) e as fontes continuarem caidas, o sistema cai legitimamente para `estimated` — investigar a ARTESP
+4. Com `ARTESP_API_KEY` setada, erros `API CCM/ARTESP retornou 403/429` indicam chave invalida ou rate limit (12 req/h) — o cache de 10min do repositorio ja respeita o limite; um `POST /v1/cron/refresh` zera os caches
+5. Rotas **BR-116 (federal/DNIT) e balsa Cananeia-Ilha Comprida ficam `estimated` por design** — nao ha fonte publica de status para elas; so SP-222/SP-165/SP-055 recebem dado ao vivo
 
 ### Erro "ReferenceError: window is not defined" no build
 **Causa:** Componente Leaflet importado diretamente sem protecao SSR.
@@ -440,7 +446,7 @@ render(
 5. **Briefing Executivo (IA)** (`#briefing`) → CTA `/swell?tab=forecast`
 6. **Status das Rodovias** (`#rodovias`) → CTA `/noticias#rodovias`
 7. **Comércio em Destaque** (`#comercio`) → CTA `/comercio`
-8. **Notícias de Surf** (`#surf-news`) — 3 cards via `useNews` → CTA `/swell?tab=news`
+8. **Esporte** (`#surf-news`) — 3 cards via `useNews` → CTA `/swell?tab=news`
 9. **Blog & Navegação** (`#blog`) → CTA `/blog`
 
 > A secao "Alerta Regional" foi removida (duplicava Status das Rodovias).
@@ -703,7 +709,7 @@ comercio/
 
 Itens ja identificados, ainda sem correcao — nao abrir issue/PR para eles sem antes conferir esta lista:
 
-1. **Trust proxy / X-Forwarded-For** — o backend nao confia no proxy: atras da Vercel o Throttler pode contar todas as requisicoes pelo mesmo IP do proxy (`app.set('trust proxy', ...)` ausente)
+1. **Trust proxy / X-Forwarded-For** — **FECHADO (04/11)**: `app.set('trust proxy', 1)` adicionado em `src/main.ts` (Nest/Express) e `api/index.ts` (handler Vercel) — o Express confia no 1o `X-Forwarded-For` (1 hop de proxy da Vercel) e o Throttler conta o IP real do cliente em vez do IP do proxy (antes, todo mundo rate-limited junto — risco de 429 em massa). **Verificacao pos-merge:** `X-RateLimit-Remaining` deve variar por cliente real
 2. **Paralelizar refresh das 4 cidades** — **FECHADO (30/10)**: `refreshAll()` usa `Promise.allSettled` (meteorologia x4 + oceanografia + weather-news em paralelo) com resultado **por cidade** no `details` (`OK (4/4)` / `ERROR parcial (3/4 OK): ...`); o `saveFallback` do open-meteo serializa o read-modify-write do JSON via `writeLock` (evita last-writer-wins)
 3. **`updatedAt` enganoso no fallback** — **FECHADO (30/10, modulo de meteorologia)**: `FallbackService` agora grava `contentAt` (coleta real, preservada ao reaproveitar conteudo) e `isStale` passou a considerar `contentAt`; em meteorologia o staleness e **por localidade** (`meta.fetchedAt`). Os demais modulos nao mesclam conteudo antigo no save — se passarem a fazer, devem repassar o `contentAt` ao `save()`
 4. **Testes dos handlers `@Cron`** — os specs exercitam o metodo diretamente; o agendamento real do `@nestjs/schedule` continua nao coberto
@@ -760,10 +766,15 @@ Variáveis configuradas no Vercel Dashboard (Settings → Environment Variables)
 Pipeline ativo em `.github/workflows/ci.yml`:
 
 **Jobs:** (todos em Node 24 via `node-version-file: .nvmrc`)
-- `backend-test`: Jest (211 testes) — `NODE_OPTIONS="--experimental-vm-modules" npx jest`
-- `frontend-test`: Vitest (65 testes)
+- `backend-test`: Jest (217 testes) — `NODE_OPTIONS="--experimental-vm-modules" npx jest`
+- `frontend-test`: Vitest (69 testes)
 - `lint`: oxlint (frontend)
+- `docs-check`: `node scripts/check-docs.mjs` (paridade rotas × REFERENCIA_API.md; local: `pnpm docs:check`)
 - `build`: valida backend + frontend (após testes)
+
+**Refresh de dados (04/11):** `.github/workflows/refresh-cron.yml` chama `POST /api/v1/cron/refresh` a cada 6h (`23 */6 * * *`) + `workflow_dispatch`, com `Authorization: Bearer ${{ secrets.CRON_SECRET }}`. **PENDING:** criar o repo secret `CRON_SECRET` (Settings → Secrets → Actions) com o MESMO valor do Vercel Dashboard — sem ele o job falha por design (401). O plano Hobby limita o cron nativo da Vercel a 1 execucao/dia; este workflow cobre o resto sem tocar no deploy.
+
+**Docs check (04/11):** `pnpm docs:check` compara as rotas declaradas nos controllers (`@Controller` + `@Get/@Post/...`) com as secoes `## GET/POST ...` da `especificacoes/REFERENCIA_API.md` — exit 1 se divergirem. Deterministico (conta rotas, nao testes/linhas). Nao esta encadeado no `pnpm verify` de proposito: `verify` espelha a CI (lint+test+build) e o `docs-check` roda como job proprio.
 
 **Actions (runtime Node 24 — out/2026):** `actions/checkout@v7`, `actions/setup-node@v7`, `pnpm/action-setup@v6`. As antigas `@v4` declaravam `node20` e geravam o aviso *"Node.js 20 está obsoleto... forçadas a serem executadas no Node.js 24"* em cada job.
 

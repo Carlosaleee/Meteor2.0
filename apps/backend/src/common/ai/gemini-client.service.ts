@@ -7,7 +7,7 @@ export type GeminiChatTurn = {
   parts: Array<{ text: string }>;
 };
 
-export type GenerateTextOptions = {
+type GenerateTextOptions = {
   /** Prompt simples (usado quando `contents` não é informado). */
   prompt?: string;
   /** Turns estruturados da conversa (alternativa ao `prompt` simples). */

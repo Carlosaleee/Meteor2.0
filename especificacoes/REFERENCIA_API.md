@@ -1,6 +1,6 @@
 # Referencia da API — Meteor 2.0
 
-> **Ultima atualizacao:** 30/10/2026 (revisao tecnica do modulo de meteorologia aplicada — 276 testes)
+> **Ultima atualizacao:** 04/11/2026 (noticias do Philippines Pro em PT + feeds WSL mesclados LATAM/Google News; 286 testes)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [../README.md](../README.md)
 
@@ -416,15 +416,16 @@ GET /v1/news
 {
   "news": [
     {
-      "id": "wsl-trestles-miguel-vence",
-      "title": "Miguel Pupo vence Trestles e sobe para 4o do ranking mundial",
-      "source": "ne9",
-      "sourceUrl": "https://ne9.com.br",
-      "url": "https://ne9.com.br/wsl-trestles-miguel-pupo-erin-brooks-ranking/",
-      "description": "Miguel Pupo derrotou Kanoa Igarashi na final...",
+      "id": "wsl-philippines-simmers-medina-campeoes",
+      "title": "Simmers e Medina coroados no Finals Day do Philippines Pro em Cloud 9",
+      "source": "WSL",
+      "sourceUrl": "https://www.worldsurfleague.com",
+      "url": "https://www.worldsurfleague.com/posts/562664/the-cloud-9-dream-ends-in-legendary-wins-from-simmers-and-medina-corona-post-show-finals-day",
+      "description": "Finals Day historico em Cloud 9: Caity Simmers venceu Isabella Nichols (12.00 a 10.77)...",
       "image": "https://d3qf8nvav5av0u.cloudfront.net/...",
       "category": "WSL",
-      "publishedAt": "2026-09-23T01:56:08.518Z"
+      "publishedAt": "2026-11-03T12:00:00.000Z",
+      "sample": true
     }
   ],
   "rankings": {
@@ -437,14 +438,14 @@ GET /v1/news
   },
   "events": [
     {
-      "name": "Banco do Brasil Sao Sebastiao Pro",
-      "location": "Sao Sebastiao, Sao Paulo, Brazil",
-      "dates": "Sep 26 - Oct 3",
-      "status": "Upcoming",
-      "tour": "Challenger Series"
+      "name": "Philippines Pro",
+      "location": "Cloud 9, Siargao Island, Filipinas",
+      "dates": "31 Out - 10 Nov 2026",
+      "status": "Completed",
+      "tour": "Championship Tour"
     }
   ],
-  "timestamp": "2026-09-25T01:56:08.518Z"
+  "timestamp": "2026-11-04T12:00:00.000Z"
 }
 ```
 
@@ -455,10 +456,10 @@ GET /v1/news
 | news[].category | string | `WSL` ou `Paulista` |
 | news[].publishedAt | string | Data de publicacao (ISO 8601) — sempre 12 noticias (ultimos 7 dias) |
 | rankings.men[] / women[] | array | Top 15 do ranking WSL (rank, name, country, points, trend) |
-| events[].status | string | `Completed`, `Standby` ou `Upcoming` (Upcoming listado primeiro) |
+| events[].status | string | `Live`, `Upcoming`, `Standby` ou `Completed` (Live primeiro, depois Upcoming; Completed no fim) |
 | timestamp | string | Momento da montagem da resposta (ISO 8601) |
 
-**Fontes (sempre em portugues):** **WSL Latin America** (wsllatinamerica.com/feed — RSS oficial pt-BR; categoria `WSL`) + Google News RSS pt-BR (categoria `Paulista`; o dominio `spsurf.com.br` morreu — NXDOMAIN — e o RSS e o fallback). Rankings/calendario continuam do site oficial WSL (dados estruturados, sem texto). Fallback: `data/fallback-news.json`. Refresh: cron diario 03:00 UTC (unico no plano Hobby) + `POST /v1/cron/refresh` (header `x-cron-secret`).
+**Fontes (sempre em portugues):** **WSL Latin America** (wsllatinamerica.com/feed — RSS oficial pt-BR) + **Google News RSS** pt-BR filtrado em 7 dias com `WSL`/`"World Surf League"`/`"Philippines Pro"` — feeds mesclados, dedup por titulo, 12 itens mais recentes (a 2a fonte cobre o gap quando o LATAM fica dias parado entre etapas; o sufixo ` - Fonte` do Google News e removido via tag `<source>`) — ambos categoria `WSL`; Google News RSS pt-BR (categoria `Paulista`; o dominio `spsurf.com.br` morreu — NXDOMAIN — e o RSS e o fallback). Rankings/calendario continuam do site oficial WSL (dados estruturados, sem texto). Fallback: `data/fallback-news.json` + amostras estaticas do Philippines Pro (datas congeladas nov/2026, `sample: true`). Refresh: cron diario 03:00 UTC (unico no plano Hobby) + `POST /v1/cron/refresh` (header `x-cron-secret`) + workflow GitHub Actions `refresh-cron.yml` (a cada 6h; exige o repo secret `CRON_SECRET`).
 
 ---
 

@@ -1,6 +1,6 @@
 # Especificacao Tecnica — Meteor 2.0
 
-> **Ultima atualizacao:** 30/10/2026 (revisao tecnica do modulo de meteorologia aplicada — 276 testes; checklist pre-merge `pnpm verify`)
+> **Ultima atualizacao:** 04/11/2026 (branch `feature/noticias-esporte-limpeza`: noticias do Philippines Pro, secao "Esporte", grid de rodovias 5 colunas, trust proxy, docs parity `pnpm docs:check`, workflow refresh-cron — 286 testes)
 >
 > **Documentos relacionados:** [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -79,12 +79,13 @@ Ordem das secoes (reestruturada em 21/10/2026 — cada secao tem CTA no header a
 | 5 | Briefing Executivo IA (`#briefing`) | `/swell?tab=forecast` |
 | 6 | Status das Rodovias (`#rodovias`) | `/noticias#rodovias` |
 | 7 | Comércio em Destaque (`#comercio`) | `/comercio` |
-| 8 | Notícias de Surf (`#surf-news`) — 3 cards (`useNews`) | `/swell?tab=news` |
+| 8 | Esporte (`#surf-news`) — 3 cards (`useNews`, WSL + Paulista) | `/swell?tab=news` |
 | 9 | Blog & Navegação (`#blog`) | `/blog` |
 
 - **Removida:** secao "Alerta Regional" (duplicava Status das Rodovias).
+- **Grid das rodovias (04/11):** 5 cards em uma so linha no xl (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5`) na home e em `/noticias` — skeletons acompanham com 5 placeholders. Antes `lg:grid-cols-4` deixava a 5a rota (balsa Cananéia) sozinha na segunda linha.
 - **`/swell?tab=`:** deep-link lido na montagem (useEffect + `history.replaceState`), tab invalida cai para `overview` — nao quebra o prerender estatico.
-- **Acessibilidade:** `h1` sr-only + skip-link `#conteudo`, `aria-busy` nas secoes carregando, `focus-within:ring` nas secoes, botao Pausar/Reproduzir do carrossel (WCAG 2.2.2), autoplay desligado com `prefers-reduced-motion` (reduzido também no `globals.css`), setas ←/→ no carrossel.
+- **Acessibilidade:** `h1` sr-only + skip-link `#conteudo` (link de secao rotulado "Pular para Esporte" para `#surf-news`), `aria-busy` nas secoes carregando, `focus-within:ring` nas secoes, botao Pausar/Reproduzir do carrossel (WCAG 2.2.2), autoplay desligado com `prefers-reduced-motion` (reduzido também no `globals.css`), setas ←/→ no carrossel.
 
 ---
 
@@ -334,19 +335,19 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 
 ## 9. Cobertura de Testes
 
-**Total: 276 testes — backend Jest (211) + frontend Vitest (65)**
+**Total: 286 testes — backend Jest (217) + frontend Vitest (69)**
 
-> Contagem atualizada apos execucao completa dos testes em 30/10/2026 (211 backend em 28 arquivos + 65 frontend em 12 arquivos — todas verdes; verificacao pre-merge = `pnpm verify`).
+> Contagem atualizada apos execucao completa dos testes em 04/11/2026 (217 backend em 28 arquivos + 69 frontend em 13 arquivos — todas verdes; verificacao pre-merge = `pnpm verify`).
 
-### Backend (Jest) — 211 testes em 28 arquivos
+### Backend (Jest) — 217 testes em 28 arquivos
 | Arquivo | Testes | Status |
 |---------|--------|--------|
 | refresh.service.spec.ts | 21 | ✅ (inclui barreira de paralelismo, falha parcial e total por cidade) |
 | meteorology.service.spec.ts | 14 | ✅ (contrato + cenarios stale/sample/WMO 99/hourly curto/locationId invalido) |
 | open-meteo.repository.spec.ts | 13 | ✅ (novo — ciclo de vida do fallback: 7 cenarios + forceRefresh + writeLock) |
 | noticias-regionais.repository.spec.ts | 15 | ✅ (RSS com mock + proveniencia live/estimated das rotas ARTESP) |
-| wsl.repository.spec.ts | 14 | ✅ (fixture WSL real + `eliminated` + sponsor + noticias via RSS pt-BR) |
-| artsp-waze.repository.spec.ts | 14 | ✅ (novo — parser painel Waze + API oficial opcional + cache) |
+| wsl.repository.spec.ts | 16 | ✅ (fixture WSL real + `eliminated` + sponsor + noticias via RSS pt-BR + merge LATAM/Google News com dedup) |
+| artsp-waze.repository.spec.ts | 18 | ✅ (parser painel Waze + API oficial opcional + cache + robustez multi-estrategia/snapshot — Backlog P2 #4) |
 | cron.controller.spec.ts | 10 | ✅ (auth Bearer/`x-cron-secret`/`?secret=`, 401, scope) |
 | gemini-chat.repository.spec.ts | 10 | ✅ (persona, turns user/model, contexto 1o turno) |
 | iron.service.spec.ts | 9 | ✅ (inclui RAG no contexto; provider GeminiContextBuilder mockado) |
@@ -370,12 +371,13 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 | fallback.service.spec.ts | 6 | ✅ (contentAt: derivacao legado, preservacao ao reaproveitar, isStale) |
 | http-exception.filter.spec.ts | 1 | ✅ |
 
-### Frontend (Vitest + RTL) — 65 testes em 12 arquivos
+### Frontend (Vitest + RTL) — 69 testes em 13 arquivos
 | Arquivo | Testes | Status |
 |---------|--------|--------|
 | ChatWidget.test.tsx | 14 | ✅ (envelope, resposta legada, rate limit 429, reiniciar/apagar, aria-live, sessionId/historico) |
 | weather-utils.test.ts | 11 | ✅ (novo — codigos WMO extremos/bordas, vento 360/-1 graus, datas invalidas) |
 | ResumoIA.test.tsx | 6 | ✅ |
+| OverviewTab.test.tsx | 4 | ✅ (novo — `pickOverviewNews` 3 WSL + 3 Paulista independente da ordem do feed) |
 | useWeatherNews.test.ts | 5 | ✅ |
 | useMeteorology.test.ts | 5 | ✅ (sucesso/erro/loading + stale preservado + refetch ao trocar local) |
 | api.test.ts | 4 | ✅ |
@@ -723,10 +725,13 @@ Pipeline em `.github/workflows/ci.yml`:
 
 | Job | Descrição | Trigger |
 |-----|-----------|---------|
-| `backend-test` | Jest (211 testes) | push/PR |
-| `frontend-test` | Vitest (65 testes) | push/PR |
+| `backend-test` | Jest (217 testes) | push/PR |
+| `frontend-test` | Vitest (69 testes) | push/PR |
 | `lint` | oxlint (frontend) | push/PR |
+| `docs-check` | `node scripts/check-docs.mjs` — paridade rotas dos controllers × seções da REFERENCIA_API.md (Backlog P2 #2; `pnpm docs:check` local) | push/PR |
 | `build` | Valida compilação | Após testes |
+
+> **Refresh de dados (04/11):** além do cron nativo da Vercel (`0 3 * * *` — limite Hobby de 1/dia), `.github/workflows/refresh-cron.yml` dispara `POST /api/v1/cron/refresh` a cada 6h (`23 */6 * * *`) com `Authorization: Bearer ${{ secrets.CRON_SECRET }}` — exige criar o repo secret `CRON_SECRET` com o mesmo valor do ambiente Vercel; sem ele o job falha com 401. `workflow_dispatch` permite disparo manual. O deploy da Vercel nao muda (nenhuma env/rota nova).
 
 > **pnpm na CI:** `pnpm/action-setup@v6` sem input `version` — a versão única vem de `packageManager: pnpm@11.10.0` no `package.json` (ter os dois causava o erro *"Multiple versions of pnpm"* que deixou a CI vermelha).
 >

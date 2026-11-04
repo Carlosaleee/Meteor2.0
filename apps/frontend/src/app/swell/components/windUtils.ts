@@ -1,4 +1,5 @@
-export type WindQuality = {
+/** Tipo interno (uso apenas neste arquivo — sem imports externos). */
+type WindQuality = {
   label: string;
   color: string;
   bgClass: string;

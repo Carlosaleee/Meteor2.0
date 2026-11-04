@@ -27,7 +27,7 @@ export type TrafficRoute = {
   sourceUrl?: string;
 };
 
-export type RegionalNewsResponse = {
+type RegionalNewsResponse = {
   news: RegionalNewsItem[];
   routes: TrafficRoute[];
   timestamp: string;

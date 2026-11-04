@@ -89,8 +89,8 @@ export default function NoticiasPage() {
           Status das Rodovias
         </h2>
         {loading ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map(i => (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+            {[1, 2, 3, 4, 5].map(i => (
               <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 animate-pulse">
                 <div className="h-4 bg-slate-800 rounded w-24 mb-3" />
                 <div className="h-6 bg-slate-800 rounded w-20" />
@@ -98,7 +98,7 @@ export default function NoticiasPage() {
             ))}
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             {routes.map(route => {
               const colors = ROUTE_CONDITION_COLORS[route.condition] ?? ROUTE_CONDITION_COLORS.LIVRE;
               const emoji = ROUTE_ICONS[route.id] ?? '🚗';

@@ -6,7 +6,7 @@
  * mas em producao (Vercel) o processo roda em UTC — `new Date().getHours()`
  * ficava 3h desalinhado e servia dados de ontem como "agora".
  */
-export const SP_TZ = 'America/Sao_Paulo';
+const SP_TZ = 'America/Sao_Paulo';
 
 const hourFormatter = new Intl.DateTimeFormat('en-US', {
   timeZone: SP_TZ,
@@ -22,12 +22,12 @@ const dateFormatter = new Intl.DateTimeFormat('en-CA', {
 });
 
 /** Hora atual (0-23) no fuso de Sao Paulo. */
-export function spHour(date: Date = new Date()): number {
+function spHour(date: Date = new Date()): number {
   return Number(hourFormatter.format(date)) % 24;
 }
 
 /** Data atual em SP no formato YYYY-MM-DD. */
-export function spDateIso(date: Date = new Date()): string {
+function spDateIso(date: Date = new Date()): string {
   return dateFormatter.format(date);
 }
 

@@ -1,16 +1,16 @@
-export type ApiErrorBody = {
+type ApiErrorBody = {
   code: string;
   message: string;
   details?: unknown;
 };
 
-export type ApiSuccess<T> = {
+type ApiSuccess<T> = {
   success: true;
   data: T;
   error: null;
 };
 
-export type ApiFailure = {
+type ApiFailure = {
   success: false;
   data: null;
   error: ApiErrorBody;

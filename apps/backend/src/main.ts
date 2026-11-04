@@ -5,6 +5,10 @@ import type { Env } from "./common/config/env.schema";
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, { abortOnError: false });
+  // Backlog P2 #1: atrás da Vercel há 1 proxy — 'trust proxy' 1 faz o Express
+  // confiar no primeiro X-Forwarded-For, senão todo cliente rate-limited
+  // compartilha o IP do proxy (risco real de 429 em massa em produção).
+  app.getHttpAdapter().getInstance().set('trust proxy', 1);
   const config = app.get(ConfigService<Env, true>);
   const origin = config.get("FRONTEND_ORIGIN", { infer: true });
 

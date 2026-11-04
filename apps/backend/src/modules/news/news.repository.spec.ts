@@ -108,7 +108,7 @@ describe('NewsRepository', () => {
       publishedAt: liveNews[0].publishedAt,
     });
     expect(result.news[0].id.startsWith('wsl-wsllatinamerica-com-')).toBe(true);
-    expect(result.news.map(n => n.title)).not.toContain('Miguel Pupo vence Trestles e sobe para 4o do ranking mundial');
+    expect(result.news.map(n => n.title)).not.toContain('Simmers e Medina coroados no Finals Day do Philippines Pro em Cloud 9');
   });
 
   it('should fall back to the static WSL list when the live feed is empty', async () => {
@@ -116,7 +116,7 @@ describe('NewsRepository', () => {
 
     const result = await repository.getNewsData();
 
-    expect(result.news.map(n => n.id)).toContain('wsl-trestles-miguel-vence');
+    expect(result.news.map(n => n.id)).toContain('wsl-philippines-simmers-medina-campeoes');
     expect(result.news.filter(n => n.category === 'WSL').length).toBeGreaterThanOrEqual(6);
   });
 

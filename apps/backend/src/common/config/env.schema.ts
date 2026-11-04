@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const envSchema = z.object({
+const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(3001),
   // Accepts single URL or comma-separated list of URLs for multi-origin CORS support.
@@ -46,7 +46,7 @@ export type Env = z.infer<typeof envSchema>;
  * Resultado do `validate` do @nestjs/config: schema validado + as chaves originais do
  * env que o Zod descarta (CRON_SECRET etc.), para que sejam publicadas em process.env.
  */
-export type ValidatedEnv = Env & { [key: string]: unknown };
+type ValidatedEnv = Env & { [key: string]: unknown };
 
 export function parseEnv(raw: NodeJS.ProcessEnv): ValidatedEnv {
   // O `validate` do @nestjs/config publica SOMENTE o objeto retornado em process.env.

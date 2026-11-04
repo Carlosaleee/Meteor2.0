@@ -6,7 +6,7 @@ import type { Env } from '../../common/config/env.schema';
 
 const FALLBACK_FILE = 'fallback-meteorology.json';
 
-export type CurrentData = {
+type CurrentData = {
   temperature_2m: number;
   relative_humidity_2m: number;
   apparent_temperature: number;
@@ -19,7 +19,7 @@ export type CurrentData = {
   surface_pressure: number;
 };
 
-export type HourlyData = {
+type HourlyData = {
   time: string[];
   temperature_2m: number[];
   relative_humidity_2m: number[];
@@ -33,7 +33,7 @@ export type HourlyData = {
   visibility: number[];
 };
 
-export type DailyData = {
+type DailyData = {
   time: string[];
   temperature_2m_max: number[];
   temperature_2m_min: number[];
@@ -46,7 +46,7 @@ export type DailyData = {
   uv_index_max: number[];
 };
 
-export type AtmosphereData = {
+type AtmosphereData = {
   current: CurrentData;
   hourly: HourlyData;
   daily: DailyData;

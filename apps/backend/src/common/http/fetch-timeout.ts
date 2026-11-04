@@ -3,7 +3,7 @@
  * padrao: uma chamada pendurada seguraria o RefreshService com `isRefreshing=true`
  * para sempre e queimaria o `maxDuration` da Vercel.
  */
-export const DEFAULT_FETCH_TIMEOUT_MS = 10_000;
+const DEFAULT_FETCH_TIMEOUT_MS = 10_000;
 
 export async function fetchWithTimeout(
   url: string,

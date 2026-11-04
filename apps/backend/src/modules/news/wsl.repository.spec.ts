@@ -247,6 +247,27 @@ describe('WslRepository', () => {
   </channel>
 </rss>`;
 
+    // Fonte secundária (Google News) com sufixo " - Fonte" no título e item já visto no LATAM.
+    const googleRss = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>WSL - Google News</title>
+    <item>
+      <title><![CDATA[Simmers e Medina coroados no Finals Day do Philippines Pro em Cloud 9 - WSL]]></title>
+      <link>https://news.google.com/rss/articles/abc123</link>
+      <description><![CDATA[Simmers e Medina coroados no Finals Day do Philippines Pro em Cloud 9 - WSL - 2 hours ago]]></description>
+      <pubDate>Wed, 04 Nov 2026 10:00:00 +0000</pubDate>
+      <source url="https://www.worldsurfleague.com">WSL</source>
+    </item>
+    <item>
+      <title><![CDATA[Ryan Kainalo e Charli Hately são os grandes campeões do Banco do Brasil São Sebastião Pro]]></title>
+      <link>https://news.google.com/rss/articles/def456</link>
+      <pubDate>Wed, 21 Oct 2026 12:00:00 +0000</pubDate>
+      <source url="https://wsllatinamerica.com">WSL Latin America</source>
+    </item>
+  </channel>
+</rss>`;
+
     it('should parse Portuguese items from the WSL Latin America RSS feed', async () => {
       global.fetch = jest.fn().mockResolvedValue({
         ok: true,
@@ -312,6 +333,44 @@ describe('WslRepository', () => {
       global.fetch = jest.fn().mockRejectedValue(new Error('network down'));
 
       await expect(repository.getNews()).resolves.toEqual([]);
+    });
+
+    it('should merge the LATAM feed with Google News, dedupe by title and sort desc', async () => {
+      global.fetch = jest.fn().mockImplementation((url: string) =>
+        Promise.resolve({
+          ok: true,
+          text: () => Promise.resolve(String(url).includes('news.google.com') ? googleRss : newsRss),
+          json: () => Promise.resolve([]),
+        }),
+      );
+
+      const news = await repository.getNews();
+
+      // Item novo do Google entra primeiro (mais recente), sem o sufixo " - Fonte" no título
+      expect(news).toHaveLength(3);
+      expect(news[0].title).toBe('Simmers e Medina coroados no Finals Day do Philippines Pro em Cloud 9');
+      expect(news[0].url).toBe('https://news.google.com/rss/articles/abc123');
+      // Mesmo título nas duas fontes aparece uma única vez
+      expect(news.filter(n => n.title.includes('Ryan Kainalo'))).toHaveLength(1);
+      // Ordem decrescente de publicação
+      expect(new Date(news[1].publishedAt).getTime()).toBeGreaterThan(new Date(news[2].publishedAt).getTime());
+    });
+
+    it('should still return Google News items when the LATAM feed fails', async () => {
+      global.fetch = jest.fn().mockImplementation((url: string) =>
+        String(url).includes('wsllatinamerica')
+          ? Promise.reject(new Error('LATAM down'))
+          : Promise.resolve({
+              ok: true,
+              text: () => Promise.resolve(googleRss),
+              json: () => Promise.resolve([]),
+            }),
+      );
+
+      const news = await repository.getNews();
+
+      expect(news).toHaveLength(2);
+      expect(news[0].title).toBe('Simmers e Medina coroados no Finals Day do Philippines Pro em Cloud 9');
     });
   });
 

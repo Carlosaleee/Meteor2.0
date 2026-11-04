@@ -16,7 +16,7 @@ export type CommerceItem = {
   googleMapsUrl: string;
 };
 
-export type ComercioResponse = {
+type ComercioResponse = {
   commerce: CommerceItem[];
   timestamp: string;
 };

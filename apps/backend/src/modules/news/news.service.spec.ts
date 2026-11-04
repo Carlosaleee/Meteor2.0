@@ -9,12 +9,12 @@ describe('NewsService', () => {
     getNewsData: jest.fn().mockResolvedValue({
       news: [
         {
-          id: 'wsl-trestles-miguel-vence',
-          title: 'Miguel Pupo vence Trestles',
-          source: 'World Surf League',
+          id: 'wsl-philippines-simmers-medina-campeoes',
+          title: 'Simmers e Medina coroados no Finals Day do Philippines Pro',
+          source: 'WSL',
           sourceUrl: 'https://www.worldsurfleague.com',
-          url: 'https://ne9.com.br/wsl-trestles-miguel-pupo-erin-brooks-ranking/',
-          description: 'Miguel Pupo derrotou Kanoa Igarashi na final.',
+          url: 'https://www.worldsurfleague.com/posts/562664/the-cloud-9-dream-ends-in-legendary-wins-from-simmers-and-medina-corona-post-show-finals-day',
+          description: 'Simmers venceu Nichols e Medina, Robinson na final em Cloud 9.',
           image: 'https://example.com/image.jpg',
           category: 'WSL',
           publishedAt: new Date().toISOString(),

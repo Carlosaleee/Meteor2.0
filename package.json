@@ -12,6 +12,7 @@
     "test": "pnpm -r test",
     "build": "pnpm -r build",
     "verify": "pnpm lint && pnpm test && pnpm build",
+    "docs:check": "node scripts/check-docs.mjs",
     "format": "prettier --write ."
   },
   "devDependencies": {
