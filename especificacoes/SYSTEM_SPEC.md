@@ -731,7 +731,9 @@ Pipeline em `.github/workflows/ci.yml`:
 | `docs-check` | `node scripts/check-docs.mjs` — paridade rotas dos controllers × seções da REFERENCIA_API.md (Backlog P2 #2; `pnpm docs:check` local) | push/PR |
 | `build` | Valida compilação | Após testes |
 
-> **Refresh de dados (04/11):** além do cron nativo da Vercel (`0 3 * * *` — limite Hobby de 1/dia), `.github/workflows/refresh-cron.yml` dispara `POST /api/v1/cron/refresh` a cada 6h (`23 */6 * * *`) com `Authorization: Bearer ${{ secrets.CRON_SECRET }}` — exige criar o repo secret `CRON_SECRET` com o mesmo valor do ambiente Vercel; sem ele o job falha com 401. `workflow_dispatch` permite disparo manual. O deploy da Vercel nao muda (nenhuma env/rota nova).
+> **Refresh de dados (05/11):** além do cron nativo da Vercel (`0 3 * * *` — limite Hobby de 1/dia), `.github/workflows/refresh-cron.yml` dispara `POST /api/v1/cron/refresh` a cada 6h (`23 */6 * * *`) com `Authorization: Bearer ${{ secrets.CRON_SECRET }}`. **FECHADO (05/11):** repo secret `CRON_SECRET` criado (Settings → Secrets and variables → Actions) com o mesmo valor da env do ambiente Vercel — sem ele o job falha por design com exit 1/401. `workflow_dispatch` permite disparo manual. O deploy da Vercel nao muda (nenhuma env/rota nova).
+>
+> **Rotacao do segredo (05/11):** o valor antigo estava em texto puro no arquivo `CRON_SECRET_STATUS.md` (versaoado em repo publico) — arquivo removido e `CRON_SECRET` rotacionado nos tres lugares (`.env` local, env da Vercel + redeploy, repo secret do GitHub).
 
 > **pnpm na CI:** `pnpm/action-setup@v6` sem input `version` — a versão única vem de `packageManager: pnpm@11.10.0` no `package.json` (ter os dois causava o erro *"Multiple versions of pnpm"* que deixou a CI vermelha).
 >

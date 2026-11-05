@@ -772,7 +772,9 @@ Pipeline ativo em `.github/workflows/ci.yml`:
 - `docs-check`: `node scripts/check-docs.mjs` (paridade rotas × REFERENCIA_API.md; local: `pnpm docs:check`)
 - `build`: valida backend + frontend (após testes)
 
-**Refresh de dados (04/11):** `.github/workflows/refresh-cron.yml` chama `POST /api/v1/cron/refresh` a cada 6h (`23 */6 * * *`) + `workflow_dispatch`, com `Authorization: Bearer ${{ secrets.CRON_SECRET }}`. **PENDING:** criar o repo secret `CRON_SECRET` (Settings → Secrets → Actions) com o MESMO valor do Vercel Dashboard — sem ele o job falha por design (401). O plano Hobby limita o cron nativo da Vercel a 1 execucao/dia; este workflow cobre o resto sem tocar no deploy.
+**Refresh de dados (05/11):** `.github/workflows/refresh-cron.yml` chama `POST /api/v1/cron/refresh` a cada 6h (`23 */6 * * *`) + `workflow_dispatch`, com `Authorization: Bearer ${{ secrets.CRON_SECRET }}`. **FECHADO (05/11):** repo secret `CRON_SECRET` criado em Settings → Secrets and variables → Actions com o MESMO valor da env `CRON_SECRET` do backend na Vercel — o guard do job (`[ -z "$CRON_SECRET" ]`) falha com exit 1 e mensagem clara no log se ele faltar. O plano Hobby limita o cron nativo da Vercel a 1 execucao/dia; este workflow cobre o resto sem tocar no deploy.
+
+> **Rotacao (05/11):** o `CRON_SECRET` anterior estava em texto puro no arquivo `CRON_SECRET_STATUS.md` (commit `ddcb624`, repo publico) — o arquivo foi **removido** e o segredo **rotacionado** (`.env` local + env `CRON_SECRET` na Vercel + repo secret no GitHub). Nunca versionar o valor do segredo.
 
 **Docs check (04/11):** `pnpm docs:check` compara as rotas declaradas nos controllers (`@Controller` + `@Get/@Post/...`) com as secoes `## GET/POST ...` da `especificacoes/REFERENCIA_API.md` — exit 1 se divergirem. Deterministico (conta rotas, nao testes/linhas). Nao esta encadeado no `pnpm verify` de proposito: `verify` espelha a CI (lint+test+build) e o `docs-check` roda como job proprio.
 
