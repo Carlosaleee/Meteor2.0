@@ -5,9 +5,9 @@ name: Refresh Data
 # Este workflow mantém o deploy da Vercel INTACTO — nenhuma env var ou rota nova
 # lá — apenas chama o endpoint já existente e protegido por CRON_SECRET.
 #
-# PENDING (manual, uma vez): criar o repo secret CRON_SECRET
-# (Settings → Secrets and variables → Actions) com o MESMO valor configurado
-# no ambiente da Vercel, senão o job falha com 401.
+# Repo secret CRON_SECRET configurado em Settings → Secrets and variables → Actions,
+# com o MESMO valor da env CRON_SECRET do projeto backend na Vercel. O guard abaixo
+# falha com exit 1 (mensagem clara no log) se o secret nao existir.
 #
 # Caveat: em repositórios públicos o GitHub suspende crons agendados após ~60
 # dias sem commits — o cron diário da Vercel continua como base.
