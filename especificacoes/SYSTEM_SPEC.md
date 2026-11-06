@@ -1,6 +1,6 @@
 # Especificacao Tecnica — Meteor 2.0
 
-> **Ultima atualizacao:** 04/11/2026 (branch `feature/noticias-esporte-limpeza`: noticias do Philippines Pro, secao "Esporte", grid de rodovias 5 colunas, trust proxy, docs parity `pnpm docs:check`, workflow refresh-cron — 286 testes)
+> **Ultima atualizacao:** 06/11/2026 (branch `feature/blog-geo-alta-performance`: blog GEO/SEO — listagem com capa real, rota `/blog/[slug]` SSG com `generateMetadata` + JSON-LD Article/FAQPage, 4 artigos, rename "Blog Técnico" → "Blog" — 329 testes)
 >
 > **Documentos relacionados:** [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -61,7 +61,8 @@
 | `/swell` | Swell & Points | **API real** + Gemini AI + ApexCharts + Leaflet |
 | `/noticias` | Noticias Regionais + Transito | **RSS auto-atualizado** (ISN + Santa Portal + Google News) + TrafficMap Leaflet + CityGrid |
 | `/comercio` | Comercio de Ilha Comprida | **API real** (fallback-comercio) + CommerceMap Leaflet + OSRM routing |
-| `/blog` | Blog Tecnico | Estatico (4 artigos) |
+| `/blog` | Blog (listagem GEO) | Estatico — server component, cards com capa real (`BlogCard`), 4 publicados + 2 "em breve" |
+| `/blog/[slug]` | Artigo individual (SSG) | Estatico — `generateStaticParams` + `generateMetadata` + JSON-LD `Article`/`FAQPage`, corpo em blocos tipados (`BlogContent`) |
 | `/creditos` | Creditos & Fontes | Estatico |
 
 > **Removidas no review 2026-09:** `/mapa` e `/transito` (paginas orfas sem link no Header/Footer; `/transito` tinha apenas mocks hardcoded). Componentes `SpotMap` e `BaseLeafletMap` tambem removidos.
@@ -335,9 +336,9 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 
 ## 9. Cobertura de Testes
 
-**Total: 286 testes — backend Jest (217) + frontend Vitest (69)**
+**Total: 329 testes — backend Jest (217) + frontend Vitest (112)**
 
-> Contagem atualizada apos execucao completa dos testes em 04/11/2026 (217 backend em 28 arquivos + 69 frontend em 13 arquivos — todas verdes; verificacao pre-merge = `pnpm verify`).
+> Contagem atualizada apos execucao completa dos testes em 06/11/2026 (217 backend em 28 arquivos + 112 frontend em 17 arquivos — todas verdes; verificacao pre-merge = `pnpm verify`).
 
 ### Backend (Jest) — 217 testes em 28 arquivos
 | Arquivo | Testes | Status |
@@ -371,10 +372,12 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 | fallback.service.spec.ts | 6 | ✅ (contentAt: derivacao legado, preservacao ao reaproveitar, isStale) |
 | http-exception.filter.spec.ts | 1 | ✅ |
 
-### Frontend (Vitest + RTL) — 69 testes em 13 arquivos
+### Frontend (Vitest + RTL) — 112 testes em 17 arquivos
 | Arquivo | Testes | Status |
 |---------|--------|--------|
 | ChatWidget.test.tsx | 14 | ✅ (envelope, resposta legada, rate limit 429, reiniciar/apagar, aria-live, sessionId/historico) |
+| blog-posts.test.ts | 16 | ✅ (novo — slugs unicos, metaTitle ≤60, description 150-160, links ∈ rotas reais, FAQ com resposta, bloco validos) |
+| BlogContent.test.tsx | 11 | ✅ (novo — answer/h2/h3/p/ul/table/callout/quote, negrito inline, rotas → Link, FAQ, relatedLinks) |
 | weather-utils.test.ts | 11 | ✅ (novo — codigos WMO extremos/bordas, vento 360/-1 graus, datas invalidas) |
 | ResumoIA.test.tsx | 6 | ✅ |
 | OverviewTab.test.tsx | 4 | ✅ (novo — `pickOverviewNews` 3 WSL + 3 Paulista independente da ordem do feed) |
@@ -387,6 +390,8 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 | useSwell.test.ts | 3 | ✅ |
 | useAllCities.test.ts | 3 | ✅ (daily[0] -> tempMax/tempMin/forecastCode) |
 | swell/tabs.test.ts | 3 | ✅ (deep-link ?tab= do /swell) |
+| BlogCard.test.tsx | 7 | ✅ (novo — capa/badge/data/readTime, href /blog/[slug], coming-soon sem link + badge "Em breve") |
+| blog-jsonld.test.ts | 9 | ✅ (novo — Article/FAQPage, URLs absolutas, serializeJsonLd escapa `<`, null sem FAQ) |
 
 > **Nota (review 2026-09):** `utils.test.ts` (11 testes) foi removido junto com `lib/utils.ts` — o teste so exercitava a propria lib morta; as paginas usam implementacoes locais mais ricas.
 
@@ -726,7 +731,7 @@ Pipeline em `.github/workflows/ci.yml`:
 | Job | Descrição | Trigger |
 |-----|-----------|---------|
 | `backend-test` | Jest (217 testes) | push/PR |
-| `frontend-test` | Vitest (69 testes) | push/PR |
+| `frontend-test` | Vitest (112 testes) | push/PR |
 | `lint` | oxlint (frontend) | push/PR |
 | `docs-check` | `node scripts/check-docs.mjs` — paridade rotas dos controllers × seções da REFERENCIA_API.md (Backlog P2 #2; `pnpm docs:check` local) | push/PR |
 | `build` | Valida compilação | Após testes |

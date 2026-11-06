@@ -1,6 +1,6 @@
 # Guia do Desenvolvedor — Meteor 2.0
 
-> **Ultima atualizacao:** 04/11/2026 (branch `feature/noticias-esporte-limpeza`: noticias do Philippines Pro, secao "Esporte", grid de rodovias 5 colunas, trust proxy, docs parity `pnpm docs:check`, workflow refresh-cron — 286 testes; checklist pre-merge `pnpm verify`)
+> **Ultima atualizacao:** 06/11/2026 (branch `feature/blog-geo-alta-performance`: blog GEO/SEO — rota `/blog/[slug]` com metadata + JSON-LD, 4 artigos em blocos tipados, rename "Blog Técnico" → "Blog" — 329 testes; checklist pre-merge `pnpm verify`)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -64,15 +64,15 @@ pnpm format
 
 ## Testes
 
-**Total: 286 testes — backend Jest (217) + frontend Vitest (69)**
+**Total: 329 testes — backend Jest (217) + frontend Vitest (112)**
 
-> Contagem atualizada apos execucao completa em 04/11/2026 (28 arquivos backend + 13 frontend, todos verdes).
+> Contagem atualizada apos execucao completa em 06/11/2026 (28 arquivos backend + 17 frontend, todos verdes).
 
 ```bash
 # Backend (217 testes — o script ja embute --experimental-vm-modules)
 pnpm --filter backend test
 
-# Frontend (69 testes — Vitest + React Testing Library)
+# Frontend (112 testes — Vitest + React Testing Library)
 pnpm --filter frontend test
 
 # Paridade docs x controllers (Backlog P2 #2)
@@ -82,7 +82,7 @@ pnpm docs:check
 | Suite | Runner | Testes | Observacao |
 |-------|--------|--------|------------|
 | `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 217 | 28 arquivos `*.spec.ts` |
-| `apps/frontend` | Vitest + RTL + jsdom | 69 | 13 arquivos `*.test.{ts,tsx}` |
+| `apps/frontend` | Vitest + RTL + jsdom | 112 | 17 arquivos `*.test.{ts,tsx}` |
 
 Detalhamento por arquivo: [SYSTEM_SPEC.md §9](./SYSTEM_SPEC.md#9-cobertura-de-testes).
 
@@ -767,7 +767,7 @@ Pipeline ativo em `.github/workflows/ci.yml`:
 
 **Jobs:** (todos em Node 24 via `node-version-file: .nvmrc`)
 - `backend-test`: Jest (217 testes) — `NODE_OPTIONS="--experimental-vm-modules" npx jest`
-- `frontend-test`: Vitest (69 testes)
+- `frontend-test`: Vitest (112 testes)
 - `lint`: oxlint (frontend)
 - `docs-check`: `node scripts/check-docs.mjs` (paridade rotas × REFERENCIA_API.md; local: `pnpm docs:check`)
 - `build`: valida backend + frontend (após testes)
