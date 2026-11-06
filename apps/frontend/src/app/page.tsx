@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import {
   FaCloudSun,
@@ -23,6 +24,7 @@ import { useRegionalNews } from '@/hooks/useRegionalNews';
 import { useNews } from '@/hooks/useNews';
 import { useComercio } from '@/hooks/useComercio';
 import { FALLBACK_IMAGES } from '@/lib/fallback-images';
+import { publishedPosts } from '@/data/blog-posts';
 import { weatherEmoji } from '@/app/meteorologia/components/weather-utils';
 
 const ROUTE_CONDITION_COLORS: Record<string, { text: string; bg: string; border: string }> = {
@@ -537,23 +539,25 @@ export default function HomePage() {
           action={<SectionCta href="/blog" tone="emerald">Ver todos</SectionCta>}
         >
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {[
-              { title: 'Guia de Marés', category: 'Maré', gradient: 'from-blue-600 to-cyan-600', href: '/blog' },
-              { title: 'Ventos de Inverno', category: 'Clima', gradient: 'from-amber-600 to-orange-600', href: '/blog' },
-              { title: 'Dinâmica Costeira', category: 'Oceanografia', gradient: 'from-emerald-600 to-teal-600', href: '/blog' },
-              { title: 'Reserva de Cananéia', category: 'Meio Ambiente', gradient: 'from-green-600 to-emerald-600', href: '/blog' },
-            ].map(post => (
+            {publishedPosts().map(post => (
               <Link
-                key={post.title}
-                href={post.href}
+                key={post.slug}
+                href={`/blog/${post.slug}`}
                 className="group bg-slate-900 border border-slate-800 hover:border-emerald-500/50 rounded-2xl overflow-hidden transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
               >
-                <div className={`h-20 bg-gradient-to-br ${post.gradient} flex items-center justify-center`}>
-                  <FaBookOpen className="w-8 h-8 text-white/30" aria-hidden="true" />
+                <div className="relative h-20 overflow-hidden">
+                  <Image
+                    src={post.imageUrl}
+                    alt={post.imageAlt}
+                    fill
+                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 to-transparent" />
                 </div>
                 <div className="p-3">
                   <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">{post.category}</span>
-                  <h3 className="text-sm font-bold text-white mt-1 group-hover:text-emerald-300 transition-colors">
+                  <h3 className="text-sm font-bold text-white mt-1 group-hover:text-emerald-300 transition-colors line-clamp-2">
                     {post.title}
                   </h3>
                 </div>
