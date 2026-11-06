@@ -1,6 +1,6 @@
 # Guia do Desenvolvedor — Meteor 2.0
 
-> **Ultima atualizacao:** 06/11/2026 (branch `feature/blog-geo-alta-performance`: blog GEO/SEO — rota `/blog/[slug]` com metadata + JSON-LD, 4 artigos em blocos tipados, rename "Blog Técnico" → "Blog" — 329 testes; checklist pre-merge `pnpm verify`)
+> **Ultima atualizacao:** 06/11/2026 (merge na `main`: blog GEO/SEO — rota `/blog/[slug]` com metadata + JSON-LD, 4 artigos em blocos tipados, rename "Blog Técnico" → "Blog", e reescrita do artigo da Juréia `jureia-itinga-praias-surf-ecoturismo` com novo título/meta/descrição e estrutura de acesso em 3 etapas — balsa de Icapara, Barra do Ribeira e Costão da Juréia — 329 testes; checklist pre-merge `pnpm verify`)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 

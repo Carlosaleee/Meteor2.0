@@ -1,6 +1,6 @@
 # Especificacao Tecnica — Meteor 2.0
 
-> **Ultima atualizacao:** 06/11/2026 (branch `feature/blog-geo-alta-performance`: blog GEO/SEO — listagem com capa real, rota `/blog/[slug]` SSG com `generateMetadata` + JSON-LD Article/FAQPage, 4 artigos, rename "Blog Técnico" → "Blog" — 329 testes)
+> **Ultima atualizacao:** 06/11/2026 (merge na `main`: blog GEO/SEO — listagem com capa real, rota `/blog/[slug]` SSG com `generateMetadata` + JSON-LD Article/FAQPage, 4 artigos, rename "Blog Técnico" → "Blog", e reescrita do artigo da Juréia `jureia-itinga-praias-surf-ecoturismo` — título "Acesso à Juréia em Iguape: Balsa de Icapara, Barra do Ribeira e Costão da Juréia", meta "Juréia em Iguape: Balsa, Barra do Ribeira e Costão" e estrutura em 3 etapas — 329 testes)
 >
 > **Documentos relacionados:** [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -61,8 +61,8 @@
 | `/swell` | Swell & Points | **API real** + Gemini AI + ApexCharts + Leaflet |
 | `/noticias` | Noticias Regionais + Transito | **RSS auto-atualizado** (ISN + Santa Portal + Google News) + TrafficMap Leaflet + CityGrid |
 | `/comercio` | Comercio de Ilha Comprida | **API real** (fallback-comercio) + CommerceMap Leaflet + OSRM routing |
-| `/blog` | Blog (listagem GEO) | Estatico — server component, cards com capa real (`BlogCard`), 4 publicados + 2 "em breve" |
-| `/blog/[slug]` | Artigo individual (SSG) | Estatico — `generateStaticParams` + `generateMetadata` + JSON-LD `Article`/`FAQPage`, corpo em blocos tipados (`BlogContent`) |
+| `/blog` | Blog (listagem GEO) | Estatico — server component, cards com capa real (`BlogCard`), 4 publicados (Tábua de Marés, Reserva de Cananéia, Juréia, Ilha Comprida) + 2 "em breve" |
+| `/blog/[slug]` | Artigo individual (SSG) | Estatico — `generateStaticParams` + `generateMetadata` + JSON-LD `Article`/`FAQPage`, corpo em blocos tipados (`BlogContent`); artigo da Juréia `jureia-itinga-praias-surf-ecoturismo` reescrito (2026-11-06) com título "Acesso à Juréia em Iguape: Balsa de Icapara, Barra do Ribeira e Costão da Juréia", estrutura em 3 etapas + tabelas de balsa/horários/tarifa e de maré no Costão |
 | `/creditos` | Creditos & Fontes | Estatico |
 
 > **Removidas no review 2026-09:** `/mapa` e `/transito` (paginas orfas sem link no Header/Footer; `/transito` tinha apenas mocks hardcoded). Componentes `SpotMap` e `BaseLeafletMap` tambem removidos.

@@ -1,6 +1,6 @@
 # Referencia da API — Meteor 2.0
 
-> **Ultima atualizacao:** 06/11/2026 (noticias do Philippines Pro em PT + feeds WSL mesclados LATAM/Google News; blog GEO/SEO com `/blog/[slug]` — 329 testes)
+> **Ultima atualizacao:** 06/11/2026 (noticias do Philippines Pro em PT + feeds WSL mesclados LATAM/Google News; blog GEO/SEO com `/blog/[slug]` e reescrita do artigo da Juréia — acesso em 3 etapas: balsa de Icapara, Barra do Ribeira e Costão — 329 testes)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [../README.md](../README.md)
 
