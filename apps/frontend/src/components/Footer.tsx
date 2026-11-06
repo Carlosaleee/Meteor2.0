@@ -23,7 +23,7 @@ const PAGES = [
   { name: 'Swell & Points', href: '/swell' },
   { name: 'Notícias Regionais', href: '/noticias' },
   { name: 'Comércio', href: '/comercio' },
-  { name: 'Blog Técnico', href: '/blog' },
+  { name: 'Blog', href: '/blog' },
   { name: 'Créditos & Fontes', href: '/creditos' },
 ];
 

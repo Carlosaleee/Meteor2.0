@@ -55,7 +55,7 @@ const SLIDES: Slide[] = [
   },
   {
     id: 4,
-    title: 'Blog Técnico',
+    title: 'Blog',
     subtitle: 'Artigos e guias especiais sobre o clima e litoral',
     href: '/blog',
     image: '/banner-meteor.jpg',

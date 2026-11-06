@@ -11,7 +11,7 @@ const NAV_ITEMS = [
   { href: '/swell', label: 'Swell', labelEs: 'Swell', icon: FaWater, description: 'Ondas, Points e Marés' },
   { href: '/noticias', label: 'Notícias', labelEs: 'Noticias', icon: FaNewspaper, description: 'Notícias Regionais e Trânsito' },
   { href: '/comercio', label: 'Comércio', labelEs: 'Comercio', icon: FaStore, description: 'Diretório Comercial de Ilha Comprida' },
-  { href: '/blog', label: 'Blog', labelEs: 'Blog', icon: FaBookOpen, description: 'Artigos Técnicos' },
+  { href: '/blog', label: 'Blog', labelEs: 'Blog', icon: FaBookOpen, description: 'Guias e Artigos' },
   { href: '/creditos', label: 'Créditos', labelEs: 'Créditos', icon: FaInfoCircle, description: 'Fontes e Agradecimentos' },
 ];
 
