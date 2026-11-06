@@ -265,88 +265,131 @@ export const BLOG_POSTS: BlogPost[] = [
   },
   {
     slug: 'jureia-itinga-praias-surf-ecoturismo',
-    title: 'Parque Estadual da Juréia-Itatinga: Praias, Surf e Guia de Ecoturismo',
-    metaTitle: 'Juréia-Itatinga: Praias, Surf e Ecoturismo | Meteor 2.0',
+    title: 'Acesso à Juréia em Iguape: Balsa de Icapara, Barra do Ribeira e Costão da Juréia',
+    metaTitle: 'Juréia em Iguape: Balsa, Barra do Ribeira e Costão',
     description:
-      'Conheça as praias do Parque Estadual da Juréia-Itatinga, entre Iguape, Itanhaém e Peruíbe: onde surfar, trilhas, baleias e dicas de maré para visitar o Lagamar.',
+      'Saiba como chegar à Praia da Juréia em Iguape: balsa de Icapara ao bairro Barra do Ribeira, horários, tarifa e o acesso ao Costão pela tábua de maré oficial.',
     summary:
-      'Guia de ecoturismo e surf na Juréia: praias de mar aberto, canais do Mar de Dentro, baleias de Peruíbe e como cruze maré, vento e swell antes de sair.',
+      'Rota em três etapas para a única praia de Iguape: balsa de Icapara, bairro Barra do Ribeira e acesso ao Costão da Juréia condicionado à maré.',
     category: 'Ecoturismo',
     categoryColor: 'bg-teal-500/20 text-teal-400',
     date: '2026-11-06',
-    readTime: '7 min de leitura',
+    readTime: '8 min de leitura',
     imageUrl: '/blog/jureia.jpg',
-    imageAlt: 'Surfistas na praia de mar aberto com a Serra do Mar ao fundo na região da Juréia-Itatinga',
+    imageAlt: 'Surfistas em ondas na praia de mar aberto da Juréia com a Serra do Mar ao fundo sob céu nublado',
     author: 'Carlos Alexandre',
     status: 'published',
     content: [
       {
         type: 'answer',
         text:
-          'O **Parque Estadual da Juréia-Itatinga** protege um dos últimos trechos contínuos de Mata Atlântica do litoral sul de São Paulo, entre Iguape, Itanhaém e Peruíbe. As praias de mar aberto — como Juqueriquerê e as faixas da porção norte do parque — combinam águas frias, vento e ondas constantes, atrairando surfistas e praticantes de SUP, enquanto os canais e manguezais do lado do **Mar de Dentro** abrigam golfinhos, aves e as rotinas caiçaras de coleta. Para visitar bem, o planejamento depende de três variáveis do Meteor 2.0: **maré** (acesso a bancos e barras), **vento** (conforto nas trilhas) e **swell** (qualidade das ondas).',
+          'Não existe acesso de carro direto até a **Praia da Juréia**, em Iguape: a rota oficial tem três etapas — até a cidade de Iguape, travessia do Rio Ribeira de Iguape na **balsa de Icapara** (cerca de 5 minutos, partidas a cada 30 minutos das 7h às 20h30, tarifa paga apenas na volta e somente em dinheiro) e chegada ao **bairro Barra do Ribeira**, conhecido localmente como "Barra da Juréia", onde começa a única praia de Iguape, com 19 km de extensão. No extremo da praia fica o **Costão da Juréia**, dentro da PE Prelado, cujo acesso pelas pequenas barras naturais depende da tábua de maré.',
       },
-      { type: 'h2', text: 'Por que a Juréia é Única: Mata Atlântica Encontrando o Atlântico Sul' },
-      { type: 'h3', text: 'O Parque e a Biodiversidade' },
+      { type: 'h2', text: 'Como Chegar à Juréia: A Rota em Três Etapas' },
       {
         type: 'p',
         text:
-          'Criado para proteger a floresta costeira, os manguezais e as praias entre os municípios do litoral sul, o parque é vizinho de outras unidades de conservação da região, como a PE Ilha do Cardoso e a APA Cananéia-Iguape-Peruíbe — juntas formam um corredor de proteção quase contínuo até o Vale do Ribeira.',
+          'O erro mais comum de quem viaja para a Juréia é tentar chegar de carro direto à praia. Não há estrada: o percurso oficial atravessa Iguape e usa a balsa sobre o Rio Ribeira de Iguape. Confira as três etapas antes de sair de casa.',
       },
-      { type: 'h3', text: 'O Mar de Dentro e o Lagamar' },
-      {
-        type: 'p',
-        text:
-          'Do lado de dentro da barreira, os canais do Mar de Dentro conectam a Juréia ao mesmo sistema estuarino de Cananéia e Iguape — a mesma água que sustenta os manguezais descritos no nosso guia da Reserva de Cananéia.',
-      },
-      { type: 'h2', text: 'Tabela GEO: Praias da Juréia — Acesso, Surf e Estrutura' },
       {
         type: 'table',
-        headers: ['Praia', 'Acesso', 'Onda/Surf', 'Estrutura'],
+        headers: ['Etapa', 'Trajeto', 'Meio', 'Tempo estimado'],
         rows: [
-          ['Juqueriquerê (Iguape)', 'Estrada de terra a partir de Iguape', 'Beach break consistente, vento favorecido', 'Pouca estrutura — praia selvagem'],
-          ['Praias norte do parque', 'Barco ou trilha', 'Variável — consulta ao /swell', 'Preservação integral'],
-          ['Peruíbe (Praia Central)', 'Urbana', 'Ondas variáveis; dias calmos bons para iniciantes', 'Completa'],
-          ['Ilha Comprida (vizinha, norte)', 'Balsa Cananéia–Ilha Comprida + ponte de Iguape', 'Boqueirão Norte/Sul e Pedrinhas', 'Completa'],
+          [
+            '1ª',
+            'Até Iguape — terminal da balsa na Estrada Vereador Manoel Alves da Silva, s/n (Icapara)',
+            "Carro, táxi coletivo (partida na Rua Porto General Câmara) ou ônibus linhas 9 e 10 do Terminal Sant'Anna de Moraes",
+            'Conforme sua origem',
+          ],
+          ['2ª', 'Travessia do Rio Ribeira de Iguape, de Iguape para a Juréia', 'Balsa Iguape–Juréia', 'Cerca de 5 minutos'],
+          [
+            '3ª',
+            'Terminal da Juréia (Avenida Sebastião Marques, 500) até o bairro Barra do Ribeira e a praia',
+            'Táxi coletivo ou carro',
+            'Poucos minutos até a orla',
+          ],
         ],
       },
-      { type: 'h2', text: 'Surf e SUP na Juréia — Condicionadas pelo Meteor' },
-      { type: 'h3', text: 'Melhores janelas de swell' },
+      { type: 'h2', text: 'Balsa de Icapara: Horários, Tarifa e Regras' },
       {
         type: 'p',
         text:
-          'Swell de Sul ou Sudeste combinado com vento terral (de terra para o mar) é a receita clássica para praias abertas desta faixa do litoral. Confira altura, período e direção em **/swell?tab=forecast** antes de rolar — dias de swell grande exigem respeito e experiência.',
+          'A balsa Iguape–Juréia é o único veículo oficial de travessia e concentra a dúvida de todo visitante. O embarque é gratuito na ida e a tarifa é cobrada apenas na volta (Juréia → Iguape), sempre em dinheiro — não há pagamento por cartão a bordo.',
       },
-      { type: 'h3', text: 'SUP e caiaque nos canais' },
       {
-        type: 'p',
-        text:
-          'Nos canais do lado do Mar de Dentro, a maré cheia facilita a navegação em trechos rasos; na maré baixa, bancos de areia aparecem e a passagem fica restrita. Desça a água em **/swell?tab=forecast** e evite canais estreitos no nível mais baixo do dia.',
+        type: 'table',
+        headers: ['Item', 'Informação'],
+        rows: [
+          ['Horários', 'Partidas a cada 30 minutos, das 7h às 20h30, com viagens às 21h30, 22h30 e 23h30'],
+          ['Travessia', 'Cerca de 5 minutos sobre o Rio Ribeira de Iguape, partindo de Icapara'],
+          ['Espera média', 'Aproximadamente 30 minutos no terminal antes do embarque'],
+          ['Tarifa', 'Paga somente na volta (Juréia → Iguape); na ida o embarque é gratuito'],
+          ['Pagamento', 'Somente em dinheiro (espécie) — não há pagamento por cartão'],
+          ['Gratuidade', 'Pedestres e ciclistas atravessam de graça'],
+          [
+            'Veículos',
+            'Carros: R$ 12,30 em dias úteis e R$ 18,40 em fins de semana (valores de 09/2024 — confirme antes de viajar)',
+          ],
+          ['Hora Marcada', 'Veículos maiores devem reservar o horário pela central 0800 77 33 711'],
+        ],
       },
-      { type: 'h2', text: 'Turismo de Observação: Baleias, Golfinhos e Aves' },
-      { type: 'h3', text: 'Baleias-jubarte na costa de Peruíbe' },
       {
-        type: 'p',
+        type: 'callout',
+        tone: 'alert',
+        title: 'Confirme a balsa antes de sair',
         text:
-          'A temporada de baleias-jubarte no litoral sul de São Paulo ocorre no período frio — tipicamente de junho a novembro —, com observação a partir de praias e embarcações de Peruíbe. Confirme o período exato com os operadores locais antes de planejar.',
+          'A SEMIL alerta que as informações publicadas sobre a travessia podem ficar desatualizadas. Ligue para a central 0800 77 33 711 ou confira o status das rodovias e travessias em /noticias#rodovias antes de sair de casa.',
       },
-      { type: 'h3', text: 'Golfinhos-cinza no Mar de Dentro' },
+      { type: 'h2', text: 'Barra do Ribeira: o Bairro que Recebe o Viajante' },
       {
         type: 'p',
         text:
-          'Os grupos de golfinho-cinza (Sotalia guianensis) marcam presença nos canais do estuário. Mantenha distância, não persiga os animais e evite manobras rápidas perto dos grupos.',
+          'A **Praia da Juréia** tem cerca de 19 km e é a única praia de Iguape. Ela começa no bairro **Barra do Ribeira** — o mesmo lugar que os locais chamam de "Barra da Juréia" —, onde ficam o terminal da balsa, pousadas, restaurantes e o acesso à areia.',
       },
-      { type: 'h2', text: 'Planejando a Visita (Checklist)' },
-      { type: 'h3', text: 'Como chegar' },
       {
-        type: 'p',
-        text:
-          'Por estrada a partir de Peruíbe ou Iguape, ou de barco pelos canais do estuário. algumas praias do parque exigem registro ou guia local autorizado — confirme as regras vigentes com o órgão gestor antes de sair.',
+        type: 'ul',
+        items: [
+          '**Trilha Ecológica da Vila Alegria:** cerca de 300 m de passarela sobre a mata e uma casa histórica do século XIX.',
+          '**Orla do Rio Suamirim:** caminhada tranquila no bairro, com vista para o encontro de águas da foz do Ribeira.',
+          '**Estrutura local:** pousadas e restaurantes de peixe no próprio bairro — reserve com antecedência em feriados e alta temporada.',
+        ],
       },
-      { type: 'h3', text: 'Regras das UCs' },
+      { type: 'h2', text: 'Acesso ao Costão da Juréia: a Maré Manda' },
       {
         type: 'p',
         text:
-          'Siga apenas as trilhas oficiais, contrate guias locais autorizados, não deixe resíduos e respeite as proibições de fogueira e acampamento fora de áreas permitidas.',
+          'No extremo da praia fica o **Costão da Juréia**, dentro do Parque Estadual da Juréia-Itatinga — mais precisamente na área da PE Prelado (Lei Estadual 14.982/2013, 1.828 hectares), administrada pelo Núcleo Costão da Juréia. O acesso é gratuito, das 8h às 17h, pelo quilômetro 225 da Praia da Juréia — e depende da maré: pequenas barras naturais se formam no caminho.',
+      },
+      {
+        type: 'table',
+        headers: ['Situação da maré', 'O que acontece nas barras', 'Janela de acesso ao Costão'],
+        rows: [
+          [
+            'Sizígia (lua nova/cheia)',
+            'Amplitude máxima: as barras naturais podem secar por completo na baixa-mar',
+            'Acesso possível apenas na janela da baixa-mar — anote o horário da tábua antes de sair',
+          ],
+          [
+            'Quadratura (lua crescente/minguante)',
+            'Amplitude mínima: menos variação de nível nas barras ao longo do dia',
+            'Janela mais estável e previsível, mas ainda assim depende do horário da maré do dia',
+          ],
+          [
+            'Qualquer ciclo',
+            'Pequenas barras naturais se formam e mudam de posição no trecho de acesso',
+            'Consulte a tábua oficial de maré e confirme com o Núcleo Costão da Juréia (13 3841-2193)',
+          ],
+        ],
+      },
+      { type: 'h2', text: 'Trilhas do Costão e da ESEC Juréia-Itatins' },
+      {
+        type: 'ul',
+        items: [
+          '**Trilha Praia → Costão:** cerca de 7 km, aproximadamente 3 horas, autoguiada, saindo do bairro Barra do Ribeira ao longo da areia.',
+          '**Cachoeira do Pocinho:** trilha curta de cerca de 500 m até a cachoeira.',
+          '**Trilha do Imperador (Telégrafo):** 27 a 28 km na ESEC Juréia-Itatins, com monitor obrigatório e agendamento prévio — não é trilha autoguiada.',
+          '**ESEC Juréia-Itatins:** abrange os municípios de Iguape, Itariri, Miracatu e Peruíbe — confirme regras, agendamento e horários com o órgão gestor antes de sair.',
+        ],
       },
       {
         type: 'callout',
@@ -354,6 +397,12 @@ export const BLOG_POSTS: BlogPost[] = [
         title: 'Quando ir: cruze maré + vento + swell no app',
         text:
           'Antes de fechar o roteiro, abra /meteorologia (chuva e temperatura), /swell?tab=forecast (maré, ondas e vento) e /swell?tab=spots (níveis de experiência dos spots vizinhos).',
+      },
+      { type: 'h2', text: 'Surf na Juréia e as Condições do Meteor' },
+      {
+        type: 'p',
+        text:
+          'Os 19 km da Praia da Juréia são mar aberto: swell de Sul ou Sudeste combinado com vento terral é a receita clássica para as ondas desta faixa. Confira altura, período e direção em **/swell?tab=forecast** e os níveis de experiência em **/swell?tab=spots** antes de rolar — dias de swell grande exigem respeito e experiência.',
       },
       {
         type: 'callout',
@@ -365,40 +414,40 @@ export const BLOG_POSTS: BlogPost[] = [
     ],
     faq: [
       {
-        q: 'O que é o Parque Estadual da Juréia-Itatinga?',
-        a: 'É uma unidade de conservação que protege um dos últimos trechos contínuos de Mata Atlântica do litoral sul de São Paulo, entre Iguape, Itanhaém e Peruíbe. Criado para preservar a floresta costeira, os manguezais e as praias, abriga trilhas, praias de mar aberto e canais do Mar de Dentro com grande biodiversidade — de golfinhos a aves migratórias.',
+        q: 'Como chegar à Praia da Juréia de Iguape?',
+        a: 'A Praia da Juréia não tem acesso de carro direto: a rota é até Iguape, travessia do Rio Ribeira de Iguape na balsa de Icapara (cerca de 5 minutos) e chegada ao bairro Barra do Ribeira, onde começa a praia. De lá até a areia são poucos minutos de táxi coletivo ou carro.',
       },
       {
-        q: 'Como chegar às praias da Juréia?',
-        a: 'De carro, por estradas a partir de Peruíbe ou Iguape (alguns trechos de terra); ou de barco pelos canais do estuário. Algumas praias do parque exigem registro prévio ou guia local autorizado — confirme as regras com o órgão gestor antes de viajar.',
+        q: 'Quanto custa a balsa de Iguape para a Juréia e quais são os horários?',
+        a: 'O embarque é gratuito na ida e a tarifa é paga apenas na volta (Juréia → Iguape), somente em dinheiro: R$ 12,30 em dias úteis e R$ 18,40 em fins de semana para carros (valores de 09/2024 — confirme). As partidas são a cada 30 minutos, das 7h às 20h30, com viagens às 21h30, 22h30 e 23h30; pedestres e ciclistas atravessam de graça.',
       },
       {
-        q: 'Onde surfar na Juréia e Ilha Comprida?',
-        a: 'Na Juréia, Juqueriquerê é a praia mais conhecida pelo beach break consistente. Na vizinha Ilha Comprida, os spots de praia aberta incluem Boqueirão Norte, Pedrinhas e Boqueirão Sul — consulte níveis de experiência em /swell?tab=spots e as condições em /swell?tab=forecast.',
+        q: 'Barra da Juréia é o mesmo que Barra do Ribeira?',
+        a: 'Sim. Barra da Juréia é o nome popular com que os locais chamam o bairro Barra do Ribeira, em Iguape, ponto de chegada da balsa e início da Praia da Juréia — a única praia do município, com cerca de 19 km. É no bairro que ficam o terminal, pousadas, restaurantes e o acesso à trilha da Vila Alegria.',
       },
       {
-        q: 'Quando ver baleias-jubarte no litoral sul de SP?',
-        a: 'A temporada ocorre no período frio, tipicamente de junho a novembro na costa de Peruíbe e região. Confirme o período e as saídas de observação com os operadores locais antes de planejar a viagem.',
+        q: 'Como funciona o acesso ao Costão da Juréia conforme a maré?',
+        a: 'O Costão fica no extremo da praia, dentro da PE Prelado, e o acesso passa por pequenas barras naturais que mudam com a maré: na sizígia a janela acontece só na baixa-mar, enquanto na quadratura a variação é menor e a travessia fica mais estável. Confirme o horário na tábua oficial e com o Núcleo Costão da Juréia (13 3841-2193), das 8h às 17h.',
       },
       {
-        q: 'É possível acampar na Juréia?',
-        a: 'Apenas em áreas autorizadas e mediante registro, conforme as regras da unidade de conservação. Fora dessas áreas, acampamento e fogueira são proibidos. Consulte o órgão gestor para as normas vigentes.',
+        q: 'Onde surfar na Juréia e como conferir as condições?',
+        a: 'A Praia da Juréia é mar aberto dos 19 km, com swell de Sul ou Sudeste e vento terral como melhor combinação. Antes de sair, confira altura, período e direção das ondas em /swell?tab=forecast e os níveis de experiência em /swell?tab=spots — as correntes de retorno ficam fortes em dias de swell grande.',
       },
     ],
     relatedLinks: [
       { label: 'Condições do mar e previsão de ondas', href: '/swell?tab=forecast' },
       { label: 'Spots e níveis de experiência', href: '/swell?tab=spots' },
       { label: 'Previsão do tempo da região', href: '/meteorologia' },
+      { label: 'Status das rodovias e da balsa', href: '/noticias#rodovias' },
       { label: 'Guia de marés de Ilha Comprida e Cananéia', href: '/blog/tabua-de-mares-ilha-comprida-cananeia' },
-      { label: 'Reserva de Cananéia e manguezais', href: '/blog/reserva-de-cananeia-manguezais-lagamar' },
     ],
     keywords: [
-      'parque estadual da juréia',
-      'praias da juréia',
-      'juqueriquerê surf',
-      'o que fazer em juréia',
-      'baleia jubarte peruíbe',
-      'turismo ecológico litoral sul sp',
+      'acesso à praia da juréia',
+      'balsa iguape juréia',
+      'barra do ribeira juréia',
+      'costão da juréia trilha',
+      'como chegar na juréia',
+      'surf juréia iguape',
     ],
   },
   {
