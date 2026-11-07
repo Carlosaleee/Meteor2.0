@@ -66,7 +66,11 @@ const SLIDES: Slide[] = [
 
 const INTERVAL_MS = 5000;
 
-export function HeroCarousel() {
+type HeroCarouselProps = {
+  compact?: boolean;
+};
+
+export function HeroCarousel({ compact = false }: HeroCarouselProps) {
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
   const [userPaused, setUserPaused] = useState(false);
@@ -110,9 +114,9 @@ export function HeroCarousel() {
     <section
       role="region"
       aria-roledescription="carrossel"
-      aria-label="Destaques do Meteor 2.0"
+      aria-label={compact ? 'Galeria e destaques do Meteor 2.0' : 'Destaques do Meteor 2.0'}
       className="relative w-full overflow-hidden rounded-2xl"
-      style={{ height: 'clamp(280px, 40vw, 420px)' }}
+      style={{ height: compact ? 'clamp(180px, 22vw, 240px)' : 'clamp(280px, 40vw, 420px)' }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
@@ -145,15 +149,15 @@ export function HeroCarousel() {
               <span className="inline-block px-3 py-1 mb-3 text-[10px] font-bold uppercase tracking-widest bg-white/10 backdrop-blur-sm rounded-full text-white/80 border border-white/10">
                 {s.label}
               </span>
-              <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight mb-2 font-[family-name:var(--font-display)]">
+              <h2 className={compact ? 'text-xl md:text-3xl font-extrabold text-white tracking-tight mb-1 font-[family-name:var(--font-display)]' : 'text-3xl md:text-5xl font-extrabold text-white tracking-tight mb-2 font-[family-name:var(--font-display)]'}>
                 {s.title}
               </h2>
-              <p className="text-sm md:text-base text-white/70 max-w-lg mb-4">
+              <p className={compact ? 'text-xs md:text-sm text-white/70 max-w-md mb-2 line-clamp-1 md:line-clamp-2' : 'text-sm md:text-base text-white/70 max-w-lg mb-4'}>
                 {s.subtitle}
               </p>
               <Link
                 href={s.href}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm font-semibold hover:bg-white/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                className={compact ? 'inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white text-xs font-semibold hover:bg-white/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white' : 'inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm font-semibold hover:bg-white/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white'}
               >
                 Explorar →
               </Link>

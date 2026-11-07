@@ -12,19 +12,20 @@ import {
   FaBookOpen,
   FaExternalLinkAlt,
   FaArrowRight,
+  FaMapMarkerAlt,
+  FaRoute,
 } from 'react-icons/fa';
 import { HeroCarousel } from '@/components/HeroCarousel';
 import { ForecastSection } from '@/app/swell/components/ForecastSection';
-import { ResumoIA } from '@/app/swell/components/ResumoIA';
 import { ConditionCards } from '@/app/swell/components/ConditionCards';
 import { useAllCities } from '@/hooks/useAllCities';
 import { useSwell } from '@/hooks/useSwell';
-import { useAiSummary } from '@/hooks/useAiSummary';
 import { useRegionalNews } from '@/hooks/useRegionalNews';
 import { useNews } from '@/hooks/useNews';
 import { useComercio } from '@/hooks/useComercio';
 import { FALLBACK_IMAGES } from '@/lib/fallback-images';
 import { publishedPosts } from '@/data/blog-posts';
+import { SPOTS, LEVEL_CONFIG } from '@/lib/spots-data';
 import { weatherEmoji } from '@/app/meteorologia/components/weather-utils';
 
 const ROUTE_CONDITION_COLORS: Record<string, { text: string; bg: string; border: string }> = {
@@ -52,8 +53,6 @@ const CATEGORY_CONFIG: Record<string, { label: string; emoji: string; color: str
   cotidiano: { label: 'Cotidiano', emoji: '🏠', color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
 };
 
-// Chaves normalizadas como a API realmente devolve (ex.: "alimentacao" —
-// antes, chaves acentuadas ("Alimentação") nunca casavam e sempre caíam no 🏪).
 const SECTOR_ICONS: Record<string, string> = {
   alimentacao: '🍔',
   hospedagem: '🏨',
@@ -65,7 +64,6 @@ const SECTOR_ICONS: Record<string, string> = {
   automotivo: '🚗',
 };
 
-/** CTA padrao do header de cada secao — uma secao por aba do portal. */
 const CTA_TONES: Record<string, string> = {
   amber: 'bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20 focus-visible:ring-amber-400',
   blue: 'bg-blue-500/10 border-blue-500/30 text-blue-400 hover:bg-blue-500/20 focus-visible:ring-blue-400',
@@ -96,14 +94,12 @@ function timeAgo(dateStr: string): string {
   return `${days}d`;
 }
 
-/** "21/10 17:48" — data/hora da coleta exibida nos cards de rodovia. */
 function formatRouteTime(iso: string): string {
   const date = new Date(iso);
   if (isNaN(date.getTime())) return '';
   return date.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 }
 
-/** Chip discreto de proveniencia — nunca fingir frescor de dado estimado. */
 function EstimatedBadge() {
   return (
     <span
@@ -115,27 +111,66 @@ function EstimatedBadge() {
   );
 }
 
+const PLACEHOLDER_BLOG_CARDS = [
+  {
+    title: 'Previsão de Ondas e Bancadas em Ilha Comprida',
+    category: 'Surf & Telemetria',
+    date: 'Em breve',
+    imageUrl: '/blog/ventos-de-sudeste.jpg',
+  },
+  {
+    title: 'Guia de Navegação e Balsas do Lagamar',
+    category: 'Mobilidade',
+    date: 'Em breve',
+    imageUrl: '/blog/reserva-cananeia.jpg',
+  },
+  {
+    title: 'Ecoturismo e Trilhas no Vale do Ribeira',
+    category: 'Natureza',
+    date: 'Em breve',
+    imageUrl: '/blog/jureia.jpg',
+  },
+  {
+    title: 'Marés, Pesca e Dinâmica Costeira Regional',
+    category: 'Oceanografia',
+    date: 'Em breve',
+    imageUrl: '/blog/dinamica-costeira.jpg',
+  },
+];
+
 export default function HomePage() {
   const { cities, loading: citiesLoading } = useAllCities();
   const { data: swellData, loading: swellLoading } = useSwell();
-  const { data: aiData, loading: aiLoading } = useAiSummary();
   const { data: newsData, loading: newsLoading } = useRegionalNews();
   const { data: surfNewsData, loading: surfNewsLoading } = useNews();
   const { data: comercioData, loading: comercioLoading } = useComercio();
 
   const [newsCategory, setNewsCategory] = useState('todas');
+  const [sportTab, setSportTab] = useState<'todas' | 'WSL' | 'Paulista'>('todas');
 
   const latestNews = newsData?.news?.slice(0, 6) ?? [];
   const routes = newsData?.routes ?? [];
   const commerce = comercioData?.commerce?.slice(0, 6) ?? [];
+  const topSpots = SPOTS.slice(0, 4);
 
   const filteredNews = newsCategory === 'todas'
     ? latestNews
     : latestNews.filter(n => n.category === newsCategory);
 
+  // 3 da WSL + 3 da SPSurf (Circuito Paulista)
+  const allSurfNews = surfNewsData?.news ?? [];
+  const wslNews = allSurfNews.filter(n => n.category === 'WSL').slice(0, 3);
+  const paulistaNews = allSurfNews.filter(n => n.category === 'Paulista').slice(0, 3);
+
+  const displayedSportNews = sportTab === 'todas'
+    ? [...wslNews, ...paulistaNews]
+    : sportTab === 'WSL'
+      ? wslNews
+      : paulistaNews;
+
   return (
     <main className="space-y-8" role="main" aria-label="Painel principal do Meteor 2.0">
-      <h1 className="sr-only">Meteor 2.0 — Previsão, notícias e condições do mar do Vale do Ribeira e Ilha Comprida</h1>
+      <h1 className="sr-only">Meteor 2.0 — Previsão, trânsito, notícias e condições do mar do Vale do Ribeira e Ilha Comprida</h1>
 
       <a href="#conteudo" className="skip-link sr-only">
         Pular para o conteúdo
@@ -144,20 +179,20 @@ export default function HomePage() {
       <nav aria-label="Navegação rápida" className="sr-only focus-within:not-sr-only">
         <a href="#conteudo" className="block p-2 bg-slate-700 text-white rounded-lg">Pular para o conteúdo</a>
         <a href="#tempo" className="block p-2 bg-amber-600 text-white rounded-lg">Pular para Previsão do Tempo</a>
+        <a href="#rodovias" className="block p-2 bg-amber-600 text-white rounded-lg">Pular para Trânsito e Rodovias</a>
         <a href="#noticias" className="block p-2 bg-blue-600 text-white rounded-lg">Pular para Últimas Notícias</a>
         <a href="#mar" className="block p-2 bg-cyan-600 text-white rounded-lg">Pular para Condições do Mar</a>
-        <a href="#briefing" className="block p-2 bg-cyan-600 text-white rounded-lg">Pular para Briefing IA</a>
-        <a href="#rodovias" className="block p-2 bg-amber-600 text-white rounded-lg">Pular para Rodovias</a>
-        <a href="#comercio" className="block p-2 bg-orange-600 text-white rounded-lg">Pular para Comércio</a>
         <a href="#surf-news" className="block p-2 bg-amber-600 text-white rounded-lg">Pular para Esporte</a>
         <a href="#blog" className="block p-2 bg-emerald-600 text-white rounded-lg">Pular para Blog</a>
+        <a href="#comercio" className="block p-2 bg-orange-600 text-white rounded-lg">Pular para Comércio</a>
+        <a href="#points" className="block p-2 bg-blue-600 text-white rounded-lg">Pular para Points de Surf</a>
       </nav>
 
-      {/* 1. Hero Carousel — slide 1: Notícias do Vale */}
+      {/* 1. Hero Carousel do Topo */}
       <HeroCarousel />
 
       <div id="conteudo" tabIndex={-1} className="space-y-8 outline-none">
-        {/* 2. Previsão do Tempo — 4 cidades (hoje: atual + max/min) */}
+        {/* 2. Previsão do Tempo — 4 cidades */}
         <ForecastSection
           id="tempo"
           title="Previsão do Tempo"
@@ -180,28 +215,28 @@ export default function HomePage() {
                     title={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)}°C` : 'Carregando...'}`}
                     aria-label={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)} graus, ${weatherEmoji(city.weatherCode)}${maxMin ? `. ${maxMin}` : ''}` : 'carregando'}`}
                   >
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1 truncate">
-                    {city?.location ?? id.replace(/-/g, ' ')}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    {city && <span className="text-xl" aria-hidden="true">{weatherEmoji(city.weatherCode)}</span>}
-                    <span className="text-2xl font-extrabold text-white tabular-nums">
-                      {citiesLoading ? '--' : city ? `${Math.round(city.temperature)}°` : '--'}
-                    </span>
-                  </div>
-                  {city?.tempMax != null && city?.tempMin != null && (
-                    <p className="text-[10px] text-amber-400/90 font-medium mt-1 tabular-nums">
-                      ▲ {Math.round(city.tempMax)}° · ▼ {Math.round(city.tempMin)}°
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1 truncate">
+                      {city?.location ?? id.replace(/-/g, ' ')}
                     </p>
-                  )}
-                  <div className="flex items-center gap-3 mt-2 text-[10px] text-slate-400">
-                    {city && (
-                      <>
-                        <span>💧 {city.humidity}%</span>
-                        <span>💨 {Math.round(city.windSpeed)} km/h</span>
-                      </>
+                    <div className="flex items-center gap-2">
+                      {city && <span className="text-xl" aria-hidden="true">{weatherEmoji(city.weatherCode)}</span>}
+                      <span className="text-2xl font-extrabold text-white tabular-nums">
+                        {citiesLoading ? '--' : city ? `${Math.round(city.temperature)}°` : '--'}
+                      </span>
+                    </div>
+                    {city?.tempMax != null && city?.tempMin != null && (
+                      <p className="text-[10px] text-amber-400/90 font-medium mt-1 tabular-nums">
+                        ▲ {Math.round(city.tempMax)}° · ▼ {Math.round(city.tempMin)}°
+                      </p>
                     )}
-                  </div>
+                    <div className="flex items-center gap-3 mt-2 text-[10px] text-slate-400">
+                      {city && (
+                        <>
+                          <span>💧 {city.humidity}%</span>
+                          <span>💨 {Math.round(city.windSpeed)} km/h</span>
+                        </>
+                      )}
+                    </div>
                   </Link>
                 </div>
               );
@@ -209,10 +244,71 @@ export default function HomePage() {
           </div>
         </ForecastSection>
 
-        {/* 3. Últimas Notícias Regionais */}
+        {/* 3. Trânsito / Status das Rodovias */}
+        <ForecastSection
+          id="rodovias"
+          title="Trânsito & Rodovias"
+          icon={<FaCar className="w-5 h-5 text-amber-400" aria-hidden="true" />}
+          ariaLabel="Condições de tráfego das rodovias e balsas"
+          ariaBusy={newsLoading}
+          action={<SectionCta href="/noticias#rodovias" tone="amber">Ver em Notícias</SectionCta>}
+        >
+          {newsLoading ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3" aria-busy="true">
+              {[1, 2, 3, 4, 5].map(i => (
+                <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-3 animate-pulse">
+                  <div className="h-4 bg-slate-800 rounded w-24 mb-3" />
+                  <div className="h-6 bg-slate-800 rounded w-20" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+              {routes.map(route => {
+                const colors = ROUTE_CONDITION_COLORS[route.condition] ?? ROUTE_CONDITION_COLORS.LIVRE;
+                const emoji = ROUTE_ICONS[route.id] ?? '🚗';
+                return (
+                  <Link
+                    key={route.id}
+                    href={route.sourceUrl || '/noticias'}
+                    target={route.sourceUrl ? '_blank' : undefined}
+                    rel={route.sourceUrl ? 'noopener noreferrer' : undefined}
+                    className={`bg-slate-900/80 border ${colors.border} rounded-2xl p-3 hover:scale-[1.02] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white`}
+                    title={`${route.name}: ${route.condition} — ${route.description}`}
+                    aria-label={`${route.name}: ${route.condition} — abrir na fonte oficial`}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-lg" aria-hidden="true">{emoji}</span>
+                      <span className="text-sm font-bold text-white">{route.name}</span>
+                      {route.source === 'estimated' && <EstimatedBadge />}
+                    </div>
+                    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${colors.bg} ${colors.text} border ${colors.border}`}>
+                      {route.condition}
+                    </div>
+                    <p className="text-[11px] text-slate-400 mt-2 truncate" title={route.description}>{route.description}</p>
+                    <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-slate-800/60 text-[10px] text-slate-400">
+                      <span className="inline-flex items-center gap-1">
+                        {route.sourceUrl ? (
+                          <>Fonte <FaExternalLinkAlt className="w-2.5 h-2.5" aria-hidden="true" /></>
+                        ) : (
+                          'Fonte não informada'
+                        )}
+                      </span>
+                      <span title={`Última atualização: ${new Date(route.updatedAt).toLocaleString('pt-BR')}`}>
+                        {formatRouteTime(route.updatedAt)}
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </ForecastSection>
+
+        {/* 4. Últimas Notícias Regionais */}
         <ForecastSection
           id="noticias"
-          title="Últimas Notícias Regionais"
+          title="Últimas Notícias"
           icon={<FaNewspaper className="w-5 h-5 text-blue-400" aria-hidden="true" />}
           ariaLabel="Notícias regionais do Vale do Ribeira"
           ariaBusy={newsLoading}
@@ -291,7 +387,7 @@ export default function HomePage() {
           )}
         </ForecastSection>
 
-        {/* 4. Condições do Mar */}
+        {/* 5. Condições do Mar */}
         <ForecastSection
           id="mar"
           title="Condições do Mar"
@@ -326,91 +422,168 @@ export default function HomePage() {
           )}
         </ForecastSection>
 
-        {/* 5. Briefing Executivo IA */}
+        {/* 6. Esporte (WSL e Circuito Paulista — 6 notícias com abas) */}
         <ForecastSection
-          id="briefing"
-          title="Briefing Executivo (IA)"
-          icon={<span aria-hidden="true">🤖</span>}
-          ariaLabel="Resumo inteligente das condições"
-          ariaBusy={aiLoading}
-          action={<SectionCta href="/swell?tab=forecast" tone="cyan">Abrir briefing</SectionCta>}
+          id="surf-news"
+          title="Esporte"
+          icon={<FaWater className="w-5 h-5 text-amber-400" aria-hidden="true" />}
+          ariaLabel="Notícias e competições de surf WSL e Circuito Paulista"
+          ariaBusy={surfNewsLoading}
+          action={<SectionCta href="/swell?tab=news" tone="blue">Ver todas</SectionCta>}
         >
-          {aiLoading ? (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 animate-pulse" aria-busy="true">
-              <div className="h-4 bg-slate-800 rounded w-48 mb-4" />
-              <div className="space-y-2">
-                <div className="h-3 bg-slate-800 rounded w-full" />
-                <div className="h-3 bg-slate-800 rounded w-5/6" />
-                <div className="h-3 bg-slate-800 rounded w-4/6" />
-              </div>
-            </div>
-          ) : (
-            <ResumoIA summary={aiData?.summary ?? null} loading={aiLoading} error={null} />
-          )}
-        </ForecastSection>
+          {/* Subfiltros em abas: Todas / WSL / Circuito Paulista */}
+          <div className="flex flex-wrap gap-2 mb-4" role="tablist" aria-label="Filtrar esportes por circuito">
+            {(
+              [
+                { id: 'todas', label: 'Todas as Matérias' },
+                { id: 'WSL', label: '🏄 World Surf League' },
+                { id: 'Paulista', label: '🏆 Circuito Paulista' },
+              ] as const
+            ).map(tab => (
+              <button
+                key={tab.id}
+                role="tab"
+                aria-selected={sportTab === tab.id}
+                onClick={() => setSportTab(tab.id)}
+                className={`px-3 py-1.5 text-xs rounded-lg border font-medium transition-all ${
+                  sportTab === tab.id
+                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                    : 'bg-slate-800/40 text-slate-400 border-slate-700/50 hover:bg-slate-800'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
 
-        {/* 6. Status das Rodovias */}
-        <ForecastSection
-          id="rodovias"
-          title="Status das Rodovias"
-          icon={<FaCar className="w-5 h-5 text-amber-400" aria-hidden="true" />}
-          ariaLabel="Condições de tráfego das rodovias"
-          ariaBusy={newsLoading}
-          action={<SectionCta href="/noticias#rodovias" tone="amber">Ver em Notícias</SectionCta>}
-        >
-          {newsLoading ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3" aria-busy="true">
-              {[1, 2, 3, 4, 5].map(i => (
-                <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-3 animate-pulse">
-                  <div className="h-4 bg-slate-800 rounded w-24 mb-3" />
-                  <div className="h-6 bg-slate-800 rounded w-20" />
+          {surfNewsLoading ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3" aria-busy="true">
+              {[1, 2, 3, 4, 5, 6].map(i => (
+                <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-4 animate-pulse">
+                  <div className="h-32 bg-slate-800 rounded mb-3" />
+                  <div className="h-4 bg-slate-800 rounded w-3/4 mb-2" />
+                  <div className="h-3 bg-slate-800 rounded w-1/2" />
                 </div>
               ))}
             </div>
           ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
-              {routes.map(route => {
-                const colors = ROUTE_CONDITION_COLORS[route.condition] ?? ROUTE_CONDITION_COLORS.LIVRE;
-                const emoji = ROUTE_ICONS[route.id] ?? '🚗';
-                return (
-                  <Link
-                    key={route.id}
-                    href={route.sourceUrl || '/noticias'}
-                    target={route.sourceUrl ? '_blank' : undefined}
-                    rel={route.sourceUrl ? 'noopener noreferrer' : undefined}
-                    className={`bg-slate-900/80 border ${colors.border} rounded-2xl p-3 hover:scale-[1.02] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white`}
-                    title={`${route.name}: ${route.condition} — ${route.description}`}
-                    aria-label={`${route.name}: ${route.condition} — abrir na fonte oficial`}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3" role="list">
+              {displayedSportNews.map(item => (
+                <div key={item.id} role="listitem">
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={`${item.title} — ${item.source} (abrir em nova aba)`}
+                    aria-label={`${item.title}, fonte: ${item.source}`}
+                    className="group block rounded-xl overflow-hidden bg-slate-800/40 border border-slate-700/50 hover:bg-slate-800/80 hover:border-blue-500/30 transition-all h-full flex flex-col"
                   >
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-lg" aria-hidden="true">{emoji}</span>
-                      <span className="text-sm font-bold text-white">{route.name}</span>
-                      {route.source === 'estimated' && <EstimatedBadge />}
-                    </div>
-                    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${colors.bg} ${colors.text} border ${colors.border}`}>
-                      {route.condition}
-                    </div>
-                    <p className="text-[11px] text-slate-400 mt-2 truncate" title={route.description}>{route.description}</p>
-                    <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-slate-800/60 text-[10px] text-slate-400">
-                      <span className="inline-flex items-center gap-1">
-                        {route.sourceUrl ? (
-                          <>Fonte <FaExternalLinkAlt className="w-2.5 h-2.5" aria-hidden="true" /></>
-                        ) : (
-                          'Fonte não informada'
-                        )}
-                      </span>
-                      <span title={`Última atualização: ${new Date(route.updatedAt).toLocaleString('pt-BR')}`}>
-                        {formatRouteTime(route.updatedAt)}
+                    <div className="h-40 bg-slate-800 overflow-hidden relative shrink-0">
+                      <img
+                        src={item.image || FALLBACK_IMAGES[item.category] || FALLBACK_IMAGES.WSL}
+                        alt=""
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = FALLBACK_IMAGES[item.category] || FALLBACK_IMAGES.WSL;
+                        }}
+                      />
+                      <span className={`absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] font-medium border ${item.category === 'WSL' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'}`}>
+                        {item.category === 'WSL' ? 'WSL' : 'SPSurf'}
                       </span>
                     </div>
-                  </Link>
-                );
-              })}
+                    <div className="p-4 flex flex-col flex-1 justify-between">
+                      <div>
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <h3 className="text-sm font-bold text-white group-hover:text-blue-300 transition-colors line-clamp-2">{item.title}</h3>
+                          <FaExternalLinkAlt className="w-3 h-3 text-slate-400 group-hover:text-blue-400 shrink-0 mt-0.5" aria-hidden="true" />
+                        </div>
+                        <p className="text-[10px] text-blue-400 font-medium mb-1">{item.source}</p>
+                        <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">{item.description}</p>
+                      </div>
+                      <p className="text-[9px] text-slate-400 mt-3 font-mono">
+                        {new Date(item.publishedAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                      </p>
+                    </div>
+                  </a>
+                </div>
+              ))}
+              {(!displayedSportNews.length && !surfNewsLoading) && (
+                <p className="col-span-full text-center py-8 text-slate-400 text-sm">
+                  Nenhuma notícia de surf disponível no momento.
+                </p>
+              )}
             </div>
           )}
         </ForecastSection>
 
-        {/* 7. Comércio em Destaque */}
+        {/* 7. Blog */}
+        <ForecastSection
+          id="blog"
+          title="Blog"
+          icon={<FaBookOpen className="w-5 h-5 text-emerald-400" aria-hidden="true" />}
+          ariaLabel="Artigos e guias especiais do Blog Meteor"
+          action={<SectionCta href="/blog" tone="emerald">Ver todos</SectionCta>}
+        >
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {publishedPosts().map(post => (
+              <Link
+                key={post.slug}
+                href={`/blog/${post.slug}`}
+                className="group bg-slate-900 border border-slate-800 hover:border-emerald-500/50 rounded-2xl overflow-hidden transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+              >
+                <div className="relative h-24 overflow-hidden">
+                  <Image
+                    src={post.imageUrl}
+                    alt={post.imageAlt}
+                    fill
+                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 to-transparent" />
+                </div>
+                <div className="p-3">
+                  <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">{post.category}</span>
+                  <h3 className="text-sm font-bold text-white mt-1 group-hover:text-emerald-300 transition-colors line-clamp-2">
+                    {post.title}
+                  </h3>
+                </div>
+              </Link>
+            ))}
+
+            {/* +4 Cards para temas futuros */}
+            {PLACEHOLDER_BLOG_CARDS.map((card, idx) => (
+              <Link
+                key={`placeholder-${idx}`}
+                href="/blog"
+                className="group bg-slate-900/60 border border-slate-800/80 hover:border-emerald-500/40 rounded-2xl overflow-hidden transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+              >
+                <div className="relative h-24 overflow-hidden opacity-75 group-hover:opacity-100 transition-opacity">
+                  <Image
+                    src={card.imageUrl}
+                    alt={card.title}
+                    fill
+                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 to-transparent" />
+                  <span className="absolute top-2 right-2 px-2 py-0.5 rounded text-[9px] font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-500/30">
+                    {card.date}
+                  </span>
+                </div>
+                <div className="p-3">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{card.category}</span>
+                  <h3 className="text-sm font-bold text-slate-200 mt-1 group-hover:text-emerald-300 transition-colors line-clamp-2">
+                    {card.title}
+                  </h3>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </ForecastSection>
+
+        {/* 8. Comércio em Destaque */}
         <ForecastSection
           id="comercio"
           title="Comércio em Destaque"
@@ -461,110 +634,75 @@ export default function HomePage() {
           )}
         </ForecastSection>
 
-        {/* 8. Esporte (WSL e Circuito Paulista em pt-BR) */}
+        {/* 9. Points de Surf (4 Cards com nível, melhor vento e GPS) */}
         <ForecastSection
-          id="surf-news"
-          title="Esporte"
-          icon={<FaWater className="w-5 h-5 text-amber-400" aria-hidden="true" />}
-          ariaLabel="Notícias e competições de surf WSL e Circuito Paulista"
-          ariaBusy={surfNewsLoading}
-          action={<SectionCta href="/swell?tab=news" tone="blue">Ver todas</SectionCta>}
-        >
-          {surfNewsLoading ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3" aria-busy="true">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-4 animate-pulse">
-                  <div className="h-32 bg-slate-800 rounded mb-3" />
-                  <div className="h-4 bg-slate-800 rounded w-3/4 mb-2" />
-                  <div className="h-3 bg-slate-800 rounded w-1/2" />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3" role="list">
-              {surfNewsData?.news?.slice(0, 3).map(item => (
-                <div key={item.id} role="listitem">
-                  <a
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title={`${item.title} — ${item.source} (abrir em nova aba)`}
-                    aria-label={`${item.title}, fonte: ${item.source}`}
-                    className="group block rounded-xl overflow-hidden bg-slate-800/40 border border-slate-700/50 hover:bg-slate-800/80 hover:border-blue-500/30 transition-all"
-                  >
-                  <div className="h-40 bg-slate-800 overflow-hidden relative">
-                    <img
-                      src={item.image || FALLBACK_IMAGES[item.category] || FALLBACK_IMAGES.WSL}
-                      alt=""
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      loading="lazy"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = FALLBACK_IMAGES[item.category] || FALLBACK_IMAGES.WSL;
-                      }}
-                    />
-                    <span className={`absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] font-medium border ${item.category === 'WSL' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'}`}>
-                      {item.category}
-                    </span>
-                  </div>
-                  <div className="p-4">
-                    <div className="flex items-start justify-between gap-2 mb-1">
-                      <h3 className="text-sm font-bold text-white group-hover:text-blue-300 transition-colors line-clamp-2">{item.title}</h3>
-                      <FaExternalLinkAlt className="w-3 h-3 text-slate-400 group-hover:text-blue-400 shrink-0 mt-0.5" aria-hidden="true" />
-                    </div>
-                    <p className="text-[10px] text-blue-400 font-medium mb-1">{item.source}</p>
-                    <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">{item.description}</p>
-                    <p className="text-[9px] text-slate-400 mt-2 font-mono">
-                      {new Date(item.publishedAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
-                    </p>
-                  </div>
-                  </a>
-                </div>
-              ))}
-              {(!surfNewsData?.news?.length && !surfNewsLoading) && (
-                <p className="col-span-full text-center py-8 text-slate-400 text-sm">
-                  Nenhuma notícia de surf disponível no momento.
-                </p>
-              )}
-            </div>
-          )}
-        </ForecastSection>
-
-        {/* 9. Blog & Navegação */}
-        <ForecastSection
-          id="blog"
-          title="Blog & Navegação"
-          icon={<FaBookOpen className="w-5 h-5 text-emerald-400" aria-hidden="true" />}
-          ariaLabel="Artigos do blog e navegação do portal"
-          action={<SectionCta href="/blog" tone="emerald">Ver todos</SectionCta>}
+          id="points"
+          title="Points de Surf"
+          icon={<FaMapMarkerAlt className="w-5 h-5 text-blue-400" aria-hidden="true" />}
+          ariaLabel="Principais points e picos de surf em Ilha Comprida"
+          action={<SectionCta href="/swell?tab=spots" tone="blue">Ver todos os points</SectionCta>}
         >
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {publishedPosts().map(post => (
-              <Link
-                key={post.slug}
-                href={`/blog/${post.slug}`}
-                className="group bg-slate-900 border border-slate-800 hover:border-emerald-500/50 rounded-2xl overflow-hidden transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
-              >
-                <div className="relative h-20 overflow-hidden">
-                  <Image
-                    src={post.imageUrl}
-                    alt={post.imageAlt}
-                    fill
-                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 to-transparent" />
+            {topSpots.map(spot => {
+              const levelCfg = LEVEL_CONFIG[spot.level];
+              return (
+                <div
+                  key={spot.id}
+                  className="bg-slate-900/80 border border-slate-800 hover:border-blue-500/40 rounded-2xl p-4 transition-all flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${levelCfg.bg} ${levelCfg.color} ${levelCfg.border}`}>
+                        {levelCfg.emoji} {levelCfg.label}
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-mono">
+                        {spot.lat.toFixed(2)}°, {spot.lon.toFixed(2)}°
+                      </span>
+                    </div>
+                    <h3 className="text-sm font-bold text-white mb-1">{spot.name}</h3>
+                    <p className="text-xs text-slate-400 line-clamp-2 mb-3 leading-relaxed">
+                      {spot.description}
+                    </p>
+                    <div className="space-y-1 text-[11px] text-slate-400 mb-3 bg-slate-800/40 p-2.5 rounded-xl border border-slate-800/60">
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-400">Vento ideal:</span>
+                        <span className="font-semibold text-slate-200">{spot.bestWind}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-400">Exposição:</span>
+                        <span className="text-slate-300 truncate max-w-[120px]">{spot.exposure}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-2 border-t border-slate-800/60">
+                    <Link
+                      href="/swell?tab=spots"
+                      className="flex-1 text-center py-1.5 px-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-lg text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                    >
+                      Ver no Mapa
+                    </Link>
+                    <a
+                      href={spot.googleMapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={`Abrir localização de ${spot.name} no Google Maps`}
+                      aria-label={`Abrir localização de ${spot.name} no Google Maps`}
+                      className="p-2 bg-slate-800/60 hover:bg-slate-700/60 text-slate-300 hover:text-white rounded-lg border border-slate-700/50 transition-colors flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                    >
+                      <FaRoute className="w-3.5 h-3.5 text-blue-400" aria-hidden="true" />
+                    </a>
+                  </div>
                 </div>
-                <div className="p-3">
-                  <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">{post.category}</span>
-                  <h3 className="text-sm font-bold text-white mt-1 group-hover:text-emerald-300 transition-colors line-clamp-2">
-                    {post.title}
-                  </h3>
-                </div>
-              </Link>
-            ))}
+              );
+            })}
           </div>
         </ForecastSection>
+
+        {/* 10. Carrossel Compacto Pré-Footer */}
+        <section aria-label="Destaques compactos do portal" className="pt-4">
+          <HeroCarousel compact={true} />
+        </section>
       </div>
     </main>
   );
