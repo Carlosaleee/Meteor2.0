@@ -18,6 +18,12 @@ const ALLOWED_HREFS = new Set([
   '/blog/reserva-de-cananeia-manguezais-lagamar',
   '/blog/jureia-itinga-praias-surf-ecoturismo',
   '/blog/ilha-comprida-mar-de-dentro-oceano',
+  '/blog/ventos-de-sudeste-o-que-esperar-no-inverno',
+  '/blog/dinamica-costeira-vale-do-ribeira',
+  '/blog/el-nino-2026-litoral-sul-sp',
+  '/blog/baleias-jubarte-litoral-sao-paulo',
+  '/blog/ilha-do-cardoso-guia-ecoturismo',
+  '/blog/caverna-do-diabo-guia-visita',
 ]);
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -35,9 +41,9 @@ function collectHrefs(post: BlogPost): string[] {
 }
 
 describe('blog-posts — base de conteúdos', () => {
-  it('tem 6 posts: 4 publicados e 2 coming-soon', () => {
-    expect(BLOG_POSTS).toHaveLength(6);
-    expect(publishedPosts()).toHaveLength(4);
+  it('tem 12 posts: 10 publicados e 2 coming-soon', () => {
+    expect(BLOG_POSTS).toHaveLength(12);
+    expect(publishedPosts()).toHaveLength(10);
     expect(comingSoonPosts()).toHaveLength(2);
   });
 
@@ -122,7 +128,8 @@ describe('blog-posts — base de conteúdos', () => {
 
   it('getPostBySlug retorna apenas posts publicados', () => {
     expect(getPostBySlug('tabua-de-mares-ilha-comprida-cananeia')?.status).toBe('published');
-    expect(getPostBySlug('ventos-de-sudeste-o-que-esperar-no-inverno')).toBeUndefined();
+    expect(getPostBySlug('el-nino-2026-litoral-sul-sp')?.status).toBe('published');
+    expect(getPostBySlug('surf-peruibe-spots-guia')).toBeUndefined();
     expect(getPostBySlug('slug-que-nao-existe')).toBeUndefined();
   });
 

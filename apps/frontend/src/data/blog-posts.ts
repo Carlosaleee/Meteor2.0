@@ -558,13 +558,96 @@ export const BLOG_POSTS: BlogPost[] = [
     imageUrl: '/blog/ventos-de-sudeste.jpg',
     imageAlt: 'Céu encoberto e mar agitado em dia de vento de sudeste no litoral sul de São Paulo',
     author: 'Carlos Alexandre',
-    status: 'coming-soon',
-    content: [],
+    status: 'published',
+    content: [
+      {
+        type: 'answer',
+        text:
+          'O **vento de sudeste** é o padrão que domina boa parte do **inverno no Litoral Sul de SP**: sopra do quadrante sudeste sobre o oceano, associado à circulação de alta pressão no Atlântico Sul e aos períodos pós-frontais. Para a praia, ele significa **céu encoberto, mar de cara (onshore) nas praias voltadas a leste** e vento local que gera ondas curtas e bagunçadas — enquanto o **terral** (vento de terra, vindo do quadrante noroeste/norte) é a janela mais limpa para o surf. Com ele também vem o resfriamento: no inverno a água do mar da região costuma ficar na **faixa de 18 a 20 °C**.',
+      },
+      { type: 'h2', text: 'De Onde Vem o Vento de Sudeste' },
+      {
+        type: 'p',
+        text:
+          'No inverno, a alta subtropical do Atlântico Sul empurra ar marítimo úmido em direção à costa paulista. Depois de cada frente fria que passa pelo Sul do país, a circulação de superfície se reorganiza e o vento passa a soprar de **sudeste (SE)** sobre o mar — trazendo umidade, neblina na orla e ressaca discreta. É o vento de "fim de inverno chuvoso e cinzento" que todo morador da região reconhece.',
+      },
+      {
+        type: 'table',
+        headers: ['Padrão de vento', 'Quadrante', 'Efeito no mar e na praia'],
+        rows: [
+          ['**Sudeste (SE)**', 'Marítimo (de fora)', 'Céu encoberto, mar agitado e ondas curtas de vento (windswell); onshore nas praias a leste'],
+          ['**Terral (NO/N)**', 'Terrestre (de dentro)', 'Manhãs de mar liso e luz limpa — a melhor janela para o surf e para fotos na praia'],
+          ['**Sul/Sudoeste pós-frontal**', 'Polar (de sul)', 'Ar mais seco e frio, rajadas, mar de sul e swell de maior período'],
+          ['**Noroeste pré-frontal**', 'Terrestre (quentão)', 'Dia abafado, quente e sem vento — o "calor antes da trova" das frentes frias'],
+        ],
+      },
+      { type: 'h2', text: 'O Que o Vento de Sudeste Faz com as Ondas' },
+      {
+        type: 'p',
+        text:
+          'O vento de sudeste **não cria swell de verdade** — ele cria vento-swell: ondas curtas, irregulares e de pouco período, que só "servem" para quem está desesperado por mar. Nas praias de mar aberto da região (Juréia, Ilha Comprida), ele sopra de cara ou de través, saindo a espuma e "abrilhantando" a face da onda. Quando ele coincide com um swell de sul, o resultado é mar confuso; quando ele cede para o terral, a mesma onda fica limpa.',
+      },
+      {
+        type: 'callout',
+        tone: 'tip',
+        title: 'A call rápida antes de sair',
+        text:
+          'Abra /swell?tab=forecast e olhe vento, altura e período juntos: SE com período curto = mar bagunçado; terral com período longo = janela limpa. Em /swell?tab=spots você confere o nível de experiência de cada spot da região.',
+      },
+      { type: 'h2', text: 'Temperatura da Água e do Ar no Inverno' },
+      {
+        type: 'ul',
+        items: [
+          '**Água do mar:** em geral entre **18 e 20 °C** no inverno, com quedas mais profundas em frentes frias fortes — muita gente sai do mar de blusa de neoprene 3/2 ou 4/3.',
+          '**Ar:** noites mais frescas na orla e madrugadas de neblina em dias de vento de sudeste estável.',
+          '**Sensação:** o vento constante do quadrante SE "rouba" calor — o que parece 20 °C na tábua, na praia com vento senta como menos.',
+        ],
+      },
+      { type: 'h2', text: 'Quando Observar Esse Padrão' },
+      {
+        type: 'p',
+        text:
+          'O pico do padrão é **junho a agosto**, mas ventos de sudeste persistem em setembro e outubro, especialmente entre frentes frias. Confira a previsão das 4 cidades da região em **/meteorologia** e cruze com o vento em **/swell?tab=forecast** — no inverno a regra é: **planifique a sessão pelo vento, não só pela altura da onda**.',
+      },
+      {
+        type: 'callout',
+        tone: 'alert',
+        title: 'Atenção com o mar de sudeste',
+        text:
+          'Vento de sudeste sustentado empurra água para a costa e intensifica as correntes de retorno nas praias de mar aberto. Confira as condições em /swell?tab=forecast antes de entrar na água.',
+      },
+    ],
+    faq: [
+      {
+        q: 'O que é vento de sudeste no inverno?',
+        a: 'É o vento que sopra do quadrante sudeste sobre o oceano, associado à circulação de alta pressão no Atlântico Sul e aos períodos pós-frontais no Sul do país. No Litoral Sul de SP ele traz umidade, céu encoberto, neblina na orla e mar agitado — é o padrão mais recorrente do inverno na região.',
+      },
+      {
+        q: 'Vento de sudeste é bom para surfar?',
+        a: 'Em geral não: ele sopra de cara nas praias voltadas a leste e gera ondas curtas e bagunçadas (windswell). A janela limpa do inverno é o terral (vento de terra, quadrante noroeste/norte), que deixa a face da onda lisa. Quando o sudeste cede e entra o terral com swell de sul, o mar fica bom.',
+      },
+      {
+        q: 'Qual a temperatura da água do mar no inverno no Litoral Sul de SP?',
+        a: 'Em geral entre 18 e 20 °C, com quedas mais profundas em frentes frias fortes. Com o vento de sudeste constante, a sensação de frio na praia aumenta — blusa de neoprene 3/2 ou 4/3 é o padrão para a maioria dos surfistas da região no inverno.',
+      },
+      {
+        q: 'Qual a diferença entre vento de sudeste e terral?',
+        a: 'O vento de sudeste vem do mar (quadrante SE) e bagunça a superfície; o terral vem da terra (quadrante NO/N na região) e sopra geralmente de madrugada e nas primeiras horas do dia, deixando o mar liso. Por isso o terral é a janela preferida dos surfistas e dos pescadores de madrugada.',
+      },
+    ],
     relatedLinks: [
       { label: 'Previsão do tempo (4 cidades)', href: '/meteorologia' },
       { label: 'Condições do mar e vento', href: '/swell?tab=forecast' },
+      { label: 'Spots e níveis de experiência', href: '/swell?tab=spots' },
+      { label: 'Alertas e rodovias', href: '/noticias' },
     ],
-    keywords: ['vento de sudeste inverno litoral sul', 'padrão de vento ilha comprida', 'previsão de vento litoral sul sp'],
+    keywords: [
+      'vento de sudeste inverno litoral sul',
+      'padrão de vento ilha comprida',
+      'previsão de vento litoral sul sp',
+      'vento terral no surf',
+      'temperatura da água do mar no inverno em são paulo',
+    ],
   },
   {
     slug: 'dinamica-costeira-vale-do-ribeira',
@@ -581,13 +664,704 @@ export const BLOG_POSTS: BlogPost[] = [
     imageUrl: '/blog/dinamica-costeira.jpg',
     imageAlt: 'Encontro de águas do rio com o oceano na desembocadura do Vale do Ribeira',
     author: 'Carlos Alexandre',
-    status: 'coming-soon',
-    content: [],
+    status: 'published',
+    content: [
+      {
+        type: 'answer',
+        text:
+          'A dinâmica costeira do Vale do Ribeira é comandada por três forças: a **descarga do Rio Ribeira de Iguape**, que traz sedimento da Serra do Mar até o estuário; o **transporte litorâneo de sedimentos gerado pelas ondas** — nas praias do litoral sul paulista, estudos de erosão e progradação de Ilha Comprida apontam deriva líquida para **nordeste**, no sentido sul → Ilha Comprida; e a **oscilação da maré**, que redistribui areia nos canais do Complexo Lagunar. Juntas, elas esculpem **Ilha Comprida** (ilha-barreira), sustentam os manguezais do **Lagamar** e modelam os costões da **Juréia** — e explicam por que a erosão de uma praia costuma ser sintoma de um desequilíbrio em outro ponto da costa.',
+      },
+      { type: 'h2', text: 'Três Forças que Esculpem a Costa' },
+      {
+        type: 'table',
+        headers: ['Força', 'Origem', 'Efeito na costa'],
+        rows: [
+          [
+            '**Descarga fluvial**',
+            'Rio Ribeira de Iguape — um dos maiores rios do estado de São Paulo, com bacia no Vale do Ribeira',
+            'Aporte de sedimento no estuário; formação de bancos, praias e a barreira que protege o Mar de Dentro',
+          ],
+          [
+            '**Transporte litorâneo**',
+            'Ângulo de chegada das ondas de sul e sudeste sobre a linha de costa',
+            'Deslocamento de areia ao longo da praia (deriva); praias ganham ou perdem areia conforme o balanço',
+          ],
+          [
+            '**Maré e ventos locais**',
+            'Ciclo de maré (sizígia/quadratura) e ventos como o sudeste e o terral',
+            'Redistribuição de sedimentos nos canais, nas barras e na boca do estuário — e atraso hidrográfico no Lagamar',
+          ],
+        ],
+      },
+      { type: 'h2', text: 'Como Ilha Comprida Se Formou' },
+      {
+        type: 'p',
+        text:
+          'Ilha Comprida é uma **ilha-barreira**: uma faixa de areia paralela ao mar que separa o Atlântico do Mar de Dentro. Ela nasceu do encontro entre o sedimento do Rio Ribeira e o transporte litorâneo — ondas que chegam em ângulo empurram a areia ao longo da costa, e onde a energia cai, ela se acumula. Essa faixa é viva: tempestades abrem e fecham barras, a maré remodela as extremidades e o vento esculpe as dunas que fixam a vegetação de restinga.',
+      },
+      {
+        type: 'callout',
+        tone: 'info',
+        title: 'Uma ilha, dois mares',
+        text:
+          'De um lado a praia aberta com swell direto; do outro o Mar de Dentro com manguezais e atraso de maré de 1 a 2 horas. Essa dualidade é detalhada no guia Ilha Comprida: a Barreira entre o Mar de Dentro e o Oceano.',
+      },
+      { type: 'h2', text: 'O Lagamar e os Manguezais: a Zona de Passagem' },
+      {
+        type: 'p',
+        text:
+          'Os sedimentos que chegam ao estuário não param: a maré os move e os manguezais os prendem. As raízes de rizófora amortecem a correnteza, capturam partículas e constroem solo — é o motor por trás dos bancos de ostra e marisco do Lagamar e da filtragem natural da água. Quando o aporte de sedimento muda (por exemplo, em anos de chuva intensa no Vale do Ribeira), a dinâmica dos canais muda junto: bancos aparecem, canais alargam e a navegação precisa de atenção redobrada.',
+      },
+      { type: 'h2', text: 'O Que Muda com o Clima' },
+      {
+        type: 'ul',
+        items: [
+          '**El Niño e chuva acima da média:** mais descarga do Rio Ribeira significa mais sedimento suspensido no estuário e maior risco de cheias no Vale do Ribeira.',
+          '**Frentes frias e ressacas:** episódios de swell forte aceleram a erosão da barreira e remobilizam areia das praias expostas.',
+          '**Mar mais quente:** anomalias térmicas prolongadas alteram a circulação de superfície e a energia disponível para os processos costeiros.',
+          '**Ciclo natural:** erosão e progradação são fases do mesmo sistema — a areia "some" de uma praia e reaparece em outro ponto da célula de deriva.',
+        ],
+      },
+      {
+        type: 'callout',
+        tone: 'tip',
+        title: 'A direção da deriva depende do swell',
+        text:
+          'A deriva litorânea é gerada pelo ângulo de chegada das ondas: muda o swell, muda o sentido do transporte de areia. Acompanhe altura, período e direção em /swell?tab=forecast e cruze com /meteorologia (vento e chuva) para entender o mar do dia.',
+      },
+      { type: 'h2', text: 'Onde Acompanhar o Mar em Tempo Real' },
+      {
+        type: 'p',
+        text:
+          'Condições do mar e próximas marés em **/swell?tab=forecast**, spots e níveis de experiência em **/swell?tab=spots**, chuva e vento das 4 cidades em **/meteorologia** e alertas de rodovias e travessias em **/noticias#rodovias**.',
+      },
+    ],
+    faq: [
+      {
+        q: 'O que é dinâmica costeira?',
+        a: 'É o conjunto de processos que movimentam e remodelam a linha costeira: ondas e correntes marinhas geram o transporte litorâneo de sedimentos, os rios trazem material do continente, e a maré e os ventos redistribuem tudo. No Vale do Ribeira, esses processos criaram e mantêm Ilha Comprida, os bancos do estuário e os manguezais do Lagamar.',
+      },
+      {
+        q: 'Como Ilha Comprida se formou?',
+        a: 'Como ilha-barreira: o sedimento aportado pelo Rio Ribeira de Iguape foi deslocado ao longo da costa pelo transporte litorâneo gerado pelas ondas e se acumulou onde a energia diminuiu, formando uma faixa de areia paralela ao mar que separa o Atlântico do Mar de Dentro. Dunas e vegetação de restinga fixam a faixa, que continua se movendo com tempestades e marés.',
+      },
+      {
+        q: 'Qual o papel do Rio Ribeira na costa?',
+        a: 'O Rio Ribeira de Iguape é a principal fonte de sedimento da região: sua descarga alimenta os bancos do estuário, ajuda a sustentar as praias e a barreira de Ilha Comprida e define a dinâmica dos canais do Lagamar. Em períodos de chuva intensa — como os anos de El Niño — a descarga aumenta, com mais sedimento em suspensão e maior risco de cheias no vale.',
+      },
+      {
+        q: 'Por que algumas praias do litoral sul perdem areia?',
+        a: 'Porque o transporte litorâneo é um balanço: a areia que sai de um ponto precisa chegar em outro. Quando muda o padrão de ondas, uma tempestade removente acelera a erosão ou um obstáculo natural interrompe o fornecimento, a praia fica no vermelho. Em Ilha Comprida, estudos apontam deriva líquida para nordeste — e a Ilha do Cardoso atua como obstáculo natural aos sedimentos vindos do sul.',
+      },
+    ],
     relatedLinks: [
       { label: 'Condições do mar', href: '/swell?tab=forecast' },
       { label: 'Guia de marés de Ilha Comprida e Cananéia', href: '/blog/tabua-de-mares-ilha-comprida-cananeia' },
+      { label: 'Ilha Comprida: Mar de Dentro e Oceano', href: '/blog/ilha-comprida-mar-de-dentro-oceano' },
+      { label: 'El Niño 2026 no Litoral Sul', href: '/blog/el-nino-2026-litoral-sul-sp' },
+      { label: 'Previsão do tempo da região', href: '/meteorologia' },
     ],
-    keywords: ['dinâmica costeira vale do ribeira', 'transporte de sedimentos ilha comprida', 'correntes costeiras litoral sul'],
+    keywords: [
+      'dinâmica costeira vale do ribeira',
+      'transporte de sedimentos ilha comprida',
+      'correntes costeiras litoral sul',
+      'ilha-barreira formação',
+      'deriva litorânea são paulo',
+    ],
+  },
+  {
+    slug: 'el-nino-2026-litoral-sul-sp',
+    title: 'El Niño em 2026: o Que a Temporada Significa para o Litoral Sul de SP',
+    metaTitle: 'El Niño 2026 no Litoral Sul de SP | Meteor 2.0',
+    description:
+      'El Niño 2026 é o mais forte desde 1950 e segue até 2027. Veja o impacto no Litoral Sul de SP: chuva acima da média, mar quente e risco de cheias no verão.',
+    summary:
+      'A temporada de El Niño de 2026/2027 em números oficiais e o que ela muda para chuva, mar, rios e rotas do Litoral Sul Paulista.',
+    category: 'Clima',
+    categoryColor: 'bg-amber-500/20 text-amber-400',
+    date: '2026-11-07',
+    readTime: '7 min de leitura',
+    imageUrl: '/blog/el-nino-2026.jpg',
+    imageAlt: 'Céu carregado e chuva sobre o mar em dia de temporal no Litoral Sul de São Paulo',
+    author: 'Carlos Alexandre',
+    status: 'published',
+    content: [
+      {
+        type: 'answer',
+        text:
+          'O **El Niño de 2026** foi confirmado em junho e bateu recorde em outubro, com anomalia mensal de **+2,47 °C** — o maior desvio da série histórica para o mês. O Painel El Niño (INMET, INPE, ANA, CEMADEN, SGB, SEDEC e CENSIPAM) projeta **95% de chance de intensidade muito forte entre outubro e dezembro** — potencialmente o El Niño mais intenso desde 1950 — e **persistência pelo menos até o início de 2027**. Para o **Litoral Sul de SP e o Vale do Ribeira**, o cenário da temporada é de **chuva acima da média**, **temperaturas acima do normal** e **maior risco de cheias e deslizamentos**, sobretudo no verão.',
+      },
+      { type: 'h2', text: 'O Que É o El Niño e Por Que 2026 é Diferente' },
+      {
+        type: 'p',
+        text:
+          'O El Niño é o aquecimento anômalo das águas do Pacífico Equatorial. Em 2026, as condições foram **confirmadas em junho** e o aquecimento seguiu crescendo: no fim de setembro, as anomalias de temperatura da superfície do mar superaram **2 °C** nas áreas central e leste do Pacífico (dados da agência norte-americana CPC/NOAA). Outubro de 2026 fechou com desvio mensal de **+2,47 °C**, recorde da série histórica para o mês.',
+      },
+      {
+        type: 'callout',
+        tone: 'info',
+        title: 'Fonte oficial da previsão',
+        text:
+          'Os números vêm do Boletim nº 4 do Painel El Niño, publicado em 30/09/2026 pelo INMET em parceria com INPE, ANA, CEMADEN, SGB, SEDEC e CENSIPAM. Previsões sazonais indicam tendências — o impacto local depende da evolução do tempo dia a dia.',
+      },
+      { type: 'h2', text: 'Tabela Comparativa GEO: O Que a Temporada de 2026/2027 Reserva' },
+      {
+        type: 'table',
+        headers: ['Região / Variável', 'Previsão da temporada', 'Leitura no Litoral Sul de SP'],
+        rows: [
+          [
+            '**Sul do Brasil**',
+            'Chuva acima da média (out–dez) com risco de cheias, que diminui até dezembro',
+            'Maior descarga do Rio Ribeira e atenção para enchentes no Vale do Ribeira',
+          ],
+          [
+            '**Sudeste (parte)**',
+            'Episódios de chuva volumosa alternados com períodos mais secos',
+            'Pragueiras fortes no verão, com dias de sol entre as pancadas',
+          ],
+          [
+            '**Temperatura**',
+            'Acima da faixa normal em quase todo o país; mais ondas de calor',
+            'Ar e água do mar mais quentes; noites tropicais mesmo no fim do inverno',
+          ],
+          [
+            '**Centro-norte do país**',
+            'Seca acentuada e maior risco de incêndios florestais',
+            'Sem impacto direto na costa — mas atenção à rota de estrada em dias de fumaça e calor',
+          ],
+        ],
+      },
+      { type: 'h2', text: 'El Niño vs. La Niña: o Que Muda no Litoral Sul' },
+      {
+        type: 'table',
+        headers: ['Parâmetro', 'El Niño (cenário 2026/2027)', 'La Niña (contraponto)'],
+        rows: [
+          ['**Chuva no Sul/Sudeste Sul**', 'Acima da média, com eventos intensos e risco de cheias', 'Tendência a chuvas abaixo da média e verões mais secos'],
+          ['**Temperatura**', 'Acima da média; ondas de calor mais frequentes', 'Menos anomalias térmicas; friagem mais recorrente no inverno'],
+          ['**Rio Ribeira**', 'Descarga maior: mais sedimento e turbidez no estuário', 'Descarga menor; águas mais claras no Lagamar'],
+          ['**Estradas e acesso**', 'Maior risco de deslizamento e alagamento em dias de chuva forte', 'Menor incidência de eventos críticos de chuva'],
+        ],
+      },
+      { type: 'h2', text: 'Como o El Niño Afeta o Mar e o Surf' },
+      {
+        type: 'p',
+        text:
+          'Ser sincero: **El Niño não decide o mar de amanhã** — altura, período e direção das ondas dependem de sistemas de vento e do swell do dia, que você confere em **/swell?tab=forecast**. O que a temporada altera é o *contexto*: mais chuva significa mais descarga de rios (com mudanças na claridade da água no estuário), mar mais quente pode mudar a fauna e a temperatura de superfície, e o padrão de ventos pode variar ao longo do verão. O surfista atento cruza a previsão de longo prazo com a telemetria do dia.',
+      },
+      { type: 'h2', text: 'Checklist de Preparação para a Temporada' },
+      {
+        type: 'ul',
+        items: [
+          '**Cadastre-se na Defesa Civil:** envie o CEP por SMS para 40199 ou pelo WhatsApp (61) 2034-4611 e Telegram (@defesacivilbrbot) para receber alertas.',
+          '**Avisos do INMET:** acompanhe os avisos meteorológicos oficiais em avisos.inmet.gov.br antes de viagens longas.',
+          '**Rodovias:** em dias de chuva forte, confira SP-222, BR-116 e o status das balsas em /noticias#rodovias antes de sair.',
+          '**Rio e estuário:** pescadores e navegadores devem atenção redobrada em dias de chuva no Vale do Ribeira — correnteza e turbidez sobem rápido.',
+          '**Rotina diária:** /meteorologia para chuva e temperatura das 4 cidades e /swell?tab=forecast para mar, vento e marés.',
+        ],
+      },
+      {
+        type: 'callout',
+        tone: 'alert',
+        title: 'Cheias não seguem calendário',
+        text:
+          'O El Niño define a tendência sazonal, não o dia exato. Chuva extrema pode acontecer em qualquer período — cadastro na Defesa Civil e monitoramento diário são a sua rede de segurança.',
+      },
+      { type: 'h2', text: 'Até Quando o El Niño Vai Durar' },
+      {
+        type: 'p',
+        text:
+          'Os modelos indicam **probabilidade acima de 90% de persistência até pelo menos o início de 2027**, com alta probabilidade de El Niño muito forte entre a primavera e o verão de 2026 (ano hidrológico que vai até meados de 2027). O Painel El Niño continua emitindo boletins mensais — a recomendação oficial é o acompanhamento contínuo das condições meteorológicas, hidrológicas e geológicas e dos alertas dos órgãos competentes.',
+      },
+    ],
+    faq: [
+      {
+        q: 'O que o El Niño significa para o litoral de São Paulo em 2026?',
+        a: 'A tendência para o Litoral Sul de SP e o Vale do Ribeira é de chuva acima da média, temperaturas acima do normal e maior risco de cheias e deslizamentos, sobretudo no verão. Mais chuva significa maior descarga do Rio Ribeira no estuário — com efeitos na claridade da água e na navegação — e mais episódios de temporal na orla.',
+      },
+      {
+        q: 'O El Niño de 2026 vai ser o mais forte da história?',
+        a: 'O Painel El Niño projeta 95% de chance de intensidade muito forte entre outubro e dezembro de 2026, o que pode ser o fenômeno mais intenso desde 1950. Em outubro de 2026, a anomalia mensal chegou a +2,47 °C, recorde da série histórica para o mês, segundo o INMET.',
+      },
+      {
+        q: 'El Niño afeta as ondas e o surf no Litoral Sul?',
+        a: 'Não diretamente: altura, período e direção das ondas dependem do swell e do vento de cada dia, que você confere em /swell?tab=forecast. O El Niño muda o contexto da temporada — chuva, temperatura da água, descarga dos rios e padrão de ventos —, mas a call do dia continua sendo a telemetria em tempo real.',
+      },
+      {
+        q: 'Até quando o El Niño deve durar?',
+        a: 'Os modelos indicam probabilidade acima de 90% de o fenômeno persistir pelo menos até o início de 2027, com o pico entre outubro e dezembro de 2026. O Painel El Niño — INMET, INPE, ANA, CEMADEN, SGB, SEDEC e CENSIPAM — publica boletins mensais com o monitoramento atualizado.',
+      },
+    ],
+    relatedLinks: [
+      { label: 'Previsão do tempo (4 cidades)', href: '/meteorologia' },
+      { label: 'Condições do mar e próximas marés', href: '/swell?tab=forecast' },
+      { label: 'Alertas, rodovias e balsas', href: '/noticias#rodovias' },
+      { label: 'Dinâmica costeira do Vale do Ribeira', href: '/blog/dinamica-costeira-vale-do-ribeira' },
+    ],
+    keywords: [
+      'el niño 2026',
+      'el niño 2026 brasil impactos',
+      'chuva acima da média litoral sul sp',
+      'el niño e o tempo em são paulo',
+      'clima verão 2026 2027 vale do ribeira',
+      'el niño mais forte desde 1950',
+    ],
+  },
+  {
+    slug: 'baleias-jubarte-litoral-sao-paulo',
+    title: 'Baleias Jubarte no Litoral de São Paulo: Temporada, Regras e Onde Ver',
+    metaTitle: 'Baleias Jubarte no Litoral Paulista | Meteor',
+    description:
+      'Temporada de baleias jubarte em SP vai de maio a novembro. Veja os avisos de 2026, as regras dos 100 metros do Ibama e onde observar no mar com segurança.',
+    summary:
+      'Calendário da migração, as regras dos 100 metros do Ibama e onde avistar jubartes no litoral paulista — do Litoral Norte ao trânsito do Sul.',
+    category: 'Meio Ambiente',
+    categoryColor: 'bg-green-500/20 text-green-400',
+    date: '2026-11-07',
+    readTime: '6 min de leitura',
+    imageUrl: '/blog/baleias-jubarte.jpg',
+    imageAlt: 'Baleia jubarte saltando no oceano cinza-esverdeado durante a migração pelo litoral de São Paulo',
+    author: 'Carlos Alexandre',
+    status: 'published',
+    content: [
+      {
+        type: 'answer',
+        text:
+          'A **baleia-jubarte** migra todos os anos pelas águas brasileiras: a temporada no litoral de São Paulo começa em **maio**, ganha força a **partir de junho** e segue até **novembro**, quando os animais deixam as áreas de reprodução no Atlântico tropical em direção ao sul. Em 2026, o Litoral Norte de SP **já havia registrado 14 avistamentos até 8 de maio** — temporada adiantada. Pela **portaria do Ibama**, qualquer embarcação deve manter **distância mínima de 100 metros**, aproximação sempre **lateral**, **motor no neutro** se o animal chegar perto e **zero perseguição**. No **Litoral Sul de SP** (Ilha Comprida, Cananéia, Juréia) os avistamentos são mais esporádicos — os animais estão em trânsito — e o passeio seguro é com agência credenciada.',
+      },
+      { type: 'h2', text: 'Calendário da Migração em São Paulo' },
+      {
+        type: 'table',
+        headers: ['Período', 'O que acontece', 'Onde observar'],
+        rows: [
+          [
+            '**Maio**',
+            'Chegada dos primeiros animais ao litoral paulista — em 2026, temporada começou antes do previsto',
+            'Litoral Norte: Ubatuba, Ilhabela e Bertioga',
+          ],
+          [
+            '**Junho a agosto**',
+            'Pico da migração ao longo da costa; alta demanda pelos passeios de observação',
+            'Litoral Norte e central (Santos, Guarujá)',
+          ],
+          [
+            '**Setembro a novembro**',
+            'Animais em trânsito de volta para as águas frias do sul; avistamentos mais pontuais',
+            'Toda a costa paulista, com registros esparsos no Litoral Sul',
+          ],
+          [
+            '**Dezembro a março**',
+            'Fase de reprodução e criação no Atlântico tropical (Nordeste/Abrolhos); fora da janela paulista',
+            'Litoral da Bahia',
+          ],
+        ],
+      },
+      { type: 'h2', text: 'As Regras do Ibama para Observação (Portaria)' },
+      {
+        type: 'ul',
+        items: [
+          '**Distância mínima de 100 metros** entre a embarcação e as baleias (e golfinhos).',
+          '**Aproximação sempre lateral** — nunca pela frente nem atrás, para não interromper o trajeto.',
+          '**Nunca perseguir** nem cercar os animais; se eles se aproximarem por curiosidade, **motor no neutro**.',
+          '**Sem barulho excessivo:** baleias e golfinhos se comunicam pelo som e precisam saber onde está a embarcação.',
+          '**Não interagir:** nada de nadar junto, tocar ou alimentar os animais.',
+          '**Agência credenciada:** em Ilhabela, o selo **"Amigo das Baleias"** identifica operadores capacitados.',
+        ],
+      },
+      {
+        type: 'callout',
+        tone: 'alert',
+        title: '100 metros não é sugestão',
+        text:
+          'A regra da portaria do Ibama vale para qualquer embarcação, inclusive particulares. A aproximação indevida colide o animal, o turista e o operador — e tira o aval de quem faz o passeio certo.',
+      },
+      { type: 'h2', text: 'Onde Ver no Litoral Sul de SP' },
+      {
+        type: 'p',
+        text:
+          'A concentração de avistamentos em São Paulo está no **Litoral Norte** (Ubatuba, Ilhabela, Bertioga), onde a temporada de 2026 começou antes do previsto. No **Litoral Sul** — Ilha Comprida, Cananéia, Iguape e Juréia — a jubarte aparece de forma **esporádica, em trânsito**: a janela é pequena e depende de sorte, de mar calmo e de olhar atento para o horizonte. Quem está no Mar de Dentro, em geral, conta com os **golfinhos-cinza** (Sotalia guianensis), que acompanhavam os barcos o ano todo — um dos grandes encantos do estuário de Cananéia.',
+      },
+      {
+        type: 'callout',
+        tone: 'tip',
+        title: 'Combine mar + vento antes de sair',
+        text:
+          'Passeio de observação pede mar manso e pouca rajada: confira /swell?tab=forecast (altura e vento) e /meteorologia (chuva e temperatura) antes de fechar o passeio.',
+      },
+      { type: 'h2', text: 'Ficha Rápida da Baleia-Jubarte' },
+      {
+        type: 'table',
+        headers: ['Característica', 'Informação'],
+        rows: [
+          ['**Nome científico**', '*Megaptera novaeangliae*'],
+          ['**Tamanho**', 'Até cerca de 16 metros de comprimento'],
+          ['**Migração**', 'Uma das maiores do reino animal: milhares de quilômetros entre as águas polares de alimentação e as tropicais de reprodução'],
+          ['**Alimentação**', 'Krill e pequenos peixes nas águas frias do sul'],
+          ['**Reprodução**', 'Tropicais — filhotes nascem e crescem em águas quentes antes da volta para o sul'],
+          ['**Som**', 'Os machos emitem os cantos característicos da época acasalamento'],
+        ],
+      },
+      { type: 'h2', text: 'Como Acompanhar a Temporada' },
+      {
+        type: 'p',
+        text:
+          'Projeções e notícias de avistamento aparecem em **/noticias**, e as condições de mar e vento para sair na água estão em **/swell?tab=forecast**. Se o seu plano é viajar pela região, cruze a previsão com o status das rodovias em **/noticias#rodovias**.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Quando começa a temporada de baleias jubarte em São Paulo?',
+        a: 'A temporada começa em maio e ganha força a partir de junho, seguindo até novembro. Em 2026, o Litoral Norte de SP registrou 14 avistamentos até 8 de maio — os animais chegaram antes do início oficial, segundo o Projeto Baleia Jubarte.',
+      },
+      {
+        q: 'Qual a distância mínima legal para observar baleias?',
+        a: 'Pela portaria do Ibama, a distância mínima é de 100 metros entre a embarcação e os animais. A aproximação deve ser sempre lateral, sem perseguição ou interrupção do trajeto, e se os animais se aproximarem por curiosidade o motor deve ficar no neutro. Barulho excessivo também é proibido.',
+      },
+      {
+        q: 'Onde ver baleias jubarte no litoral de São Paulo?',
+        a: 'Os principais pontos ficam no Litoral Norte — Ubatuba, Ilhabela e Bertioga, com registros também em Santos e no litoral central. Em Ilhabela, o selo "Amigo das Baleias" identifica agências credenciadas para os passeios de observação.',
+      },
+      {
+        q: 'Dá para ver baleias no Litoral Sul, em Ilha Comprida e Cananéia?',
+        a: 'Sim, mas de forma esporádica: no Litoral Sul as jubartes estão em trânsito e os avistamentos são pontuais, dependentes de mar calmo e de olhar atento. Quem navega no Mar de Dentro, em geral, encontra os golfinhos-cinza, que acompanham os barcos no estuário o ano todo.',
+      },
+    ],
+    relatedLinks: [
+      { label: 'Condições do mar e vento', href: '/swell?tab=forecast' },
+      { label: 'Previsão do tempo (4 cidades)', href: '/meteorologia' },
+      { label: 'Notícias e avistamentos', href: '/noticias' },
+      { label: 'Roteiros e parceiros locais', href: '/comercio' },
+      { label: 'Reserva de Cananéia e manguezais', href: '/blog/reserva-de-cananeia-manguezais-lagamar' },
+    ],
+    keywords: [
+      'baleia jubarte são paulo',
+      'temporada de baleias litoral paulista',
+      'avistamento de baleias jubarte 2026',
+      'regras ibama baleias 100 metros',
+      'migração de baleias no brasil',
+      'onde ver baleias em são paulo',
+    ],
+  },
+  {
+    slug: 'ilha-do-cardoso-guia-ecoturismo',
+    title: 'Ilha do Cardoso: Guia Completo de Ecoturismo em Cananéia',
+    metaTitle: 'Ilha do Cardoso: Guia de Ecoturismo | Meteor 2.0',
+    description:
+      'Guia da Ilha do Cardoso em Cananéia: acesso de barco, núcleos Perequê e Marujá, trilhas, horário de visita e todas as dicas para montar o roteiro completo.',
+    summary:
+      'Tudo para planejar uma visita ao Parque Estadual da Ilha do Cardoso: como chegar de barco, os dois núcleos abertos, trilhas e regras do parque.',
+    category: 'Ecoturismo',
+    categoryColor: 'bg-teal-500/20 text-teal-400',
+    date: '2026-11-07',
+    readTime: '8 min de leitura',
+    imageUrl: '/blog/ilha-do-cardoso.jpg',
+    imageAlt: 'Praia quase deserta e mata atlântica preservada na Ilha do Cardoso, em Cananéia, no Vale do Ribeira',
+    author: 'Carlos Alexandre',
+    status: 'published',
+    content: [
+      {
+        type: 'answer',
+        text:
+          'A **Ilha do Cardoso** é um Parque Estadual de **13,6 mil hectares** no extremo sul de São Paulo, no município de **Cananéia**, a cerca de **245 km da capital** — e mais perto de **Curitiba (138 km)** do que de São Paulo. O arquipélago tem três núcleos — **Perequê, Marujá e Ilha da Casca** —, mas só **Perequê e Marujá recebem visitantes**, e **carros são proibidos na ilha**: o acesso é sempre de **barco**, a partir de Cananéia, Iguape ou Ilha Comprida. A visitação é **gratuita e sem agendamento prévio**, com horário de **quinta a domingo, das 9h às 17h** (confirme com o parque antes de sair) e trilhas como a da **Cachoeira Grande** (queda de 11 m) e a do **Morro das Almas** (2 km, cerca de 3 horas).',
+      },
+      { type: 'h2', text: 'Onde Fica e Como Chegar' },
+      {
+        type: 'p',
+        text:
+          'A ilha fica no Vale do Ribeira, banhada a leste pelo Atlântico, a oeste pelo Canal de Ararapira e ao norte pela Baía de Trapandé. Não existe estrada até os núcleos: o roteiro combina transporte terrestre até Cananéia (ou até Cubatão) e o transfer de barco — a viagem de barco já faz parte da experiência, com chance de avistar golfinhos logo na chegada.',
+      },
+      {
+        type: 'table',
+        headers: ['Etapa', 'Rota', 'Observação'],
+        rows: [
+          ['**1ª**', 'Até Cananéia (ou Cubatão, com balsa para Cananéia)', 'De carro ou ônibus; de São Paulo a Cubatão são cerca de 3h30 de ônibus'],
+          ['**2ª**', 'Transfer de barco até os núcleos do parque', 'Saídas de Cananéia, Iguape ou Ilha Comprida — confira disponibilidade com as empresas locais'],
+          ['**3ª**', 'Chegada ao Núcleo Perequê ou Marujá', 'Sede do parque e principais estruturas de recepção'],
+        ],
+      },
+      {
+        type: 'callout',
+        tone: 'alert',
+        title: 'Confirme barco e visitação antes de sair',
+        text:
+          'Horários de barco e de visitação do parque podem mudar. Ligue para o parque: (13) 3851-1163 / (13) 3851-1108 — e acompanhe o status das rodovias e travessias em /noticias#rodovias.',
+      },
+      { type: 'h2', text: 'Os Três Núcleos do Parque' },
+      {
+        type: 'table',
+        headers: ['Núcleo', 'Recebe visitante?', 'Destaques'],
+        rows: [
+          [
+            '**Perequê**',
+            'Sim — sede do parque',
+            'Inaugurado em 2010, explica a história da ilha com painéis e objetos; caiaque monitorado no Rio Perequê; avistamento de botos-cinza; porta de entrada das trilhas',
+          ],
+          [
+            '**Marujá**',
+            'Sim',
+            'Melhor estrutura de hospedagem: casas típicas caiçaras, restaurantes e pousadas; Praia do Marujá; bicicleta até o Pontal do Leste (18 km de litoral)',
+          ],
+          [
+            '**Ilha da Casca**',
+            'Não',
+            'Base de apoio e fiscalização do Parque Estadual da Ilha do Cardoso',
+          ],
+        ],
+      },
+      { type: 'h2', text: 'Trilhas: o Que Fazer a Pé' },
+      {
+        type: 'ul',
+        items: [
+          '**Trilha da Cachoeira Grande:** uma das mais procuradas; queda d\'água de mais de 11 metros, com acesso por trilha de dificuldade moderada ou de barco.',
+          '**Trilha do Morro das Almas:** 2 km, cerca de 3 horas, nível moderado — aves, bromélias e mata nativa.',
+          '**Trilha do Poço das Antas:** 2,5 km e cerca de 4 horas, com margens do Rio Perequê, piscinas naturais e transição de restinga, floresta de encosta e mata de planície.',
+          '**Trilha do Mangueal:** sai do Núcleo Perequê até a Praia da Pereirinha, passando por mata nativa e bancos de caranguejo.',
+          '**Trilha do Sambaqui e do Costão Rochoso:** menos de 2 horas, nível médio — sítios arqueológicos com ossos e objetos dos antigos habitantes da ilha.',
+        ],
+      },
+      { type: 'h2', text: 'Praias e Atrativos Imperdíveis' },
+      {
+        type: 'ul',
+        items: [
+          '**Praia do Pereirinha (Itacuruçá):** a mais próxima de Cananéia e considerada uma das melhores para crianças — e um dos pontos de mergulho com golfinhos.',
+          '**Praia de Ipanema:** a partir do Perequê, spot de surf e golfinhos saltando na orla.',
+          '**Praia do Marujá:** faixa extensa e quase deserta, "tesouro escondido" da ilha.',
+          '**Pontal do Leste:** 18 km de litoral do Marujá até o pontal — ideal de bicicleta (carros são proibidos).',
+          '**Marco do Tratado de Tordesilhas:** em Itacuruçá, a linha imaginária que dividia América portuguesa e espanhola passava bem sobre a ilha.',
+        ],
+      },
+      {
+        type: 'callout',
+        tone: 'tip',
+        title: 'Turismo comunitário que sustenta a ilha',
+        text:
+          'Hospedagem e alimentação no Marujá e no Perequê são das famílias caiçaras: consumir serviços locais é o que mantém a floresta de pé. A reserva faz parte da Reserva da Biosfera reconhecida pela Unesco no Vale do Ribeira.',
+      },
+      { type: 'h2', text: 'Regras e Cuidados na Visitação' },
+      {
+        type: 'ul',
+        items: [
+          '**Carros proibidos** na ilha: desloque-se a pé ou de bicicleta.',
+          '**Siga apenas as trilhas oficiais** e respeite os horários de visitação do parque.',
+          '**Leve água, repelente e protetor solar** — a estrutura nos núcleos é limitada.',
+          '**Zero resíduo:** leve todo o seu lixo; a ilha não tem tratamento como a cidade.',
+          '**Respeite a fauna:** não alimente animais, não aproxime dos golfinhos e mantenha distância.',
+          '**Consulte o parque** ((13) 3851-1163 / (13) 3851-1108) para horários de barco, visitação e trilhas fechadas.',
+        ],
+      },
+      { type: 'h2', text: 'Melhor Época e Telemetria para o Roteiro' },
+      {
+        type: 'p',
+        text:
+          'A ilha recebe visitantes de quinta a domingo ao longo do ano — o fator decisivo é o **tempo**: chuva forte deixa as trilhas escorregadias e o barco mais desconfortável. Cruze **/meteorologia** (chuva e temperatura das 4 cidades), **/swell?tab=forecast** (mar e vento para a travessia) e **/noticias#rodovias** (acesso até Cananéia) antes de fechar o roteiro.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Como chegar à Ilha do Cardoso?',
+        a: 'Não há estrada até os núcleos: o acesso é de barco a partir de Cananéia, Iguape ou Ilha Comprida. De São Paulo, a rota comum é até Cubatão (cerca de 3h30 de ônibus) e balsa até Cananéia, seguida do transfer de barco. Na ilha, carros são proibidos — o deslocamento é a pé ou de bicicleta.',
+      },
+      {
+        q: 'Quanto custa e qual o horário de visita do Parque Estadual da Ilha do Cardoso?',
+        a: 'A visitação é gratuita e não exige agendamento prévio, de quinta a domingo, das 9h às 17h (horário informado por guias oficiais — confirme com o parque antes de sair). O acesso depende do transfer de barco, cujo valor é cobrado pelas empresas de transporte.',
+      },
+      {
+        q: 'Quais trilhas fazer na Ilha do Cardoso?',
+        a: 'As mais procuradas são a da Cachoeira Grande (queda de mais de 11 metros, acesso moderado ou de barco), do Morro das Almas (2 km, cerca de 3 horas), do Poço das Antas (2,5 km, cerca de 4 horas, com piscinas naturais), do Mangueal (Perequê até a Praia da Pereirinha) e do Sambaqui e Costão Rochoso (menos de 2 horas, com sítios arqueológicos).',
+      },
+      {
+        q: 'Dá para surfar e nadar com golfinhos na Ilha do Cardoso?',
+        a: 'Sim. A Praia de Ipanema, acessível a partir do Núcleo Perequê, é apontada pelos surfistas da região, e o mergulho com golfinhos acontece com mais frequência perto de Itacuruçá e da Praia do Pereirinha — os animais costumam acompanhar os barcos na chegada à ilha. Confira mar e vento em /swell?tab=forecast antes.',
+      },
+    ],
+    relatedLinks: [
+      { label: 'Condições do mar e próximas marés', href: '/swell?tab=forecast' },
+      { label: 'Previsão do tempo da região', href: '/meteorologia' },
+      { label: 'Reserva de Cananéia e manguezais', href: '/blog/reserva-de-cananeia-manguezais-lagamar' },
+      { label: 'Status das rodovias e travessias', href: '/noticias#rodovias' },
+      { label: 'Roteiros e parceiros locais', href: '/comercio' },
+    ],
+    keywords: [
+      'ilha do cardoso',
+      'parque estadual ilha do cardoso trilhas',
+      'como chegar ilha do cardoso cananéia',
+      'ecoturismo vale do ribeira',
+      'núcleo perequê e marujá',
+      'ilha do cardoso onde ficar',
+    ],
+  },
+  {
+    slug: 'caverna-do-diabo-guia-visita',
+    title: 'Caverna do Diabo: Guia de Visita em Eldorado, Vale do Ribeira',
+    metaTitle: 'Caverna do Diabo: Guia de Visita em Eldorado',
+    description:
+      'Guia completo da Caverna do Diabo em Eldorado: como chegar, preço 2026, monitoria AMAMEL, horários e as principais trilhas do parque no Vale do Ribeira.',
+    summary:
+      'A maior caverna de São Paulo em detalhes: rota pela BR-116, ingresso e monitoria, grupos de 12 pessoas e o que fazer além da caverna.',
+    category: 'Ecoturismo',
+    categoryColor: 'bg-teal-500/20 text-teal-400',
+    date: '2026-11-07',
+    readTime: '7 min de leitura',
+    imageUrl: '/blog/caverna-do-diabo.jpg',
+    imageAlt: 'Formações rochosas iluminadas e passarelas no interior da Caverna do Diabo, em Eldorado, SP',
+    author: 'Carlos Alexandre',
+    status: 'published',
+    content: [
+      {
+        type: 'answer',
+        text:
+          'A **Caverna do Diabo**, em **Eldorado (SP)**, é a maior caverna do estado: mais de **6.000 metros de galerias**, com cerca de **600 metros abertos à visitação** em **grupos de 12 pessoas** e **1 hora de duração**, sempre acompanhada de monitor. Ela fica no **Parque Estadual Caverna do Diabo** (criado em 2008, com mais de 40 mil hectares no mosaico de conservação de Jacupiranga), a **292 km de São Paulo** — cerca de **4h30 pela BR-116 (Régis Bittencourt) até o km 446 e depois a SP-165 no km 111**. O ingresso custa **R$ 19** (gratuito para crianças até 12 anos, adultos 60+ e pessoas com deficiência; estudantes pagam meia) e a **monitoria ambiental da AMAMEL é obrigatória**: R$ 18 em dinheiro ou R$ 20 no cartão. A abertura é de **terça a domingo, das 8h às 17h** — monitores credenciados no local, **sem agendamento prévio**.',
+      },
+      { type: 'h2', text: 'Ficha Técnica do Parque' },
+      {
+        type: 'table',
+        headers: ['Item', 'Informação'],
+        rows: [
+          ['**Criação**', 'Parque Estadual Caverna do Diabo (PECD), em 2008 — integra o mosaico de unidades de conservação de Jacupiranga'],
+          ['**Área**', 'Mais de 40.000 hectares, abrangendo Barra do Turvo, Cajati, Eldorado e Iporanga'],
+          ['**Caverna**', 'Mais de 6.000 m de galerias (cerca de 6.340 m topografados), com ~600 m abertos à visita'],
+          ['**Acesso**', 'BR-116 (Régis Bittencourt) até o km 446 → SP-165, km 111 (bairro André Lopes), na Serra do André Lopes'],
+          ['**Distância**', '292 km de São Paulo (~4h30) e 255 km de Curitiba (~4h)'],
+          ['**Atendimento**', 'Terça a domingo, das 8h às 17h (última visita às 17h); segunda aberta em feriados e férias escolares'],
+        ],
+      },
+      { type: 'h2', text: 'Quanto Custa (2026)' },
+      {
+        type: 'table',
+        headers: ['Item', 'Valor'],
+        rows: [
+          ['**Ingresso**', 'R$ 19 — meia-entrada para estudantes (R$ 9,50)'],
+          ['**Isenções**', 'Crianças até 12 anos, adultos 60+ e pessoas com deficiência não pagam'],
+          ['**Monitoria AMAMEL (obrigatória)**', 'R$ 18 em dinheiro ou R$ 20 no cartão, por pessoa'],
+          ['**Compra**', 'Site oficial de ingressos do parque; monitores credenciados ficam no próprio parque'],
+        ],
+      },
+      {
+        type: 'callout',
+        tone: 'alert',
+        title: 'Valores podem mudar',
+        text:
+          'Os preços acima são os praticados em 2026 — confirme ingresso, monitoria e horários com o parque: (13) 3871-1242 / (13) 3871-3318, antes de sair de casa.',
+      },
+      { type: 'h2', text: 'Como é a Visita à Caverna' },
+      {
+        type: 'p',
+        text:
+          'A visita acontece em **grupos de 12 pessoas** e dura cerca de **1 hora**, sempre com monitor. Você desce escadarias e atravessa passarelas e pontes até o **"Cathedral Hall"**, o grande salão com formações batizadas de **Guardião, Branca de Neve, Três Reis e Caldeirão do Diabo** — todas esculpidas por milhões de anos de gotejamento. Cada visitante preenche ficha de entrada e saída, controle que ajuda o parque a distribuir os grupos.',
+      },
+      { type: 'h2', text: 'O que Fazer Além da Caverna' },
+      {
+        type: 'ul',
+        items: [
+          '**Trilha do Araçá:** autoguiada e de fácil acesso, sai de perto da entrada da caverna e leva a três belas quedas d\'água.',
+          '**Mirante do Governador:** cruza floresta e campo de altitude até o mirante com vista para o **Vale do Ribeira**.',
+          '**Queda do Meu Deus:** eleita a mais bonita do estado — e o roteiro quilombola passa por ela.',
+          '**Mirante do Cruzeiro e Vale das Ostras:** outros pontos do parque com paisagem e história local.',
+          '**Circuito Quilombola:** passeio por comunidades remanescentes de quilombos em Eldorado, com atrativos naturais e culturais.',
+          '**Cachoeira do Sapatu e cavernas do Rolado e Frias:** complementos para quem fica mais de um dia na região.',
+        ],
+      },
+      { type: 'h2', text: 'Caverna do Diabo x PETAR: São Parques Diferentes' },
+      {
+        type: 'p',
+        text:
+          'Sim, confusão comum: a **Caverna do Diabo não faz parte do PETAR**. São parques vizinhos e distintos — o PECD fica em **Eldorado** e o PETAR em **Iporanga** —, ambos administrados pela Fundação Florestal. A separação faz parte do plano de manejo e ajuda no controle de visitantes e na distribuição dos monitores locais.',
+      },
+      { type: 'h2', text: 'Como Chegar' },
+      {
+        type: 'table',
+        headers: ['Origem', 'Rota', 'Distância e tempo'],
+        rows: [
+          ['**São Paulo (SP)**', 'BR-116 até o km 446 → SP-165 (acesso por Jacupiranga ou Eldorado), km 111', '292 km — cerca de 4h30'],
+          ['**Curitiba (PR)**', 'BR-116 até o km 477 → SP-165, km 111', '255 km — cerca de 4h'],
+        ],
+      },
+      {
+        type: 'callout',
+        tone: 'tip',
+        title: 'Cruze o clima antes de rolar',
+        text:
+          'Eldorado fica no Vale do Ribeira, onde chuva forte afeta estradas e o nível dos rios. Confira /meteorologia (chuva), /swell?tab=forecast (condições da região) e /noticias#rodovias (SP-222 e BR-116) antes de sair.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Como funciona a visita à Caverna do Diabo?',
+        a: 'A visita é em grupos de 12 pessoas, sempre com monitor, e dura cerca de 1 hora. São cerca de 600 metros abertos da caverna, com escadarias, passarelas e pontes até o "Cathedral Hall". O visitante preenche ficha de entrada e saída — controle do parque. Não há agendamento prévio: monitores credenciados ficam disponíveis no local.',
+      },
+      {
+        q: 'Quanto custa entrar na Caverna do Diabo em 2026?',
+        a: 'O ingresso do parque custa R$ 19 (meia-entrada R$ 9,50 para estudantes; gratuito para crianças até 12 anos, adultos 60+ e pessoas com deficiência). Somam-se a monitoria ambiental obrigatória da AMAMEL: R$ 18 em dinheiro ou R$ 20 no cartão por pessoa. Confirme os valores com o parque: (13) 3871-1242.',
+      },
+      {
+        q: 'Precisa agendar para visitar a Caverna do Diabo?',
+        a: 'Não: os monitores credenciados ficam disponíveis nas dependências do parque e não é necessário agendamento prévio. O atendimento é de terça a domingo, das 8h às 17h (última visita às 17h), com abertura às segundas-feiras em feriados e nas férias escolares (segunda quinzena de dezembro, janeiro e julho).',
+      },
+      {
+        q: 'A Caverna do Diabo é a mesma coisa que o PETAR?',
+        a: 'Não. São parques distintos e vizinhos: o Parque Estadual Caverna do Diabo fica em Eldorado e o PETAR (Parque Estadual Turístico do Alto Ribeira) em Iporanga. Ambos pertencem à Fundação Florestal e fazem parte do mosaico de conservação do Vale do Ribeira, mas têm entradas, estruturas e regras próprias.',
+      },
+    ],
+    relatedLinks: [
+      { label: 'Previsão do tempo da região', href: '/meteorologia' },
+      { label: 'Status das rodovias (SP-222 e BR-116)', href: '/noticias#rodovias' },
+      { label: 'Roteiros e parceiros locais', href: '/comercio' },
+      { label: 'Dinâmica costeira do Vale do Ribeira', href: '/blog/dinamica-costeira-vale-do-ribeira' },
+      { label: 'Todos os artigos do blog', href: '/blog' },
+    ],
+    keywords: [
+      'caverna do diabo eldorado',
+      'como visitar a caverna do diabo',
+      'parque estadual caverna do diabo preço',
+      'caverna do diabo x petar',
+      'atrativos do vale do ribeira',
+      'trilha do araca mirante do governador',
+    ],
+  },
+  {
+    slug: 'surf-peruibe-spots-guia',
+    title: 'Surf em Peruíbe: Spots e Condições',
+    metaTitle: 'Surf em Peruíbe: Spots e Condições | Meteor',
+    description:
+      'Guia dos spots de surf em Peruíbe: níveis de experiência de cada pico, melhor maré e vento, e como consultar as condições do mar antes de entrar na água.',
+    summary:
+      'Os principais spots de surf de Peruíbe e o que observar de maré, vento e swell antes de entrar na água.',
+    category: 'Ecoturismo',
+    categoryColor: 'bg-teal-500/20 text-teal-400',
+    date: '2026-11-07',
+    readTime: '5 min de leitura',
+    imageUrl: '/blog/surf-peruibe.jpg',
+    imageAlt: 'Surfista na queda de onda na praia de mar aberto de Peruíbe sob luz dourada do fim de tarde',
+    author: 'Carlos Alexandre',
+    status: 'coming-soon',
+    content: [],
+    relatedLinks: [
+      { label: 'Spots e níveis de experiência', href: '/swell?tab=spots' },
+      { label: 'Condições do mar', href: '/swell?tab=forecast' },
+    ],
+    keywords: ['surf peruíbe', 'spots de surf peruíbe sp', 'previsão de surf peruíbe'],
+  },
+  {
+    slug: 'golfinhos-cinza-lagamar',
+    title: 'Golfinhos-cinza do Lagamar',
+    metaTitle: 'Golfinhos-cinza do Lagamar | Meteor 2.0',
+    description:
+      'Onde avistar golfinhos-cinza no estuário de Cananéia e Ilha Comprida: melhor horário, comportamento do grupo e como observar sem perturbar os animais.',
+    summary:
+      'O Sotalia guianensis é o morador mais simpático do Mar de Dentro: onde, quando e como observar os golfinhos do Lagamar.',
+    category: 'Meio Ambiente',
+    categoryColor: 'bg-green-500/20 text-green-400',
+    date: '2026-11-07',
+    readTime: '5 min de leitura',
+    imageUrl: '/blog/golfinhos-lagamar.jpg',
+    imageAlt: 'Grupo de golfinhos-cinza superfície em canal do manguezal do Lagamar ao amanhecer',
+    author: 'Carlos Alexandre',
+    status: 'coming-soon',
+    content: [],
+    relatedLinks: [
+      { label: 'Condições do mar e marés', href: '/swell?tab=forecast' },
+      { label: 'Reserva de Cananéia e manguezais', href: '/blog/reserva-de-cananeia-manguezais-lagamar' },
+    ],
+    keywords: ['golfinho cinza lagamar', 'golfinhos cananéia', 'sotalia guianensis litoral sul'],
   },
 ];
 
