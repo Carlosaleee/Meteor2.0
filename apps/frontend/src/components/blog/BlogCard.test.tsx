@@ -3,8 +3,8 @@ import { render, screen } from '@testing-library/react';
 import { BlogCard, formatBlogDate } from './BlogCard';
 import { BLOG_POSTS } from '@/data/blog-posts';
 
-const published = BLOG_POSTS.find(p => p.status === 'published')!;
-const comingSoon = BLOG_POSTS.find(p => p.status === 'coming-soon')!;
+const published = BLOG_POSTS.find(p => p.slug === 'tabua-de-mares-ilha-comprida-cananeia')!;
+const comingSoon = BLOG_POSTS.find(p => p.slug === 'surf-peruibe-spots-guia')!;
 
 describe('formatBlogDate', () => {
   it('converte ISO para DD/MM/YYYY sem deslocar o dia', () => {
@@ -57,7 +57,7 @@ describe('BlogCard — coming-soon', () => {
   it('continua exibindo categoria, data e readTime', () => {
     render(<BlogCard post={comingSoon} />);
     expect(screen.getByText(comingSoon.category)).toBeInTheDocument();
-    expect(screen.getByText('01/09/2026')).toBeInTheDocument();
+    expect(screen.getByText('07/11/2026')).toBeInTheDocument();
     expect(screen.getByText(comingSoon.readTime)).toBeInTheDocument();
   });
 });
