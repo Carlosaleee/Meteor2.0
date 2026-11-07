@@ -25,6 +25,9 @@ Thumbs.db
 # local agent kit (not product)
 .agents/
 
+# scratch de buscas web (firecrawl CLI)
+.firecrawl/
+
 # IDE
 .idea/
 .vscode/
