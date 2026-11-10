@@ -1,6 +1,8 @@
 ﻿'use client';
 
 import { FaDatabase, FaCode, FaExternalLinkAlt, FaGithub, FaMap, FaPhone, FaWater } from 'react-icons/fa';
+import { useDict } from '@/i18n/context';
+import { common } from '@/i18n/dictionaries/common';
 
 const DATA_SOURCES = [
   { name: 'Open-Meteo', url: 'https://open-meteo.com' },
@@ -19,25 +21,26 @@ const TECH_STACK = [
 ];
 
 const PAGES = [
-  { name: 'Previsão do Tempo', href: '/meteorologia' },
-  { name: 'Swell & Points', href: '/swell' },
-  { name: 'Notícias Regionais', href: '/noticias' },
-  { name: 'Comércio', href: '/comercio' },
-  { name: 'Blog', href: '/blog' },
-  { name: 'Créditos & Fontes', href: '/creditos' },
+  { key: 'previsao', href: '/meteorologia' },
+  { key: 'swell', href: '/swell' },
+  { key: 'noticias', href: '/noticias' },
+  { key: 'comercio', href: '/comercio' },
+  { key: 'blog', href: '/blog' },
+  { key: 'creditos', href: '/creditos' },
 ];
 
 const EMERGENCY_CONTACTS = [
-  { name: 'Polícia Civil', phone: '190', icon: '🚔' },
-  { name: 'Bombeiros', phone: '193', icon: '🚒' },
-  { name: 'SAMU', phone: '192', icon: '🚑' },
-  { name: 'Defesa Civil', phone: '199', icon: '🛡️' },
-  { name: 'Polícia Militar', phone: '197', icon: '👮' },
-  { name: 'Hospital Regional', phone: '(13) 3851-1515', icon: '🏥' },
+  { key: 'policiaCivil', phone: '190', icon: '🚔' },
+  { key: 'bombeiros', phone: '193', icon: '🚒' },
+  { key: 'samu', phone: '192', icon: '🚑' },
+  { key: 'defesaCivil', phone: '199', icon: '🛡️' },
+  { key: 'policiaMilitar', phone: '197', icon: '👮' },
+  { key: 'hospital', phone: '(13) 3851-1515', icon: '🏥' },
 ];
 
 export function Footer() {
   const year = new Date().getFullYear();
+  const t = useDict(common);
 
   return (
     <footer className="w-full bg-[var(--color-footer-bg)] mt-auto transition-colors duration-300" role="contentinfo">
@@ -49,14 +52,13 @@ export function Footer() {
         <div className="text-center mb-10">
           <h2 className="text-xl md:text-2xl font-bold text-[var(--color-gold)] tracking-wide uppercase flex items-center justify-center gap-3">
             <FaWater className="w-6 h-6" aria-hidden="true" />
-            Meteor 2.0
+            {t['footer.brand']}
           </h2>
           <p className="mt-2 text-sm text-[var(--color-footer-text)] max-w-2xl mx-auto leading-relaxed">
-            Dashboard tático de telemetria meteorológica, oceanográfica e de trânsito para Ilha Comprida e Vale do Ribeira.
-            Dados em tempo real integrados de fontes oficiais.
+            {t['footer.description']}
           </p>
           <p className="mt-2 text-xs text-[var(--color-footer-text)]">
-            &copy; {year} Meteor 2.0 — Licenciado sob MIT License
+            &copy; {year} {t['footer.license']}
           </p>
         </div>
 
@@ -66,7 +68,7 @@ export function Footer() {
           <div className="text-center">
             <h3 className="text-xs font-bold text-[var(--color-gold)] uppercase tracking-widest mb-4 flex items-center justify-center gap-2">
               <FaMap className="w-3 h-3" aria-hidden="true" />
-              Navegação
+              {t['footer.nav.title']}
             </h3>
             <ul className="space-y-2" role="list">
               {PAGES.map(page => (
@@ -75,7 +77,7 @@ export function Footer() {
                     href={page.href}
                     className="text-xs text-[var(--color-footer-link)] hover:text-[var(--color-gold)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)] rounded"
                   >
-                    {page.name}
+                    {t[`footer.pages.${page.key}`]}
                   </a>
                 </li>
               ))}
@@ -86,7 +88,7 @@ export function Footer() {
           <div className="text-center">
             <h3 className="text-xs font-bold text-[var(--color-gold)] uppercase tracking-widest mb-4 flex items-center justify-center gap-2">
               <FaDatabase className="w-3 h-3" aria-hidden="true" />
-              Fontes de Dados
+              {t['footer.sources.title']}
             </h3>
             <ul className="space-y-2" role="list">
               {DATA_SOURCES.map(source => (
@@ -96,7 +98,7 @@ export function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group inline-flex items-center gap-1.5 text-xs text-[var(--color-footer-link)] hover:text-[var(--color-gold)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)] rounded"
-                    aria-label={`${source.name} (abre em nova janela)`}
+                    aria-label={`${source.name} ${t['footer.newWindow']}`}
                   >
                     <FaExternalLinkAlt className="w-2 h-2 opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
                     {source.name}
@@ -110,7 +112,7 @@ export function Footer() {
           <div className="text-center">
             <h3 className="text-xs font-bold text-[var(--color-gold)] uppercase tracking-widest mb-4 flex items-center justify-center gap-2">
               <FaCode className="w-3 h-3" aria-hidden="true" />
-              Stack Tecnológica
+              {t['footer.stack.title']}
             </h3>
             <ul className="space-y-2" role="list">
               {TECH_STACK.map(tech => (
@@ -120,7 +122,7 @@ export function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group inline-flex items-center gap-1.5 text-xs text-[var(--color-footer-link)] hover:text-[var(--color-gold)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)] rounded"
-                    aria-label={`${tech.name} (abre em nova janela)`}
+                    aria-label={`${tech.name} ${t['footer.newWindow']}`}
                   >
                     <FaExternalLinkAlt className="w-2 h-2 opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
                     {tech.name}
@@ -134,18 +136,18 @@ export function Footer() {
           <div className="text-center">
             <h3 className="text-xs font-bold text-[var(--color-gold)] uppercase tracking-widest mb-4 flex items-center justify-center gap-2">
               <FaPhone className="w-3 h-3" aria-hidden="true" />
-              Links Úteis
+              {t['footer.links.title']}
             </h3>
             <ul className="space-y-2" role="list">
               {EMERGENCY_CONTACTS.map(contact => (
-                <li key={contact.name}>
+                <li key={contact.key}>
                   <a
                     href={`tel:${contact.phone.replace(/\D/g, '')}`}
                     className="group inline-flex items-center gap-2 text-xs text-[var(--color-footer-link)] hover:text-[var(--color-gold)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)] rounded"
-                    aria-label={`${contact.name}: ${contact.phone}`}
+                    aria-label={`${t[`footer.contact.${contact.key}`]}: ${contact.phone}`}
                   >
                     <span className="text-sm" aria-hidden="true">{contact.icon}</span>
-                    <span className="flex-1 text-left">{contact.name}</span>
+                    <span className="flex-1 text-left">{t[`footer.contact.${contact.key}`]}</span>
                     <span className="font-mono text-[10px] text-[var(--color-muted)] group-hover:text-[var(--color-gold)]">{contact.phone}</span>
                   </a>
                 </li>
@@ -157,20 +159,20 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-[var(--color-footer-border)] pt-6 flex flex-col items-center gap-3">
           <p className="text-xs text-[var(--color-footer-text)]">
-            <span className="text-[var(--color-gold)] font-semibold">Meteor</span> — Créditos de Desenvolvimento:{' '}
+            <span className="text-[var(--color-gold)] font-semibold">Meteor</span> — {t['footer.credits.label']}{' '}
             <a
               href="https://github.com/Carlosaleee"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[var(--color-footer-link)] hover:text-[var(--color-gold)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)] rounded inline-flex items-center gap-1"
-              aria-label="GitHub do Carlos Alexandre (abre em nova janela)"
+              aria-label={t['footer.github.ariaLabel']}
             >
               Carlos Alexandre
               <FaGithub className="w-3 h-3" aria-hidden="true" />
             </a>
           </p>
           <p className="text-[10px] text-[var(--color-footer-text)]">
-            Dados: Open-Meteo · RainViewer · INMET · CPTEC · Mapas: OpenStreetMap
+            {t['footer.data.line']}
           </p>
         </div>
       </div>

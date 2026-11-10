@@ -2,13 +2,16 @@
 
 import { FaInfoCircle, FaExternalLinkAlt, FaCloud, FaWater, FaShieldAlt, FaCode, FaDatabase, FaGlobe } from 'react-icons/fa';
 import { PageBanner } from '@/components/PageBanner';
+import { useDict } from '@/i18n/context';
+import { creditos } from '@/i18n/dictionaries/creditos';
+import { fmt } from '@/i18n/format';
 
 const DATA_SOURCES = [
   {
     name: 'Open-Meteo',
     description: 'API gratuita de previsão do tempo e dados marinhos. Sem necessidade de chave de API.',
     url: 'https://open-meteo.com',
-    status: 'Ativo',
+    status: 'source.status',
     statusColor: 'bg-emerald-500/20 text-emerald-400',
     icon: FaCloud,
   },
@@ -16,7 +19,7 @@ const DATA_SOURCES = [
     name: 'Open-Meteo Marine',
     description: 'Dados de ondas, swell, vento e marés para toda a costa brasileira.',
     url: 'https://open-meteo.com/en/docs/marine-api',
-    status: 'Ativo',
+    status: 'source.status',
     statusColor: 'bg-emerald-500/20 text-emerald-400',
     icon: FaWater,
   },
@@ -24,7 +27,7 @@ const DATA_SOURCES = [
     name: 'Google Gemini',
     description: 'Inteligência artificial para briefings de surf e análise de condições oceânicas.',
     url: 'https://ai.google.dev',
-    status: 'Ativo',
+    status: 'source.status',
     statusColor: 'bg-emerald-500/20 text-emerald-400',
     icon: FaDatabase,
   },
@@ -32,7 +35,7 @@ const DATA_SOURCES = [
     name: 'RainViewer',
     description: 'Radar de precipitação em tempo real. Dados de chuva e intensidade.',
     url: 'https://www.rainviewer.com',
-    status: 'Ativo',
+    status: 'source.status',
     statusColor: 'bg-emerald-500/20 text-emerald-400',
     icon: FaCloud,
   },
@@ -40,7 +43,7 @@ const DATA_SOURCES = [
     name: 'OpenStreetMap',
     description: 'Dados cartográficos gratuitos para mapas interativos com Leaflet.',
     url: 'https://www.openstreetmap.org',
-    status: 'Ativo',
+    status: 'source.status',
     statusColor: 'bg-emerald-500/20 text-emerald-400',
     icon: FaGlobe,
   },
@@ -48,7 +51,7 @@ const DATA_SOURCES = [
     name: 'OSRM',
     description: 'Routing engine para cálculo de rotas e distâncias entre pontos.',
     url: 'http://project-osrm.org',
-    status: 'Ativo',
+    status: 'source.status',
     statusColor: 'bg-emerald-500/20 text-emerald-400',
     icon: FaGlobe,
   },
@@ -89,23 +92,25 @@ const LICENSES = [
 ];
 
 export default function CreditosPage() {
+  const t = useDict(creditos);
+
   return (
     <div className="space-y-8">
-      <PageBanner title="Créditos & Fontes" subtitle="Transparência de dados e stack tecnológica utilizada" />
+      <PageBanner title={t['page.title']} subtitle={t['page.subtitle']} />
 
       <div>
         <h2 className="text-3xl font-extrabold text-white flex items-center gap-3">
           <FaInfoCircle className="w-8 h-8 text-blue-500" />
-          Créditos & Fontes Oficiais
+          {t['section.intro.title']}
         </h2>
-        <p className="text-slate-400 text-sm mt-1">Transparência de dados e stack tecnológica utilizada</p>
+        <p className="text-card-muted text-sm mt-1">{t['section.intro.desc']}</p>
       </div>
 
       {/* Fontes de Dados */}
-      <section>
+      <section aria-label={t['section.sources.title']}>
         <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
           <FaDatabase className="w-5 h-5 text-blue-400" />
-          Fontes de Dados
+          {t['section.sources.title']}
         </h3>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {DATA_SOURCES.map(source => {
@@ -116,21 +121,23 @@ export default function CreditosPage() {
                 href={source.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group p-5 bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-blue-500/50 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-blue-500/10"
+                title={fmt(t['a11y.openSource'], { name: source.name })}
+                aria-label={fmt(t['a11y.openSourceDesc'], { name: source.name, description: source.description })}
+                className="group p-5 bg-card/80 hover:bg-card border border-card-border hover:border-blue-500/50 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-blue-500/10"
               >
                 <div className="flex items-start justify-between mb-3">
-                  <div className="p-2.5 rounded-xl bg-slate-800 text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                  <div className="p-2.5 rounded-xl bg-card-2 text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                     <Icon className="w-5 h-5" />
                   </div>
                   <div className="flex items-center gap-2">
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${source.statusColor}`}>
-                      {source.status}
+                      {t[source.status]}
                     </span>
-                    <FaExternalLinkAlt className="w-3.5 h-3.5 text-slate-600 group-hover:text-blue-400 transition-colors" />
+                    <FaExternalLinkAlt className="w-3.5 h-3.5 text-slate-600 group-hover:text-blue-400 transition-colors" aria-hidden="true" />
                   </div>
                 </div>
-                <h4 className="text-sm font-bold text-white mb-1">{source.name}</h4>
-                <p className="text-[11px] text-slate-400 leading-relaxed">{source.description}</p>
+                <h4 className="text-sm font-bold text-card-text mb-1">{source.name}</h4>
+                <p className="text-[11px] text-card-muted leading-relaxed">{source.description}</p>
               </a>
             );
           })}
@@ -138,10 +145,10 @@ export default function CreditosPage() {
       </section>
 
       {/* Stack Tecnológica */}
-      <section>
+      <section aria-label={t['section.stack.title']}>
         <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
           <FaCode className="w-5 h-5 text-blue-400" />
-          Stack Tecnológica
+          {t['section.stack.title']}
         </h3>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {TECH_STACK.map(tech => {
@@ -149,13 +156,13 @@ export default function CreditosPage() {
             return (
               <div
                 key={tech.name}
-                className="p-4 bg-slate-900 border border-slate-800 rounded-2xl shadow-lg"
+                className="p-4 bg-card border border-card-border rounded-2xl shadow-lg"
               >
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 rounded-lg bg-slate-800 text-blue-400">
+                  <div className="p-2 rounded-lg bg-card-2 text-blue-400">
                     <Icon className="w-4 h-4" />
                   </div>
-                  <span className="text-sm font-bold text-white">{tech.name}</span>
+                  <span className="text-sm font-bold text-card-text">{tech.name}</span>
                 </div>
                 <p className="text-[11px] text-slate-500">{tech.role}</p>
               </div>
@@ -165,16 +172,16 @@ export default function CreditosPage() {
       </section>
 
       {/* Licenças */}
-      <section>
+      <section aria-label={t['section.licenses.title']}>
         <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
           <FaShieldAlt className="w-5 h-5 text-blue-400" />
-          Licenças
+          {t['section.licenses.title']}
         </h3>
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
+        <div className="bg-card border border-card-border rounded-2xl p-5 shadow-lg">
           <div className="space-y-3">
             {LICENSES.map(lic => (
-              <div key={lic.name} className="flex items-center justify-between py-2 border-b border-slate-800 last:border-0">
-                <span className="text-sm font-semibold text-white">{lic.name}</span>
+              <div key={lic.name} className="flex items-center justify-between py-2 border-b border-card-border last:border-0">
+                <span className="text-sm font-semibold text-card-text">{lic.name}</span>
                 <span className="text-[11px] text-slate-500">{lic.usage}</span>
               </div>
             ))}

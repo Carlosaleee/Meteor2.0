@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { FallbackService } from '../../common/fallback/fallback.service';
 import { ArtspWazeRepository } from '../traffic/artsp-waze.repository';
+import { isPortuguese } from '../../common/text/language';
 
 const FALLBACK_FILE = 'fallback-noticias-regionais.json';
 
@@ -196,6 +197,10 @@ export class NoticiasRegionaisRepository {
       const image = this.getImage(block);
 
       if (title.length < 10 || !url.startsWith('http')) continue;
+
+      // Google News e os feeds locais podem devolver materia em ingles ou
+      // espanhol — o feed regional so deve mostrar portugues.
+      if (!isPortuguese(`${title} ${description}`)) continue;
 
       const date = new Date(pubDate);
       const itemSource = customSource || source.name;

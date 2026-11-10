@@ -23,7 +23,7 @@ export function PageBanner({ title, subtitle }: PageBannerProps) {
             {title}
           </h1>
           {subtitle && (
-            <p className="mt-1 text-sm text-slate-300">{subtitle}</p>
+            <p className="mt-1 text-sm text-card-subtle">{subtitle}</p>
           )}
         </div>
       </div>

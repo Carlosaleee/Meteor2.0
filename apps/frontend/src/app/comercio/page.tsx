@@ -8,6 +8,8 @@ import { CommerceGrid } from '@/app/swell/components/CommerceGrid';
 import dynamic from 'next/dynamic';
 const CommerceMap = dynamic(() => import('./CommerceMap').then(mod => mod.CommerceMap), { ssr: false });
 import type { CommerceItem } from '@/lib/api';
+import { useDict } from '@/i18n/context';
+import { comercio } from '@/i18n/dictionaries/comercio';
 
 export default function ComercioPage() {
   const { data, loading, error } = useComercio();
@@ -33,12 +35,13 @@ export default function ComercioPage() {
   };
 
   const commerce = data?.commerce ?? [];
+  const t = useDict(comercio);
 
   return (
     <div className="space-y-8">
       <PageBanner
-        title="Comercio de Ilha Comprida"
-        subtitle="Directorio completo de estabelecimentos comerciais da regiao"
+        title={t['page.title']}
+        subtitle={t['page.subtitle']}
       />
 
       {error && (
@@ -58,10 +61,10 @@ export default function ComercioPage() {
       ) : (
         <>
           {/* Mapa */}
-          <section aria-label="Mapa de comercios">
+          <section aria-label={t['map.aria']}>
             <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
               <FaStore className="w-5 h-5 text-orange-400" aria-hidden="true" />
-              Mapa de Comercios
+              {t['map.title']}
             </h2>
             <CommerceMap
               commerce={commerce}
@@ -73,7 +76,7 @@ export default function ComercioPage() {
           </section>
 
           {/* Grid */}
-          <section aria-label="Lista de comercios">
+          <section aria-label={t['list.aria']}>
             <CommerceGrid
               commerce={commerce}
               onGetDirections={handleSelectCommerce}

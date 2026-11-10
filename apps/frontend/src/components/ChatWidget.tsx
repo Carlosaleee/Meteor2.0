@@ -178,20 +178,20 @@ export function ChatWidget() {
       {/* Janela de Chat */}
       {isChatOpen && (
         <div
-          className="fixed bottom-24 right-6 z-50 w-80 sm:w-96 bg-slate-900 border border-slate-700/50 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden flex flex-col h-[500px] animate-in slide-in-from-bottom-4 fade-in duration-200"
+          className="fixed bottom-24 right-6 z-50 w-80 sm:w-96 bg-card border border-card-line/50 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden flex flex-col h-[500px] animate-in slide-in-from-bottom-4 fade-in duration-200"
           role="dialog"
           aria-label="Chat com Irons"
         >
           <div className="sr-only" role="status" aria-live="polite">{status}</div>
 
           {/* Header */}
-          <div className="p-4 bg-gradient-to-r from-amber-900/40 via-slate-800 to-slate-800 border-b border-slate-700/50 flex items-center justify-between">
+          <div className="p-4 bg-gradient-to-r from-amber-900/40 via-card-2 to-card-2 border-b border-card-line/50 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-xl bg-amber-500/20 border border-amber-500/30">
                 <FaWater className="w-5 h-5 text-amber-400" />
               </div>
               <div>
-                <h3 className="font-bold text-sm text-white tracking-wide">IRONS</h3>
+                <h3 className="font-bold text-sm text-card-text tracking-wide">IRONS</h3>
                 <p className="text-[10px] text-amber-400/80 font-mono">ASSISTENTE TÁTICO</p>
               </div>
             </div>
@@ -199,7 +199,7 @@ export function ChatWidget() {
               <button
                 onClick={handleRestart}
                 disabled={isTyping}
-                className="text-slate-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-slate-700/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="text-card-muted hover:text-card-text transition-colors p-1 rounded-lg hover:bg-card-line/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 disabled:opacity-40 disabled:cursor-not-allowed"
                 aria-label="Reiniciar conversa"
                 title="Reiniciar conversa"
               >
@@ -208,7 +208,7 @@ export function ChatWidget() {
               <button
                 onClick={handleClear}
                 disabled={isTyping}
-                className="text-slate-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-slate-700/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="text-card-muted hover:text-card-text transition-colors p-1 rounded-lg hover:bg-card-line/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 disabled:opacity-40 disabled:cursor-not-allowed"
                 aria-label="Apagar conversa"
                 title="Apagar conversa"
               >
@@ -216,8 +216,9 @@ export function ChatWidget() {
               </button>
               <button
                 onClick={() => setChatOpen(false)}
-                className="text-slate-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-slate-700/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                className="text-card-muted hover:text-card-text transition-colors p-1 rounded-lg hover:bg-card-line/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
                 aria-label="Fechar chat"
+                title="Fechar chat"
               >
                 <FaTimes className="w-5 h-5" />
               </button>
@@ -225,7 +226,7 @@ export function ChatWidget() {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3 text-xs scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+          <div className="flex-1 p-4 overflow-y-auto space-y-3 text-xs scrollbar-thin scrollbar-thumb-card-line scrollbar-track-transparent">
             {messages.length === 0 && (
               <div className="h-full min-h-[200px] flex items-center justify-center">
                 <p className="text-slate-500 text-xs text-center px-4">
@@ -239,18 +240,18 @@ export function ChatWidget() {
                   className={`max-w-[85%] p-3 rounded-2xl text-xs leading-relaxed ${
                     m.role === 'user'
                       ? 'bg-amber-600/90 text-white rounded-br-md'
-                      : 'bg-slate-800/80 text-slate-200 border border-slate-700/50 rounded-bl-md'
+                      : 'bg-card-2/80 text-card-text border border-card-line/50 rounded-bl-md'
                   }`}
                 >
                   {(m.text ?? '').split('**').map((part, j) =>
-                    j % 2 === 1 ? <strong key={j} className="text-white font-semibold">{part}</strong> : part
+                    j % 2 === 1 ? <strong key={j} className="font-semibold">{part}</strong> : part
                   )}
                 </div>
               </div>
             ))}
             {isTyping && (
               <div className="flex justify-start animate-in slide-in-from-bottom-2 fade-in duration-150">
-                <div className="bg-slate-800/80 border border-slate-700/50 rounded-2xl rounded-bl-md px-4 py-3">
+                <div className="bg-card-2/80 border border-card-line/50 rounded-2xl rounded-bl-md px-4 py-3">
                   <div className="flex gap-1">
                     <span className="w-2 h-2 bg-amber-400/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                     <span className="w-2 h-2 bg-amber-400/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -263,14 +264,14 @@ export function ChatWidget() {
           </div>
 
           {/* Input */}
-          <form onSubmit={handleSend} className="p-3 bg-slate-800/80 border-t border-slate-700/50 flex gap-2">
+          <form onSubmit={handleSend} className="p-3 bg-card-2/80 border-t border-card-line/50 flex gap-2">
             <input
               ref={inputRef}
               type="text"
               value={input}
               onChange={e => setInput(e.target.value)}
               placeholder="Pergunte sobre tempo, ondas, vento..."
-              className="flex-1 bg-slate-900/80 border border-slate-700/50 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500/50 transition-colors"
+              className="flex-1 bg-card/80 border border-card-line/50 rounded-xl px-4 py-2.5 text-xs text-card-text placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500/50 transition-colors"
               aria-label="Digite sua mensagem"
             />
             <button
@@ -278,6 +279,7 @@ export function ChatWidget() {
               disabled={!input.trim()}
               className="p-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-900 transition-all disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
               aria-label="Enviar mensagem"
+              title="Enviar mensagem"
             >
               <FaPaperPlane className="w-4 h-4" />
             </button>

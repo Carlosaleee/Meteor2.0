@@ -1,0 +1,248 @@
+import type { Dict } from '../context';
+
+export const home: Dict = {
+  pt: {
+    // Acessibilidade / estrutura
+    'main.aria': 'Painel principal do Meteor',
+    'main.h1': 'Meteor 2.0 — Telemetria de Ilha Comprida e Vale do Ribeira',
+    'skip.aria': 'Links de navegação rápida',
+    'skip.content': 'Ir para o conteúdo',
+    'skip.weather': 'Ir para a previsão do tempo',
+    'skip.traffic': 'Ir para o trânsito nas rodovias',
+    'skip.news': 'Ir para as notícias',
+    'skip.sea': 'Ir para as condições do mar',
+    'skip.sport': 'Ir para as notícias de surf',
+    'skip.blog': 'Ir para o blog',
+    'skip.comercio': 'Ir para o comércio',
+    'skip.points': 'Ir para os points de surf',
+
+    // Seções
+    'section.weather': 'Previsão do Tempo',
+    'section.traffic': 'Status das Rodovias',
+    'section.news': 'Últimas Notícias',
+    'section.sea': 'Condições do Mar',
+    'section.sport': 'Surf & Esporte',
+    'section.blog': 'Blog',
+    'section.comercio': 'Comércio em Destaque',
+    'section.points': 'Points de Surf',
+
+    // Aria labels das seções
+    'aria.weather': 'Previsão do tempo nas cidades da região',
+    'aria.cityList': 'Temperatura atual por cidade',
+    'aria.traffic': 'Condições de trânsito nas rodovias regionais',
+    'aria.news': 'Últimas notícias regionais',
+    'aria.newsFilter': 'Filtrar notícias por categoria',
+    'aria.sea': 'Condições atuais do mar',
+    'aria.sport': 'Notícias de surf e esporte',
+    'aria.sportFilter': 'Filtrar notícias de esporte',
+    'aria.blog': 'Artigos recentes do blog',
+    'aria.comercio': 'Estabelecimentos comerciais em destaque',
+    'aria.points': 'Points de surf com nível e condições',
+    'aria.compact': 'Destaques do Meteor',
+
+    // CTAs
+    'cta.weather': 'Ver previsão completa',
+    'cta.traffic': 'Ver trânsito',
+    'cta.viewAll': 'Ver tudo',
+    'cta.sea': 'Ver mar e marés',
+    'cta.blog': 'Ir para o blog',
+    'cta.comercio': 'Ver todo o comércio',
+    'cta.points': 'Ver todos os points',
+    'cta.map': 'Ver no mapa',
+
+    // Previsão
+    'city.maxMin': 'máx {max}° · mín {min}°',
+    'loading': 'Carregando',
+    'loadingLower': 'carregando',
+
+    // Trânsito
+    'source.label': 'Fonte',
+    'source.none': 'Sem link',
+    'source.lastUpdate': 'Atualizado em {date}',
+    'badge.estimated': 'Estimado',
+    'badge.estimatedTitle': 'Dado estimado com base em registros anteriores',
+
+    // News
+    'empty.news': 'Nenhuma notícia encontrada para esta categoria.',
+    'empty.sea': 'Dados do mar indisponíveis no momento.',
+    'empty.sport': 'Nenhuma notícia de surf disponível.',
+    'cat.todas': 'Todas',
+    'cat.transito': 'Trânsito',
+    'cat.noticia': 'Notícia',
+    'cat.policial': 'Policial',
+    'cat.turismo': 'Turismo',
+    'cat.cotidiano': 'Cotidiano',
+    'sport.todas': 'Todas',
+    'sport.wsl': 'WSL',
+    'sport.paulista': 'Circuito Paulista',
+
+    // Blog
+    'blog.soon': 'Em breve',
+    'blog.cat.telemetria': 'Telemetria',
+    'blog.cat.mobilidade': 'Mobilidade',
+    'blog.cat.natureza': 'Natureza',
+    'blog.cat.oceanografia': 'Oceanografia',
+
+    // Points
+    'points.bestWind': 'Melhor vento',
+    'points.exposure': 'Exposição',
+
+    // A11y de elementos interativos
+    'a11y.route.open': 'abrir rota no mapa',
+    'a11y.news.source': 'fonte',
+    'a11y.news.openTab': 'abre em nova aba',
+    'a11y.blog.open': 'Ler artigo',
+    'a11y.commerce.sector': 'setor',
+    'a11y.spot.maps': 'Abrir {name} no Google Maps',
+
+    // Hero carousel
+    'hero.region': 'Carrossel de notícias e temas',
+    'hero.regionCompact': 'Destaques em destaque',
+    'hero.slideOf': 'Slide {i} de {n}: {title}',
+    'hero.explore': 'Explorar',
+    'hero.prev': 'Slide anterior',
+    'hero.next': 'Próximo slide',
+    'hero.play': 'Reproduzir rotação automática',
+    'hero.pause': 'Pausar rotação automática',
+    'hero.navAria': 'Navegação do carrossel',
+    'hero.goToSlide': 'Ir para slide: {title}',
+    'hero.announce': 'Slide {i} de {n}: {title}',
+    'hero.s0.label': 'Notícias',
+    'hero.s0.title': 'Notícias Regionais e Trânsito',
+    'hero.s0.subtitle': 'Acompanhe o que acontece em Ilha Comprida, Iguape, Cananéia e Registro.',
+    'hero.s1.label': 'Previsão',
+    'hero.s1.title': 'Previsão do Tempo',
+    'hero.s1.subtitle': 'Temperatura, vento e umidade em tempo real para toda a região.',
+    'hero.s2.label': 'Swell',
+    'hero.s2.title': 'Condições do Mar',
+    'hero.s2.subtitle': 'Ondas, marés e a leitura do swell para surfar com segurança.',
+    'hero.s3.label': 'Comércio',
+    'hero.s3.title': 'Comércio de Ilha Comprida',
+    'hero.s3.subtitle': 'Guia completo de estabelecimentos, serviços e horários.',
+    'hero.s4.label': 'Blog',
+    'hero.s4.title': 'Guias e Artigos',
+    'hero.s4.subtitle': 'Conteúdo sobre navegação, telemetria e ecoturismo da região.',
+  },
+  es: {
+    // Acessibilidade / estructura
+    'main.aria': 'Panel principal de Meteor',
+    'main.h1': 'Meteor 2.0 — Telemetría de Ilha Comprida y Vale do Ribeira',
+    'skip.aria': 'Enlaces de navegación rápida',
+    'skip.content': 'Ir al contenido',
+    'skip.weather': 'Ir a la previsión del tiempo',
+    'skip.traffic': 'Ir al tráfico en las carreteras',
+    'skip.news': 'Ir a las noticias',
+    'skip.sea': 'Ir a las condiciones del mar',
+    'skip.sport': 'Ir a las noticias de surf',
+    'skip.blog': 'Ir al blog',
+    'skip.comercio': 'Ir al comercio',
+    'skip.points': 'Ir a los puntos de surf',
+
+    // Secciones
+    'section.weather': 'Pronóstico del Tiempo',
+    'section.traffic': 'Estado de las Carreteras',
+    'section.news': 'Últimas Noticias',
+    'section.sea': 'Condiciones del Mar',
+    'section.sport': 'Surf y Deporte',
+    'section.blog': 'Blog',
+    'section.comercio': 'Comercio Destacado',
+    'section.points': 'Puntos de Surf',
+
+    // Aria labels de las secciones
+    'aria.weather': 'Previsión del tiempo en las ciudades de la región',
+    'aria.cityList': 'Temperatura actual por ciudad',
+    'aria.traffic': 'Condiciones de tráfico en las carreteras regionales',
+    'aria.news': 'Últimas noticias regionales',
+    'aria.newsFilter': 'Filtrar noticias por categoría',
+    'aria.sea': 'Condiciones actuales del mar',
+    'aria.sport': 'Noticias de surf y deporte',
+    'aria.sportFilter': 'Filtrar noticias de deporte',
+    'aria.blog': 'Artículos recientes del blog',
+    'aria.comercio': 'Establecimientos comerciales destacados',
+    'aria.points': 'Puntos de surf con nivel y condiciones',
+    'aria.compact': 'Destacados de Meteor',
+
+    // CTAs
+    'cta.weather': 'Ver previsión completa',
+    'cta.traffic': 'Ver tráfico',
+    'cta.viewAll': 'Ver todo',
+    'cta.sea': 'Ver mar y mareas',
+    'cta.blog': 'Ir al blog',
+    'cta.comercio': 'Ver todo el comercio',
+    'cta.points': 'Ver todos los puntos',
+    'cta.map': 'Ver en el mapa',
+
+    // Previsión
+    'city.maxMin': 'máx {max}° · mín {min}°',
+    'loading': 'Cargando',
+    'loadingLower': 'cargando',
+
+    // Tráfico
+    'source.label': 'Fuente',
+    'source.none': 'Sin enlace',
+    'source.lastUpdate': 'Actualizado en {date}',
+    'badge.estimated': 'Estimado',
+    'badge.estimatedTitle': 'Dato estimado a partir de registros anteriores',
+
+    // Noticias
+    'empty.news': 'No se encontraron noticias para esta categoría.',
+    'empty.sea': 'Datos del mar no disponibles por el momento.',
+    'empty.sport': 'No hay noticias de surf disponibles.',
+    'cat.todas': 'Todas',
+    'cat.transito': 'Tráfico',
+    'cat.noticia': 'Noticia',
+    'cat.policial': 'Policial',
+    'cat.turismo': 'Turismo',
+    'cat.cotidiano': 'Cotidiano',
+    'sport.todas': 'Todas',
+    'sport.wsl': 'WSL',
+    'sport.paulista': 'Circuito Paulista',
+
+    // Blog
+    'blog.soon': 'Próximamente',
+    'blog.cat.telemetria': 'Telemetría',
+    'blog.cat.mobilidade': 'Movilidad',
+    'blog.cat.natureza': 'Naturaleza',
+    'blog.cat.oceanografia': 'Oceanografía',
+
+    // Puntos
+    'points.bestWind': 'Mejor viento',
+    'points.exposure': 'Exposición',
+
+    // A11y de elementos interactivos
+    'a11y.route.open': 'abrir ruta en el mapa',
+    'a11y.news.source': 'fuente',
+    'a11y.news.openTab': 'se abre en una pestaña nueva',
+    'a11y.blog.open': 'Leer artículo',
+    'a11y.commerce.sector': 'sector',
+    'a11y.spot.maps': 'Abrir {name} en Google Maps',
+
+    // Hero carousel
+    'hero.region': 'Carrusel de noticias y temas',
+    'hero.regionCompact': 'Destacados',
+    'hero.slideOf': 'Diapositiva {i} de {n}: {title}',
+    'hero.explore': 'Explorar',
+    'hero.prev': 'Diapositiva anterior',
+    'hero.next': 'Diapositiva siguiente',
+    'hero.play': 'Reproducir rotación automática',
+    'hero.pause': 'Pausar rotación automática',
+    'hero.navAria': 'Navegación del carrusel',
+    'hero.goToSlide': 'Ir a la diapositiva: {title}',
+    'hero.announce': 'Diapositiva {i} de {n}: {title}',
+    'hero.s0.label': 'Noticias',
+    'hero.s0.title': 'Noticias Regionales y Tráfico',
+    'hero.s0.subtitle': 'Sigue lo que ocurre en Ilha Comprida, Iguape, Cananéia y Registro.',
+    'hero.s1.label': 'Previsión',
+    'hero.s1.title': 'Pronóstico del Tiempo',
+    'hero.s1.subtitle': 'Temperatura, viento y humedad en tiempo real para toda la región.',
+    'hero.s2.label': 'Swell',
+    'hero.s2.title': 'Condiciones del Mar',
+    'hero.s2.subtitle': 'Olas, mareas y la lectura del swell para surfear con seguridad.',
+    'hero.s3.label': 'Comercio',
+    'hero.s3.title': 'Comercio de Ilha Comprida',
+    'hero.s3.subtitle': 'Guía completa de establecimientos, servicios y horarios.',
+    'hero.s4.label': 'Blog',
+    'hero.s4.title': 'Guías y Artículos',
+    'hero.s4.subtitle': 'Contenido sobre navegación, telemetría y ecoturismo de la región.',
+  },
+};

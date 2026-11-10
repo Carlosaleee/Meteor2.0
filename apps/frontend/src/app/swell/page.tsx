@@ -27,6 +27,9 @@ import { WindChart } from './components/WindChart';
 import { HourlyWind } from './components/HourlyWind';
 import { ForecastSection } from './components/ForecastSection';
 import { resolveSwellTab, type SwellTab } from './tabs';
+import { useDict } from '@/i18n/context';
+import { swell } from '@/i18n/dictionaries/swell';
+import { fmt } from '@/i18n/format';
 import {
   SkeletonResumoIA,
   SkeletonWaveChart,
@@ -49,6 +52,7 @@ export default function SwellPage() {
   const { data: hourlyData, loading: hourlyLoading, refetch: refetchHourly } = useHourlyMarine();
   const { data: aiData, loading: aiLoading } = useAiSummary();
   const { data: newsData, loading: newsLoading, refetch: refetchNews } = useNews();
+  const t = useDict(swell);
 
   useEffect(() => {
     if ('geolocation' in navigator) {
@@ -87,14 +91,14 @@ export default function SwellPage() {
 
   return (
     <div className="space-y-8">
-      <PageBanner title="Swell & Points" subtitle="Telemetria de ondas, marés e points de surf em Ilha Comprida" />
+      <PageBanner title={t['page.title']} subtitle={t['page.subtitle']} />
 
       {/* Skip links for accessibility */}
-      <nav aria-label="Navegação rápida" className="sr-only focus-within:not-sr-only">
-        <a href="#condicoes" className="block p-2 bg-cyan-600 text-white rounded-lg">Pular para Condições</a>
-        <a href="#grafico" className="block p-2 bg-cyan-600 text-white rounded-lg">Pular para Gráfico</a>
-        <a href="#horas" className="block p-2 bg-cyan-600 text-white rounded-lg">Pular para Próximas Horas</a>
-        <a href="#mares" className="block p-2 bg-cyan-600 text-white rounded-lg">Pular para Marés</a>
+      <nav aria-label={t['skip.aria']} className="sr-only focus-within:not-sr-only">
+        <a href="#condicoes" className="block p-2 bg-cyan-600 text-white rounded-lg">{t['skip.conditions']}</a>
+        <a href="#grafico" className="block p-2 bg-cyan-600 text-white rounded-lg">{t['skip.chart']}</a>
+        <a href="#horas" className="block p-2 bg-cyan-600 text-white rounded-lg">{t['skip.hours']}</a>
+        <a href="#mares" className="block p-2 bg-cyan-600 text-white rounded-lg">{t['skip.tides']}</a>
       </nav>
 
       {error && (
@@ -126,7 +130,7 @@ export default function SwellPage() {
           <div
             className="relative overflow-hidden bg-gradient-to-r from-blue-700 via-blue-800 to-slate-900 text-white rounded-3xl p-6 md:p-10 shadow-xl border border-blue-600/30"
             role="banner"
-            aria-label="Condições atuais de swell"
+            aria-label={t['hero.aria']}
           >
             <div className="relative z-10 flex flex-wrap items-center justify-between gap-6">
               <div className="flex items-center gap-4">
@@ -134,17 +138,17 @@ export default function SwellPage() {
                   <FaWater className="w-10 h-10 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-3xl font-extrabold tracking-tight">Condições de Swell & Mar</h2>
+                  <h2 className="text-3xl font-extrabold tracking-tight">{t['hero.title']}</h2>
                   <p className="text-blue-200 text-sm mt-1">{data.location}</p>
                 </div>
               </div>
 
               <div className="flex flex-wrap items-center gap-4">
                 <div className="px-6 py-3 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 backdrop-blur-sm"
-                  title={`Qualidade: ${data.qualityLabel}`}
-                  aria-label={`Qualidade do surf: ${data.qualityLabel}`}
+                  title={fmt(t['a11y.quality'], { value: data.qualityLabel })}
+                  aria-label={fmt(t['a11y.quality'], { value: data.qualityLabel })}
                 >
-                  <p className="text-xs font-semibold text-emerald-300 uppercase tracking-wider">Qualidade</p>
+                  <p className="text-xs font-semibold text-emerald-300 uppercase tracking-wider">{t['kpi.quality']}</p>
                   <p className="text-2xl font-extrabold flex items-center gap-2 text-emerald-100">
                     <span aria-hidden="true">{data.qualityEmoji}</span>
                     <span>{data.qualityLabel}</span>
@@ -152,19 +156,19 @@ export default function SwellPage() {
                 </div>
 
                 <div className="px-5 py-3 rounded-2xl bg-white/10 backdrop-blur-sm"
-                  title={`Melhor horário para surf: ${data.bestTime}`}
-                  aria-label={`Melhor horário: ${data.bestTime}`}
+                  title={fmt(t['a11y.bestTime'], { value: data.bestTime })}
+                  aria-label={fmt(t['a11y.bestTime'], { value: data.bestTime })}
                 >
                   <p className="text-xs font-semibold text-blue-200 uppercase tracking-wider flex items-center gap-1">
-                    <FaClock className="w-3.5 h-3.5" aria-hidden="true" /> Melhor Horário
+                    <FaClock className="w-3.5 h-3.5" aria-hidden="true" /> {t['kpi.bestTime']}
                   </p>
                   <p className="text-2xl font-extrabold text-white">{data.bestTime}</p>
                 </div>
 
                 <button
                   onClick={handleRefresh}
-                  title="Atualizar dados de swell, ondas e notícias"
-                  aria-label="Atualizar dados"
+                  title={t['a11y.refreshTitle']}
+                  aria-label={t['a11y.refresh']}
                   className="px-4 py-3 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10 text-white/80 hover:text-white hover:bg-white/20 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                 >
                   <FaSyncAlt className="w-5 h-5" aria-hidden="true" />
@@ -177,50 +181,50 @@ export default function SwellPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div
               className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-2 hover:border-slate-700 transition-colors"
-              title={`Altura da onda: ${data.current.waveHeight} metros, período ${data.current.wavePeriod}s`}
-              aria-label={`Altura da onda: ${data.current.waveHeight} metros`}
+              title={fmt(t['a11y.waveHeight'], { value: data.current.waveHeight })}
+              aria-label={fmt(t['a11y.waveHeight'], { value: data.current.waveHeight })}
             >
-              <span className="text-xs font-semibold text-slate-400">Altura da Onda</span>
+              <span className="text-xs font-semibold text-slate-400">{t['kpi.waveHeight']}</span>
               <p className="text-4xl font-extrabold text-white">
-                {data.current.waveHeight} <span className="text-sm font-normal text-slate-400">metros</span>
+                {data.current.waveHeight} <span className="text-sm font-normal text-slate-400">{t['kpi.meters']}</span>
               </p>
-              <p className="text-[11px] text-emerald-400">Período: {data.current.wavePeriod}s</p>
+              <p className="text-[11px] text-emerald-400">{fmt(t['kpi.period'], { value: data.current.wavePeriod })}</p>
             </div>
 
             <div
               className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-2 hover:border-slate-700 transition-colors"
-              title={`Swell: ${data.current.swellHeight} metros, período ${data.current.swellPeriod}s, direção ${waveDir(data.current.swellDirection)}`}
-              aria-label={`Swell: ${data.current.swellHeight} metros`}
+              title={fmt(t['a11y.swell'], { value: data.current.swellHeight })}
+              aria-label={fmt(t['a11y.swell'], { value: data.current.swellHeight })}
             >
-              <span className="text-xs font-semibold text-slate-400">Swell</span>
+              <span className="text-xs font-semibold text-slate-400">{t['kpi.swell']}</span>
               <p className="text-4xl font-extrabold text-white">
-                {data.current.swellHeight} <span className="text-sm font-normal text-slate-400">metros</span>
+                {data.current.swellHeight} <span className="text-sm font-normal text-slate-400">{t['kpi.meters']}</span>
               </p>
               <p className="text-[11px] text-blue-400">
-                Período: {data.current.swellPeriod}s · {waveDir(data.current.swellDirection)}
+                {fmt(t['kpi.periodDir'], { value: data.current.swellPeriod, dir: waveDir(data.current.swellDirection) })}
               </p>
             </div>
 
             <div
               className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-2 hover:border-slate-700 transition-colors"
-              title={`Direção principal: ${data.current.waveDirection} graus ${waveDir(data.current.waveDirection)}`}
-              aria-label={`Direção: ${data.current.waveDirection} graus ${waveDir(data.current.waveDirection)}`}
+              title={fmt(t['a11y.direction'], { value: data.current.waveDirection })}
+              aria-label={fmt(t['a11y.direction'], { value: data.current.waveDirection })}
             >
-              <span className="text-xs font-semibold text-slate-400">Direção Principal</span>
+              <span className="text-xs font-semibold text-slate-400">{t['kpi.direction']}</span>
               <p className="text-4xl font-extrabold text-white">
                 {data.current.waveDirection}° <span className="text-sm font-normal text-slate-400">{waveDir(data.current.waveDirection)}</span>
               </p>
-              <p className="text-[11px] text-slate-500">Entrada na costa</p>
+              <p className="text-[11px] text-slate-500">{t['kpi.coastEntry']}</p>
             </div>
 
             <div
               className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-2 hover:border-slate-700 transition-colors"
-              title={`Próxima maré alta: ${data.nextTide}, coeficiente ${data.tideCoefficient}`}
-              aria-label={`Próxima maré alta: ${data.nextTide}`}
+              title={fmt(t['a11y.nextTide'], { value: data.nextTide })}
+              aria-label={fmt(t['a11y.nextTide'], { value: data.nextTide })}
             >
-              <span className="text-xs font-semibold text-slate-400">Próxima Maré Alta</span>
+              <span className="text-xs font-semibold text-slate-400">{t['kpi.nextTide']}</span>
               <p className="text-4xl font-extrabold text-white">{data.nextTide}</p>
-              <p className="text-[11px] text-amber-400">Coeficiente: {data.tideCoefficient}</p>
+              <p className="text-[11px] text-amber-400">{fmt(t['kpi.coefficient'], { value: data.tideCoefficient })}</p>
             </div>
           </div>
 
@@ -262,20 +266,20 @@ export default function SwellPage() {
           {activeTab === 'forecast' && (
             <div role="tabpanel" id="panel-forecast" aria-labelledby="tab-forecast" className="space-y-6">
               {/* Section navigation */}
-              <nav aria-label="Seções da previsão de ondas" className="flex flex-wrap gap-2 text-xs">
-                <a href="#condicoes" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Condições</a>
-                <a href="#grafico" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Gráfico</a>
-                <a href="#horas" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Próximas Horas</a>
-                <a href="#mares" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Marés</a>
-                <a href="#resumo" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Resumo IA</a>
-                <a href="#dica" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Dica</a>
+              <nav aria-label={t['section.forecastNav']} className="flex flex-wrap gap-2 text-xs">
+                <a href="#condicoes" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.conditions']}</a>
+                <a href="#grafico" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.chart']}</a>
+                <a href="#horas" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.hours']}</a>
+                <a href="#mares" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.tides']}</a>
+                <a href="#resumo" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.aiSummary']}</a>
+                <a href="#dica" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.tip']}</a>
               </nav>
 
               <ForecastSection
                 id="condicoes"
-                title="Condições Atuais"
+                title={t['section.conditions']}
                 icon={<FaWater className="w-5 h-5 text-cyan-400" aria-hidden="true" />}
-                ariaLabel="Condições atuais de ondas"
+                ariaLabel={t['section.conditionsAria']}
               >
                 <ConditionCards
                   waveHeight={data.current.waveHeight}
@@ -289,45 +293,45 @@ export default function SwellPage() {
 
               <ForecastSection
                 id="grafico"
-                title="Gráfico Horário — Ondas"
+                title={t['section.waveChart']}
                 icon={<span aria-hidden="true">📊</span>}
-                ariaLabel="Gráfico horário de ondas"
+                ariaLabel={t['section.waveChartAria']}
               >
                 {hourlyLoading ? <SkeletonWaveChart /> : hourlyData && <WaveChart data={hourlyData} />}
               </ForecastSection>
 
               <ForecastSection
                 id="horas"
-                title="Próximas Horas"
+                title={t['section.hours']}
                 icon={<span aria-hidden="true">⏱️</span>}
-                ariaLabel="Próximas horas de ondas"
+                ariaLabel={t['section.hoursAria']}
               >
                 {hourlyLoading ? <SkeletonHourly /> : hourlyData && <HourlySwell data={hourlyData} />}
               </ForecastSection>
 
               <ForecastSection
                 id="mares"
-                title="Marés"
+                title={t['section.tides']}
                 icon={<span aria-hidden="true">🌙</span>}
-                ariaLabel="Previsão de marés"
+                ariaLabel={t['section.tidesAria']}
               >
                 {hourlyLoading ? <SkeletonTideChart /> : hourlyData && <TideChart data={hourlyData} />}
               </ForecastSection>
 
               <ForecastSection
                 id="resumo"
-                title="Resumo IA"
+                title={t['section.aiSummary']}
                 icon={<span aria-hidden="true">🤖</span>}
-                ariaLabel="Resumo inteligente das condições"
+                ariaLabel={t['section.aiSummaryAria']}
               >
                 {aiLoading ? <SkeletonResumoIA /> : <ResumoIA summary={aiData?.summary ?? null} loading={aiLoading} error={null} />}
               </ForecastSection>
 
               <ForecastSection
                 id="dica"
-                title="Dica do Dia"
+                title={t['section.tip']}
                 icon={<span aria-hidden="true">💡</span>}
-                ariaLabel="Dica do dia para surf"
+                ariaLabel={t['section.tipAria']}
               >
                 <DailyTip
                   waveHeight={data.current.waveHeight}
@@ -343,20 +347,20 @@ export default function SwellPage() {
           {activeTab === 'wind' && (
             <div role="tabpanel" id="panel-wind" aria-labelledby="tab-wind" className="space-y-6">
               {/* Section navigation */}
-              <nav aria-label="Seções da previsão de ventos" className="flex flex-wrap gap-2 text-xs">
-                <a href="#wind-condicoes" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Condições</a>
-                <a href="#wind-grafico" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Gráfico</a>
-                <a href="#wind-horas" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Próximas Horas</a>
-                <a href="#wind-mares" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Marés</a>
-                <a href="#wind-resumo" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Resumo IA</a>
-                <a href="#wind-dica" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">Dica</a>
+              <nav aria-label={t['section.windNav']} className="flex flex-wrap gap-2 text-xs">
+                <a href="#wind-condicoes" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.conditions']}</a>
+                <a href="#wind-grafico" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.chart']}</a>
+                <a href="#wind-horas" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.hours']}</a>
+                <a href="#wind-mares" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.tides']}</a>
+                <a href="#wind-resumo" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.aiSummary']}</a>
+                <a href="#wind-dica" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.tip']}</a>
               </nav>
 
               <ForecastSection
                 id="wind-condicoes"
-                title="Condições do Vento"
+                title={t['section.windConditions']}
                 icon={<span aria-hidden="true">💨</span>}
-                ariaLabel="Condições atuais do vento"
+                ariaLabel={t['section.windConditionsAria']}
               >
                 {hourlyLoading ? (
                   <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -375,60 +379,60 @@ export default function SwellPage() {
                   />
                 ) : (
                   <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 text-center text-slate-500">
-                    Dados de vento indisponíveis no momento
+                    {t['empty.wind']}
                   </div>
                 )}
               </ForecastSection>
 
               <ForecastSection
                 id="wind-grafico"
-                title="Gráfico Horário — Ventos"
+                title={t['section.windChart']}
                 icon={<span aria-hidden="true">📊</span>}
-                ariaLabel="Gráfico horário de ventos"
+                ariaLabel={t['section.windChartAria']}
               >
                 {hourlyLoading ? <SkeletonWaveChart /> : hourlyData && hourlyData.length > 0 ? <WindChart data={hourlyData} /> : (
                   <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 text-center text-slate-500">
-                    Gráfico de ventos indisponível
+                    {t['empty.windChart']}
                   </div>
                 )}
               </ForecastSection>
 
               <ForecastSection
                 id="wind-horas"
-                title="Próximas Horas — Ventos"
+                title={t['section.windHours']}
                 icon={<span aria-hidden="true">⏱️</span>}
-                ariaLabel="Próximas horas de ventos"
+                ariaLabel={t['section.windHoursAria']}
               >
                 {hourlyLoading ? <SkeletonHourly /> : hourlyData && hourlyData.length > 0 ? <HourlyWind data={hourlyData} /> : (
                   <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 text-center text-slate-500">
-                    Previsão horária de ventos indisponível
+                    {t['empty.windHours']}
                   </div>
                 )}
               </ForecastSection>
 
               <ForecastSection
                 id="wind-mares"
-                title="Marés"
+                title={t['section.tides']}
                 icon={<span aria-hidden="true">🌙</span>}
-                ariaLabel="Previsão de marés"
+                ariaLabel={t['section.tidesAria']}
               >
                 {hourlyLoading ? <SkeletonTideChart /> : hourlyData && <TideChart data={hourlyData} />}
               </ForecastSection>
 
               <ForecastSection
                 id="wind-resumo"
-                title="Resumo IA — Kitesurf & Windsurf"
+                title={t['section.windAiSummary']}
                 icon={<span aria-hidden="true">🤖</span>}
-                ariaLabel="Resumo inteligente para kitesurf e windsurf"
+                ariaLabel={t['section.windAiSummaryAria']}
               >
                 {aiLoading ? <SkeletonResumoIA /> : <ResumoIA summary={aiData?.summary ?? null} loading={aiLoading} error={null} />}
               </ForecastSection>
 
               <ForecastSection
                 id="wind-dica"
-                title="Dica do Dia"
+                title={t['section.windTip']}
                 icon={<span aria-hidden="true">💡</span>}
-                ariaLabel="Dica do dia para kitesurf e windsurf"
+                ariaLabel={t['section.windTipAria']}
               >
                 <DailyTip
                   waveHeight={data.current.waveHeight}
@@ -459,7 +463,7 @@ export default function SwellPage() {
           )}
 
           <p className="text-[11px] text-slate-600 text-right">
-            Última atualização: {new Date(data.timestamp).toLocaleString('pt-BR')}
+            {fmt(t['footer.lastUpdate'], { date: new Date(data.timestamp).toLocaleString('pt-BR') })}
           </p>
         </>
       )}

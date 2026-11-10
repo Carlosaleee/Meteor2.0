@@ -18,6 +18,9 @@ import {
 import { HeroCarousel } from '@/components/HeroCarousel';
 import { ForecastSection } from '@/app/swell/components/ForecastSection';
 import { ConditionCards } from '@/app/swell/components/ConditionCards';
+import { useDict } from '@/i18n/context';
+import { home } from '@/i18n/dictionaries/home';
+import { fmt } from '@/i18n/format';
 import { useAllCities } from '@/hooks/useAllCities';
 import { useSwell } from '@/hooks/useSwell';
 import { useRegionalNews } from '@/hooks/useRegionalNews';
@@ -46,11 +49,11 @@ const ROUTE_ICONS: Record<string, string> = {
 };
 
 const CATEGORY_CONFIG: Record<string, { label: string; emoji: string; color: string; bg: string }> = {
-  transito: { label: 'Trânsito', emoji: '🚗', color: 'text-amber-400', bg: 'bg-amber-500/10' },
-  noticia: { label: 'Notícia', emoji: '📰', color: 'text-blue-400', bg: 'bg-blue-500/10' },
-  policial: { label: 'Policial', emoji: '🚨', color: 'text-red-400', bg: 'bg-red-500/10' },
-  turismo: { label: 'Turismo', emoji: '🏖️', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-  cotidiano: { label: 'Cotidiano', emoji: '🏠', color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
+  transito: { label: 'cat.transito', emoji: '🚗', color: 'text-amber-400', bg: 'bg-amber-500/10' },
+  noticia: { label: 'cat.noticia', emoji: '📰', color: 'text-blue-400', bg: 'bg-blue-500/10' },
+  policial: { label: 'cat.policial', emoji: '🚨', color: 'text-red-400', bg: 'bg-red-500/10' },
+  turismo: { label: 'cat.turismo', emoji: '🏖️', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+  cotidiano: { label: 'cat.cotidiano', emoji: '🏠', color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
 };
 
 const SECTOR_ICONS: Record<string, string> = {
@@ -72,10 +75,12 @@ const CTA_TONES: Record<string, string> = {
   emerald: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 focus-visible:ring-emerald-400',
 };
 
-function SectionCta({ href, tone, children }: { href: string; tone: keyof typeof CTA_TONES; children: React.ReactNode }) {
+function SectionCta({ href, tone, children }: { href: string; tone: keyof typeof CTA_TONES; children: string }) {
   return (
     <Link
       href={href}
+      title={children}
+      aria-label={children}
       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 ${CTA_TONES[tone]}`}
     >
       {children}
@@ -101,12 +106,13 @@ function formatRouteTime(iso: string): string {
 }
 
 function EstimatedBadge() {
+  const t = useDict(home);
   return (
     <span
-      className="ml-auto px-1.5 py-0.5 rounded text-[9px] font-semibold bg-slate-700/50 text-slate-400 border border-slate-600/50"
-      title="Dado estimado (sem fonte ao vivo no momento)"
+      className="ml-auto px-1.5 py-0.5 rounded text-[9px] font-semibold bg-card-line/50 text-card-muted border border-card-line/50"
+      title={t['badge.estimatedTitle']}
     >
-      estimado
+      {t['badge.estimated']}
     </span>
   );
 }
@@ -114,31 +120,32 @@ function EstimatedBadge() {
 const PLACEHOLDER_BLOG_CARDS = [
   {
     title: 'Previsão de Ondas e Bancadas em Ilha Comprida',
-    category: 'Surf & Telemetria',
-    date: 'Em breve',
+    category: 'blog.cat.telemetria',
+    date: 'blog.soon',
     imageUrl: '/blog/ventos-de-sudeste.jpg',
   },
   {
     title: 'Guia de Navegação e Balsas do Lagamar',
-    category: 'Mobilidade',
-    date: 'Em breve',
+    category: 'blog.cat.mobilidade',
+    date: 'blog.soon',
     imageUrl: '/blog/reserva-cananeia.jpg',
   },
   {
     title: 'Ecoturismo e Trilhas no Vale do Ribeira',
-    category: 'Natureza',
-    date: 'Em breve',
+    category: 'blog.cat.natureza',
+    date: 'blog.soon',
     imageUrl: '/blog/jureia.jpg',
   },
   {
     title: 'Marés, Pesca e Dinâmica Costeira Regional',
-    category: 'Oceanografia',
-    date: 'Em breve',
+    category: 'blog.cat.oceanografia',
+    date: 'blog.soon',
     imageUrl: '/blog/dinamica-costeira.jpg',
   },
 ];
 
 export default function HomePage() {
+  const t = useDict(home);
   const { cities, loading: citiesLoading } = useAllCities();
   const { data: swellData, loading: swellLoading } = useSwell();
   const { data: newsData, loading: newsLoading } = useRegionalNews();
@@ -169,23 +176,23 @@ export default function HomePage() {
       : paulistaNews;
 
   return (
-    <main className="space-y-8" role="main" aria-label="Painel principal do Meteor 2.0">
-      <h1 className="sr-only">Meteor 2.0 — Previsão, trânsito, notícias e condições do mar do Vale do Ribeira e Ilha Comprida</h1>
+    <main className="space-y-8" role="main" aria-label={t['main.aria']}>
+      <h1 className="sr-only">{t['main.h1']}</h1>
 
-      <a href="#conteudo" className="skip-link sr-only">
-        Pular para o conteúdo
+      <a href="#conteudo" className="skip-link sr-only" title={t['skip.content']} aria-label={t['skip.content']}>
+        {t['skip.content']}
       </a>
 
-      <nav aria-label="Navegação rápida" className="sr-only focus-within:not-sr-only">
-        <a href="#conteudo" className="block p-2 bg-slate-700 text-white rounded-lg">Pular para o conteúdo</a>
-        <a href="#tempo" className="block p-2 bg-amber-600 text-white rounded-lg">Pular para Previsão do Tempo</a>
-        <a href="#rodovias" className="block p-2 bg-amber-600 text-white rounded-lg">Pular para Trânsito e Rodovias</a>
-        <a href="#noticias" className="block p-2 bg-blue-600 text-white rounded-lg">Pular para Últimas Notícias</a>
-        <a href="#mar" className="block p-2 bg-cyan-600 text-white rounded-lg">Pular para Condições do Mar</a>
-        <a href="#surf-news" className="block p-2 bg-amber-600 text-white rounded-lg">Pular para Esporte</a>
-        <a href="#blog" className="block p-2 bg-emerald-600 text-white rounded-lg">Pular para Blog</a>
-        <a href="#comercio" className="block p-2 bg-orange-600 text-white rounded-lg">Pular para Comércio</a>
-        <a href="#points" className="block p-2 bg-blue-600 text-white rounded-lg">Pular para Points de Surf</a>
+      <nav aria-label={t['skip.aria']} className="sr-only focus-within:not-sr-only">
+        <a href="#conteudo" className="block p-2 bg-card-line text-card-text rounded-lg" title={t['skip.content']} aria-label={t['skip.content']}>{t['skip.content']}</a>
+        <a href="#tempo" className="block p-2 bg-amber-600 text-white rounded-lg" title={t['skip.weather']} aria-label={t['skip.weather']}>{t['skip.weather']}</a>
+        <a href="#rodovias" className="block p-2 bg-amber-600 text-white rounded-lg" title={t['skip.traffic']} aria-label={t['skip.traffic']}>{t['skip.traffic']}</a>
+        <a href="#noticias" className="block p-2 bg-blue-600 text-white rounded-lg" title={t['skip.news']} aria-label={t['skip.news']}>{t['skip.news']}</a>
+        <a href="#mar" className="block p-2 bg-cyan-600 text-white rounded-lg" title={t['skip.sea']} aria-label={t['skip.sea']}>{t['skip.sea']}</a>
+        <a href="#surf-news" className="block p-2 bg-amber-600 text-white rounded-lg" title={t['skip.sport']} aria-label={t['skip.sport']}>{t['skip.sport']}</a>
+        <a href="#blog" className="block p-2 bg-emerald-600 text-white rounded-lg" title={t['skip.blog']} aria-label={t['skip.blog']}>{t['skip.blog']}</a>
+        <a href="#comercio" className="block p-2 bg-orange-600 text-white rounded-lg" title={t['skip.comercio']} aria-label={t['skip.comercio']}>{t['skip.comercio']}</a>
+        <a href="#points" className="block p-2 bg-blue-600 text-white rounded-lg" title={t['skip.points']} aria-label={t['skip.points']}>{t['skip.points']}</a>
       </nav>
 
       {/* 1. Hero Carousel do Topo */}
@@ -195,32 +202,32 @@ export default function HomePage() {
         {/* 2. Previsão do Tempo — 4 cidades */}
         <ForecastSection
           id="tempo"
-          title="Previsão do Tempo"
+          title={t['section.weather']}
           icon={<FaCloudSun className="w-5 h-5 text-amber-400" aria-hidden="true" />}
-          ariaLabel="Previsão do tempo das 4 cidades"
+          ariaLabel={t['aria.weather']}
           ariaBusy={citiesLoading}
-          action={<SectionCta href="/meteorologia" tone="amber">Ver previsão</SectionCta>}
+          action={<SectionCta href="/meteorologia" tone="amber">{t['cta.weather']}</SectionCta>}
         >
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" role="list" aria-label="Temperatura atual das cidades">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" role="list" aria-label={t['aria.cityList']}>
             {(['ilha-comprida', 'iguape', 'cananeia', 'registro'] as const).map(id => {
               const city = cities[id];
               const maxMin = city?.tempMax != null && city?.tempMin != null
-                ? `Máx ${Math.round(city.tempMax)} graus, mín ${Math.round(city.tempMin)} graus`
+                ? fmt(t['city.maxMin'], { max: Math.round(city.tempMax), min: Math.round(city.tempMin) })
                 : null;
               return (
                 <div key={id} role="listitem">
                   <Link
                     href={`/meteorologia?city=${id}`}
-                    className="block bg-slate-900/80 border border-slate-800 rounded-2xl p-3 hover:border-amber-500/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
-                    title={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)}°C` : 'Carregando...'}`}
-                    aria-label={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)} graus, ${weatherEmoji(city.weatherCode)}${maxMin ? `. ${maxMin}` : ''}` : 'carregando'}`}
+                    className="block bg-card/80 border border-card-border rounded-2xl p-3 hover:border-amber-500/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                    title={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)}°C` : t['loading']}`}
+                    aria-label={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)} graus, ${weatherEmoji(city.weatherCode)}${maxMin ? `. ${maxMin}` : ''}` : t['loadingLower']}`}
                   >
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1 truncate">
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-card-muted mb-1 truncate">
                       {city?.location ?? id.replace(/-/g, ' ')}
                     </p>
                     <div className="flex items-center gap-2">
                       {city && <span className="text-xl" aria-hidden="true">{weatherEmoji(city.weatherCode)}</span>}
-                      <span className="text-2xl font-extrabold text-white tabular-nums">
+                      <span className="text-2xl font-extrabold text-card-text tabular-nums">
                         {citiesLoading ? '--' : city ? `${Math.round(city.temperature)}°` : '--'}
                       </span>
                     </div>
@@ -229,7 +236,7 @@ export default function HomePage() {
                         ▲ {Math.round(city.tempMax)}° · ▼ {Math.round(city.tempMin)}°
                       </p>
                     )}
-                    <div className="flex items-center gap-3 mt-2 text-[10px] text-slate-400">
+                    <div className="flex items-center gap-3 mt-2 text-[10px] text-card-muted">
                       {city && (
                         <>
                           <span>💧 {city.humidity}%</span>
@@ -247,18 +254,18 @@ export default function HomePage() {
         {/* 3. Trânsito / Status das Rodovias */}
         <ForecastSection
           id="rodovias"
-          title="Trânsito & Rodovias"
+          title={t['section.traffic']}
           icon={<FaCar className="w-5 h-5 text-amber-400" aria-hidden="true" />}
-          ariaLabel="Condições de tráfego das rodovias e balsas"
+          ariaLabel={t['aria.traffic']}
           ariaBusy={newsLoading}
-          action={<SectionCta href="/noticias#rodovias" tone="amber">Ver em Notícias</SectionCta>}
+          action={<SectionCta href="/noticias#rodovias" tone="amber">{t['cta.traffic']}</SectionCta>}
         >
           {newsLoading ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3" aria-busy="true">
               {[1, 2, 3, 4, 5].map(i => (
-                <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-3 animate-pulse">
-                  <div className="h-4 bg-slate-800 rounded w-24 mb-3" />
-                  <div className="h-6 bg-slate-800 rounded w-20" />
+                <div key={i} className="bg-card border border-card-border rounded-2xl p-3 animate-pulse">
+                  <div className="h-4 bg-card-2 rounded w-24 mb-3" />
+                  <div className="h-6 bg-card-2 rounded w-20" />
                 </div>
               ))}
             </div>
@@ -273,28 +280,28 @@ export default function HomePage() {
                     href={route.sourceUrl || '/noticias'}
                     target={route.sourceUrl ? '_blank' : undefined}
                     rel={route.sourceUrl ? 'noopener noreferrer' : undefined}
-                    className={`bg-slate-900/80 border ${colors.border} rounded-2xl p-3 hover:scale-[1.02] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white`}
+                    className={`bg-card/80 border ${colors.border} rounded-2xl p-3 hover:scale-[1.02] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white`}
                     title={`${route.name}: ${route.condition} — ${route.description}`}
-                    aria-label={`${route.name}: ${route.condition} — abrir na fonte oficial`}
+                    aria-label={`${route.name}: ${route.condition} — ${t['a11y.route.open']}`}
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-lg" aria-hidden="true">{emoji}</span>
-                      <span className="text-sm font-bold text-white">{route.name}</span>
+                      <span className="text-sm font-bold text-card-text">{route.name}</span>
                       {route.source === 'estimated' && <EstimatedBadge />}
                     </div>
                     <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${colors.bg} ${colors.text} border ${colors.border}`}>
                       {route.condition}
                     </div>
-                    <p className="text-[11px] text-slate-400 mt-2 truncate" title={route.description}>{route.description}</p>
-                    <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-slate-800/60 text-[10px] text-slate-400">
+                    <p className="text-[11px] text-card-muted mt-2 truncate" title={route.description}>{route.description}</p>
+                    <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-card-border/60 text-[10px] text-card-muted">
                       <span className="inline-flex items-center gap-1">
                         {route.sourceUrl ? (
-                          <>Fonte <FaExternalLinkAlt className="w-2.5 h-2.5" aria-hidden="true" /></>
+                          <>{t['source.label']} <FaExternalLinkAlt className="w-2.5 h-2.5" aria-hidden="true" /></>
                         ) : (
-                          'Fonte não informada'
+                          t['source.none']
                         )}
                       </span>
-                      <span title={`Última atualização: ${new Date(route.updatedAt).toLocaleString('pt-BR')}`}>
+                      <span title={fmt(t['source.lastUpdate'], { date: new Date(route.updatedAt).toLocaleString('pt-BR') })}>
                         {formatRouteTime(route.updatedAt)}
                       </span>
                     </div>
@@ -308,27 +315,29 @@ export default function HomePage() {
         {/* 4. Últimas Notícias Regionais */}
         <ForecastSection
           id="noticias"
-          title="Últimas Notícias"
+          title={t['section.news']}
           icon={<FaNewspaper className="w-5 h-5 text-blue-400" aria-hidden="true" />}
-          ariaLabel="Notícias regionais do Vale do Ribeira"
+          ariaLabel={t['aria.news']}
           ariaBusy={newsLoading}
-          action={<SectionCta href="/noticias" tone="blue">Ver todas</SectionCta>}
+          action={<SectionCta href="/noticias" tone="blue">{t['cta.viewAll']}</SectionCta>}
         >
-          <div className="flex flex-wrap gap-2 mb-4" role="group" aria-label="Filtrar notícias por categoria">
+          <div className="flex flex-wrap gap-2 mb-4" role="group" aria-label={t['aria.newsFilter']}>
             {['todas', ...Object.keys(CATEGORY_CONFIG)].map(key => {
-              const cfg = key === 'todas' ? { label: 'Todas', emoji: '📰', color: 'text-slate-300', bg: 'bg-slate-800/40' } : CATEGORY_CONFIG[key];
+              const cfg = key === 'todas' ? { label: 'cat.todas', emoji: '📰', color: 'text-card-subtle', bg: 'bg-card-2/40' } : CATEGORY_CONFIG[key];
               return (
                 <button
                   key={key}
                   onClick={() => setNewsCategory(key)}
                   aria-pressed={newsCategory === key}
+                  title={t[cfg.label]}
+                  aria-label={t[cfg.label]}
                   className={`px-3 py-1.5 text-xs rounded-lg border transition-all ${
                     newsCategory === key
                       ? `${cfg.bg} ${cfg.color} border-current`
-                      : 'bg-slate-800/40 text-slate-400 border-slate-700/50 hover:bg-slate-800'
+                      : 'bg-card-2/40 text-card-muted border-card-line/50 hover:bg-card-2'
                   }`}
                 >
-                  {cfg.emoji} {cfg.label}
+                  {cfg.emoji} {t[cfg.label]}
                 </button>
               );
             })}
@@ -337,11 +346,11 @@ export default function HomePage() {
           {newsLoading ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3" aria-busy="true">
               {[1, 2, 3, 4, 5, 6].map(i => (
-                <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-4 animate-pulse">
-                  <div className="h-4 bg-slate-800 rounded w-20 mb-3" />
-                  <div className="h-5 bg-slate-800 rounded w-3/4 mb-2" />
-                  <div className="h-3 bg-slate-800 rounded w-full mb-1" />
-                  <div className="h-3 bg-slate-800 rounded w-2/3" />
+                <div key={i} className="bg-card border border-card-border rounded-2xl p-4 animate-pulse">
+                  <div className="h-4 bg-card-2 rounded w-20 mb-3" />
+                  <div className="h-5 bg-card-2 rounded w-3/4 mb-2" />
+                  <div className="h-3 bg-card-2 rounded w-full mb-1" />
+                  <div className="h-3 bg-card-2 rounded w-2/3" />
                 </div>
               ))}
             </div>
@@ -356,22 +365,22 @@ export default function HomePage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     title={`${item.title} — ${item.source}`}
-                    aria-label={`${item.title}, fonte: ${item.source}`}
-                    className="group bg-slate-900/80 border border-slate-800 rounded-2xl p-4 hover:border-blue-500/30 hover:bg-slate-800/60 transition-all overflow-hidden"
+                    aria-label={`${item.title}, ${t['a11y.news.source']}: ${item.source}`}
+                    className="group bg-card/80 border border-card-border rounded-2xl p-4 hover:border-blue-500/30 hover:bg-card-2/60 transition-all overflow-hidden"
                   >
                     <div className="flex items-center justify-between mb-3">
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border ${catCfg.bg} ${catCfg.color} border-current`}>
                         {catCfg.emoji} {catCfg.label}
                       </span>
-                      <FaExternalLinkAlt className="w-3 h-3 text-slate-400 group-hover:text-blue-400 transition-colors" aria-hidden="true" />
+                      <FaExternalLinkAlt className="w-3 h-3 text-card-muted group-hover:text-blue-400 transition-colors" aria-hidden="true" />
                     </div>
-                    <h3 className="text-sm font-bold text-white group-hover:text-blue-300 transition-colors mb-2 line-clamp-2">
+                    <h3 className="text-sm font-bold text-card-text group-hover:text-blue-300 transition-colors mb-2 line-clamp-2">
                       {item.title}
                     </h3>
-                    <p className="text-xs text-slate-400 leading-relaxed mb-3 max-h-8 group-hover:max-h-40 overflow-hidden transition-all duration-300 ease-in-out">
+                    <p className="text-xs text-card-muted leading-relaxed mb-3 max-h-8 group-hover:max-h-40 overflow-hidden transition-all duration-300 ease-in-out">
                       {item.description}
                     </p>
-                    <div className="flex items-center justify-between text-[10px] text-slate-400">
+                    <div className="flex items-center justify-between text-[10px] text-card-muted">
                       <span className="font-medium">{item.source}</span>
                       <span>{timeAgo(item.publishedAt)}</span>
                     </div>
@@ -379,8 +388,8 @@ export default function HomePage() {
                 );
               })}
               {filteredNews.length === 0 && (
-                <p className="text-sm text-slate-400 col-span-full text-center py-8">
-                  Nenhuma notícia encontrada nesta categoria.
+                <p className="text-sm text-card-muted col-span-full text-center py-8">
+                  {t['empty.news']}
                 </p>
               )}
             </div>
@@ -390,19 +399,19 @@ export default function HomePage() {
         {/* 5. Condições do Mar */}
         <ForecastSection
           id="mar"
-          title="Condições do Mar"
+          title={t['section.sea']}
           icon={<FaWater className="w-5 h-5 text-cyan-400" aria-hidden="true" />}
-          ariaLabel="Condições atuais de ondas e mar"
+          ariaLabel={t['aria.sea']}
           ariaBusy={swellLoading}
-          action={<SectionCta href="/swell?tab=overview" tone="cyan">Ver detalhes</SectionCta>}
+          action={<SectionCta href="/swell?tab=overview" tone="cyan">{t['cta.sea']}</SectionCta>}
         >
           {swellLoading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2" aria-busy="true">
               {[1, 2, 3, 4, 5].map(i => (
-                <div key={i} className="flex flex-col items-center gap-2 p-3 rounded-xl bg-slate-800/60 border border-slate-700/50 animate-pulse">
-                  <div className="w-8 h-8 rounded-lg bg-slate-700" />
-                  <div className="h-5 bg-slate-700 rounded w-12" />
-                  <div className="h-3 bg-slate-700 rounded w-16" />
+                <div key={i} className="flex flex-col items-center gap-2 p-3 rounded-xl bg-card-2/60 border border-card-line/50 animate-pulse">
+                  <div className="w-8 h-8 rounded-lg bg-card-line" />
+                  <div className="h-5 bg-card-line rounded w-12" />
+                  <div className="h-3 bg-card-line rounded w-16" />
                 </div>
               ))}
             </div>
@@ -416,8 +425,8 @@ export default function HomePage() {
               qualityEmoji={swellData.qualityEmoji}
             />
           ) : (
-            <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 text-center text-slate-400">
-              Dados oceânicos indisponíveis
+            <div className="bg-card/80 border border-card-border rounded-2xl p-4 text-center text-card-muted">
+              {t['empty.sea']}
             </div>
           )}
         </ForecastSection>
@@ -425,19 +434,19 @@ export default function HomePage() {
         {/* 6. Esporte (WSL e Circuito Paulista — 6 notícias com abas) */}
         <ForecastSection
           id="surf-news"
-          title="Esporte"
+          title={t['section.sport']}
           icon={<FaWater className="w-5 h-5 text-amber-400" aria-hidden="true" />}
-          ariaLabel="Notícias e competições de surf WSL e Circuito Paulista"
+          ariaLabel={t['aria.sport']}
           ariaBusy={surfNewsLoading}
-          action={<SectionCta href="/swell?tab=news" tone="blue">Ver todas</SectionCta>}
+          action={<SectionCta href="/swell?tab=news" tone="blue">{t['cta.viewAll']}</SectionCta>}
         >
           {/* Subfiltros em abas: Todas / WSL / Circuito Paulista */}
-          <div className="flex flex-wrap gap-2 mb-4" role="tablist" aria-label="Filtrar esportes por circuito">
+          <div className="flex flex-wrap gap-2 mb-4" role="tablist" aria-label={t['aria.sportFilter']}>
             {(
               [
-                { id: 'todas', label: 'Todas as Matérias' },
-                { id: 'WSL', label: '🏄 World Surf League' },
-                { id: 'Paulista', label: '🏆 Circuito Paulista' },
+                { id: 'todas', label: 'sport.todas' },
+                { id: 'WSL', label: 'sport.wsl' },
+                { id: 'Paulista', label: 'sport.paulista' },
               ] as const
             ).map(tab => (
               <button
@@ -445,13 +454,15 @@ export default function HomePage() {
                 role="tab"
                 aria-selected={sportTab === tab.id}
                 onClick={() => setSportTab(tab.id)}
+                title={t[tab.label]}
+                aria-label={t[tab.label]}
                 className={`px-3 py-1.5 text-xs rounded-lg border font-medium transition-all ${
                   sportTab === tab.id
                     ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                    : 'bg-slate-800/40 text-slate-400 border-slate-700/50 hover:bg-slate-800'
+                    : 'bg-card-2/40 text-card-muted border-card-line/50 hover:bg-card-2'
                 }`}
               >
-                {tab.label}
+                {t[tab.label]}
               </button>
             ))}
           </div>
@@ -459,10 +470,10 @@ export default function HomePage() {
           {surfNewsLoading ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3" aria-busy="true">
               {[1, 2, 3, 4, 5, 6].map(i => (
-                <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-4 animate-pulse">
-                  <div className="h-32 bg-slate-800 rounded mb-3" />
-                  <div className="h-4 bg-slate-800 rounded w-3/4 mb-2" />
-                  <div className="h-3 bg-slate-800 rounded w-1/2" />
+                <div key={i} className="bg-card border border-card-border rounded-2xl p-4 animate-pulse">
+                  <div className="h-32 bg-card-2 rounded mb-3" />
+                  <div className="h-4 bg-card-2 rounded w-3/4 mb-2" />
+                  <div className="h-3 bg-card-2 rounded w-1/2" />
                 </div>
               ))}
             </div>
@@ -474,11 +485,11 @@ export default function HomePage() {
                     href={item.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    title={`${item.title} — ${item.source} (abrir em nova aba)`}
-                    aria-label={`${item.title}, fonte: ${item.source}`}
-                    className="group block rounded-xl overflow-hidden bg-slate-800/40 border border-slate-700/50 hover:bg-slate-800/80 hover:border-blue-500/30 transition-all h-full flex flex-col"
+                    title={`${item.title} — ${item.source} ${t['a11y.news.openTab']}`}
+                    aria-label={`${item.title}, ${t['a11y.news.source']}: ${item.source}`}
+                    className="group block rounded-xl overflow-hidden bg-card-2/40 border border-card-line/50 hover:bg-card-2/80 hover:border-blue-500/30 transition-all h-full flex flex-col"
                   >
-                    <div className="h-40 bg-slate-800 overflow-hidden relative shrink-0">
+                    <div className="h-40 bg-card-2 overflow-hidden relative shrink-0">
                       <img
                         src={item.image || FALLBACK_IMAGES[item.category] || FALLBACK_IMAGES.WSL}
                         alt=""
@@ -496,13 +507,13 @@ export default function HomePage() {
                     <div className="p-4 flex flex-col flex-1 justify-between">
                       <div>
                         <div className="flex items-start justify-between gap-2 mb-1">
-                          <h3 className="text-sm font-bold text-white group-hover:text-blue-300 transition-colors line-clamp-2">{item.title}</h3>
-                          <FaExternalLinkAlt className="w-3 h-3 text-slate-400 group-hover:text-blue-400 shrink-0 mt-0.5" aria-hidden="true" />
+                          <h3 className="text-sm font-bold text-card-text group-hover:text-blue-300 transition-colors line-clamp-2">{item.title}</h3>
+                          <FaExternalLinkAlt className="w-3 h-3 text-card-muted group-hover:text-blue-400 shrink-0 mt-0.5" aria-hidden="true" />
                         </div>
                         <p className="text-[10px] text-blue-400 font-medium mb-1">{item.source}</p>
-                        <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">{item.description}</p>
+                        <p className="text-xs text-card-muted leading-relaxed line-clamp-2">{item.description}</p>
                       </div>
-                      <p className="text-[9px] text-slate-400 mt-3 font-mono">
+                      <p className="text-[9px] text-card-muted mt-3 font-mono">
                         {new Date(item.publishedAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
                       </p>
                     </div>
@@ -510,8 +521,8 @@ export default function HomePage() {
                 </div>
               ))}
               {(!displayedSportNews.length && !surfNewsLoading) && (
-                <p className="col-span-full text-center py-8 text-slate-400 text-sm">
-                  Nenhuma notícia de surf disponível no momento.
+                <p className="col-span-full text-center py-8 text-card-muted text-sm">
+                  {t['empty.sport']}
                 </p>
               )}
             </div>
@@ -521,17 +532,19 @@ export default function HomePage() {
         {/* 7. Blog */}
         <ForecastSection
           id="blog"
-          title="Blog"
+          title={t['section.blog']}
           icon={<FaBookOpen className="w-5 h-5 text-emerald-400" aria-hidden="true" />}
-          ariaLabel="Artigos e guias especiais do Blog Meteor"
-          action={<SectionCta href="/blog" tone="emerald">Ver todos</SectionCta>}
+          ariaLabel={t['aria.blog']}
+          action={<SectionCta href="/blog" tone="emerald">{t['cta.blog']}</SectionCta>}
         >
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {publishedPosts().map(post => (
               <Link
                 key={post.slug}
                 href={`/blog/${post.slug}`}
-                className="group bg-slate-900 border border-slate-800 hover:border-emerald-500/50 rounded-2xl overflow-hidden transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+                title={post.title}
+                aria-label={`${t['a11y.blog.open']}: ${post.title}`}
+                className="group bg-card border border-card-border hover:border-emerald-500/50 rounded-2xl overflow-hidden transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
               >
                 <div className="relative h-24 overflow-hidden">
                   <Image
@@ -545,7 +558,7 @@ export default function HomePage() {
                 </div>
                 <div className="p-3">
                   <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">{post.category}</span>
-                  <h3 className="text-sm font-bold text-white mt-1 group-hover:text-emerald-300 transition-colors line-clamp-2">
+                  <h3 className="text-sm font-bold text-card-text mt-1 group-hover:text-emerald-300 transition-colors line-clamp-2">
                     {post.title}
                   </h3>
                 </div>
@@ -557,7 +570,9 @@ export default function HomePage() {
               <Link
                 key={`placeholder-${idx}`}
                 href="/blog"
-                className="group bg-slate-900/60 border border-slate-800/80 hover:border-emerald-500/40 rounded-2xl overflow-hidden transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+                title={card.title}
+                aria-label={`${t['a11y.blog.open']}: ${card.title}`}
+                className="group bg-card/60 border border-card-border/80 hover:border-emerald-500/40 rounded-2xl overflow-hidden transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
               >
                 <div className="relative h-24 overflow-hidden opacity-75 group-hover:opacity-100 transition-opacity">
                   <Image
@@ -569,12 +584,12 @@ export default function HomePage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 to-transparent" />
                   <span className="absolute top-2 right-2 px-2 py-0.5 rounded text-[9px] font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-500/30">
-                    {card.date}
+                    {t[card.date]}
                   </span>
                 </div>
                 <div className="p-3">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{card.category}</span>
-                  <h3 className="text-sm font-bold text-slate-200 mt-1 group-hover:text-emerald-300 transition-colors line-clamp-2">
+                  <span className="text-[10px] font-bold text-card-muted uppercase tracking-wider">{t[card.category]}</span>
+                  <h3 className="text-sm font-bold text-card-text mt-1 group-hover:text-emerald-300 transition-colors line-clamp-2">
                     {card.title}
                   </h3>
                 </div>
@@ -586,19 +601,19 @@ export default function HomePage() {
         {/* 8. Comércio em Destaque */}
         <ForecastSection
           id="comercio"
-          title="Comércio em Destaque"
+          title={t['section.comercio']}
           icon={<FaStore className="w-5 h-5 text-orange-400" aria-hidden="true" />}
-          ariaLabel="Estabelecimentos comerciais de Ilha Comprida"
+          ariaLabel={t['aria.comercio']}
           ariaBusy={comercioLoading}
-          action={<SectionCta href="/comercio" tone="orange">Ver diretório</SectionCta>}
+          action={<SectionCta href="/comercio" tone="orange">{t['cta.comercio']}</SectionCta>}
         >
           {comercioLoading ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3" aria-busy="true">
               {[1, 2, 3, 4, 5, 6].map(i => (
-                <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-3 animate-pulse">
-                  <div className="h-4 bg-slate-800 rounded w-20 mb-3" />
-                  <div className="h-5 bg-slate-800 rounded w-3/4 mb-2" />
-                  <div className="h-3 bg-slate-800 rounded w-full" />
+                <div key={i} className="bg-card border border-card-border rounded-2xl p-3 animate-pulse">
+                  <div className="h-4 bg-card-2 rounded w-20 mb-3" />
+                  <div className="h-5 bg-card-2 rounded w-3/4 mb-2" />
+                  <div className="h-3 bg-card-2 rounded w-full" />
                 </div>
               ))}
             </div>
@@ -611,22 +626,22 @@ export default function HomePage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   title={`${item.name} — ${item.sector}`}
-                  aria-label={`${item.name}, setor: ${item.sector}`}
-                  className="group bg-slate-900/80 border border-slate-800 rounded-2xl p-3 hover:border-orange-500/30 hover:bg-slate-800/60 transition-all overflow-hidden"
+                  aria-label={`${item.name}, ${t['a11y.commerce.sector']}: ${item.sector}`}
+                  className="group bg-card/80 border border-card-border rounded-2xl p-3 hover:border-orange-500/30 hover:bg-card-2/60 transition-all overflow-hidden"
                 >
                   <div className="flex items-center gap-3 mb-3">
                     <span className="text-2xl" aria-hidden="true">{SECTOR_ICONS[item.sector] ?? '🏪'}</span>
                     <div className="min-w-0">
-                      <h3 className="text-sm font-bold text-white group-hover:text-orange-300 transition-colors truncate">
+                      <h3 className="text-sm font-bold text-card-text group-hover:text-orange-300 transition-colors truncate">
                         {item.name}
                       </h3>
                       <span className="text-[10px] text-orange-400 font-medium">{item.sector}</span>
                     </div>
                   </div>
-                  <p className="text-xs text-slate-400 max-h-8 group-hover:max-h-40 overflow-hidden transition-all duration-300 ease-in-out mb-2">{item.description}</p>
-                  <div className="flex items-center justify-between text-[10px] text-slate-400">
+                  <p className="text-xs text-card-muted max-h-8 group-hover:max-h-40 overflow-hidden transition-all duration-300 ease-in-out mb-2">{item.description}</p>
+                  <div className="flex items-center justify-between text-[10px] text-card-muted">
                     <span className="truncate">{item.address}</span>
-                    <FaExternalLinkAlt className="w-3 h-3 text-slate-400 group-hover:text-orange-400 transition-colors flex-shrink-0" aria-hidden="true" />
+                    <FaExternalLinkAlt className="w-3 h-3 text-card-muted group-hover:text-orange-400 transition-colors flex-shrink-0" aria-hidden="true" />
                   </div>
                 </a>
               ))}
@@ -637,10 +652,10 @@ export default function HomePage() {
         {/* 9. Points de Surf (4 Cards com nível, melhor vento e GPS) */}
         <ForecastSection
           id="points"
-          title="Points de Surf"
+          title={t['section.points']}
           icon={<FaMapMarkerAlt className="w-5 h-5 text-blue-400" aria-hidden="true" />}
-          ariaLabel="Principais points e picos de surf em Ilha Comprida"
-          action={<SectionCta href="/swell?tab=spots" tone="blue">Ver todos os points</SectionCta>}
+          ariaLabel={t['aria.points']}
+          action={<SectionCta href="/swell?tab=spots" tone="blue">{t['cta.points']}</SectionCta>}
         >
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {topSpots.map(spot => {
@@ -648,47 +663,49 @@ export default function HomePage() {
               return (
                 <div
                   key={spot.id}
-                  className="bg-slate-900/80 border border-slate-800 hover:border-blue-500/40 rounded-2xl p-4 transition-all flex flex-col justify-between"
+                  className="bg-card/80 border border-card-border hover:border-blue-500/40 rounded-2xl p-4 transition-all flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-2">
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${levelCfg.bg} ${levelCfg.color} ${levelCfg.border}`}>
                         {levelCfg.emoji} {levelCfg.label}
                       </span>
-                      <span className="text-[10px] text-slate-400 font-mono">
+                      <span className="text-[10px] text-card-muted font-mono">
                         {spot.lat.toFixed(2)}°, {spot.lon.toFixed(2)}°
                       </span>
                     </div>
-                    <h3 className="text-sm font-bold text-white mb-1">{spot.name}</h3>
-                    <p className="text-xs text-slate-400 line-clamp-2 mb-3 leading-relaxed">
+                    <h3 className="text-sm font-bold text-card-text mb-1">{spot.name}</h3>
+                    <p className="text-xs text-card-muted line-clamp-2 mb-3 leading-relaxed">
                       {spot.description}
                     </p>
-                    <div className="space-y-1 text-[11px] text-slate-400 mb-3 bg-slate-800/40 p-2.5 rounded-xl border border-slate-800/60">
+                    <div className="space-y-1 text-[11px] text-card-muted mb-3 bg-card-2/40 p-2.5 rounded-xl border border-card-border/60">
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-400">Vento ideal:</span>
-                        <span className="font-semibold text-slate-200">{spot.bestWind}</span>
+                        <span className="text-card-muted">{t['points.bestWind']}</span>
+                        <span className="font-semibold text-card-text">{spot.bestWind}</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-400">Exposição:</span>
-                        <span className="text-slate-300 truncate max-w-[120px]">{spot.exposure}</span>
+                        <span className="text-card-muted">{t['points.exposure']}</span>
+                        <span className="text-card-subtle truncate max-w-[120px]">{spot.exposure}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 pt-2 border-t border-slate-800/60">
+                  <div className="flex items-center gap-2 pt-2 border-t border-card-border/60">
                     <Link
                       href="/swell?tab=spots"
+                      title={t['cta.map']}
+                      aria-label={t['cta.map']}
                       className="flex-1 text-center py-1.5 px-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-lg text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
                     >
-                      Ver no Mapa
+                      {t['cta.map']}
                     </Link>
                     <a
                       href={spot.googleMapsUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      title={`Abrir localização de ${spot.name} no Google Maps`}
-                      aria-label={`Abrir localização de ${spot.name} no Google Maps`}
-                      className="p-2 bg-slate-800/60 hover:bg-slate-700/60 text-slate-300 hover:text-white rounded-lg border border-slate-700/50 transition-colors flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                      title={fmt(t['a11y.spot.maps'], { name: spot.name })}
+                      aria-label={fmt(t['a11y.spot.maps'], { name: spot.name })}
+                      className="p-2 bg-card-2/60 hover:bg-card-line/60 text-card-subtle hover:text-card-text rounded-lg border border-card-line/50 transition-colors flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                     >
                       <FaRoute className="w-3.5 h-3.5 text-blue-400" aria-hidden="true" />
                     </a>
@@ -700,7 +717,7 @@ export default function HomePage() {
         </ForecastSection>
 
         {/* 10. Carrossel Compacto Pré-Footer */}
-        <section aria-label="Destaques compactos do portal" className="pt-4">
+        <section aria-label={t['aria.compact']} className="pt-4">
           <HeroCarousel compact={true} />
         </section>
       </div>

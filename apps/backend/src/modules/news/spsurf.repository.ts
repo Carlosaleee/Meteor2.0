@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { isPortuguese } from '../../common/text/language';
 
 export type SpsurfNewsItem = {
   title: string;
@@ -89,10 +90,14 @@ export class SpsurfRepository {
       if (title.length < 10 || !url.startsWith('http')) continue;
       if (!SURF_KEYWORDS.test(title) || OFF_TOPIC.test(title)) continue;
 
+      // Google News devolve materia em ingles/espanhol mesmo com hl=pt-BR.
+      const description = this.stripHtml(this.decodeEntities(this.getTag(block, 'description'))).substring(0, 200);
+      if (!isPortuguese(`${title} ${description}`)) continue;
+
       const date = new Date(pubDate);
       items.push({
         title,
-        description: this.stripHtml(this.decodeEntities(this.getTag(block, 'description'))).substring(0, 200),
+        description,
         url,
         publishedAt: isNaN(date.getTime()) ? new Date().toISOString() : date.toISOString(),
         image: '',

@@ -12,6 +12,8 @@ import { PrevisaoTab } from './components/PrevisaoTab';
 import { AvisosTab } from './components/AvisosTab';
 import { SourceBadge } from './components/SourceBadge';
 import { weatherEmoji } from './components/weather-utils';
+import { useDict } from '@/i18n/context';
+import { meteorologia } from '@/i18n/dictionaries/meteorologia';
 
 const SatelliteTab = dynamic(
   () => import('./components/SatelliteTab').then(mod => ({ default: mod.SatelliteTab })),
@@ -29,18 +31,19 @@ export default function MeteorologiaPage() {
   const [locationId, setLocationId] = useState('ilha-comprida');
   const { data, loading, error, refetch } = useMeteorology(locationId);
   const { cities, loading: citiesLoading, refetch: refetchCities } = useAllCities();
+  const t = useDict(meteorologia);
 
   return (
-    <main className="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden" role="main" aria-label="Painel de Previsão do Tempo">
+    <main className="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden" role="main" aria-label={t['page.aria']}>
       <PageBanner
-        title="Meteorologia"
-        subtitle="Previsão de tempo, satélite e modelos numéricos"
+        title={t['page.title']}
+        subtitle={t['page.subtitle']}
       />
 
       {/* Cards de temperatura */}
       <div className="px-6 pt-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2" role="list" aria-label="Temperatura atual das cidades">
+          <div className="flex flex-wrap items-center gap-2" role="list" aria-label={t['cityList.aria']}>
             {CITY_ORDER.map(id => {
               const city = cities[id];
               const isActive = locationId === id;
@@ -49,8 +52,8 @@ export default function MeteorologiaPage() {
                   key={id}
                   onClick={() => setLocationId(id)}
                   role="listitem"
-                  title={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)}°C, ${weatherEmoji(city.weatherCode)}` : 'Carregando...'}`}
-                  aria-label={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)} graus` : 'carregando'}`}
+                  title={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)}°C, ${weatherEmoji(city.weatherCode)}` : t['city.loading']}`}
+                  aria-label={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)} graus` : t['city.loadingLower']}`}
                   className={`
                     px-3 py-2 rounded-lg transition-all duration-200 min-w-[90px]
                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white
@@ -76,12 +79,12 @@ export default function MeteorologiaPage() {
           <button
             onClick={() => { refetch(); refetchCities(); }}
             disabled={loading}
-            title="Atualizar dados meteorológicos"
+            title={t['a11y.refreshTitle']}
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:text-white hover:bg-slate-800 transition-all disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-            aria-label="Atualizar dados meteorológicos"
+            aria-label={t['a11y.refresh']}
           >
             <FaSyncAlt className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} aria-hidden="true" />
-            <span className="text-xs font-medium">Atualizar</span>
+            <span className="text-xs font-medium">{t['action.refresh']}</span>
           </button>
         </div>
       </div>
@@ -122,7 +125,7 @@ export default function MeteorologiaPage() {
       <div className="px-6 pb-5 flex flex-col items-end gap-1">
         <SourceBadge data={data} />
         <p className="text-[10px] text-slate-600 text-right" aria-live="polite">
-          Resposta gerada em: {data?.timestamp ? new Date(data.timestamp).toLocaleString('pt-BR') : '--'}
+          {t['footer.generatedAt']} {data?.timestamp ? new Date(data.timestamp).toLocaleString('pt-BR') : '--'}
         </p>
       </div>
 

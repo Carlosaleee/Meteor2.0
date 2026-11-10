@@ -4,21 +4,24 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
 import { FaHome, FaCloudSun, FaWater, FaNewspaper, FaStore, FaBookOpen, FaInfoCircle, FaGlobe, FaSun, FaMoon, FaBars, FaTimes } from 'react-icons/fa';
+import { useI18n, useDict } from '@/i18n/context';
+import { common } from '@/i18n/dictionaries/common';
 
 const NAV_ITEMS = [
-  { href: '/', label: 'Principal', labelEs: 'Principal', icon: FaHome, description: 'Tela Principal do Dashboard' },
-  { href: '/meteorologia', label: 'Previsão do Tempo', labelEs: 'Meteorología', icon: FaCloudSun, description: 'Previsão do Tempo e Vento' },
-  { href: '/swell', label: 'Swell', labelEs: 'Swell', icon: FaWater, description: 'Ondas, Points e Marés' },
-  { href: '/noticias', label: 'Notícias', labelEs: 'Noticias', icon: FaNewspaper, description: 'Notícias Regionais e Trânsito' },
-  { href: '/comercio', label: 'Comércio', labelEs: 'Comercio', icon: FaStore, description: 'Diretório Comercial de Ilha Comprida' },
-  { href: '/blog', label: 'Blog', labelEs: 'Blog', icon: FaBookOpen, description: 'Guias e Artigos' },
-  { href: '/creditos', label: 'Créditos', labelEs: 'Créditos', icon: FaInfoCircle, description: 'Fontes e Agradecimentos' },
+  { href: '/', key: 'principal', icon: FaHome },
+  { href: '/meteorologia', key: 'meteorologia', icon: FaCloudSun },
+  { href: '/swell', key: 'swell', icon: FaWater },
+  { href: '/noticias', key: 'noticias', icon: FaNewspaper },
+  { href: '/comercio', key: 'comercio', icon: FaStore },
+  { href: '/blog', key: 'blog', icon: FaBookOpen },
+  { href: '/creditos', key: 'creditos', icon: FaInfoCircle },
 ];
 
 export function Header() {
   const pathname = usePathname();
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
-  const [lang, setLang] = useState<'pt' | 'es'>('pt');
+  const { lang, setLang } = useI18n();
+  const t = useDict(common);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -45,7 +48,7 @@ export function Header() {
   }, [pathname]);
 
   const toggleTheme = useCallback(() => setTheme(prev => prev === 'dark' ? 'light' : 'dark'), []);
-  const toggleLang = useCallback(() => setLang(prev => prev === 'pt' ? 'es' : 'pt'), []);
+  const toggleLang = useCallback(() => setLang(lang === 'pt' ? 'es' : 'pt'), [lang, setLang]);
 
   return (
     <header className="w-full bg-[var(--color-header-bg)] sticky top-0 z-50 transition-colors duration-300" role="banner">
@@ -56,13 +59,14 @@ export function Header() {
       <nav
         className="w-full bg-[var(--color-header-bg)]"
         role="navigation"
-        aria-label={lang === 'pt' ? 'Menu principal' : 'Menú principal'}
+        aria-label={t['header.nav.ariaLabel']}
       >
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           {/* Desktop: Logo + Nav + Theme Toggle */}
-          <div className="hidden md:flex items-center justify-between h-16">
+          {/* O nav completo so cabe a partir de xl (1280px) — em md/lg ele estoura a largura. */}
+          <div className="hidden xl:flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 shrink-0" aria-label="Meteor - Página inicial">
+            <Link href="/" className="flex items-center gap-2 shrink-0" aria-label={t['header.logo.ariaLabel']}>
               <FaWater className="w-6 h-6 text-cyan-400" aria-hidden="true" />
               <span className="text-xl font-bold text-[var(--color-header-text)] tracking-tight">
                 Meteor
@@ -74,7 +78,7 @@ export function Header() {
               {NAV_ITEMS.map(item => {
                 const Icon = item.icon;
                 const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
-                const label = lang === 'pt' ? item.label : item.labelEs;
+                const label = t[`nav.${item.key}`];
 
                 return (
                   <li key={item.href} role="none">
@@ -82,7 +86,7 @@ export function Header() {
                       href={item.href}
                       role="menuitem"
                       aria-current={isActive ? 'page' : undefined}
-                      title={item.description}
+                      title={t[`nav.desc.${item.key}`]}
                       className={`
                         group flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-header-bg)]
@@ -105,9 +109,9 @@ export function Header() {
               <button
                 onClick={toggleLang}
                 className="p-2 rounded-lg text-[var(--color-header-muted)] hover:bg-[var(--color-nav-hover-bg)] hover:text-[var(--color-nav-hover-text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
-                aria-label={lang === 'pt' ? 'Mudar para espanhol' : 'Cambiar a portugués'}
+                aria-label={t['header.lang.ariaLabel']}
                 aria-pressed={lang === 'es'}
-                title="Mudar idioma"
+                title={t['header.lang.title']}
               >
                 <FaGlobe className="w-4 h-4" aria-hidden="true" />
               </button>
@@ -115,9 +119,9 @@ export function Header() {
               <button
                 onClick={toggleTheme}
                 className="p-2 rounded-lg text-[var(--color-header-muted)] hover:bg-[var(--color-nav-hover-bg)] hover:text-[var(--color-nav-hover-text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
-                aria-label={theme === 'dark' ? 'Alternar para tema claro' : 'Alternar para tema escuro'}
+                aria-label={theme === 'dark' ? t['header.theme.toLight'] : t['header.theme.toDark']}
                 aria-pressed={theme === 'light'}
-                title="Alternar tema"
+                title={t['header.theme.title']}
               >
                 {theme === 'dark' ? (
                   <FaSun className="w-4 h-4 text-amber-400" aria-hidden="true" />
@@ -129,8 +133,8 @@ export function Header() {
           </div>
 
           {/* Mobile: Logo + Hamburger */}
-          <div className="md:hidden flex items-center justify-between h-14">
-            <Link href="/" className="flex items-center gap-2" aria-label="Meteor - Página inicial">
+          <div className="xl:hidden flex items-center justify-between h-14">
+            <Link href="/" className="flex items-center gap-2" aria-label={t['header.logo.ariaLabel']}>
               <FaWater className="w-5 h-5 text-cyan-400" aria-hidden="true" />
               <span className="text-lg font-bold text-[var(--color-header-text)] tracking-tight">
                 Meteor
@@ -141,9 +145,9 @@ export function Header() {
               <button
                 onClick={toggleLang}
                 className="p-2 rounded-lg text-[var(--color-header-muted)] hover:bg-[var(--color-nav-hover-bg)] hover:text-[var(--color-nav-hover-text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
-                aria-label={lang === 'pt' ? 'Mudar para espanhol' : 'Cambiar a portugués'}
+                aria-label={t['header.lang.ariaLabel']}
                 aria-pressed={lang === 'es'}
-                title="Mudar idioma"
+                title={t['header.lang.title']}
               >
                 <FaGlobe className="w-4 h-4" aria-hidden="true" />
               </button>
@@ -151,9 +155,9 @@ export function Header() {
               <button
                 onClick={toggleTheme}
                 className="p-2 rounded-lg text-[var(--color-header-muted)] hover:bg-[var(--color-nav-hover-bg)] hover:text-[var(--color-nav-hover-text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
-                aria-label={theme === 'dark' ? 'Alternar para tema claro' : 'Alternar para tema escuro'}
+                aria-label={theme === 'dark' ? t['header.theme.toLight'] : t['header.theme.toDark']}
                 aria-pressed={theme === 'light'}
-                title="Alternar tema"
+                title={t['header.theme.title']}
               >
                 {theme === 'dark' ? (
                   <FaSun className="w-4 h-4 text-amber-400" aria-hidden="true" />
@@ -165,7 +169,7 @@ export function Header() {
               <button
                 onClick={() => setMenuOpen(prev => !prev)}
                 className="p-2 rounded-lg text-[var(--color-header-muted)] hover:bg-[var(--color-nav-hover-bg)] hover:text-[var(--color-nav-hover-text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
-                aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
+                aria-label={menuOpen ? t['header.menu.close'] : t['header.menu.open']}
                 aria-expanded={menuOpen}
                 aria-controls="mobile-nav"
               >
@@ -178,14 +182,14 @@ export function Header() {
           {menuOpen && (
             <ul
               id="mobile-nav"
-              className="md:hidden flex flex-col gap-1 pb-4 text-sm"
+              className="xl:hidden flex flex-col gap-1 pb-4 text-sm"
               role="menubar"
               aria-live="polite"
             >
               {NAV_ITEMS.map(item => {
                 const Icon = item.icon;
                 const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
-                const label = lang === 'pt' ? item.label : item.labelEs;
+                const label = t[`nav.${item.key}`];
 
                 return (
                   <li key={item.href} role="none">
@@ -193,7 +197,7 @@ export function Header() {
                       href={item.href}
                       role="menuitem"
                       aria-current={isActive ? 'page' : undefined}
-                      title={item.description}
+                      title={t[`nav.desc.${item.key}`]}
                       className={`
                         group flex items-center gap-2 px-3 py-2.5 rounded-lg font-medium transition-all duration-200
                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-header-bg)]

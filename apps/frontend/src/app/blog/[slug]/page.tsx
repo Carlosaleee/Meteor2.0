@@ -76,6 +76,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
         <Link
           href="/blog"
           className="inline-flex items-center gap-2 text-sm text-blue-400 transition-colors hover:text-blue-300"
+          title="Voltar para a listagem do blog"
         >
           <FaArrowLeft className="h-3.5 w-3.5" aria-hidden />
           Voltar ao Blog
@@ -83,18 +84,18 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
         <nav aria-label="Breadcrumb" className="text-xs text-slate-500">
           <ol className="flex flex-wrap items-center gap-1">
             <li>
-              <Link href="/" className="transition-colors hover:text-slate-300">
+              <Link href="/" className="transition-colors hover:text-card-subtle">
                 Meteor
               </Link>
             </li>
             <li aria-hidden>›</li>
             <li>
-              <Link href="/blog" className="transition-colors hover:text-slate-300">
+              <Link href="/blog" className="transition-colors hover:text-card-subtle">
                 Blog
               </Link>
             </li>
             <li aria-hidden>›</li>
-            <li className="text-slate-400">{post.category}</li>
+            <li className="text-card-muted">{post.category}</li>
           </ol>
         </nav>
       </div>
@@ -123,7 +124,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
             {post.readTime}
           </span>
         </div>
-        <div className="relative aspect-[16/7] w-full overflow-hidden rounded-2xl border border-slate-800">
+        <div className="relative aspect-[16/7] w-full overflow-hidden rounded-2xl border border-card-border">
           <Image
             src={post.imageUrl}
             alt={post.imageAlt}

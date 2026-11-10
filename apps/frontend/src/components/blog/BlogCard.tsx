@@ -2,6 +2,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { FaCalendar, FaClock, FaArrowRight, FaBookOpen } from 'react-icons/fa';
 import type { BlogPost } from '@/types/blog';
+import { useDict } from '@/i18n/context';
+import { blog } from '@/i18n/dictionaries/blog';
+import { fmt } from '@/i18n/format';
 
 /** `YYYY-MM-DD` → `DD/MM/YYYY` (sem `new Date()` para evitar shift de timezone). */
 export function formatBlogDate(iso: string): string {
@@ -20,6 +23,7 @@ type BlogCardProps = {
  */
 export function BlogCard({ post }: BlogCardProps) {
   const published = post.status === 'published';
+  const t = useDict(blog);
 
   const cover = (
     <div className="relative h-44 w-full overflow-hidden">
@@ -38,7 +42,7 @@ export function BlogCard({ post }: BlogCardProps) {
       </span>
       {!published && (
         <span className="absolute right-3 top-3 rounded-full bg-slate-900/80 px-2.5 py-1 text-[10px] font-bold text-amber-400 ring-1 ring-amber-400/40">
-          Em breve
+          {t['card.comingSoon']}
         </span>
       )}
     </div>
@@ -57,32 +61,32 @@ export function BlogCard({ post }: BlogCardProps) {
         </span>
       </div>
 
-      <h3 className="mb-2 text-lg font-bold text-white transition-colors group-hover:text-blue-300">
+      <h3 className="mb-2 text-lg font-bold text-card-text transition-colors group-hover:text-blue-300">
         {post.title}
       </h3>
 
-      <p className="mb-4 text-xs leading-relaxed text-slate-400">{post.summary}</p>
+      <p className="mb-4 text-xs leading-relaxed text-card-muted">{post.summary}</p>
 
       {published ? (
         <span className="flex items-center gap-1 text-xs text-blue-400 transition-colors group-hover:text-blue-300">
-          Ler artigo completo
+          {t['a11y.openPost']}
           <FaArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" aria-hidden />
         </span>
       ) : (
         <span className="flex items-center gap-1 text-xs text-slate-500">
           <FaBookOpen className="h-3.5 w-3.5" aria-hidden />
-          Artigo em produção
+          {t['card.inProduction']}
         </span>
       )}
     </div>
   );
 
   const cardClass =
-    'group block overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-lg transition-all duration-300';
+    'group block overflow-hidden rounded-2xl border border-card-border bg-card shadow-lg transition-all duration-300';
 
   if (!published) {
     return (
-      <article className={`${cardClass} opacity-80`} aria-label={`${post.title} (em breve)`}>
+      <article className={`${cardClass} opacity-80`} aria-label={fmt(t['a11y.comingSoon'], { title: post.title })}>
         {cover}
         {body}
       </article>
@@ -91,7 +95,12 @@ export function BlogCard({ post }: BlogCardProps) {
 
   return (
     <article className={`${cardClass} hover:border-blue-500/50 hover:shadow-blue-500/10`}>
-      <Link href={`/blog/${post.slug}`} className="focus-visible:outline-none">
+      <Link
+        href={`/blog/${post.slug}`}
+        className="focus-visible:outline-none"
+        title={t['a11y.openPostTitle']}
+        aria-label={`${t['a11y.openPostTitle']}: ${post.title}`}
+      >
         {cover}
         {body}
       </Link>

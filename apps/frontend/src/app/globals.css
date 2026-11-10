@@ -32,6 +32,15 @@
   --color-nav-hover-text: #38bdf8;
   --color-gold-line: #e0b429;
 
+  /* semantic card tokens (dark defaults — espelham classes slate hardcoded) */
+  --color-card: #0f172a;        /* era bg-slate-900 */
+  --color-card-2: #1e293b;      /* era bg-slate-800 (elevado/hover) */
+  --color-card-border: #1e293b; /* era border-slate-800 */
+  --color-card-line: #334155;   /* era border-slate-700 */
+  --color-card-text: #e2e8f0;   /* era text-slate-200 */
+  --color-card-subtle: #cbd5e1; /* era text-slate-300 */
+  --color-card-muted: #94a3b8;  /* era text-slate-400 */
+
   --font-display: "Archivo Black", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
   --radius-none: 0px;
@@ -39,28 +48,36 @@
 }
 
 [data-theme="light"] {
-  --color-bg: #d6d0c8;
-  --color-graphite: #f5f3ee;
-  --color-surface: #ddd9d0;
-  --color-line: #c4bfb5;
-  --color-ink: #1a1a1a;
-  --color-muted: #5a5550;
-  --color-orange: #e05a10;
-  --color-gold: #b08a18;
-  --color-hazard: #e03515;
+  --color-bg: #f8f6f0;
+  --color-graphite: #ffffff;
+  --color-surface: #edebe6;
+  --color-line: #d6d0c8;
+  --color-ink: #141414;
+  --color-muted: #6b6560;
+  --color-orange: #ff6a1a;
+  --color-gold: #c49a1a;
+  --color-hazard: #ff3b1a;
 
-  --color-header-bg: #f0ece4;
-  --color-header-surface: #e8e4dc;
-  --color-header-text: #1a1a1a;
-  --color-header-muted: #5a5550;
-  --color-header-border: #c4bfb5;
-  --color-header-hover: #d6d0c8;
+  --color-card: #ffffff;
+  --color-card-2: #edebe6;
+  --color-card-border: #d6d0c8;
+  --color-card-line: #d6d0c8;
+  --color-card-text: #141414;
+  --color-card-subtle: #334155;
+  --color-card-muted: #6b6560;
 
-  --color-footer-bg: #e0dcd4;
-  --color-footer-text: #5a5550;
-  --color-footer-border: #c4bfb5;
-  --color-footer-heading: #1a1a1a;
-  --color-footer-link: #5a5550;
+  --color-header-bg: #ffffff;
+  --color-header-surface: #edebe6;
+  --color-header-text: #141414;
+  --color-header-muted: #6b6560;
+  --color-header-border: #d6d0c8;
+  --color-header-hover: #edebe6;
+
+  --color-footer-bg: #edebe6;
+  --color-footer-text: #6b6560;
+  --color-footer-border: #d6d0c8;
+  --color-footer-heading: #141414;
+  --color-footer-link: #6b6560;
   --color-footer-link-hover: #1d4ed8;
 
   --color-nav-active-bg: rgba(14, 110, 180, 0.12);
@@ -68,7 +85,7 @@
   --color-nav-text: #334155;
   --color-nav-hover-bg: rgba(14, 110, 180, 0.06);
   --color-nav-hover-text: #0369a1;
-  --color-gold-line: #b08a18;
+  --color-gold-line: #c49a1a;
 }
 
 html,

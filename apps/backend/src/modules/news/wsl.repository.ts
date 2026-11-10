@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { isPortuguese } from '../../common/text/language';
 
 export type WslRankingEntry = {
   rank: number;
@@ -145,6 +146,10 @@ export class WslRepository {
       const pubDate = this.getTag(block, 'pubDate');
 
       if (title.length < 10 || !url.startsWith('http')) continue;
+
+      // Feed da WSL Latam e Google News podem devolver materia em ingles ou
+      // espanhol — o feed so deve mostrar portugues.
+      if (!isPortuguese(`${title} ${description}`)) continue;
 
       // Google News anexa " - Fonte" ao título; o <source> do item identifica a fonte.
       const source = this.stripHtml(this.decodeEntities(this.getTag(block, 'source')));

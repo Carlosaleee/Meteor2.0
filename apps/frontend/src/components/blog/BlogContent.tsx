@@ -70,14 +70,14 @@ function Block({ block, index }: { block: BlogBlock; index: number }) {
       return (
         <p
           data-testid="geo-answer"
-          className="rounded-xl border-l-4 border-blue-500 bg-slate-900/80 p-4 text-sm leading-relaxed text-slate-200"
+          className="rounded-xl border-l-4 border-blue-500 bg-card/80 p-4 text-sm leading-relaxed text-card-text"
         >
           {renderInline(block.text, key)}
         </p>
       );
 
     case 'p':
-      return <p className="leading-relaxed text-slate-300">{renderInline(block.text, key)}</p>;
+      return <p className="leading-relaxed text-card-subtle">{renderInline(block.text, key)}</p>;
 
     case 'h2':
       return (
@@ -89,7 +89,7 @@ function Block({ block, index }: { block: BlogBlock; index: number }) {
 
     case 'ul':
       return (
-        <ul className="list-disc space-y-2 pl-6 text-slate-300">
+        <ul className="list-disc space-y-2 pl-6 text-card-subtle">
           {block.items.map((item, i) => (
             <li key={`${key}-li${i}`}>{renderInline(item, `${key}-li${i}`)}</li>
           ))}
@@ -98,12 +98,12 @@ function Block({ block, index }: { block: BlogBlock; index: number }) {
 
     case 'table':
       return (
-        <div className="overflow-x-auto rounded-xl border border-slate-800">
+        <div className="overflow-x-auto rounded-xl border border-card-border">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-900">
+            <thead className="bg-card">
               <tr>
                 {block.headers.map((header, i) => (
-                  <th key={`${key}-th${i}`} className="px-4 py-3 font-bold text-slate-200">
+                  <th key={`${key}-th${i}`} className="px-4 py-3 font-bold text-card-text">
                     {header}
                   </th>
                 ))}
@@ -111,9 +111,9 @@ function Block({ block, index }: { block: BlogBlock; index: number }) {
             </thead>
             <tbody>
               {block.rows.map((row, r) => (
-                <tr key={`${key}-tr${r}`} className="border-t border-slate-800">
+                <tr key={`${key}-tr${r}`} className="border-t border-card-border">
                   {row.map((cell, c) => (
-                    <td key={`${key}-td${r}-${c}`} className="px-4 py-3 align-top text-slate-400">
+                    <td key={`${key}-td${r}-${c}`} className="px-4 py-3 align-top text-card-muted">
                       {renderInline(cell, `${key}-td${r}-${c}`)}
                     </td>
                   ))}
@@ -131,7 +131,7 @@ function Block({ block, index }: { block: BlogBlock; index: number }) {
           {block.title && (
             <p className={`mb-1 text-sm font-bold ${style.label}`}>{block.title}</p>
           )}
-          <p className="text-sm leading-relaxed text-slate-300">
+          <p className="text-sm leading-relaxed text-card-subtle">
             {renderInline(block.text, key)}
           </p>
         </aside>
@@ -140,7 +140,7 @@ function Block({ block, index }: { block: BlogBlock; index: number }) {
 
     case 'quote':
       return (
-        <blockquote className="border-l-4 border-slate-700 pl-4 italic text-slate-400">
+        <blockquote className="border-l-4 border-card-line pl-4 italic text-card-muted">
           {renderInline(block.text, key)}
           {block.cite && <footer className="mt-1 text-xs not-italic text-slate-500">— {block.cite}</footer>}
         </blockquote>
@@ -172,10 +172,10 @@ export function BlogContent({ post }: BlogContentProps) {
             {post.faq.map((item, i) => (
               <div
                 key={`faq-${i}`}
-                className="rounded-xl border border-slate-800 bg-slate-900/60 p-4"
+                className="rounded-xl border border-card-border bg-card/60 p-4"
               >
                 <dt className="font-bold text-slate-100">{item.q}</dt>
-                <dd className="mt-2 text-sm leading-relaxed text-slate-400">{item.a}</dd>
+                <dd className="mt-2 text-sm leading-relaxed text-card-muted">{item.a}</dd>
               </div>
             ))}
           </dl>
@@ -184,13 +184,13 @@ export function BlogContent({ post }: BlogContentProps) {
 
       {post.relatedLinks.length > 0 && (
         <nav aria-label="Continue lendo" className="space-y-3 pt-4">
-          <h2 className="text-xl font-bold text-slate-200">Continue lendo no Meteor 2.0</h2>
+          <h2 className="text-xl font-bold text-card-text">Continue lendo no Meteor 2.0</h2>
           <ul className="grid gap-3 sm:grid-cols-2">
             {post.relatedLinks.map(link => (
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="block rounded-xl border border-slate-800 bg-slate-900 p-4 text-sm text-blue-400 transition-colors hover:border-blue-500/50 hover:text-blue-300"
+                  className="block rounded-xl border border-card-border bg-card p-4 text-sm text-blue-400 transition-colors hover:border-blue-500/50 hover:text-blue-300"
                 >
                   {link.label} →
                 </Link>

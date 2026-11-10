@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { ChatWidget } from "@/components/ChatWidget";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 import { ChatProvider } from "@/components/ChatContext";
+import { I18nProvider } from "@/i18n/context";
 
 const display = Archivo_Black({
   weight: "400",
@@ -46,15 +47,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a href="#main-content" className="skip-link sr-only">
           Pular para o conteúdo principal
         </a>
-        <Header />
-        <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8" role="main">
-          {children}
-        </main>
-        <Footer />
-        <ChatProvider>
-          <ChatWidget />
-          <ScrollToTopButton />
-        </ChatProvider>
+        <I18nProvider>
+          <Header />
+          <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8" role="main">
+            {children}
+          </main>
+          <Footer />
+          <ChatProvider>
+            <ChatWidget />
+            <ScrollToTopButton />
+          </ChatProvider>
+        </I18nProvider>
       </body>
     </html>
   );
