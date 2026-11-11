@@ -1,6 +1,6 @@
 # Guia do Desenvolvedor — Meteor 2.0
 
-> **Ultima atualizacao:** 06/11/2026 (merge na `main`: blog GEO/SEO — rota `/blog/[slug]` com metadata + JSON-LD, 4 artigos em blocos tipados, rename "Blog Técnico" → "Blog", e reescrita do artigo da Juréia `jureia-itinga-praias-surf-ecoturismo` com novo título/meta/descrição e estrutura de acesso em 3 etapas — balsa de Icapara, Barra do Ribeira e Costão da Juréia — 329 testes; checklist pre-merge `pnpm verify`)
+> **Ultima atualizacao:** 11/11/2026 (merge na `main`: refatoracao de UI/UX em 5 fronts - modo claro legivel com paleta slate e tokens semanticos, migracao de ~100 `text-white` + 61 `bg-slate-9xx` + 229 `text-slate-*` para tokens, i18n PT/ES completo (textos visiveis + aria-labels/titles) com datas por idioma, a11y com `title`/`aria-label` descritivos, responsividade com breakpoints, graficos ApexCharts adaptativos via `useThemeMode`, e home com exatamente 8 materias de blog - 368 testes; checklist pre-merge `pnpm verify`)
 >
 > **Documentos relacionados:** [SYSTEM_SPEC.md](./SYSTEM_SPEC.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -64,15 +64,15 @@ pnpm format
 
 ## Testes
 
-**Total: 329 testes — backend Jest (217) + frontend Vitest (112)**
+**Total: 368 testes — backend Jest (226) + frontend Vitest (142)**
 
-> Contagem atualizada apos execucao completa em 06/11/2026 (28 arquivos backend + 17 frontend, todos verdes).
+> Contagem atualizada apos execucao completa em 11/11/2026 (30 suites backend + 18 arquivos frontend, todos verdes).
 
 ```bash
-# Backend (217 testes — o script ja embute --experimental-vm-modules)
+# Backend (226 testes — o script ja embute --experimental-vm-modules)
 pnpm --filter backend test
 
-# Frontend (112 testes — Vitest + React Testing Library)
+# Frontend (142 testes — Vitest + React Testing Library)
 pnpm --filter frontend test
 
 # Paridade docs x controllers (Backlog P2 #2)
@@ -81,8 +81,8 @@ pnpm docs:check
 
 | Suite | Runner | Testes | Observacao |
 |-------|--------|--------|------------|
-| `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 217 | 28 arquivos `*.spec.ts` |
-| `apps/frontend` | Vitest + RTL + jsdom | 112 | 17 arquivos `*.test.{ts,tsx}` |
+| `apps/backend` | Jest 30.5 (`node --experimental-vm-modules`) | 226 | 30 arquivos `*.spec.ts` |
+| `apps/frontend` | Vitest + RTL + jsdom | 142 | 18 arquivos `*.test.{ts,tsx}` |
 
 Detalhamento por arquivo: [SYSTEM_SPEC.md §9](./SYSTEM_SPEC.md#9-cobertura-de-testes).
 
@@ -130,8 +130,8 @@ Meteor_2.0/
         app/           # Paginas (7 rotas)
           meteorologia/
             page.tsx   # PageBanner + cards temperatura + Tabs
-            components/ # 13 componentes
-          swell/           # 5 abas + 21 componentes
+            components/ # 16 arquivos
+          swell/           # 5 abas + 22 arquivos
             page.tsx
             components/
           noticias/        # Noticias regionais + TrafficMap + CityGrid
@@ -147,7 +147,9 @@ Meteor_2.0/
           Footer.tsx   # 4 colunas (Navegacao, Fontes, Stack, Links uteis)
           PageBanner.tsx # Hero reutilizavel (banner-meteor.jpg)
           ChatWidget.tsx # Chat Iron: desempacota envelope, sanitiza historico, trata 429, botoes Reiniciar/Apagar, aria-live, sessionId + historico (ate 10 turnos)
-        hooks/         # Hooks customizados (9 hooks + 5 testes)
+          blog/        # BlogCard, BlogContent, BlogArticleNav (client p/ i18n)
+        hooks/         # Hooks customizados (10 hooks + 5 testes)
+        i18n/          # context.tsx (I18nProvider/useDict/useI18n), format.ts (fmt), dictionaries/ (8 rotas pt/es)
         lib/           # Utilitarios (api.ts, spots-data.ts)
   especificacoes/      # Documentacao do projeto
   DESIGN.md            # Design system tokens
@@ -174,12 +176,27 @@ Meteor_2.0/
 
 ### Estilizacao
 - Tailwind CSS v4 (sem tailwind.config.js)
-- Design tokens em `globals.css` via `@theme` + `[data-theme="light"]`
+- Design tokens em `globals.css` via `@theme` (dark, default) + `[data-theme="light"]` (light)
 - CSS custom properties para Header, Footer, Nav (dark + light)
-- Padrao visual: slate-900, rounded-2xl, border-slate-800
+- **Tokens semanticos (11/11):** nunca hardcode `bg-slate-*`/`text-slate-*`/`text-white` em cards ou superficies de pagina — use `bg-card`, `bg-card-2`, `border-card-border`, `border-card-line`, `text-card-text`, `text-card-subtle`, `text-card-muted`, `text-card-dim`, `text-card-faint`, `ring-offset-[var(--color-ring-offset)]`, `text-[var(--color-amber-on)]`
+- Padrao visual: `rounded-2xl`, borda 1px, tokens semanticos (a paleta slate-900 literal foi eliminada)
 - Icones: React Icons (Font Awesome) — `react-icons/fa`
 - Tema: dark/light com `localStorage` + `prefers-color-scheme`
 - Linha dourada: `var(--color-gold-line)` #E0B429 (dark) / #C49A1A (light)
+- **Paleta clara:** fundo `#F1F5F9` (slate-100), cards `#FFFFFF`, bordas `#E2E8F0`, sombra leve (1px/3px a 4-6%)
+- **Acentos:** as shades `-300`/`-400` escurecem no claro (equivalentes `-700`) para manter contraste >= 4.5:1 sobre card branco
+- **Excecoes que permanecem escuras:** `HeroCarousel`, `PageBanner`, overlays `from-slate-950/*` sobre imagens, badges `bg-*-700 text-white`, HTML inline de popups Leaflet, gradiente do hero do `/swell`
+- **`.panel-tinted`:** paineis com gradiente escuro (Dica do Dia, Briefing IA, visor de satelite) viram card branco no tema claro
+
+### Internacionalizacao (PT/ES)
+- Dicionarios flat em `src/i18n/dictionaries/<rota>.ts` — `{ pt: {...}, es: {...} }` com chaves **identicas** nos dois idiomas (`i18n.test.ts` garante paridade + valores nao vazios)
+- `const t = useDict(meteorologia)` / `useDict(swell)` / `useDict(common)` / etc. em componentes client
+- `const { lang } = useI18n()` — `lang` e `'pt' | 'es'`
+- **Todo** texto visivel e **todo** `aria-label`/`title` passa pelo dicionario — nao deixe Portuguese hardcoded no JSX
+- Interpolacao de variaveis: `fmt(t['chave'], { valor })` de `@/i18n/format` (chaves usam `{valor}`)
+- Datas: `const locale = lang === 'pt' ? 'pt-BR' : 'es-ES'` — nunca fixe `'pt-BR'` em `toLocaleString`
+- Valores de configuracao (nivel do spot, qualidade do swell) **nao** se traduzem no call site — traduza na exibicao, com fallback para o valor cru
+- Componente novo: `BlogArticleNav.tsx` — server components nao podem usar hooks de i18n, entao a nav do artigo virou client component
 
 ## Vercel MCP (Integracao com IA)
 
@@ -250,6 +267,37 @@ Tipos: feat, fix, docs, style, refactor, test, chore, ci
 5. Apos aprovacao, merge na `main`
 
 **NUNCA** commitar direto na `main`.
+
+### Ciclo de vida das branches (11/11)
+
+O repositorio mantem **apenas `main`** local e remoto — branches de feature sao temporarias.
+
+```bash
+# 1) branch de trabalho a partir da main atualizada
+git checkout -b feature/nome-da-feature
+
+# ... implementacao + pnpm verify ...
+
+# 2) commit na branch
+git add -A && git commit -F <msgfile>
+
+# 3) merge local na main (--no-ff preserva o historico da branch)
+git checkout main
+git merge --no-ff feature/nome-da-feature -m "merge: <resumo>"
+
+# 4) push da main
+git push origin main
+
+# 5) limpeza: checar que nada se perde antes de apagar
+git rev-list --count main..feature/nome-da-feature   # tem que ser 0
+git branch -d feature/nome-da-feature                # delete seguro (recusa se nao mergeado)
+git push origin --delete feature/nome-da-feature     # remove do remoto
+git fetch --prune origin
+```
+
+- **Antes de deletar**, rode `git rev-list --count main..<branch>` — se for `> 0`, a branch tem commits que nao chegaram na `main` e **nao** pode ser apagada.
+- `git branch -d` (com `-d`, nao `-D`) recusa branches nao mergeadas — e a protecao contra perda de trabalho.
+- A branch de feature da ultima refatoracao (`feat/ui-ux-refatoracao`) ja foi mesclada e removida; o repositorio esta com `main` e `origin/main` sincronizados.
 
 ## Variaveis de Ambiente
 
@@ -421,18 +469,22 @@ render(
 - `aria-expanded` / `aria-controls` no hamburger
 - `aria-pressed` nos botoes de toggle
 - `aria-hidden="true"` em icones decorativos
-- `focus-visible:ring-2 focus-visible:ring-[var(--color-gold)]` em todos os interativos
-- **Title tooltips em todos os elementos interativos**
+- `focus-visible:ring-2 focus-visible:ring-[var(--color-card-text)]` + `focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-ring-offset)]` em todos os interativos
+- **Title tooltips em todos os elementos interativos** — descritivos (nome + funcao), ex.: "Gráfico de ventos — clique para alternar a aba"
+- **aria-label descritivo (nome + funcao)** em botoes, abas, filtros, cards clicaveis, icones e links
 - `aria-live="polite"` para atualizacoes de dados
 - `role="radiogroup"` em seletores de cidade
 - `role="tablist/tab/tabpanel"` em abas
+- `aria-label`/`title` sempre **traduzidos** pelo dicionario da rota
 
 ### Tema Dark/Light
-- CSS variables em `globals.css`: `@theme` (dark) + `[data-theme="light"]` (light)
+- CSS variables em `globals.css`: `@theme` (dark, default) + `[data-theme="light"]` (light)
 - Persistencia: `localStorage.setItem('meteor-theme', theme)`
 - Deteccao: `window.matchMedia('(prefers-color-scheme: light)')`
-- Aplicacao: `document.documentElement.setAttribute('data-theme', 'light')`
-- Componentes usam `var(--color-*)` em vez de hardcoded
+- Aplicacao: `document.documentElement.setAttribute('data-theme', 'light')` (dark = atributo ausente)
+- Componentes usam `var(--color-*)` / classes de token em vez de hardcoded
+- **Leitura do tema em runtime:** `useThemeMode()` (`src/hooks/useThemeMode.ts`) observa o atributo `data-theme` via `MutationObserver` e devolve `'dark' | 'light'` — use em graficos e canvas que precisam repintar no toggle
+- **Paleta clara (11/11):** fundo `#F1F5F9`, cards `#FFFFFF`, bordas `#E2E8F0`, texto `#0F172A`, sombra leve nos cards; acentos `-300`/`-400` escurecem para os equivalentes `-700` (contraste >= 4.5:1)
 
 ---
 
@@ -441,15 +493,19 @@ render(
 ### Ordem das secoes (uma por aba do portal)
 1. **Hero Carousel** — slide 1 = Notícias do Vale; ordem: Notícias → Previsão → Swell → Comércio → Blog
 2. **Previsão do Tempo** (`#tempo`) — 4 cidades, atual + máx/mín de hoje → CTA `/meteorologia`
-3. **Últimas Notícias Regionais** (`#noticias`) — filtros `aria-pressed` → CTA `/noticias`
-4. **Condições do Mar** (`#mar`) → CTA `/swell?tab=overview`
-5. **Briefing Executivo (IA)** (`#briefing`) → CTA `/swell?tab=forecast`
-6. **Status das Rodovias** (`#rodovias`) → CTA `/noticias#rodovias`
-7. **Comércio em Destaque** (`#comercio`) → CTA `/comercio`
-8. **Esporte** (`#surf-news`) — 3 cards via `useNews` → CTA `/swell?tab=news`
-9. **Blog & Navegação** (`#blog`) → CTA `/blog`
+3. **Status das Rodovias** (`#rodovias`) — 5 cards, link externo → CTA `/noticias#rodovias`
+4. **Últimas Notícias Regionais** (`#noticias`) — filtros `aria-pressed` → CTA `/noticias`
+5. **Condições do Mar** (`#mar`) → CTA `/swell?tab=overview`
+6. **Esporte** (`#surf-news`) — 3 cards via `useNews` → CTA `/swell?tab=news`
+7. **Blog & Navegação** (`#blog`) — **exatamente 8 matérias** → CTA `/blog`
+8. **Comércio em Destaque** (`#comercio`) → CTA `/comercio`
 
-> A secao "Alerta Regional" foi removida (duplicava Status das Rodovias).
+> A secao "Alerta Regional" foi removida (duplicava Status das Rodovias) e a secao "Briefing Executivo (IA)" (`#briefing`) tambem nao existe mais na capa.
+
+### Blog na capa (11/11)
+- A capa renderiza `publishedPosts().slice(0, 8)` — **exatamente 8 materias**
+- Os 4 cards "em breve" (`PLACEHOLDER_BLOG_CARDS`) foram removidos do codigo
+- A lista completa (10 publicados + 2 em breve) fica **somente** em `/blog`
 
 ### Deep-link de aba no `/swell`
 - `?tab=overview|news|forecast|wind|spots` lido no `useEffect` de `app/swell/page.tsx` (nao usa `useSearchParams` — nao quebra o prerender estatico)
@@ -564,6 +620,7 @@ swell/
 | useAiSummary.ts | src/hooks/ | Busca GET /v1/oceanography/summary |
 | useNews.ts | src/hooks/ | Busca GET /v1/news (refetch via `useCallback` estavel) |
 | useWeatherNews.ts | src/hooks/ | Busca GET /v1/meteorology/news (auto-refresh 10min) |
+| useThemeMode.ts | src/hooks/ | **Novo (11/11)** — le o atributo `data-theme` do `<html>` via `MutationObserver` e retorna `'dark' \| 'light'` |
 
 ### Ordem das Abas (padrao: Visao Geral)
 ```
@@ -589,6 +646,23 @@ const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 // Annotations: alta (amber) e baixa (blue)
 // Tabela de proximas 4 marees abaixo do grafico
 ```
+
+#### Tema adaptativo (11/11)
+```tsx
+const mode = useThemeMode();              // 'dark' | 'light'
+const isLight = mode === 'light';
+const labelColor = isLight ? '#475569' : '#94a3b8';
+const gridColor = isLight ? '#e2e8f0' : '#1e293b';
+
+const options: ApexCharts.ApexOptions = {
+  tooltip: { theme: mode, /* ... */ },
+  grid: { borderColor: gridColor, /* ... */ },
+  xaxis: { labels: { style: { colors: labelColor } } },
+};
+```
+- `WaveChart`, `WindChart` e `TideChart` repintam no toggle de tema sem recarregar a pagina
+- O `custom` tooltip usa classes de token (`bg-card`, `text-card-text`) — as CSS vars do documento sao herdadas pelo tooltip, entao ele acompanha o tema
+- Rotulos e anotacoes dos graficos sao traduzidos pelo dicionario `swell` (`t['wave.*']`, `t['windc.*']`, `t['tide.*']`)
 
 ### Padroes de UI (Swell)
 
@@ -766,8 +840,8 @@ Variáveis configuradas no Vercel Dashboard (Settings → Environment Variables)
 Pipeline ativo em `.github/workflows/ci.yml`:
 
 **Jobs:** (todos em Node 24 via `node-version-file: .nvmrc`)
-- `backend-test`: Jest (217 testes) — `NODE_OPTIONS="--experimental-vm-modules" npx jest`
-- `frontend-test`: Vitest (112 testes)
+- `backend-test`: Jest (226 testes) - `NODE_OPTIONS="--experimental-vm-modules" npx jest`
+- `frontend-test`: Vitest (142 testes)
 - `lint`: oxlint (frontend)
 - `docs-check`: `node scripts/check-docs.mjs` (paridade rotas × REFERENCIA_API.md; local: `pnpm docs:check`)
 - `build`: valida backend + frontend (após testes)

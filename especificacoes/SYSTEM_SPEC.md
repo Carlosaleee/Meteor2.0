@@ -1,6 +1,6 @@
 # Especificacao Tecnica — Meteor 2.0
 
-> **Ultima atualizacao:** 06/11/2026 (merge na `main`: blog GEO/SEO — listagem com capa real, rota `/blog/[slug]` SSG com `generateMetadata` + JSON-LD Article/FAQPage, 4 artigos, rename "Blog Técnico" → "Blog", e reescrita do artigo da Juréia `jureia-itinga-praias-surf-ecoturismo` — título "Acesso à Juréia em Iguape: Balsa de Icapara, Barra do Ribeira e Costão da Juréia", meta "Juréia em Iguape: Balsa, Barra do Ribeira e Costão" e estrutura em 3 etapas — 329 testes)
+> **Ultima atualizacao:** 11/11/2026 (merge na `main`: refatoracao de UI/UX em 5 fronts - modo claro legivel com paleta slate e tokens semanticos, migracao de ~100 `text-white` + 61 `bg-slate-9xx` + 229 `text-slate-*` para tokens, i18n PT/ES completo (textos visiveis + aria-labels/titles) com datas por idioma, a11y com `title`/`aria-label` descritivos, responsividade com breakpoints, graficos ApexCharts adaptativos via `useThemeMode`, e home com exatamente 8 materias de blog - 368 testes)
 >
 > **Documentos relacionados:** [GUIA_DESENVOLVEDOR.md](./GUIA_DESENVOLVEDOR.md) · [REFERENCIA_API.md](./REFERENCIA_API.md) · [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 
@@ -44,7 +44,7 @@
 - Tema: dark/light com `data-theme` + `localStorage` + `prefers-color-scheme`
 - Mapas: Leaflet nativo (useRef + cleanup pattern) — tiles OpenStreetMap (gratuitos, sem API key)
 - **SSR Protection:** Componentes Leaflet importados via `next/dynamic` com `{ ssr: false }` para evitar `ReferenceError: window is not defined` durante build estatico
-- Hooks: useMeteorology, useSwell, useHourlyMarine, useAiSummary, useAllCities, useRegionalNews, useComercio, useNews, useWeatherNews (9 hooks)
+- Hooks: useMeteorology, useSwell, useHourlyMarine, useAiSummary, useAllCities, useRegionalNews, useComercio, useNews, useWeatherNews, useThemeMode (10 hooks — `useThemeMode` observa o `data-theme` para os graficos adaptativos)
 - API Layer: lib/api.ts com fetch generico
 - Icones: React Icons (Font Awesome)
 - Graficos: ApexCharts (react-apexcharts)
@@ -61,7 +61,7 @@
 | `/swell` | Swell & Points | **API real** + Gemini AI + ApexCharts + Leaflet |
 | `/noticias` | Noticias Regionais + Transito | **RSS auto-atualizado** (ISN + Santa Portal + Google News) + TrafficMap Leaflet + CityGrid |
 | `/comercio` | Comercio de Ilha Comprida | **API real** (fallback-comercio) + CommerceMap Leaflet + OSRM routing |
-| `/blog` | Blog (listagem GEO) | Estatico — server component, cards com capa real (`BlogCard`), 4 publicados (Tábua de Marés, Reserva de Cananéia, Juréia, Ilha Comprida) + 2 "em breve" |
+| `/blog` | Blog (listagem GEO) | Estatico — server component, cards com capa real (`BlogCard`), 10 publicados (Tábua de Marés, Reserva de Cananéia, Juréia, Ilha Comprida, Ventos de Sudeste, Dinâmica Costeira, El Niño, Baleias-jubarte, Ilha do Cardoso, Caverna do Diabo) + 2 "em breve" (Surf Peruibe) |
 | `/blog/[slug]` | Artigo individual (SSG) | Estatico — `generateStaticParams` + `generateMetadata` + JSON-LD `Article`/`FAQPage`, corpo em blocos tipados (`BlogContent`); artigo da Juréia `jureia-itinga-praias-surf-ecoturismo` reescrito (2026-11-06) com título "Acesso à Juréia em Iguape: Balsa de Icapara, Barra do Ribeira e Costão da Juréia", estrutura em 3 etapas + tabelas de balsa/horários/tarifa e de maré no Costão |
 | `/creditos` | Creditos & Fontes | Estatico |
 
@@ -69,24 +69,25 @@
 
 ### 3.1 Estrutura da capa (`/`) — uma secao por aba
 
-Ordem das secoes (reestruturada em 21/10/2026 — cada secao tem CTA no header apontando para a aba correspondente):
+Ordem das secoes (reestruturada em 11/11/2026 — cada secao tem CTA no header apontando para a aba correspondente):
 
 | # | Secao (id) | CTA (aba de destino) |
 |---|------------|----------------------|
 | 1 | Hero Carousel (slide 1 = **Notícias do Vale**) | slide links (Noticias → Previsao → Swell → Comercio → Blog) |
 | 2 | Previsão do Tempo (`#tempo`) — atual + max/min de hoje (daily[0] via `useAllCities`) | `/meteorologia` |
-| 3 | Últimas Notícias Regionais (`#noticias`) — filtros com `aria-pressed` | `/noticias` |
-| 4 | Condições do Mar (`#mar`) | `/swell?tab=overview` |
-| 5 | Briefing Executivo IA (`#briefing`) | `/swell?tab=forecast` |
-| 6 | Status das Rodovias (`#rodovias`) | `/noticias#rodovias` |
-| 7 | Comércio em Destaque (`#comercio`) | `/comercio` |
-| 8 | Esporte (`#surf-news`) — 3 cards (`useNews`, WSL + Paulista) | `/swell?tab=news` |
-| 9 | Blog & Navegação (`#blog`) | `/blog` |
+| 3 | Status das Rodovias (`#rodovias`) — 5 cards, link externo com `aria-label` | `/noticias#rodovias` |
+| 4 | Últimas Notícias Regionais (`#noticias`) — filtros com `aria-pressed` | `/noticias` |
+| 5 | Condições do Mar (`#mar`) | `/swell?tab=overview` |
+| 6 | Esporte (`#surf-news`) — 3 cards (`useNews`, WSL + Paulista) | `/swell?tab=news` |
+| 7 | Blog & Navegação (`#blog`) — **exatamente 8 materias** | `/blog` |
+| 8 | Comércio em Destaque (`#comercio`) | `/comercio` |
 
-- **Removida:** secao "Alerta Regional" (duplicava Status das Rodovias).
+- **Removida:** secao "Alerta Regional" (duplicava Status das Rodovias) e a secao "Briefing Executivo IA" (`#briefing` — nao existe mais na capa).
+- **Blog da capa (11/11):** `publishedPosts().slice(0, 8)` — os 4 cards "em breve" (`PLACEHOLDER_BLOG_CARDS`) foram removidos; a lista completa de posts fica somente em `/blog`.
 - **Grid das rodovias (04/11):** 5 cards em uma so linha no xl (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5`) na home e em `/noticias` — skeletons acompanham com 5 placeholders. Antes `lg:grid-cols-4` deixava a 5a rota (balsa Cananéia) sozinha na segunda linha.
 - **`/swell?tab=`:** deep-link lido na montagem (useEffect + `history.replaceState`), tab invalida cai para `overview` — nao quebra o prerender estatico.
 - **Acessibilidade:** `h1` sr-only + skip-link `#conteudo` (link de secao rotulado "Pular para Esporte" para `#surf-news`), `aria-busy` nas secoes carregando, `focus-within:ring` nas secoes, botao Pausar/Reproduzir do carrossel (WCAG 2.2.2), autoplay desligado com `prefers-reduced-motion` (reduzido também no `globals.css`), setas ←/→ no carrossel.
+- **Tokens (11/11):** todos os cards/titulos da capa usam os tokens semanticos (`bg-card`, `text-card-text`, `border-card-border`) — nenhum literal `text-white`/`bg-slate-*` sobre card ou fundo de pagina.
 
 ---
 
@@ -336,11 +337,11 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 
 ## 9. Cobertura de Testes
 
-**Total: 329 testes — backend Jest (217) + frontend Vitest (112)**
+**Total: 368 testes — backend Jest (226) + frontend Vitest (142)**
 
-> Contagem atualizada apos execucao completa dos testes em 06/11/2026 (217 backend em 28 arquivos + 112 frontend em 17 arquivos — todas verdes; verificacao pre-merge = `pnpm verify`).
+> Contagem atualizada apos execucao completa dos testes em 11/11/2026 (226 backend em 30 suites + 142 frontend em 18 arquivos — todas verdes; verificacao pre-merge = `pnpm verify`).
 
-### Backend (Jest) — 217 testes em 28 arquivos
+### Backend (Jest) — 226 testes em 30 suites
 | Arquivo | Testes | Status |
 |---------|--------|--------|
 | refresh.service.spec.ts | 21 | ✅ (inclui barreira de paralelismo, falha parcial e total por cidade) |
@@ -370,13 +371,16 @@ Requisicao > API Externa OK? --SIM--> Salva no JSON + Retorna dados reais
 | api-health.spec.ts | 2 | ✅ |
 | envelope.interceptor.spec.ts | 2 | ✅ |
 | fallback.service.spec.ts | 6 | ✅ (contentAt: derivacao legado, preservacao ao reaproveitar, isStale) |
+| language.spec.ts | 7 | ✅ (detecção de idioma por pontuação de palavras de função pt/en/es — filtro dos RSS) |
+| language.samples.spec.ts | 2 | ✅ (amostras de headlines pt/en/es) |
 | http-exception.filter.spec.ts | 1 | ✅ |
 
-### Frontend (Vitest + RTL) — 112 testes em 17 arquivos
+### Frontend (Vitest + RTL) — 142 testes em 18 arquivos
 | Arquivo | Testes | Status |
 |---------|--------|--------|
+| i18n.test.ts | 24 | ✅ (paridade de chaves pt/es em 8 dicionários, valores não vazios, cobertura de `fmt` e chaves exigidas) |
+| blog-posts.test.ts | 22 | ✅ (slugs unicos, metaTitle ≤60, description 150-160, links ∈ rotas reais, FAQ com resposta, bloco validos) |
 | ChatWidget.test.tsx | 14 | ✅ (envelope, resposta legada, rate limit 429, reiniciar/apagar, aria-live, sessionId/historico) |
-| blog-posts.test.ts | 16 | ✅ (novo — slugs unicos, metaTitle ≤60, description 150-160, links ∈ rotas reais, FAQ com resposta, bloco validos) |
 | BlogContent.test.tsx | 11 | ✅ (novo — answer/h2/h3/p/ul/table/callout/quote, negrito inline, rotas → Link, FAQ, relatedLinks) |
 | weather-utils.test.ts | 11 | ✅ (novo — codigos WMO extremos/bordas, vento 360/-1 graus, datas invalidas) |
 | ResumoIA.test.tsx | 6 | ✅ |
@@ -430,10 +434,10 @@ Meteor_2.0/
         app/
           meteorologia/
             page.tsx (PageBanner + cards temperatura + LocationSelector + Tabs)
-            components/ (13 componentes)
+            components/ (16 arquivos)
           swell/
             page.tsx (5 abas: Visao Geral, Noticias, Previsao, Vento, Picos)
-            components/ (21 arquivos — ver secao 13)
+            components/ (22 arquivos — ver secao 13)
           noticias/
             page.tsx (PageBanner + TrafficMap + CityGrid + filtros + grid noticias)
             components/ (TrafficMap)
@@ -450,6 +454,10 @@ Meteor_2.0/
           PageBanner.tsx (hero reutilizavel — banner-meteor.jpg)
           ChatWidget.tsx + ChatContext.tsx (bot flutuante; botoes Reiniciar/Apagar, aria-live, sessionId + historico de ate 10 turnos)
           HeroCarousel.tsx, ScrollToTopButton.tsx
+          blog/
+            BlogCard.tsx (card do post — capa real, badge, data, readTime)
+            BlogContent.tsx (blocos tipados: answer/h2/h3/p/ul/table/callout/quote + FAQ + relatedLinks)
+            BlogArticleNav.tsx (voltar + breadcrumbs do artigo — client component, traduz title/aria-label/texto)
         hooks/
           useMeteorology.ts
           useSwell.ts
@@ -460,7 +468,12 @@ Meteor_2.0/
           useNews.ts (noticias WSL/SPSurf — refetch useCallback estavel)
           useWeatherNews.ts (auto-refresh 10min)
           useComercio.ts (diretorio comercial)
+          useThemeMode.ts (observa `data-theme` do <html> — usado pelos graficos ApexCharts)
           *.test.ts (5 arquivos de teste de hooks)
+        i18n/
+          context.tsx (I18nProvider + useDict + useI18n — persistencia em localStorage `meteor-lang`)
+          format.ts (fmt — interpolacao de variaveis `{var}` nas chaves)
+          dictionaries/ (common, home, meteorologia, swell, noticias, comercio, blog, creditos — flat pt/es)
         lib/
           api.ts (client HTTP + tipos)
           spots-data.ts (dados estaticos de picos)
@@ -507,11 +520,57 @@ Meteor_2.0/
 - Acessibilidade: `role="contentinfo"`, `aria-label`, `focus-visible` rings
 
 ### Sistema de Tema (Dark/Light)
-- Variaveis CSS em `globals.css` via `@theme` (dark) e `[data-theme="light"]` (light)
+- Variaveis CSS em `globals.css` via `@theme` (dark — default) e `[data-theme="light"]` (light)
 - Persistencia: `localStorage.getItem('meteor-theme')`
 - Deteccao: `window.matchMedia('(prefers-color-scheme: light)')`
-- Aplicacao: `document.documentElement.setAttribute('data-theme', 'light')`
+- Aplicacao: `document.documentElement.setAttribute('data-theme', 'light')` (dark = atributo ausente)
 - Componentes usam `var(--color-*)` em vez de classes hardcoded
+
+#### Paleta do tema claro (11/11)
+| Papel | Token | Dark | Light |
+|-------|-------|------|-------|
+| Fundo da pagina | `--color-bg` | `#0A0A0A` | `#F1F5F9` (slate-100) |
+| Superficie de card | `--color-card` | `#0F172A` | `#FFFFFF` |
+| Card elevado | `--color-card-2` | `#1E293B` | `#F8FAFC` |
+| Borda de card | `--color-card-border` | `#1E293B` | `#E2E8F0` |
+| Regra interna | `--color-card-line` | `#334155` | `#CBD5E1` |
+| Texto principal | `--color-card-text` | `#E2E8F0` | `#0F172A` |
+| Texto secundario | `--color-card-subtle` | `#CBD5E1` | `#334155` |
+| Texto discreto | `--color-card-muted` / `--color-card-dim` / `--color-card-faint` | `#94A3B8` / `#64748B` / `#475569` | `#475569` / `#55647D` / `#5B6B82` |
+| Offset do foco | `--color-ring-offset` | `#020617` | `#F1F5F9` |
+| Texto sobre amber | `--color-amber-on` | `#0F172A` | `#0F172A` |
+| Botao amber | `--color-amber-btn` / `--color-amber-btn-hover` | `#F59E0B` / `#FBBF24` | idem |
+
+- **Cards brancos com sombra leve** no claro (`0 1px 2px` + `0 1px 3px` a 4-6% de preto) — `DESIGN.md` > Elevation & Depth.
+- **Acentos `-300`/`-400` escurecem no claro** (17 overrides: amber, blue, cyan, emerald, orange, red, sky, green, yellow, teal, rose) para os equivalentes `-700`, garantindo **contraste >= 4.5:1** sobre card branco (antes ~1.7:1 em `text-amber-400`).
+- **Regra `.panel-tinted`:** paineis com gradiente escuro (Dica do Dia, Briefing IA, visor de satelite) perdem o gradiente e viram card branco no tema claro — sem isso o texto claro ficaria ilegivel.
+- **Excecoes (permanecem escuras por design):** `HeroCarousel`, `PageBanner`, overlays `from-slate-950/*` sobre imagens, badges `bg-*-700 text-white`, HTML inline de popups Leaflet, gradiente do hero do `/swell`.
+
+#### Tokens semanticos (regra de uso)
+Never hardcode slate utilities em cards ou superficies de pagina — use os tokens para que os dois temas fiquem sincronizados:
+
+| Proposito | Token | Utility |
+|----------|-------|---------|
+| Superficie de card | `--color-card` | `bg-card` |
+| Superficie elevada | `--color-card-2` | `bg-card-2` |
+| Borda de card | `--color-card-border` | `border-card-border` |
+| Regra interna | `--color-card-line` | `border-card-line` |
+| Texto principal | `--color-card-text` | `text-card-text` |
+| Texto secundario | `--color-card-subtle` | `text-card-subtle` |
+| Texto discreto | `--color-card-muted` | `text-card-muted` |
+| Texto muito discreto | `--color-card-dim` / `--color-card-faint` | `text-card-dim` / `text-card-faint` |
+| Offset do foco | `--color-ring-offset` | `ring-offset-[var(--color-ring-offset)]` |
+| Texto sobre amber | `--color-amber-on` | `text-[var(--color-amber-on)]` |
+
+Migracao 11/11: ~100 `text-white`, 61 `bg-slate-9xx` e 229 `text-slate-*` foram trocados pelos tokens acima em 29 arquivos.
+
+### Internacionalizacao (PT/ES)
+- Dicionarios flat em `src/i18n/dictionaries/<rota>.ts` — `{ pt: {...}, es: {...} }` com **chaves identicas** nos dois idiomas (garantido por `i18n.test.ts`).
+- `useDict(dict)` devolve o dicionario do idioma ativo; `useI18n()` expoe `lang` + `setLang`.
+- **Todo** texto visivel e **todo** `aria-label`/`title` passa pelo dicionario — nao ha Portuguese hardcoded nos componentes.
+- Datas usam locale derivado do idioma: `const locale = lang === 'pt' ? 'pt-BR' : 'es-ES'`.
+- Interpolacao de variaveis com `fmt()` de `@/i18n/format` (ex.: `'{value}m'`).
+- Valores de configuracao (nivel do spot, qualidade do swell) **nao** sao traduzidos no call site — a traducao acontece na exibicao, com fallback para o valor cru.
 
 ### Acessibilidade
 - Skip-link: "Pular para o conteudo principal" (visivel no focus)
@@ -520,9 +579,10 @@ Meteor_2.0/
 - `aria-current="page"` na pagina ativa
 - `aria-pressed` nos botoes de toggle
 - `aria-hidden="true"` em icones decorativos
-- `focus-visible:ring-2 focus-visible:ring-[var(--color-gold)]` em todos os elementos interativos
+- `focus-visible:ring-2 focus-visible:ring-[var(--color-card-text)]` + `ring-offset-[var(--color-ring-offset)]` em todos os elementos interativos
 - `<main id="main-content" role="main">` para skip-link
-- **Title tooltips em todos os elementos interativos** (botoes, cards, links)
+- **Title tooltips em todos os elementos interativos** (botoes, cards, links) — descritivos (nome + funcao)
+- `aria-label` descritivo (nome + funcao) em botoes, abas, filtros, cards clicaveis, icones e links
 - `aria-live="polite"` para atualizacoes de dados
 
 ---
@@ -543,7 +603,7 @@ Meteor_2.0/
 - Cards de temperatura em linha abaixo do banner
 - Botao Atualizar ao lado dos cards
 
-### Componentes (13 arquivos em meteorologia/components/)
+### Componentes (16 arquivos em meteorologia/components/)
 | Componente | Descricao |
 |------------|-----------|
 | LocationSelector.tsx | Selecao de cidade com tooltips |
@@ -569,6 +629,8 @@ Meteor_2.0/
 - Tooltips descritivos: "Clique para ver previsao de Ilha Comprida — praia e litoral"
 - Tooltips de metricas: "Temperatura do ar em graus Celsius"
 - Grid responsivo HourlyTimeline: 4 colunas mobile, 8 tablet, 12 desktop
+- **i18n (11/11):** todos os `aria-label`/`title`/textos das abas, seletores de cidade, cards de metrica, alertas e satelite passam pelo dicionario `meteorologia` (`useDict`)
+- **Tokens (11/11):** cards usam `bg-card`/`bg-card-2`/`border-card-border` — o `bg-slate-900`/`bg-slate-800` literal foi eliminado
 
 ### Fontes de Dados (Reais)
 - **Open-Meteo:** Previsao do tempo (gratuita)
@@ -609,6 +671,7 @@ Meteor_2.0/
 - **WaveChart:** grafico ApexCharts area com 2 series (Onda + Swell), faixas de qualidade tracejadas, tooltip detalhado, altura 350px
 - **TideChart:** grafico ApexCharts linha com annotations + tabela das proximas 4 mareis (320px)
 - **HourlySwell / ResumoIA / DailyTip**
+- **Tema adaptativo (11/11):** `WaveChart`, `WindChart` e `TideChart` leem o modo via `useThemeMode()` e trocam `tooltip.theme`, cores de eixo/legenda, cor da grade e fundo das annotations — o grafico acompanha o toggle de tema sem recarregar a pagina.
 
 #### Previsao de Ventos (`wind`)
 - **WindConditionCards:** velocidade, rajada e direcao (kitesurf/windsurf)
@@ -619,7 +682,7 @@ Meteor_2.0/
 - **SpotsMap:** Leaflet com marcadores coloridos
 - **SpotGrid:** cards com filtros (Iniciante/Intermediario/Avancado) e busca
 
-### Componentes (21 arquivos em swell/components/)
+### Componentes (22 arquivos em swell/components/)
 | Componente | Descricao |
 |------------|-----------|
 | SwellTabs.tsx | 5 abas com aria pattern (padrao `overview`) |
@@ -643,7 +706,7 @@ Meteor_2.0/
 | Skeletons.tsx | Loading states |
 | windUtils.ts | Helpers de vento (classificacao, direcao) |
 
-### Hooks (9 hooks)
+### Hooks (11 hooks)
 | Hook | Descricao |
 |------|-----------|
 | useMeteorology.ts | Busca GET /v1/meteorology |
@@ -655,6 +718,7 @@ Meteor_2.0/
 | useWeatherNews.ts | Busca GET /v1/meteorology/news (auto-refresh 10min) |
 | useRegionalNews.ts | Busca GET /v1/noticias-regionais |
 | useComercio.ts | Busca GET /v1/comercio |
+| useThemeMode.ts | **Novo (11/11)** — observa `data-theme` do `<html>` via `MutationObserver` e retorna `'dark' \| 'light'` (SSR-safe: dark = default) |
 
 ### Acessibilidade (Swell)
 - `role="tablist/tab/tabpanel"` nas abas
@@ -664,6 +728,7 @@ Meteor_2.0/
 - `aria-live="polite"` para resumo IA
 - `focus-visible:ring-2 focus-visible:ring-blue-400`
 - Tooltips detalhados com todos os valores
+- **i18n (11/11):** titulos, `aria-label`/`title` e legendas dos graficos, cards, abas, ranking e dicas passam pelo dicionario `swell`
 
 ### Fontes de Dados (Reais)
 - **Open-Meteo Marine:** Dados de ondas, swell, período (current + hourly)
@@ -730,8 +795,8 @@ Pipeline em `.github/workflows/ci.yml`:
 
 | Job | Descrição | Trigger |
 |-----|-----------|---------|
-| `backend-test` | Jest (217 testes) | push/PR |
-| `frontend-test` | Vitest (112 testes) | push/PR |
+| `backend-test` | Jest (226 testes) | push/PR |
+| `frontend-test` | Vitest (142 testes) | push/PR |
 | `lint` | oxlint (frontend) | push/PR |
 | `docs-check` | `node scripts/check-docs.mjs` — paridade rotas dos controllers × seções da REFERENCIA_API.md (Backlog P2 #2; `pnpm docs:check` local) | push/PR |
 | `build` | Valida compilação | Após testes |
