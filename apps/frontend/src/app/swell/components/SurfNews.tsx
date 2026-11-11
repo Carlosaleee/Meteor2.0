@@ -3,6 +3,9 @@
 import { FaExternalLinkAlt, FaNewspaper } from 'react-icons/fa';
 import type { NewsItem } from '@/lib/api';
 import { FALLBACK_IMAGES } from '@/lib/fallback-images';
+import { useDict, useI18n } from '@/i18n/context';
+import { swell } from '@/i18n/dictionaries/swell';
+import { fmt } from '@/i18n/format';
 
 type SurfNewsProps = {
   news: NewsItem[];
@@ -17,15 +20,18 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 export function SurfNews({ news, loading, category, title }: SurfNewsProps) {
+  const t = useDict(swell);
+  const { lang } = useI18n();
+  const locale = lang === 'pt' ? 'pt-BR' : 'es-ES';
   const filtered = category ? news.filter(n => n.category === category) : news;
 
   if (loading) {
     return (
-      <section className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 animate-pulse" aria-hidden="true">
-        <div className="h-4 bg-slate-800 rounded w-36 mb-4" />
+      <section className="bg-card/80 border border-card-border rounded-2xl p-5 animate-pulse" aria-hidden="true">
+        <div className="h-4 bg-card-2 rounded w-36 mb-4" />
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-64 bg-slate-800/50 rounded-xl" />
+            <div key={i} className="h-64 bg-card-2/50 rounded-xl" />
           ))}
         </div>
       </section>
@@ -33,11 +39,11 @@ export function SurfNews({ news, loading, category, title }: SurfNewsProps) {
   }
 
   return (
-    <section className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5" aria-label={title || 'Notícias de surf'}>
-      <h3 className="text-sm font-semibold text-slate-300 mb-4 uppercase tracking-wider flex items-center gap-2">
+    <section className="bg-card/80 border border-card-border rounded-2xl p-5" aria-label={title || t['news.heading']}>
+      <h3 className="text-sm font-semibold text-card-subtle mb-4 uppercase tracking-wider flex items-center gap-2">
         <FaNewspaper className="w-4 h-4 text-blue-400" aria-hidden="true" />
-        {title || 'Notícias de Surf'}
-        <span className="text-[10px] text-slate-500 font-normal ml-1">({filtered.length} matérias)</span>
+        {title || t['news.heading']}
+        <span className="text-[10px] text-card-dim font-normal ml-1">{fmt(t['news.count'], { count: filtered.length })}</span>
       </h3>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3" role="list">
         {filtered.map(item => (
@@ -46,12 +52,12 @@ export function SurfNews({ news, loading, category, title }: SurfNewsProps) {
             href={item.url}
             target="_blank"
             rel="noopener noreferrer"
-            title={`${item.title} — ${item.source} (abrir em nova aba)`}
-            aria-label={`${item.title}, fonte: ${item.source}`}
+            title={fmt(t['news.cardTitle'], { title: item.title, source: item.source })}
+            aria-label={fmt(t['news.cardAria'], { title: item.title, source: item.source })}
             role="listitem"
-            className="group rounded-xl overflow-hidden bg-slate-800/40 border border-slate-700/50 hover:bg-slate-800/80 hover:border-blue-500/30 transition-all"
+            className="group rounded-xl overflow-hidden bg-card-2/40 border border-card-line/50 hover:bg-card-2/80 hover:border-blue-500/30 transition-all"
           >
-            <div className="h-40 bg-slate-800 overflow-hidden relative">
+            <div className="h-40 bg-card-2 overflow-hidden relative">
               <img
                 src={item.image || FALLBACK_IMAGES[item.category] || FALLBACK_IMAGES.WSL}
                 alt={item.title}
@@ -68,13 +74,13 @@ export function SurfNews({ news, loading, category, title }: SurfNewsProps) {
             </div>
             <div className="p-4">
               <div className="flex items-start justify-between gap-2 mb-1">
-                <h4 className="text-sm font-bold text-white group-hover:text-blue-300 transition-colors line-clamp-2">{item.title}</h4>
-                <FaExternalLinkAlt className="w-3 h-3 text-slate-500 group-hover:text-blue-400 shrink-0 mt-0.5" aria-hidden="true" />
+                <h4 className="text-sm font-bold text-card-text group-hover:text-blue-300 transition-colors line-clamp-2">{item.title}</h4>
+                <FaExternalLinkAlt className="w-3 h-3 text-card-dim group-hover:text-blue-400 shrink-0 mt-0.5" aria-hidden="true" />
               </div>
               <p className="text-[10px] text-blue-400 font-medium mb-1">{item.source}</p>
-              <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">{item.description}</p>
-              <p className="text-[9px] text-slate-600 mt-2 font-mono">
-                {new Date(item.publishedAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
+              <p className="text-xs text-card-muted leading-relaxed line-clamp-2">{item.description}</p>
+              <p className="text-[9px] text-card-faint mt-2 font-mono">
+                {new Date(item.publishedAt).toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' })}
               </p>
             </div>
           </a>

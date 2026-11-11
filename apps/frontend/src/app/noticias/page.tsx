@@ -8,12 +8,12 @@ import { useRegionalNews } from '@/hooks/useRegionalNews';
 import dynamic from 'next/dynamic';
 const TrafficMap = dynamic(() => import('./components/TrafficMap').then(mod => mod.TrafficMap), { ssr: false });
 import { CityGrid } from '../meteorologia/components/CityGrid';
-import { useDict } from '@/i18n/context';
+import { useDict, useI18n } from '@/i18n/context';
 import { noticias } from '@/i18n/dictionaries/noticias';
 import { fmt } from '@/i18n/format';
 
 const CATEGORY_CONFIG: Record<string, { label: string; emoji: string; color: string; bg: string }> = {
-  todas: { label: 'cat.todas', emoji: '📰', color: 'text-slate-300', bg: 'bg-slate-800/40' },
+  todas: { label: 'cat.todas', emoji: '📰', color: 'text-card-subtle', bg: 'bg-card-2/40' },
   transito: { label: 'cat.transito', emoji: '🚗', color: 'text-amber-400', bg: 'bg-amber-500/10' },
   noticia: { label: 'cat.noticia', emoji: '📰', color: 'text-blue-400', bg: 'bg-blue-500/10' },
   policial: { label: 'cat.policial', emoji: '🚨', color: 'text-red-400', bg: 'bg-red-500/10' },
@@ -38,6 +38,11 @@ const ROUTE_ICONS: Record<string, string> = {
   'balsa-cananeia': '⛴️',
 };
 
+/** Converte a condição crua vinda da API em rótulo traduzido (fallback: valor cru). */
+function condLabel(condition: string, t: Record<string, string>): string {
+  return t[`cond.${condition}`] ?? condition;
+}
+
 function timeAgo(dateStr: string, t: Record<string, string>): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
@@ -49,10 +54,10 @@ function timeAgo(dateStr: string, t: Record<string, string>): string {
 }
 
 /** "21/10 17:48" — data/hora da coleta exibida nos cards de rodovia. */
-function formatRouteTime(iso: string): string {
+function formatRouteTime(iso: string, locale = 'pt-BR'): string {
   const date = new Date(iso);
   if (isNaN(date.getTime())) return '';
-  return date.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+  return date.toLocaleString(locale, { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 }
 
 export default function NoticiasPage() {
@@ -60,6 +65,8 @@ export default function NoticiasPage() {
   const { data, loading, error } = useRegionalNews();
   const [activeCategory, setActiveCategory] = useState('todas');
   const t = useDict(noticias);
+  const { lang } = useI18n();
+  const locale = lang === 'pt' ? 'pt-BR' : 'es-ES';
 
   const news = data?.news ?? [];
   const routes = data?.routes ?? [];
@@ -88,16 +95,16 @@ export default function NoticiasPage() {
 
       {/* Status das Rodovias */}
       <section id="rodovias" aria-label={t['roads.aria']} className="scroll-mt-20">
-        <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+        <h2 className="text-lg font-bold text-card-text mb-4 flex items-center gap-2">
           <FaCar className="w-5 h-5 text-amber-400" aria-hidden="true" />
           {t['roads.title']}
         </h2>
         {loading ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             {[1, 2, 3, 4, 5].map(i => (
-              <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 animate-pulse">
-                <div className="h-4 bg-slate-800 rounded w-24 mb-3" />
-                <div className="h-6 bg-slate-800 rounded w-20" />
+              <div key={i} className="bg-card border border-card-border rounded-2xl p-5 animate-pulse">
+                <div className="h-4 bg-card-2 rounded w-24 mb-3" />
+                <div className="h-6 bg-card-2 rounded w-20" />
               </div>
             ))}
           </div>
@@ -106,19 +113,20 @@ export default function NoticiasPage() {
             {routes.map(route => {
               const colors = ROUTE_CONDITION_COLORS[route.condition] ?? ROUTE_CONDITION_COLORS.LIVRE;
               const emoji = ROUTE_ICONS[route.id] ?? '🚗';
+              const conditionLabel = condLabel(route.condition, t);
               return (
                 <div
                   key={route.id}
-                  className={`bg-slate-900/80 border ${colors.border} rounded-2xl p-5`}
-                  title={`${route.name}: ${route.condition} — ${route.description}`}
-                  aria-label={`${route.name}: ${route.condition}`}
+                  className={`bg-card/80 border ${colors.border} rounded-2xl p-5`}
+                  title={`${route.name}: ${conditionLabel} — ${route.description}`}
+                  aria-label={`${route.name}: ${conditionLabel}`}
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-lg" aria-hidden="true">{emoji}</span>
-                    <span className="text-sm font-bold text-white">{route.name}</span>
+                    <span className="text-sm font-bold text-card-text">{route.name}</span>
                     {route.source === 'estimated' && (
                       <span
-                        className="ml-auto px-1.5 py-0.5 rounded text-[9px] font-semibold bg-slate-700/50 text-slate-400 border border-slate-600/50"
+                        className="ml-auto px-1.5 py-0.5 rounded text-[9px] font-semibold bg-card-line/50 text-card-muted border border-card-line/60"
                         title={t['badge.estimatedTitle']}
                       >
                         {t['badge.estimated']}
@@ -127,16 +135,17 @@ export default function NoticiasPage() {
                   </div>
                   <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${colors.bg} ${colors.text} border ${colors.border}`}>
                     {route.condition === 'BLOQUEADO' && <FaExclamationTriangle className="w-3 h-3" aria-hidden="true" />}
-                    {route.condition}
+                    {conditionLabel}
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-2 truncate" title={route.description}>{route.description}</p>
-                  <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-slate-800/60 text-[10px] text-slate-500">
+                  <p className="text-[11px] text-card-muted mt-2 truncate" title={route.description}>{route.description}</p>
+                  <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-card-border/60 text-[10px] text-card-dim">
                     {route.sourceUrl ? (
                       <a
                         href={route.sourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         title={t['source.verify']}
+                        aria-label={fmt(t['source.openAria'], { name: route.name })}
                         className="inline-flex items-center gap-1 hover:text-amber-400 transition-colors"
                       >
                         {t['source.label']} <FaExternalLinkAlt className="w-2.5 h-2.5" aria-hidden="true" />
@@ -144,8 +153,8 @@ export default function NoticiasPage() {
                     ) : (
                       <span>{t['source.none']}</span>
                     )}
-                    <span title={fmt(t['a11y.lastUpdate'], { date: new Date(route.updatedAt).toLocaleString('pt-BR') })}>
-                      {formatRouteTime(route.updatedAt)}
+                    <span title={fmt(t['a11y.lastUpdate'], { date: new Date(route.updatedAt).toLocaleString(locale) })}>
+                      {formatRouteTime(route.updatedAt, locale)}
                     </span>
                   </div>
                 </div>
@@ -157,12 +166,12 @@ export default function NoticiasPage() {
 
       {/* Mapa de Status das Rodovias */}
       <section aria-label={t['roads.mapAria']}>
-        <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+        <h2 className="text-lg font-bold text-card-text mb-4 flex items-center gap-2">
           <FaCar className="w-5 h-5 text-cyan-400" aria-hidden="true" />
           {t['roads.mapTitle']}
         </h2>
         {loading ? (
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl animate-pulse" style={{ height: 380 }} />
+          <div className="bg-card border border-card-border rounded-2xl animate-pulse h-[320px] sm:h-[380px]" />
         ) : (
           <TrafficMap routes={routes} />
         )}
@@ -171,26 +180,30 @@ export default function NoticiasPage() {
       {/* Filtros de Categoria */}
       <section aria-label={t['filters.aria']}>
         <div className="flex flex-wrap items-center gap-2">
-          <FaFilter className="w-4 h-4 text-slate-500" aria-hidden="true" />
-          {Object.entries(CATEGORY_CONFIG).map(([key, cfg]) => (
-            <button
-              key={key}
-              onClick={() => setActiveCategory(key)}
-              title={t[cfg.label]}
-              aria-label={t[cfg.label]}
-              aria-pressed={activeCategory === key}
-              className={`px-3 py-1.5 text-xs rounded-lg border transition-all ${
-                activeCategory === key
-                  ? `${cfg.bg} ${cfg.color} border-current`
-                  : 'bg-slate-800/40 text-slate-400 border-slate-700/50 hover:bg-slate-800'
-              }`}
-            >
-              {cfg.emoji} {t[cfg.label]}
-              {key !== 'todas' && categoryCounts[key] ? (
-                <span className="ml-1 text-[10px] opacity-60">({categoryCounts[key]})</span>
-              ) : null}
-            </button>
-          ))}
+          <FaFilter className="w-4 h-4 text-card-dim" aria-hidden="true" />
+          {Object.entries(CATEGORY_CONFIG).map(([key, cfg]) => {
+            const categoryLabel = t[cfg.label];
+            const filterAria = fmt(t['filters.apply'], { category: categoryLabel });
+            return (
+              <button
+                key={key}
+                onClick={() => setActiveCategory(key)}
+                title={filterAria}
+                aria-label={filterAria}
+                aria-pressed={activeCategory === key}
+                className={`px-3 py-1.5 text-xs rounded-lg border transition-all ${
+                  activeCategory === key
+                    ? `${cfg.bg} ${cfg.color} border-current`
+                    : 'bg-card-2/40 text-card-muted border-card-line/50 hover:bg-card-2'
+                }`}
+              >
+                {cfg.emoji} {categoryLabel}
+                {key !== 'todas' && categoryCounts[key] ? (
+                  <span className="ml-1 text-[10px] opacity-60">({categoryCounts[key]})</span>
+                ) : null}
+              </button>
+            );
+          })}
         </div>
       </section>
 
@@ -199,11 +212,11 @@ export default function NoticiasPage() {
         {loading ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 animate-pulse">
-                <div className="h-4 bg-slate-800 rounded w-20 mb-3" />
-                <div className="h-5 bg-slate-800 rounded w-3/4 mb-2" />
-                <div className="h-3 bg-slate-800 rounded w-full mb-1" />
-                <div className="h-3 bg-slate-800 rounded w-2/3" />
+              <div key={i} className="bg-card border border-card-border rounded-2xl p-5 animate-pulse">
+                <div className="h-4 bg-card-2 rounded w-20 mb-3" />
+                <div className="h-5 bg-card-2 rounded w-3/4 mb-2" />
+                <div className="h-3 bg-card-2 rounded w-full mb-1" />
+                <div className="h-3 bg-card-2 rounded w-2/3" />
               </div>
             ))}
           </div>
@@ -218,22 +231,22 @@ export default function NoticiasPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   title={`${item.title} — ${item.source}`}
-                  aria-label={`${item.title}, fonte: ${item.source}`}
-                  className="group bg-slate-900/80 border border-slate-800 rounded-2xl p-5 hover:border-blue-500/30 hover:bg-slate-800/60 transition-all"
+                  aria-label={fmt(t['a11y.newsLink'], { title: item.title, source: item.source })}
+                  className="group bg-card/80 border border-card-border rounded-2xl p-5 hover:border-blue-500/30 hover:bg-card-2/60 transition-all"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border ${catCfg.bg} ${catCfg.color} border-current`}>
                       {catCfg.emoji} {t[catCfg.label]}
                     </span>
-                    <FaExternalLinkAlt className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors" aria-hidden="true" />
+                    <FaExternalLinkAlt className="w-3 h-3 text-card-faint group-hover:text-blue-400 transition-colors" aria-hidden="true" />
                   </div>
-                  <h3 className="text-sm font-bold text-white group-hover:text-blue-300 transition-colors mb-2 line-clamp-2">
+                  <h3 className="text-sm font-bold text-card-text group-hover:text-blue-300 transition-colors mb-2 line-clamp-2">
                     {item.title}
                   </h3>
-                  <p className="text-xs text-slate-400 leading-relaxed mb-3 line-clamp-3">
+                  <p className="text-xs text-card-muted leading-relaxed mb-3 line-clamp-3">
                     {item.description}
                   </p>
-                  <div className="flex items-center justify-between text-[10px] text-slate-500">
+                  <div className="flex items-center justify-between text-[10px] text-card-dim">
                     <span className="font-medium">{item.source}</span>
                     <span>{timeAgo(item.publishedAt, t)}</span>
                   </div>
@@ -241,7 +254,7 @@ export default function NoticiasPage() {
               );
             })}
             {filtered.length === 0 && !loading && (
-              <p className="text-sm text-slate-500 col-span-full text-center py-8">
+              <p className="text-sm text-card-dim col-span-full text-center py-8">
                 {t['empty.news']}
               </p>
             )}

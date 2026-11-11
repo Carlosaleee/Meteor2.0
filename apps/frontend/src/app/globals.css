@@ -40,6 +40,12 @@
   --color-card-text: #e2e8f0;   /* era text-slate-200 */
   --color-card-subtle: #cbd5e1; /* era text-slate-300 */
   --color-card-muted: #94a3b8;  /* era text-slate-400 */
+  --color-card-dim: #64748b;    /* era text-slate-500 */
+  --color-card-faint: #475569;  /* era text-slate-600 */
+  --color-ring-offset: #020617; /* era ring-offset-slate-950 */
+  --color-amber-on: #0f172a;    /* texto sobre acento amber */
+  --color-amber-btn: #f59e0b;      /* fundo de botao ambar (sempre com texto escuro) */
+  --color-amber-btn-hover: #fbbf24;
 
   --font-display: "Archivo Black", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
@@ -48,36 +54,44 @@
 }
 
 [data-theme="light"] {
-  --color-bg: #f8f6f0;
+  /* Tema claro — paleta slate pedida pelo usuario: fundo slate-100, cards
+     brancos, bordas slate-200. O modo escuro permanece o default do @theme. */
+  --color-bg: #f1f5f9;
   --color-graphite: #ffffff;
-  --color-surface: #edebe6;
-  --color-line: #d6d0c8;
-  --color-ink: #141414;
-  --color-muted: #6b6560;
-  --color-orange: #ff6a1a;
+  --color-surface: #e2e8f0;
+  --color-line: #cbd5e1;
+  --color-ink: #0f172a;
+  --color-muted: #64748b;
+  --color-orange: #c2410c;
   --color-gold: #c49a1a;
-  --color-hazard: #ff3b1a;
+  --color-hazard: #dc2626;
 
   --color-card: #ffffff;
-  --color-card-2: #edebe6;
-  --color-card-border: #d6d0c8;
-  --color-card-line: #d6d0c8;
-  --color-card-text: #141414;
+  --color-card-2: #f8fafc;
+  --color-card-border: #e2e8f0;
+  --color-card-line: #cbd5e1;
+  --color-card-text: #0f172a;
   --color-card-subtle: #334155;
-  --color-card-muted: #6b6560;
+  --color-card-muted: #475569;
+  --color-card-dim: #55647d;
+  --color-card-faint: #5b6b82;
+  --color-ring-offset: #f1f5f9;
+  --color-amber-on: #0f172a; /* amber-500/600 nao escurece no claro: texto escuro nos dois temas */
+  --color-amber-btn: #f59e0b;
+  --color-amber-btn-hover: #fbbf24;
 
   --color-header-bg: #ffffff;
-  --color-header-surface: #edebe6;
-  --color-header-text: #141414;
-  --color-header-muted: #6b6560;
-  --color-header-border: #d6d0c8;
-  --color-header-hover: #edebe6;
+  --color-header-surface: #f1f5f9;
+  --color-header-text: #0f172a;
+  --color-header-muted: #64748b;
+  --color-header-border: #e2e8f0;
+  --color-header-hover: #f1f5f9;
 
-  --color-footer-bg: #edebe6;
-  --color-footer-text: #6b6560;
-  --color-footer-border: #d6d0c8;
-  --color-footer-heading: #141414;
-  --color-footer-link: #6b6560;
+  --color-footer-bg: #ffffff;
+  --color-footer-text: #64748b;
+  --color-footer-border: #e2e8f0;
+  --color-footer-heading: #0f172a;
+  --color-footer-link: #64748b;
   --color-footer-link-hover: #1d4ed8;
 
   --color-nav-active-bg: rgba(14, 110, 180, 0.12);
@@ -86,6 +100,42 @@
   --color-nav-hover-bg: rgba(14, 110, 180, 0.06);
   --color-nav-hover-text: #0369a1;
   --color-gold-line: #c49a1a;
+
+  /* Acentos usados como TEXTO sobre card branco: escurecem para >= 4.5:1.
+     Afeta text-*, border-*, ring-*, hover:* das mesmas tonalidades. */
+  --color-amber-300: #92400e;
+  --color-amber-400: #b45309;
+  --color-blue-300: #1e40af;
+  --color-blue-400: #1d4ed8;
+  --color-cyan-300: #155e75;
+  --color-cyan-400: #0e7490;
+  --color-emerald-300: #065f46;
+  --color-emerald-400: #047857;
+  --color-orange-300: #9a3412;
+  --color-orange-400: #c2410c;
+  --color-red-300: #991b1b;
+  --color-red-400: #b91c1c;
+  --color-sky-400: #0369a1;
+  --color-green-400: #15803d;
+  --color-yellow-400: #854d0e;
+  --color-teal-400: #0f766e;
+  --color-rose-400: #be123c;
+}
+
+/* Tema claro: profundidade leve nos cards (DESIGN.md - Elevation, light theme) */
+[data-theme="light"] :where(.bg-card, .bg-card\/80, .bg-card\/60, .bg-card\/40, .bg-card-2) {
+  box-shadow:
+    0 1px 2px rgb(15 23 42 / 0.06),
+    0 1px 3px rgb(15 23 42 / 0.04);
+}
+
+/* Tema claro: paineis com gradiente escuro (dica do dia, resumo IA, satélite).
+   Sem isto o texto do painel ficaria claro sobre fundo escuro (ilegivel).
+   O gradiente vira um card claro e o texto usa os tokens card-*. */
+[data-theme="light"] :where(.panel-tinted) {
+  background-image: none !important;
+  background-color: var(--color-card) !important;
+  border-color: var(--color-card-border) !important;
 }
 
 html,

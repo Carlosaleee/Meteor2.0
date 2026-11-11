@@ -27,22 +27,22 @@ export function MetricCard({ icon: Icon, label, value, unit, subLabel, tip, colo
 
   return (
     <div
-      className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-2 hover:border-slate-700 transition-colors"
+      className="bg-card/80 border border-card-border rounded-xl p-4 flex flex-col gap-2 hover:border-card-line transition-colors"
       aria-label={ariaLabel ?? `${label}: ${value} ${unit}`}
       title={tooltip}
     >
       <div className="flex items-center gap-2">
-        <div className={`p-1.5 rounded-lg bg-slate-800 ${color}`} aria-hidden="true">
+        <div className={`p-1.5 rounded-lg bg-card-2 ${color}`} aria-hidden="true">
           <Icon className="w-3.5 h-3.5" />
         </div>
-        <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">{label}</span>
+        <span className="text-[10px] font-medium text-card-dim uppercase tracking-wider">{label}</span>
       </div>
       <div className="flex items-baseline gap-1">
-        <span className="text-2xl font-bold text-white tabular-nums">{value}</span>
-        <span className="text-xs text-slate-400">{unit}</span>
+        <span className="text-2xl font-bold text-card-text tabular-nums">{value}</span>
+        <span className="text-xs text-card-muted">{unit}</span>
       </div>
       {subLabel && (
-        <span className="text-[10px] text-slate-500">{subLabel}</span>
+        <span className="text-[10px] text-card-dim">{subLabel}</span>
       )}
     </div>
   );

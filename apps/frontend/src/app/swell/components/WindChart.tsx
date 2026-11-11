@@ -4,6 +4,10 @@ import dynamic from 'next/dynamic';
 import { FaInfoCircle } from 'react-icons/fa';
 import type { HourlyMarinePoint } from '@/lib/api';
 import { windQuality, windDir, beaufortScale } from './windUtils';
+import { useDict } from '@/i18n/context';
+import { swell } from '@/i18n/dictionaries/swell';
+import { fmt } from '@/i18n/format';
+import { useThemeMode } from '@/hooks/useThemeMode';
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
@@ -12,6 +16,13 @@ type WindChartProps = {
 };
 
 export function WindChart({ data }: WindChartProps) {
+  const mode = useThemeMode();
+  const t = useDict(swell);
+  const isLight = mode === 'light';
+  const labelColor = isLight ? '#475569' : '#94a3b8';
+  const titleColor = isLight ? '#475569' : '#64748b';
+  const gridColor = isLight ? '#e2e8f0' : '#1e293b';
+
   const categories = data.map(d => {
     const h = new Date(d.time).getHours();
     return `${String(h).padStart(2, '0')}:00`;
@@ -45,22 +56,22 @@ export function WindChart({ data }: WindChartProps) {
     },
     xaxis: {
       categories,
-      labels: { style: { colors: '#94a3b8', fontSize: '10px' }, rotate: -45, rotateAlways: false },
+      labels: { style: { colors: labelColor, fontSize: '10px' }, rotate: -45, rotateAlways: false },
       axisBorder: { show: false },
       axisTicks: { show: false },
     },
     yaxis: {
-      title: { text: 'km/h', style: { color: '#64748b', fontSize: '10px' } },
-      labels: { style: { colors: '#94a3b8', fontSize: '10px' }, formatter: v => `${v}` },
+      title: { text: t['windc.yAxis'], style: { color: titleColor, fontSize: '10px' } },
+      labels: { style: { colors: labelColor, fontSize: '10px' }, formatter: v => `${v}` },
       min: 0,
     },
     legend: {
       position: 'top',
       horizontalAlign: 'right',
-      labels: { colors: '#94a3b8', useSeriesColors: true },
+      labels: { colors: labelColor, useSeriesColors: true },
     },
     tooltip: {
-      theme: 'dark',
+      theme: mode,
       shared: true,
       custom: ({ series, dataPointIndex }) => {
         const speed = series[0]?.[dataPointIndex] ?? 0;
@@ -68,62 +79,62 @@ export function WindChart({ data }: WindChartProps) {
         const dir = data[dataPointIndex]?.windDirection ?? 0;
         const q = windQuality(speed);
         const dirLabel = windDir(dir);
-        return `<div class="bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-xs space-y-1">
-          <div class="text-slate-300 font-medium">${categories[dataPointIndex]}</div>
-          <div class="text-white font-bold">Velocidade: ${speed} km/h <span style="color:${q.color}">(${q.label})</span></div>
-          <div class="text-orange-400">Rajada: ${gust} km/h</div>
-          <div class="text-slate-400">Direção: ${dirLabel} (${dir}°)</div>
+        return `<div class="bg-card border border-card-line rounded-lg px-4 py-3 text-xs space-y-1">
+          <div class="text-card-subtle font-medium">${categories[dataPointIndex]}</div>
+          <div class="text-card-text font-bold">${fmt(t['windc.tipSpeed'], { value: speed })} <span style="color:${q.color}">(${t[q.labelKey] ?? q.label})</span></div>
+          <div class="text-orange-400">${fmt(t['windc.tipGust'], { value: gust })}</div>
+          <div class="text-card-muted">${fmt(t['windc.tipDir'], { dir: dirLabel, deg: dir })}</div>
         </div>`;
       },
     },
     grid: {
-      borderColor: '#1e293b',
+      borderColor: gridColor,
       strokeDashArray: 4,
       padding: { left: 10, right: 10 },
     },
     dataLabels: { enabled: false },
     annotations: {
       yaxis: [
-        { y: 12, borderColor: '#06b6d4', strokeDashArray: 4, label: { text: 'Bom p/ surf', style: { color: '#06b6d4', background: 'transparent', fontSize: '10px' } } },
-        { y: 20, borderColor: '#10b981', strokeDashArray: 4, label: { text: 'Ótimo p/ kitesurf', style: { color: '#10b981', background: 'transparent', fontSize: '10px' } } },
-        { y: 30, borderColor: '#f59e0b', strokeDashArray: 4, label: { text: 'Perigoso', style: { color: '#f59e0b', background: 'transparent', fontSize: '10px' } } },
+        { y: 12, borderColor: '#06b6d4', strokeDashArray: 4, label: { text: t['windc.annSurf'], style: { color: '#06b6d4', background: 'transparent', fontSize: '10px' } } },
+        { y: 20, borderColor: '#10b981', strokeDashArray: 4, label: { text: t['windc.annKite'], style: { color: '#10b981', background: 'transparent', fontSize: '10px' } } },
+        { y: 30, borderColor: '#f59e0b', strokeDashArray: 4, label: { text: t['windc.annDanger'], style: { color: '#f59e0b', background: 'transparent', fontSize: '10px' } } },
       ],
     },
   };
 
   const series = [
-    { name: '💨 Velocidade', data: speedSeries },
-    { name: '🌪️ Rajada', data: gustSeries },
+    { name: t['windc.seriesSpeed'], data: speedSeries },
+    { name: t['windc.seriesGust'], data: gustSeries },
   ];
 
   return (
-    <section className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5" aria-label="Gráfico de previsão de ventos">
+    <section className="bg-card/80 border border-card-border rounded-2xl p-5" aria-label={t['windc.sectionAria']}>
       <div className="flex items-start justify-between mb-2">
-        <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">Previsão Horária — Ventos</h3>
-        <div className="flex items-center gap-1.5 text-[10px] text-slate-500" title="Linha tracejada indicando faixas de qualidade">
+        <h3 className="text-sm font-semibold text-card-subtle uppercase tracking-wider">{t['windc.heading']}</h3>
+        <div className="flex items-center gap-1.5 text-[10px] text-card-dim" title={t['chart.dashTitle']}>
           <FaInfoCircle className="w-3 h-3" aria-hidden="true" />
-          <span>Linhas tracejadas = faixas de qualidade</span>
+          <span>{t['chart.dashLegend']}</span>
         </div>
       </div>
       <div className="flex flex-wrap gap-3 mb-3 text-[10px]">
-        <span className="text-slate-400">
-          <span className="text-sky-400 font-medium">Velocidade</span> = vento sustentado
+        <span className="text-card-muted">
+          <span className="text-sky-400 font-medium">{t['windc.legendSpeedName']}</span> {t['windc.legendSpeedDesc']}
         </span>
-        <span className="text-slate-400">
-          <span className="text-orange-400 font-medium">Rajada</span> = rajadas máximas
+        <span className="text-card-muted">
+          <span className="text-orange-400 font-medium">{t['windc.legendGustName']}</span> {t['windc.legendGustDesc']}
         </span>
       </div>
       <div className="flex flex-wrap items-center gap-3 mb-3">
-        <span className="text-[10px] text-slate-500">Pico atual:</span>
+        <span className="text-[10px] text-card-dim">{t['chart.peak']}</span>
         <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: `${bestQuality.color}20`, color: bestQuality.color, border: `1px solid ${bestQuality.color}40` }}>
-          {bestQuality.label} ({maxSpeed} km/h)
+          {t[bestQuality.labelKey] ?? bestQuality.label} ({maxSpeed} km/h)
         </span>
-        <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-700/50 text-slate-300 border border-slate-600/50">
-          Beaufort {maxBeaufort}
+        <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-card-line/50 text-card-subtle border border-card-line/50">
+          {fmt(t['windc.beaufort'], { value: maxBeaufort })}
         </span>
         {maxGust > maxSpeed * 1.3 && (
           <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">
-            Rajada forte ({maxGust} km/h)
+            {fmt(t['windc.gustStrong'], { value: maxGust })}
           </span>
         )}
       </div>

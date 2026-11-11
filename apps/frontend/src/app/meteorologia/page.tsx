@@ -12,7 +12,7 @@ import { PrevisaoTab } from './components/PrevisaoTab';
 import { AvisosTab } from './components/AvisosTab';
 import { SourceBadge } from './components/SourceBadge';
 import { weatherEmoji } from './components/weather-utils';
-import { useDict } from '@/i18n/context';
+import { useDict, useI18n } from '@/i18n/context';
 import { meteorologia } from '@/i18n/dictionaries/meteorologia';
 
 const SatelliteTab = dynamic(
@@ -32,9 +32,11 @@ export default function MeteorologiaPage() {
   const { data, loading, error, refetch } = useMeteorology(locationId);
   const { cities, loading: citiesLoading, refetch: refetchCities } = useAllCities();
   const t = useDict(meteorologia);
+  const { lang } = useI18n();
+  const locale = lang === 'pt' ? 'pt-BR' : 'es-ES';
 
   return (
-    <main className="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden" role="main" aria-label={t['page.aria']}>
+    <div className="bg-card border border-card-border rounded-2xl overflow-hidden" aria-label={t['page.aria']}>
       <PageBanner
         title={t['page.title']}
         subtitle={t['page.subtitle']}
@@ -56,10 +58,10 @@ export default function MeteorologiaPage() {
                   aria-label={`${city?.location ?? id}: ${city ? `${Math.round(city.temperature)} graus` : t['city.loadingLower']}`}
                   className={`
                     px-3 py-2 rounded-lg transition-all duration-200 min-w-[90px]
-                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white
+                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-card-text)]
                     ${isActive
                       ? 'bg-amber-500/20 border border-amber-400/50 text-amber-300'
-                      : 'bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-800'
+                      : 'bg-card-2/60 border border-card-line/50 text-card-subtle hover:bg-card-2'
                     }
                   `}
                 >
@@ -80,7 +82,7 @@ export default function MeteorologiaPage() {
             onClick={() => { refetch(); refetchCities(); }}
             disabled={loading}
             title={t['a11y.refreshTitle']}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:text-white hover:bg-slate-800 transition-all disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card-2/60 border border-card-line/50 text-card-subtle hover:text-card-text hover:bg-card-2 transition-all disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-card-text)]"
             aria-label={t['a11y.refresh']}
           >
             <FaSyncAlt className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} aria-hidden="true" />
@@ -124,11 +126,11 @@ export default function MeteorologiaPage() {
       {/* Footer info */}
       <div className="px-6 pb-5 flex flex-col items-end gap-1">
         <SourceBadge data={data} />
-        <p className="text-[10px] text-slate-600 text-right" aria-live="polite">
-          {t['footer.generatedAt']} {data?.timestamp ? new Date(data.timestamp).toLocaleString('pt-BR') : '--'}
+        <p className="text-[10px] text-card-faint text-right" aria-live="polite">
+          {t['footer.generatedAt']} {data?.timestamp ? new Date(data.timestamp).toLocaleString(locale) : '--'}
         </p>
       </div>
 
-    </main>
+    </div>
   );
 }

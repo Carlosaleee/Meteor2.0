@@ -1,5 +1,7 @@
 'use client';
 
+import { swell } from '@/i18n/dictionaries/swell';
+import { useDict } from '@/i18n/context';
 import { FaLightbulb } from 'react-icons/fa';
 
 type DailyTipProps = {
@@ -10,6 +12,7 @@ type DailyTipProps = {
 };
 
 export function DailyTip({ waveHeight, wavePeriod, bestTime }: DailyTipProps) {
+  const t = useDict(swell);
   let tip = '';
   let board = '';
 
@@ -32,8 +35,8 @@ export function DailyTip({ waveHeight, wavePeriod, bestTime }: DailyTipProps) {
 
   return (
     <section
-      className="bg-gradient-to-br from-amber-900/20 via-slate-900/80 to-slate-900/80 border border-amber-800/30 rounded-2xl p-5"
-      aria-label="Dica do dia para surf"
+      className="panel-tinted bg-gradient-to-br from-amber-900/20 via-slate-900/80 to-slate-900/80 border border-amber-800/30 rounded-2xl p-5"
+      aria-label={t['tip.sectionAria']}
     >
       <div className="flex items-center gap-3 mb-3">
         <div className="p-2 rounded-lg bg-amber-500/20 text-amber-400">
@@ -42,14 +45,14 @@ export function DailyTip({ waveHeight, wavePeriod, bestTime }: DailyTipProps) {
         <h3 className="text-sm font-semibold text-amber-300 uppercase tracking-wider">Dica do Dia</h3>
       </div>
       <p
-        className="text-sm text-slate-300 leading-relaxed mb-3"
-        title="Dica prática de surf baseada nas condições atuais"
+        className="text-sm text-card-subtle leading-relaxed mb-3"
+        title={t['tip.title']}
         aria-live="polite"
       >
         {tip}
       </p>
       <div className="flex items-center gap-2 text-xs">
-        <span className="text-slate-500">Prancha recomendada:</span>
+        <span className="text-card-dim">Prancha recomendada:</span>
         <span className="text-amber-400 font-medium">{board}</span>
       </div>
     </section>

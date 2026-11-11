@@ -1,5 +1,8 @@
 "use client";
 
+import { useDict } from '@/i18n/context';
+import { common } from '@/i18n/dictionaries/common';
+
 export default function Error({
   error,
   reset,
@@ -7,6 +10,8 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useDict(common);
+
   return (
     <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-4 py-6">
       <div className="border border-hazard bg-graphite p-4">
@@ -16,9 +21,10 @@ export default function Error({
         <button
           onClick={reset}
           className="mt-4 border border-orange bg-bg px-4 py-2 font-mono text-xs tracking-[0.12em] text-orange uppercase hover:bg-graphite"
-          aria-label="Tentar novamente"
+          aria-label={t['error.retry']}
+          title={t['error.retry']}
         >
-          Retry
+          {t['error.retry']}
         </button>
       </div>
     </main>

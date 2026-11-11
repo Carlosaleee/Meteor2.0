@@ -4,6 +4,9 @@ import { useEffect, useRef, useCallback } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { CommerceItem } from '@/lib/api';
+import { useDict } from '@/i18n/context';
+import { comercio } from '@/i18n/dictionaries/comercio';
+import { fmt } from '@/i18n/format';
 
 type CommerceMapProps = {
   commerce: CommerceItem[];
@@ -32,6 +35,7 @@ const SECTOR_EMOJI: Record<string, string> = {
 const CENTER_ICOMPRIDA: [number, number] = [-24.7167, -47.5333];
 
 export function CommerceMap({ commerce, selectedCommerce, userPosition, onSelectCommerce, onClearRoute }: CommerceMapProps) {
+  const t = useDict(comercio);
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
@@ -70,7 +74,14 @@ export function CommerceMap({ commerce, selectedCommerce, userPosition, onSelect
       center: CENTER_ICOMPRIDA,
       zoom: 12,
       scrollWheelZoom: false,
+      zoomControl: false,
     });
+
+    L.control.zoom({
+      position: 'topleft',
+      zoomInTitle: t['map.zoomIn'],
+      zoomOutTitle: t['map.zoomOut'],
+    }).addTo(map);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors',
@@ -96,7 +107,7 @@ export function CommerceMap({ commerce, selectedCommerce, userPosition, onSelect
             <span class="text-slate-500">${c.subsector}</span><br/>
             <span class="text-slate-400">${c.address}</span><br/>
             ${c.phone !== 'Não informado' ? `<span class="text-slate-400">📞 ${c.phone}</span><br/>` : ''}
-            <a href="${c.googleMapsUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline mt-1 inline-block">Abrir no Google Maps</a>
+            <a href="${c.googleMapsUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline mt-1 inline-block">${t['popup.openMaps']}</a>
           </div>
         `)
         .addTo(map);
@@ -113,8 +124,11 @@ export function CommerceMap({ commerce, selectedCommerce, userPosition, onSelect
         mapRef.current = null;
       }
       markersRef.current = [];
+      routeLineRef.current = null;
+      userMarkerRef.current = null;
     };
-  }, [commerce, onSelectCommerce]);
+    // `t` (idioma atual) recria o mapa para traduzir popups e títulos dos controles.
+  }, [commerce, onSelectCommerce, t]);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -135,7 +149,7 @@ export function CommerceMap({ commerce, selectedCommerce, userPosition, onSelect
         mapRef.current.setView([selectedCommerce.lat, selectedCommerce.lon], 15, { animate: true });
       }
     }
-  }, [selectedCommerce]);
+  }, [selectedCommerce, t]);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -158,7 +172,7 @@ export function CommerceMap({ commerce, selectedCommerce, userPosition, onSelect
       });
 
       userMarkerRef.current = L.marker(userPosition, { icon: userIcon })
-        .bindPopup('Sua localização')
+        .bindPopup(t['popup.yourLocation'])
         .addTo(mapRef.current);
 
       fetchRoute(userPosition, [selectedCommerce.lat, selectedCommerce.lon]).then(coords => {
@@ -170,7 +184,7 @@ export function CommerceMap({ commerce, selectedCommerce, userPosition, onSelect
             dashArray: '10, 6',
           }).addTo(mapRef.current);
 
-          line.bindTooltip(`Rota até ${selectedCommerce.name}`, {
+          line.bindTooltip(fmt(t['popup.routeTo'], { name: selectedCommerce.name }), {
             permanent: false,
             direction: 'center',
           });
@@ -180,23 +194,23 @@ export function CommerceMap({ commerce, selectedCommerce, userPosition, onSelect
         }
       });
     }
-  }, [selectedCommerce, userPosition, fetchRoute]);
+  }, [selectedCommerce, userPosition, fetchRoute, t]);
 
   return (
     <div className="relative">
       <div
         ref={containerRef}
-        className="w-full rounded-xl overflow-hidden border border-slate-800"
-        style={{ height: '500px' }}
+        aria-label={t['map.aria']}
+        className="w-full h-[360px] sm:h-[500px] rounded-xl overflow-hidden border border-card-border"
       />
       {selectedCommerce && userPosition && (
         <button
           onClick={onClearRoute}
-          className="absolute top-3 right-3 z-[1000] px-3 py-1.5 bg-slate-900/90 border border-slate-700 rounded-lg text-xs text-white hover:bg-slate-800 transition-colors"
-          title="Fechar rota"
-          aria-label="Fechar rota"
+          className="absolute top-3 right-3 z-[1000] px-3 py-1.5 bg-card/90 border border-card-line rounded-lg text-xs text-card-text hover:bg-card-2 transition-colors"
+          title={t['route.close']}
+          aria-label={t['route.close']}
         >
-          ✕ Fechar rota
+          ✕ {t['route.close']}
         </button>
       )}
     </div>

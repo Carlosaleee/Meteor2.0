@@ -27,7 +27,7 @@ import { WindChart } from './components/WindChart';
 import { HourlyWind } from './components/HourlyWind';
 import { ForecastSection } from './components/ForecastSection';
 import { resolveSwellTab, type SwellTab } from './tabs';
-import { useDict } from '@/i18n/context';
+import { useDict, useI18n } from '@/i18n/context';
 import { swell } from '@/i18n/dictionaries/swell';
 import { fmt } from '@/i18n/format';
 import {
@@ -53,6 +53,8 @@ export default function SwellPage() {
   const { data: aiData, loading: aiLoading } = useAiSummary();
   const { data: newsData, loading: newsLoading, refetch: refetchNews } = useNews();
   const t = useDict(swell);
+  const { lang } = useI18n();
+  const locale = lang === 'pt' ? 'pt-BR' : 'es-ES';
 
   useEffect(() => {
     if ('geolocation' in navigator) {
@@ -95,10 +97,10 @@ export default function SwellPage() {
 
       {/* Skip links for accessibility */}
       <nav aria-label={t['skip.aria']} className="sr-only focus-within:not-sr-only">
-        <a href="#condicoes" className="block p-2 bg-cyan-600 text-white rounded-lg">{t['skip.conditions']}</a>
-        <a href="#grafico" className="block p-2 bg-cyan-600 text-white rounded-lg">{t['skip.chart']}</a>
-        <a href="#horas" className="block p-2 bg-cyan-600 text-white rounded-lg">{t['skip.hours']}</a>
-        <a href="#mares" className="block p-2 bg-cyan-600 text-white rounded-lg">{t['skip.tides']}</a>
+        <a href="#condicoes" className="block p-2 bg-cyan-700 text-white rounded-lg">{t['skip.conditions']}</a>
+        <a href="#grafico" className="block p-2 bg-cyan-700 text-white rounded-lg">{t['skip.chart']}</a>
+        <a href="#horas" className="block p-2 bg-cyan-700 text-white rounded-lg">{t['skip.hours']}</a>
+        <a href="#mares" className="block p-2 bg-cyan-700 text-white rounded-lg">{t['skip.tides']}</a>
       </nav>
 
       {error && (
@@ -109,15 +111,15 @@ export default function SwellPage() {
 
       {loading && !data && (
         <div className="space-y-8">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-10 animate-pulse">
-            <div className="h-8 bg-slate-800 rounded w-64 mb-4" />
-            <div className="h-4 bg-slate-800 rounded w-48" />
+          <div className="bg-card border border-card-border rounded-3xl p-6 md:p-10 animate-pulse">
+            <div className="h-8 bg-card-2 rounded w-64 mb-4" />
+            <div className="h-4 bg-card-2 rounded w-48" />
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map(i => (
-              <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg animate-pulse">
-                <div className="h-3 bg-slate-800 rounded w-20 mb-3" />
-                <div className="h-8 bg-slate-800 rounded w-16" />
+              <div key={i} className="bg-card border border-card-border rounded-2xl p-5 shadow-lg animate-pulse">
+                <div className="h-3 bg-card-2 rounded w-20 mb-3" />
+                <div className="h-8 bg-card-2 rounded w-16" />
               </div>
             ))}
           </div>
@@ -162,14 +164,14 @@ export default function SwellPage() {
                   <p className="text-xs font-semibold text-blue-200 uppercase tracking-wider flex items-center gap-1">
                     <FaClock className="w-3.5 h-3.5" aria-hidden="true" /> {t['kpi.bestTime']}
                   </p>
-                  <p className="text-2xl font-extrabold text-white">{data.bestTime}</p>
+                  <p className="text-2xl font-extrabold text-card-text">{data.bestTime}</p>
                 </div>
 
                 <button
                   onClick={handleRefresh}
                   title={t['a11y.refreshTitle']}
                   aria-label={t['a11y.refresh']}
-                  className="px-4 py-3 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10 text-white/80 hover:text-white hover:bg-white/20 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                  className="px-4 py-3 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10 text-card-text/80 hover:text-card-text hover:bg-white/20 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                 >
                   <FaSyncAlt className="w-5 h-5" aria-hidden="true" />
                 </button>
@@ -180,25 +182,25 @@ export default function SwellPage() {
           {/* KPI Cards */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div
-              className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-2 hover:border-slate-700 transition-colors"
+              className="bg-card/80 border border-card-border rounded-xl p-4 flex flex-col gap-2 hover:border-card-line transition-colors"
               title={fmt(t['a11y.waveHeight'], { value: data.current.waveHeight })}
               aria-label={fmt(t['a11y.waveHeight'], { value: data.current.waveHeight })}
             >
-              <span className="text-xs font-semibold text-slate-400">{t['kpi.waveHeight']}</span>
-              <p className="text-4xl font-extrabold text-white">
-                {data.current.waveHeight} <span className="text-sm font-normal text-slate-400">{t['kpi.meters']}</span>
+              <span className="text-xs font-semibold text-card-muted">{t['kpi.waveHeight']}</span>
+              <p className="text-4xl font-extrabold text-card-text">
+                {data.current.waveHeight} <span className="text-sm font-normal text-card-muted">{t['kpi.meters']}</span>
               </p>
               <p className="text-[11px] text-emerald-400">{fmt(t['kpi.period'], { value: data.current.wavePeriod })}</p>
             </div>
 
             <div
-              className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-2 hover:border-slate-700 transition-colors"
+              className="bg-card/80 border border-card-border rounded-xl p-4 flex flex-col gap-2 hover:border-card-line transition-colors"
               title={fmt(t['a11y.swell'], { value: data.current.swellHeight })}
               aria-label={fmt(t['a11y.swell'], { value: data.current.swellHeight })}
             >
-              <span className="text-xs font-semibold text-slate-400">{t['kpi.swell']}</span>
-              <p className="text-4xl font-extrabold text-white">
-                {data.current.swellHeight} <span className="text-sm font-normal text-slate-400">{t['kpi.meters']}</span>
+              <span className="text-xs font-semibold text-card-muted">{t['kpi.swell']}</span>
+              <p className="text-4xl font-extrabold text-card-text">
+                {data.current.swellHeight} <span className="text-sm font-normal text-card-muted">{t['kpi.meters']}</span>
               </p>
               <p className="text-[11px] text-blue-400">
                 {fmt(t['kpi.periodDir'], { value: data.current.swellPeriod, dir: waveDir(data.current.swellDirection) })}
@@ -206,24 +208,24 @@ export default function SwellPage() {
             </div>
 
             <div
-              className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-2 hover:border-slate-700 transition-colors"
+              className="bg-card/80 border border-card-border rounded-xl p-4 flex flex-col gap-2 hover:border-card-line transition-colors"
               title={fmt(t['a11y.direction'], { value: data.current.waveDirection })}
               aria-label={fmt(t['a11y.direction'], { value: data.current.waveDirection })}
             >
-              <span className="text-xs font-semibold text-slate-400">{t['kpi.direction']}</span>
-              <p className="text-4xl font-extrabold text-white">
-                {data.current.waveDirection}° <span className="text-sm font-normal text-slate-400">{waveDir(data.current.waveDirection)}</span>
+              <span className="text-xs font-semibold text-card-muted">{t['kpi.direction']}</span>
+              <p className="text-4xl font-extrabold text-card-text">
+                {data.current.waveDirection}° <span className="text-sm font-normal text-card-muted">{waveDir(data.current.waveDirection)}</span>
               </p>
-              <p className="text-[11px] text-slate-500">{t['kpi.coastEntry']}</p>
+              <p className="text-[11px] text-card-dim">{t['kpi.coastEntry']}</p>
             </div>
 
             <div
-              className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-2 hover:border-slate-700 transition-colors"
+              className="bg-card/80 border border-card-border rounded-xl p-4 flex flex-col gap-2 hover:border-card-line transition-colors"
               title={fmt(t['a11y.nextTide'], { value: data.nextTide })}
               aria-label={fmt(t['a11y.nextTide'], { value: data.nextTide })}
             >
-              <span className="text-xs font-semibold text-slate-400">{t['kpi.nextTide']}</span>
-              <p className="text-4xl font-extrabold text-white">{data.nextTide}</p>
+              <span className="text-xs font-semibold text-card-muted">{t['kpi.nextTide']}</span>
+              <p className="text-4xl font-extrabold text-card-text">{data.nextTide}</p>
               <p className="text-[11px] text-amber-400">{fmt(t['kpi.coefficient'], { value: data.tideCoefficient })}</p>
             </div>
           </div>
@@ -267,12 +269,12 @@ export default function SwellPage() {
             <div role="tabpanel" id="panel-forecast" aria-labelledby="tab-forecast" className="space-y-6">
               {/* Section navigation */}
               <nav aria-label={t['section.forecastNav']} className="flex flex-wrap gap-2 text-xs">
-                <a href="#condicoes" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.conditions']}</a>
-                <a href="#grafico" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.chart']}</a>
-                <a href="#horas" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.hours']}</a>
-                <a href="#mares" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.tides']}</a>
-                <a href="#resumo" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.aiSummary']}</a>
-                <a href="#dica" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.tip']}</a>
+                <a href="#condicoes" className="px-3 py-1.5 rounded-full bg-card-2/60 border border-card-line/50 text-card-subtle hover:bg-card-line/60 hover:text-card-text transition-colors">{t['nav.conditions']}</a>
+                <a href="#grafico" className="px-3 py-1.5 rounded-full bg-card-2/60 border border-card-line/50 text-card-subtle hover:bg-card-line/60 hover:text-card-text transition-colors">{t['nav.chart']}</a>
+                <a href="#horas" className="px-3 py-1.5 rounded-full bg-card-2/60 border border-card-line/50 text-card-subtle hover:bg-card-line/60 hover:text-card-text transition-colors">{t['nav.hours']}</a>
+                <a href="#mares" className="px-3 py-1.5 rounded-full bg-card-2/60 border border-card-line/50 text-card-subtle hover:bg-card-line/60 hover:text-card-text transition-colors">{t['nav.tides']}</a>
+                <a href="#resumo" className="px-3 py-1.5 rounded-full bg-card-2/60 border border-card-line/50 text-card-subtle hover:bg-card-line/60 hover:text-card-text transition-colors">{t['nav.aiSummary']}</a>
+                <a href="#dica" className="px-3 py-1.5 rounded-full bg-card-2/60 border border-card-line/50 text-card-subtle hover:bg-card-line/60 hover:text-card-text transition-colors">{t['nav.tip']}</a>
               </nav>
 
               <ForecastSection
@@ -348,12 +350,12 @@ export default function SwellPage() {
             <div role="tabpanel" id="panel-wind" aria-labelledby="tab-wind" className="space-y-6">
               {/* Section navigation */}
               <nav aria-label={t['section.windNav']} className="flex flex-wrap gap-2 text-xs">
-                <a href="#wind-condicoes" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.conditions']}</a>
-                <a href="#wind-grafico" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.chart']}</a>
-                <a href="#wind-horas" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.hours']}</a>
-                <a href="#wind-mares" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.tides']}</a>
-                <a href="#wind-resumo" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.aiSummary']}</a>
-                <a href="#wind-dica" className="px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">{t['nav.tip']}</a>
+                <a href="#wind-condicoes" className="px-3 py-1.5 rounded-full bg-card-2/60 border border-card-line/50 text-card-subtle hover:bg-card-line/60 hover:text-card-text transition-colors">{t['nav.conditions']}</a>
+                <a href="#wind-grafico" className="px-3 py-1.5 rounded-full bg-card-2/60 border border-card-line/50 text-card-subtle hover:bg-card-line/60 hover:text-card-text transition-colors">{t['nav.chart']}</a>
+                <a href="#wind-horas" className="px-3 py-1.5 rounded-full bg-card-2/60 border border-card-line/50 text-card-subtle hover:bg-card-line/60 hover:text-card-text transition-colors">{t['nav.hours']}</a>
+                <a href="#wind-mares" className="px-3 py-1.5 rounded-full bg-card-2/60 border border-card-line/50 text-card-subtle hover:bg-card-line/60 hover:text-card-text transition-colors">{t['nav.tides']}</a>
+                <a href="#wind-resumo" className="px-3 py-1.5 rounded-full bg-card-2/60 border border-card-line/50 text-card-subtle hover:bg-card-line/60 hover:text-card-text transition-colors">{t['nav.aiSummary']}</a>
+                <a href="#wind-dica" className="px-3 py-1.5 rounded-full bg-card-2/60 border border-card-line/50 text-card-subtle hover:bg-card-line/60 hover:text-card-text transition-colors">{t['nav.tip']}</a>
               </nav>
 
               <ForecastSection
@@ -365,9 +367,9 @@ export default function SwellPage() {
                 {hourlyLoading ? (
                   <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {[1, 2, 3, 4].map(i => (
-                      <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg animate-pulse">
-                        <div className="h-3 bg-slate-800 rounded w-20 mb-3" />
-                        <div className="h-8 bg-slate-800 rounded w-16" />
+                      <div key={i} className="bg-card border border-card-border rounded-2xl p-5 shadow-lg animate-pulse">
+                        <div className="h-3 bg-card-2 rounded w-20 mb-3" />
+                        <div className="h-8 bg-card-2 rounded w-16" />
                       </div>
                     ))}
                   </div>
@@ -378,7 +380,7 @@ export default function SwellPage() {
                     windGust={hourlyData[0].windGust}
                   />
                 ) : (
-                  <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 text-center text-slate-500">
+                  <div className="bg-card/80 border border-card-border rounded-2xl p-5 text-center text-card-dim">
                     {t['empty.wind']}
                   </div>
                 )}
@@ -391,7 +393,7 @@ export default function SwellPage() {
                 ariaLabel={t['section.windChartAria']}
               >
                 {hourlyLoading ? <SkeletonWaveChart /> : hourlyData && hourlyData.length > 0 ? <WindChart data={hourlyData} /> : (
-                  <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 text-center text-slate-500">
+                  <div className="bg-card/80 border border-card-border rounded-2xl p-5 text-center text-card-dim">
                     {t['empty.windChart']}
                   </div>
                 )}
@@ -404,7 +406,7 @@ export default function SwellPage() {
                 ariaLabel={t['section.windHoursAria']}
               >
                 {hourlyLoading ? <SkeletonHourly /> : hourlyData && hourlyData.length > 0 ? <HourlyWind data={hourlyData} /> : (
-                  <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 text-center text-slate-500">
+                  <div className="bg-card/80 border border-card-border rounded-2xl p-5 text-center text-card-dim">
                     {t['empty.windHours']}
                   </div>
                 )}
@@ -462,8 +464,8 @@ export default function SwellPage() {
             </div>
           )}
 
-          <p className="text-[11px] text-slate-600 text-right">
-            {fmt(t['footer.lastUpdate'], { date: new Date(data.timestamp).toLocaleString('pt-BR') })}
+          <p className="text-[11px] text-card-faint text-right">
+            {fmt(t['footer.lastUpdate'], { date: new Date(data.timestamp).toLocaleString(locale) })}
           </p>
         </>
       )}

@@ -1,5 +1,7 @@
 'use client';
 
+import { meteorologia } from '@/i18n/dictionaries/meteorologia';
+import { useDict, useI18n } from '@/i18n/context';
 import type { MeteorologyResponse } from '@/lib/api';
 
 type Props = {
@@ -20,7 +22,7 @@ const STYLES: Record<string, { label: string; className: string; title: string }
   },
   sample: {
     label: 'Dados de exemplo',
-    className: 'bg-slate-500/15 text-slate-400 border-slate-500/30',
+    className: 'bg-card-line/15 text-card-muted border-card-line/30',
     title: 'Conteúdo sintético determinístico — não representa condições reais',
   },
 };
@@ -30,13 +32,17 @@ const STYLES: Record<string, { label: string; className: string; title: string }
  * distingue previsao fresca, fallback antigo e conteudo sintetico.
  * Sem dados ainda (loading) mostra estado neutro — nunca anuncia frescor antes da resposta.
  */
+
 export function SourceBadge({ data }: Props) {
+  const t = useDict(meteorologia);
+  const { lang } = useI18n();
+  const locale = lang === 'pt' ? 'pt-BR' : 'es-ES';
   if (!data) {
     return (
       <div className="flex flex-wrap items-center justify-end gap-2" aria-live="polite">
         <span
-          className="px-2 py-0.5 rounded-full border bg-slate-500/10 text-slate-400 border-slate-500/30 text-[10px] font-semibold uppercase tracking-wider"
-          title="Aguardando a primeira resposta do backend"
+          className="px-2 py-0.5 rounded-full border bg-card-line/10 text-card-muted border-card-line/30 text-[10px] font-semibold uppercase tracking-wider"
+          title={t['badge.loadingTitle']}
           data-testid="source-badge"
         >
           Carregando…
@@ -51,7 +57,7 @@ export function SourceBadge({ data }: Props) {
 
   const coleta = data.fetchedAt ?? null;
   const hora = coleta
-    ? new Date(coleta).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+    ? new Date(coleta).toLocaleString(locale, { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
     : null;
   const idadeHoras = data.ageHours;
 
@@ -65,13 +71,13 @@ export function SourceBadge({ data }: Props) {
         {style.label}
       </span>
       <span
-        className="px-2 py-0.5 rounded-full border bg-slate-500/10 text-slate-400 border-slate-500/30 text-[10px] font-medium"
+        className="px-2 py-0.5 rounded-full border bg-card-line/10 text-card-muted border-card-line/30 text-[10px] font-medium"
         title={`Natureza do dado: ${kind}${data.meta?.provider ? ` — ${data.meta.provider}` : ''}${data.meta?.model ? ` (${data.meta.model})` : ''}`}
       >
         {kind}
       </span>
       <span
-        className="text-[10px] text-slate-500 tabular-nums"
+        className="text-[10px] text-card-dim tabular-nums"
         title={coleta ? 'Quando o backend coletou este conteúdo da fonte' : 'Sem registro de coleta (cache antigo)'}
       >
         Coleta: {hora ?? '--'}

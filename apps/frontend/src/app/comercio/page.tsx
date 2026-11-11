@@ -51,18 +51,18 @@ export default function ComercioPage() {
       )}
 
       {loading ? (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 animate-pulse">
+        <div className="bg-card border border-card-border rounded-2xl p-6 animate-pulse">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-slate-800" />
-            <div className="h-5 bg-slate-800 rounded w-48" />
+            <div className="w-10 h-10 rounded-lg bg-card-2" />
+            <div className="h-5 bg-card-2 rounded w-48" />
           </div>
-          <div className="h-[500px] bg-slate-800 rounded-xl" />
+          <div className="h-[360px] sm:h-[500px] bg-card-2 rounded-xl" />
         </div>
       ) : (
         <>
           {/* Mapa */}
           <section aria-label={t['map.aria']}>
-            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-bold text-card-text mb-4 flex items-center gap-2">
               <FaStore className="w-5 h-5 text-orange-400" aria-hidden="true" />
               {t['map.title']}
             </h2>

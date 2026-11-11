@@ -1,5 +1,7 @@
 'use client';
 
+import { meteorologia } from '@/i18n/dictionaries/meteorologia';
+import { useDict } from '@/i18n/context';
 import dynamic from 'next/dynamic';
 import type { MeteorologyResponse } from '@/lib/api';
 import { MetricCard } from './MetricCard';
@@ -22,9 +24,10 @@ type PrevisaoTabProps = {
 };
 
 export function PrevisaoTab({ data, loading, onSelectLocation }: PrevisaoTabProps) {
+  const t = useDict(meteorologia);
   if (loading || !data) {
     return (
-      <div className="space-y-6" aria-busy="true" aria-label="Carregando dados meteorológicos">
+      <div className="space-y-6" aria-busy="true" aria-label={t['pre.loadingAria']}>
         <SkeletonMap />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)}
@@ -41,7 +44,7 @@ export function PrevisaoTab({ data, loading, onSelectLocation }: PrevisaoTabProp
     <div className="space-y-6">
       {/* 1. MAPA — primeira seção */}
       <section aria-label={`Mapa meteorológico — ${data.location}`}>
-        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl overflow-hidden">
+        <div className="bg-card/80 border border-card-border rounded-2xl overflow-hidden">
           <WeatherMapDetail data={data} />
         </div>
       </section>
@@ -53,12 +56,12 @@ export function PrevisaoTab({ data, loading, onSelectLocation }: PrevisaoTabProp
       >
         <p className="text-sm text-cyan-300">
           <FaSun className="inline w-4 h-4 mr-1.5" aria-hidden="true" />
-          {weatherDescription(c.weatherCode)} em <strong className="text-white">{data.location}</strong>
+          {weatherDescription(c.weatherCode)} em <strong className="text-card-text">{data.location}</strong>
         </p>
       </div>
 
       {/* 4. Metric Cards — 8 cards */}
-      <section aria-label="Métricas atuais">
+      <section aria-label={t['pre.metricsAria']}>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <MetricCard
             icon={FaTemperatureHigh}
@@ -103,7 +106,7 @@ export function PrevisaoTab({ data, loading, onSelectLocation }: PrevisaoTabProp
             label="Pressão"
             value={Math.round(c.pressure)}
             unit="hPa"
-            color="text-slate-400"
+            color="text-card-muted"
             ariaLabel={`Pressão atmosférica: ${Math.round(c.pressure)} hectopascais`}
           />
           <MetricCard
@@ -111,7 +114,7 @@ export function PrevisaoTab({ data, loading, onSelectLocation }: PrevisaoTabProp
             label="Nuvens"
             value={data.hourly?.[0]?.cloudCover ?? '--'}
             unit="%"
-            color="text-slate-400"
+            color="text-card-muted"
             ariaLabel={`Cobertura de nuvens: ${data.hourly?.[0]?.cloudCover ?? 'indisponível'} por cento`}
           />
           <MetricCard
@@ -119,7 +122,7 @@ export function PrevisaoTab({ data, loading, onSelectLocation }: PrevisaoTabProp
             label="Visibilidade"
             value={data.hourly?.[0]?.visibility ? `${(data.hourly[0].visibility / 1000).toFixed(0)}` : '--'}
             unit="km"
-            color="text-slate-400"
+            color="text-card-muted"
             ariaLabel={`Visibilidade: ${data.hourly?.[0]?.visibility ? `${(data.hourly[0].visibility / 1000).toFixed(0)} quilômetros` : 'indisponível'}`}
           />
           <MetricCard

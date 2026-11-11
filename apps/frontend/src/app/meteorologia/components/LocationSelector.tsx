@@ -1,5 +1,7 @@
 'use client';
 
+import { meteorologia } from '@/i18n/dictionaries/meteorologia';
+import { useDict } from '@/i18n/context';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 
 const LOCATIONS = [
@@ -15,10 +17,11 @@ type LocationSelectorProps = {
 };
 
 export function LocationSelector({ active, onSelect }: LocationSelectorProps) {
+  const t = useDict(meteorologia);
   return (
-    <div role="group" aria-label="Selecionar cidade para ver previsão do tempo">
-      <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-2 font-medium">Selecione a cidade</p>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2" role="radiogroup" aria-label="Cidades disponíveis">
+    <div role="group" aria-label={t['loc.groupAria']}>
+      <p className="text-[10px] text-card-dim uppercase tracking-widest mb-2 font-medium">{t['loc.heading']}</p>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2" role="radiogroup" aria-label={t['loc.radiogroupAria']}>
         {LOCATIONS.map(loc => {
           const isActive = active === loc.id;
           return (
@@ -31,16 +34,16 @@ export function LocationSelector({ active, onSelect }: LocationSelectorProps) {
               title={loc.tip}
               className={`
                 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 w-full
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-ring-offset)]
                 ${isActive
                   ? 'bg-amber-500/20 text-amber-400 border border-amber-400 shadow-lg shadow-amber-500/10'
-                  : 'bg-slate-800/60 text-slate-400 border border-slate-700/50 hover:bg-slate-800 hover:text-slate-200 hover:border-slate-600'
+                  : 'bg-card-2/60 text-card-muted border border-card-line/50 hover:bg-card-2 hover:text-card-text hover:border-card-line'
                 }
               `}
             >
-              <FaMapMarkerAlt className={`w-3 h-3 shrink-0 ${isActive ? 'text-amber-400' : 'text-slate-500'}`} aria-hidden="true" />
+              <FaMapMarkerAlt className={`w-3 h-3 shrink-0 ${isActive ? 'text-amber-400' : 'text-card-dim'}`} aria-hidden="true" />
               <span className="truncate">{loc.name}</span>
-              <span className={`text-[10px] truncate hidden sm:inline ${isActive ? 'text-amber-500/60' : 'text-slate-600'}`}>{loc.region}</span>
+              <span className={`text-[10px] truncate hidden sm:inline ${isActive ? 'text-amber-500/60' : 'text-card-faint'}`}>{loc.region}</span>
             </button>
           );
         })}

@@ -1,6 +1,10 @@
+'use client';
+
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import type { BlogBlock, BlogCalloutTone, BlogPost } from '@/types/blog';
+import { useDict } from '@/i18n/context';
+import { blog as blogDict } from '@/i18n/dictionaries/blog';
 
 /** Rotas reais do app — qualquer match vira `<Link>` (nunca link morto). */
 const ROUTE_SPLIT =
@@ -81,11 +85,11 @@ function Block({ block, index }: { block: BlogBlock; index: number }) {
 
     case 'h2':
       return (
-        <h2 className="pt-4 text-2xl font-extrabold tracking-tight text-white">{block.text}</h2>
+        <h2 className="pt-4 text-2xl font-extrabold tracking-tight text-card-text">{block.text}</h2>
       );
 
     case 'h3':
-      return <h3 className="pt-2 text-lg font-bold text-slate-100">{block.text}</h3>;
+      return <h3 className="pt-2 text-lg font-bold text-card-text">{block.text}</h3>;
 
     case 'ul':
       return (
@@ -142,7 +146,7 @@ function Block({ block, index }: { block: BlogBlock; index: number }) {
       return (
         <blockquote className="border-l-4 border-card-line pl-4 italic text-card-muted">
           {renderInline(block.text, key)}
-          {block.cite && <footer className="mt-1 text-xs not-italic text-slate-500">— {block.cite}</footer>}
+          {block.cite && <footer className="mt-1 text-xs not-italic text-card-dim">— {block.cite}</footer>}
         </blockquote>
       );
 
@@ -157,6 +161,8 @@ type BlogContentProps = {
 
 /** Renderiza o corpo do artigo: blocos tipados → FAQ (PAA) → links de saída. */
 export function BlogContent({ post }: BlogContentProps) {
+  const t = useDict(blogDict);
+
   return (
     <div className="space-y-5">
       {post.content.map((block, i) => (
@@ -165,8 +171,8 @@ export function BlogContent({ post }: BlogContentProps) {
 
       {post.faq && post.faq.length > 0 && (
         <section aria-labelledby="faq-heading" className="space-y-4 pt-4">
-          <h2 id="faq-heading" className="text-2xl font-extrabold text-white">
-            Perguntas da Galera (People Also Ask)
+          <h2 id="faq-heading" className="text-2xl font-extrabold text-card-text">
+            {t['faq.heading']}
           </h2>
           <dl className="space-y-4">
             {post.faq.map((item, i) => (
@@ -174,7 +180,7 @@ export function BlogContent({ post }: BlogContentProps) {
                 key={`faq-${i}`}
                 className="rounded-xl border border-card-border bg-card/60 p-4"
               >
-                <dt className="font-bold text-slate-100">{item.q}</dt>
+                <dt className="font-bold text-card-text">{item.q}</dt>
                 <dd className="mt-2 text-sm leading-relaxed text-card-muted">{item.a}</dd>
               </div>
             ))}
@@ -183,8 +189,8 @@ export function BlogContent({ post }: BlogContentProps) {
       )}
 
       {post.relatedLinks.length > 0 && (
-        <nav aria-label="Continue lendo" className="space-y-3 pt-4">
-          <h2 className="text-xl font-bold text-card-text">Continue lendo no Meteor 2.0</h2>
+        <nav aria-label={t['related.navAria']} className="space-y-3 pt-4">
+          <h2 className="text-xl font-bold text-card-text">{t['related.title']}</h2>
           <ul className="grid gap-3 sm:grid-cols-2">
             {post.relatedLinks.map(link => (
               <li key={link.href}>

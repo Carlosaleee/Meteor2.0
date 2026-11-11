@@ -1,5 +1,7 @@
 'use client';
 
+import { swell } from '@/i18n/dictionaries/swell';
+import { useDict } from '@/i18n/context';
 import { useEffect, useRef, useCallback } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -17,6 +19,7 @@ type SpotsMapProps = {
 const CENTER_ILHA_COMPRIDA: [number, number] = [-24.78, -47.58];
 
 export function SpotsMap({ spots, selectedSpot, userPosition, onSelectSpot, onClearRoute }: SpotsMapProps) {
+  const t = useDict(swell);
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
@@ -78,9 +81,9 @@ export function SpotsMap({ spots, selectedSpot, userPosition, onSelectSpot, onCl
           <div class="text-xs min-w-[200px]">
             <strong class="text-sm">${spot.name}</strong><br/>
             <span style="color:${spot.level === 'beginner' ? '#10b981' : spot.level === 'intermediate' ? '#f59e0b' : '#ef4444'}">${cfg.emoji} ${cfg.label}</span><br/>
-            <span class="text-slate-400">Vento: ${spot.bestWind}</span><br/>
-            <span class="text-slate-400">Exposição: ${spot.exposure}</span><br/>
-            <a href="${spot.googleMapsUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline mt-1 inline-block">Abrir no Google Maps</a>
+            <span class="text-slate-400">${t['spots.wind']} ${spot.bestWind}</span><br/>
+            <span class="text-slate-400">${t['spots.exposure']} ${spot.exposure}</span><br/>
+            <a href="${spot.googleMapsUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline mt-1 inline-block">{t['spots.mapsLink']}</a>
           </div>
         `)
         .addTo(map);
@@ -170,15 +173,15 @@ export function SpotsMap({ spots, selectedSpot, userPosition, onSelectSpot, onCl
     <div className="relative">
       <div
         ref={containerRef}
-        className="w-full rounded-xl overflow-hidden border border-slate-800"
+        className="w-full rounded-xl overflow-hidden border border-card-border"
         style={{ height: '450px' }}
       />
       {selectedSpot && userPosition && (
         <button
           onClick={onClearRoute}
-          className="absolute top-3 right-3 z-[1000] px-3 py-1.5 bg-slate-900/90 border border-slate-700 rounded-lg text-xs text-white hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-          title="Fechar rota e voltar à visão geral"
-          aria-label="Fechar rota"
+          className="absolute top-3 right-3 z-[1000] px-3 py-1.5 bg-card/90 border border-card-line rounded-lg text-xs text-card-text hover:bg-card-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+          title={t['map.closeRouteTitle']}
+          aria-label={t['map.closeRoute']}
         >
           ✕ Fechar rota
         </button>

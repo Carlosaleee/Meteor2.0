@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { FaArrowLeft, FaCalendar, FaClock, FaUser } from 'react-icons/fa';
+import { FaCalendar, FaClock, FaUser } from 'react-icons/fa';
 import { getPostBySlug, publishedPosts } from '@/data/blog-posts';
 import { BlogContent } from '@/components/blog/BlogContent';
+import { BlogArticleNav } from '@/components/blog/BlogArticleNav';
 import { formatBlogDate } from '@/components/blog/BlogCard';
 import { buildArticleJsonLd, buildFaqJsonLd, serializeJsonLd } from '@/lib/blog-jsonld';
 
@@ -72,33 +72,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
       )}
 
       {/* Voltar + breadcrumbs */}
-      <div className="space-y-2">
-        <Link
-          href="/blog"
-          className="inline-flex items-center gap-2 text-sm text-blue-400 transition-colors hover:text-blue-300"
-          title="Voltar para a listagem do blog"
-        >
-          <FaArrowLeft className="h-3.5 w-3.5" aria-hidden />
-          Voltar ao Blog
-        </Link>
-        <nav aria-label="Breadcrumb" className="text-xs text-slate-500">
-          <ol className="flex flex-wrap items-center gap-1">
-            <li>
-              <Link href="/" className="transition-colors hover:text-card-subtle">
-                Meteor
-              </Link>
-            </li>
-            <li aria-hidden>›</li>
-            <li>
-              <Link href="/blog" className="transition-colors hover:text-card-subtle">
-                Blog
-              </Link>
-            </li>
-            <li aria-hidden>›</li>
-            <li className="text-card-muted">{post.category}</li>
-          </ol>
-        </nav>
-      </div>
+      <BlogArticleNav category={post.category} />
 
       {/* Hero: H1 + meta + capa expandida */}
       <header className="space-y-4">
@@ -107,10 +81,10 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
         >
           {post.category}
         </span>
-        <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-white md:text-4xl">
+        <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-card-text md:text-4xl">
           {post.title}
         </h1>
-        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500">
+        <div className="flex flex-wrap items-center gap-4 text-xs text-card-dim">
           <span className="flex items-center gap-1.5">
             <FaUser className="h-3 w-3" aria-hidden />
             {post.author}

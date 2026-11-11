@@ -1,5 +1,7 @@
 'use client';
 
+import { swell } from '@/i18n/dictionaries/swell';
+import { useDict } from '@/i18n/context';
 import { FaWater, FaWind, FaMapMarkerAlt, FaNewspaper } from 'react-icons/fa';
 import type { OceanographyResponse, HourlyMarinePoint, AiSummaryResponse, NewsResponse, NewsItem } from '@/lib/api';
 import { SPOTS, LEVEL_CONFIG } from '@/lib/spots-data';
@@ -47,6 +49,7 @@ export function OverviewTab({
   aiLoading,
   newsLoading,
 }: OverviewTabProps) {
+  const t = useDict(swell);
   const latestNews = pickOverviewNews(newsData?.news);
 
   return (
@@ -54,9 +57,9 @@ export function OverviewTab({
       {/* 1. Resumo IA — full width */}
       <ForecastSection
         id="overview-resumo"
-        title="Resumo do Dia"
+        title={t['ov.resumoTitle']}
         icon={<span aria-hidden="true">🤖</span>}
-        ariaLabel="Resumo inteligente das condições"
+        ariaLabel={t['ov.resumoAria']}
       >
         {aiLoading ? <SkeletonResumoIA /> : <ResumoIA summary={aiData?.summary ?? null} loading={aiLoading} error={null} />}
       </ForecastSection>
@@ -64,9 +67,9 @@ export function OverviewTab({
       {/* 2. Condições de Ondas — full width, 5 cards */}
       <ForecastSection
         id="overview-condicoes"
-        title="Condições de Ondas"
+        title={t['ov.wavesTitle']}
         icon={<FaWater className="w-4 h-4 text-cyan-400" aria-hidden="true" />}
-        ariaLabel="Condições atuais de ondas"
+        ariaLabel={t['section.conditionsAria']}
       >
         <ConditionCards
           waveHeight={data.current.waveHeight}
@@ -81,17 +84,17 @@ export function OverviewTab({
       {/* 3. Condições de Vento — full width, 5 cards */}
       <ForecastSection
         id="overview-vento"
-        title="Condições de Vento"
+        title={t['ov.windTitle']}
         icon={<FaWind className="w-4 h-4 text-blue-400" aria-hidden="true" />}
-        ariaLabel="Condições atuais do vento"
+        ariaLabel={t['section.windConditionsAria']}
       >
         {hourlyLoading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {[1, 2, 3, 4, 5].map(i => (
-              <div key={i} className="flex flex-col items-center gap-2 p-3 rounded-xl bg-slate-800/60 border border-slate-700/50 animate-pulse">
-                <div className="w-8 h-8 rounded-lg bg-slate-700" />
-                <div className="h-5 bg-slate-700 rounded w-12" />
-                <div className="h-3 bg-slate-700 rounded w-16" />
+              <div key={i} className="flex flex-col items-center gap-2 p-3 rounded-xl bg-card-2/60 border border-card-line/50 animate-pulse">
+                <div className="w-8 h-8 rounded-lg bg-card-line" />
+                <div className="h-5 bg-card-line rounded w-12" />
+                <div className="h-3 bg-card-line rounded w-16" />
               </div>
             ))}
           </div>
@@ -102,8 +105,8 @@ export function OverviewTab({
             windGust={hourlyData[0].windGust}
           />
         ) : (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 text-center text-slate-500">
-            Dados de vento indisponíveis
+          <div className="bg-card/80 border border-card-border rounded-2xl p-5 text-center text-card-dim">
+            {t['ov.windEmpty']}
           </div>
         )}
       </ForecastSection>
@@ -111,9 +114,9 @@ export function OverviewTab({
       {/* 4. Próximas Horas — full width */}
       <ForecastSection
         id="overview-horas"
-        title="Próximas Horas — Ondas"
+        title={t['ov.hoursTitle']}
         icon={<span aria-hidden="true">⏱️</span>}
-        ariaLabel="Próximas horas de ondas"
+        ariaLabel={t['section.hoursAria']}
       >
         {hourlyLoading ? <SkeletonHourly /> : hourlyData && <HourlySwell data={hourlyData} />}
       </ForecastSection>
@@ -121,9 +124,9 @@ export function OverviewTab({
       {/* 5. Todos os Points — full width, 2 linhas de 5 */}
       <ForecastSection
         id="overview-points"
-        title="Todos os Points"
+        title={t['ov.spotsTitle']}
         icon={<FaMapMarkerAlt className="w-4 h-4 text-blue-400" aria-hidden="true" />}
-        ariaLabel="Todos os points de surf"
+        ariaLabel={t['ov.spotsAria']}
       >
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
           {SPOTS.map(spot => {
@@ -133,11 +136,11 @@ export function OverviewTab({
                 key={spot.id}
                 className={`p-3 rounded-xl border ${cfg.bg} ${cfg.border} hover:scale-[1.02] transition-transform`}
               >
-                <h4 className="text-sm font-bold text-white truncate">{spot.name}</h4>
+                <h4 className="text-sm font-bold text-card-text truncate">{spot.name}</h4>
                 <span className={`text-[10px] font-medium ${cfg.color}`}>
                   {cfg.emoji} {cfg.label}
                 </span>
-                <p className="text-[10px] text-slate-400 mt-1 truncate">{spot.bestWind}</p>
+                <p className="text-[10px] text-card-muted mt-1 truncate">{spot.bestWind}</p>
               </div>
             );
           })}
@@ -147,9 +150,9 @@ export function OverviewTab({
       {/* 6. Últimas Notícias — full width */}
       <ForecastSection
         id="overview-noticias"
-        title="Últimas Notícias"
+        title={t['ov.newsTitle']}
         icon={<FaNewspaper className="w-4 h-4 text-orange-400" aria-hidden="true" />}
-        ariaLabel="Últimas notícias de surf"
+        ariaLabel={t['ov.newsAria']}
       >
         <SurfNews news={latestNews} loading={newsLoading} title="" />
       </ForecastSection>
@@ -157,9 +160,9 @@ export function OverviewTab({
       {/* 7. Dica do Dia — full width */}
       <ForecastSection
         id="overview-dica"
-        title="Dica do Dia"
+        title={t['ov.tipTitle']}
         icon={<span aria-hidden="true">💡</span>}
-        ariaLabel="Dica do dia para surf"
+        ariaLabel={t['ov.tipAria']}
       >
         <DailyTip
           waveHeight={data.current.waveHeight}

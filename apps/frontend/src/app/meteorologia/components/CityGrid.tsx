@@ -1,5 +1,7 @@
 'use client';
 
+import { meteorologia } from '@/i18n/dictionaries/meteorologia';
+import { useDict, useI18n } from '@/i18n/context';
 import { FaNewspaper, FaMapMarkerAlt, FaCalendarAlt, FaExternalLinkAlt, FaSpinner } from 'react-icons/fa';
 import { useWeatherNews, type WeatherNewsItem } from '@/hooks/useWeatherNews';
 
@@ -13,7 +15,7 @@ const CITY_META: Record<string, { name: string; region: string; state: string }>
 const TYPE_STYLES: Record<string, { bg: string; text: string; dot: string }> = {
   alerta: { bg: 'bg-amber-500/10', text: 'text-amber-400', dot: 'bg-amber-400' },
   informe: { bg: 'bg-cyan-500/10', text: 'text-cyan-400', dot: 'bg-cyan-400' },
-  boletim: { bg: 'bg-slate-500/10', text: 'text-slate-400', dot: 'bg-slate-400' },
+  boletim: { bg: 'bg-card-line/10', text: 'text-card-muted', dot: 'bg-card-muted' },
 };
 
 const FALLBACK_NEWS: Record<string, Array<{ title: string; source: string; type: 'alerta' | 'informe' | 'boletim'; url: string }>> = {
@@ -44,10 +46,10 @@ function groupNewsByCity(news: WeatherNewsItem[]): Record<string, WeatherNewsIte
   return grouped;
 }
 
-function formatDate(iso: string): string {
+function formatDate(iso: string, locale = 'pt-BR'): string {
   try {
     const d = new Date(iso);
-    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    return d.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' });
   } catch {
     return iso;
   }
@@ -58,16 +60,19 @@ type CityGridProps = {
 };
 
 export function CityGrid({ onSelectLocation }: CityGridProps) {
+  const t = useDict(meteorologia);
+  const { lang } = useI18n();
+  const locale = lang === 'pt' ? 'pt-BR' : 'es-ES';
   const { data, loading } = useWeatherNews();
   const apiNews = data?.news ?? [];
   const groupedApi = groupNewsByCity(apiNews);
 
   return (
-    <section className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5" aria-label="Notícias meteorológicas por cidade">
+    <section className="bg-card/80 border border-card-border rounded-2xl p-5" aria-label={t['news.aria']}>
       <div className="flex items-center gap-2 mb-4">
         <FaNewspaper className="w-4 h-4 text-cyan-400" aria-hidden="true" />
-        <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">Notícias Meteorológicas</h3>
-        {loading && <FaSpinner className="w-3 h-3 text-cyan-400 animate-spin ml-auto" aria-label="Carregando" />}
+        <h3 className="text-sm font-semibold text-card-subtle uppercase tracking-wider">{t['news.title']}</h3>
+        {loading && <FaSpinner className="w-3 h-3 text-cyan-400 animate-spin ml-auto" aria-label={t['news.loading']} />}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" role="list">
         {Object.entries(CITY_META).map(([cityId, meta]) => {
@@ -80,13 +85,13 @@ export function CityGrid({ onSelectLocation }: CityGridProps) {
               key={cityId}
               role="listitem"
               title={`Notícias meteorológicas de ${meta.name} — ${meta.region}`}
-              className="group bg-slate-800/60 border border-slate-700/50 rounded-xl p-4 hover:border-cyan-500/30 hover:bg-slate-800/80 transition-all"
+              className="group bg-card-2/60 border border-card-line/50 rounded-xl p-4 hover:border-cyan-500/30 hover:bg-card-2/80 transition-all"
             >
               <div className="flex items-center gap-2 mb-3">
                 <FaMapMarkerAlt className="w-3.5 h-3.5 text-cyan-400 shrink-0" aria-hidden="true" />
                 <div className="min-w-0">
-                  <h4 className="text-sm font-bold text-white truncate">{meta.name}</h4>
-                  <p className="text-[10px] text-slate-500">{meta.region} · {meta.state}</p>
+                  <h4 className="text-sm font-bold text-card-text truncate">{meta.name}</h4>
+                  <p className="text-[10px] text-card-dim">{meta.region} · {meta.state}</p>
                 </div>
               </div>
 
@@ -101,19 +106,19 @@ export function CityGrid({ onSelectLocation }: CityGridProps) {
                           target="_blank"
                           rel="noopener noreferrer"
                           title={`${item.title} — Clique para ler na fonte oficial (${item.source})`}
-                          className={`block rounded-lg p-2.5 ${style.bg} border border-transparent hover:border-slate-700/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400`}
-                          aria-label={`${item.title} — ${item.source}, ${formatDate(item.publishedAt)}`}
+                          className={`block rounded-lg p-2.5 ${style.bg} border border-transparent hover:border-card-line/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400`}
+                          aria-label={`${item.title} — ${item.source}, ${formatDate(item.publishedAt, locale)}`}
                         >
                           <div className="flex items-start gap-2">
                             <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${style.dot}`} aria-hidden="true" />
                             <div className="min-w-0 flex-1">
-                              <p className="text-xs text-slate-200 leading-snug line-clamp-2">{item.title}</p>
+                              <p className="text-xs text-card-text leading-snug line-clamp-2">{item.title}</p>
                               <div className="flex items-center gap-1.5 mt-1">
-                                <FaCalendarAlt className="w-2.5 h-2.5 text-slate-500" aria-hidden="true" />
-                                <span className="text-[10px] text-slate-500">{formatDate(item.publishedAt)}</span>
-                                <span className="text-[10px] text-slate-600">·</span>
+                                <FaCalendarAlt className="w-2.5 h-2.5 text-card-dim" aria-hidden="true" />
+                                <span className="text-[10px] text-card-dim">{formatDate(item.publishedAt, locale)}</span>
+                                <span className="text-[10px] text-card-faint">·</span>
                                 <span className={`text-[10px] font-medium ${style.text}`}>{item.source}</span>
-                                <FaExternalLinkAlt className="w-2 h-2 text-slate-600 ml-auto" aria-hidden="true" />
+                                <FaExternalLinkAlt className="w-2 h-2 text-card-faint ml-auto" aria-hidden="true" />
                               </div>
                             </div>
                           </div>
@@ -129,16 +134,16 @@ export function CityGrid({ onSelectLocation }: CityGridProps) {
                           target="_blank"
                           rel="noopener noreferrer"
                           title={`${item.title} — Clique para ler na fonte oficial (${item.source})`}
-                          className={`block rounded-lg p-2.5 ${style.bg} border border-transparent hover:border-slate-700/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400`}
+                          className={`block rounded-lg p-2.5 ${style.bg} border border-transparent hover:border-card-line/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400`}
                           aria-label={`${item.title} — ${item.source}`}
                         >
                           <div className="flex items-start gap-2">
                             <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${style.dot}`} aria-hidden="true" />
                             <div className="min-w-0 flex-1">
-                              <p className="text-xs text-slate-200 leading-snug line-clamp-2">{item.title}</p>
+                              <p className="text-xs text-card-text leading-snug line-clamp-2">{item.title}</p>
                               <div className="flex items-center gap-1.5 mt-1">
                                 <span className={`text-[10px] font-medium ${style.text}`}>{item.source}</span>
-                                <FaExternalLinkAlt className="w-2 h-2 text-slate-600 ml-auto" aria-hidden="true" />
+                                <FaExternalLinkAlt className="w-2 h-2 text-card-faint ml-auto" aria-hidden="true" />
                               </div>
                             </div>
                           </div>

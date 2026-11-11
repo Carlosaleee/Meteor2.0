@@ -1,5 +1,8 @@
 /** Tipo interno (uso apenas neste arquivo — sem imports externos). */
 type WindQuality = {
+  /** Chave do dicionário `swell` para tradução do rótulo. */
+  labelKey: string;
+  /** Rótulo cru em PT, usado como fallback. */
   label: string;
   color: string;
   bgClass: string;
@@ -7,12 +10,12 @@ type WindQuality = {
 };
 
 export function windQuality(speed: number): WindQuality {
-  if (speed < 6) return { label: 'Calmo', color: '#94a3b8', bgClass: 'bg-slate-500/20', textClass: 'text-slate-400' };
-  if (speed < 12) return { label: 'Leve', color: '#06b6d4', bgClass: 'bg-cyan-500/20', textClass: 'text-cyan-400' };
-  if (speed < 20) return { label: 'Moderado', color: '#10b981', bgClass: 'bg-emerald-500/20', textClass: 'text-emerald-400' };
-  if (speed < 30) return { label: 'Forte', color: '#f59e0b', bgClass: 'bg-amber-500/20', textClass: 'text-amber-400' };
-  if (speed < 40) return { label: 'Muito Forte', color: '#f97316', bgClass: 'bg-orange-500/20', textClass: 'text-orange-400' };
-  return { label: 'Tempestuoso', color: '#ef4444', bgClass: 'bg-red-500/20', textClass: 'text-red-400' };
+  if (speed < 6) return { labelKey: 'windq.calmo', label: 'Calmo', color: '#94a3b8', bgClass: 'bg-card-line/20', textClass: 'text-card-muted' };
+  if (speed < 12) return { labelKey: 'windq.leve', label: 'Leve', color: '#06b6d4', bgClass: 'bg-cyan-500/20', textClass: 'text-cyan-400' };
+  if (speed < 20) return { labelKey: 'windq.moderado', label: 'Moderado', color: '#10b981', bgClass: 'bg-emerald-500/20', textClass: 'text-emerald-400' };
+  if (speed < 30) return { labelKey: 'windq.forte', label: 'Forte', color: '#f59e0b', bgClass: 'bg-amber-500/20', textClass: 'text-amber-400' };
+  if (speed < 40) return { labelKey: 'windq.muitoForte', label: 'Muito Forte', color: '#f97316', bgClass: 'bg-orange-500/20', textClass: 'text-orange-400' };
+  return { labelKey: 'windq.tempestuoso', label: 'Tempestuoso', color: '#ef4444', bgClass: 'bg-red-500/20', textClass: 'text-red-400' };
 }
 
 export function beaufortScale(speed: number): number {
@@ -50,10 +53,10 @@ export function surfWindQuality(windSpeed: number, windDirection: number, exposu
   const isOffshore = isOffshoreWind(windDirection, exposure);
   const isOnshore = isOnshoreWind(windDirection, exposure);
 
-  if (windSpeed < 6) return { label: 'Sem vento', color: '#94a3b8', bgClass: 'bg-slate-500/20', textClass: 'text-slate-400' };
-  if (isOffshore) return { label: 'Offshore ✓', color: '#10b981', bgClass: 'bg-emerald-500/20', textClass: 'text-emerald-400' };
-  if (isOnshore) return { label: 'Onshore ✗', color: '#ef4444', bgClass: 'bg-red-500/20', textClass: 'text-red-400' };
-  return { label: 'Cross-shore', color: '#f59e0b', bgClass: 'bg-amber-500/20', textClass: 'text-amber-400' };
+  if (windSpeed < 6) return { labelKey: 'windq.semVento', label: 'Sem vento', color: '#94a3b8', bgClass: 'bg-card-line/20', textClass: 'text-card-muted' };
+  if (isOffshore) return { labelKey: 'windq.offshore', label: 'Offshore ✓', color: '#10b981', bgClass: 'bg-emerald-500/20', textClass: 'text-emerald-400' };
+  if (isOnshore) return { labelKey: 'windq.onshore', label: 'Onshore ✗', color: '#ef4444', bgClass: 'bg-red-500/20', textClass: 'text-red-400' };
+  return { labelKey: 'windq.cross', label: 'Cross-shore', color: '#f59e0b', bgClass: 'bg-amber-500/20', textClass: 'text-amber-400' };
 }
 
 function isOffshoreWind(windDirection: number, exposure: string): boolean {
@@ -100,9 +103,9 @@ function isOnshoreWind(windDirection: number, exposure: string): boolean {
 }
 
 export function kitesurfWindQuality(speed: number): WindQuality {
-  if (speed < 12) return { label: 'Insuficiente', color: '#94a3b8', bgClass: 'bg-slate-500/20', textClass: 'text-slate-400' };
-  if (speed < 18) return { label: 'Bom (leve)', color: '#06b6d4', bgClass: 'bg-cyan-500/20', textClass: 'text-cyan-400' };
-  if (speed < 25) return { label: 'Ótimo', color: '#10b981', bgClass: 'bg-emerald-500/20', textClass: 'text-emerald-400' };
-  if (speed < 35) return { label: 'Excelente', color: '#f59e0b', bgClass: 'bg-amber-500/20', textClass: 'text-amber-400' };
-  return { label: 'Perigoso', color: '#ef4444', bgClass: 'bg-red-500/20', textClass: 'text-red-400' };
+  if (speed < 12) return { labelKey: 'windq.insuficiente', label: 'Insuficiente', color: '#94a3b8', bgClass: 'bg-card-line/20', textClass: 'text-card-muted' };
+  if (speed < 18) return { labelKey: 'windq.bomLeve', label: 'Bom (leve)', color: '#06b6d4', bgClass: 'bg-cyan-500/20', textClass: 'text-cyan-400' };
+  if (speed < 25) return { labelKey: 'windq.otimo', label: 'Ótimo', color: '#10b981', bgClass: 'bg-emerald-500/20', textClass: 'text-emerald-400' };
+  if (speed < 35) return { labelKey: 'windq.excelente', label: 'Excelente', color: '#f59e0b', bgClass: 'bg-amber-500/20', textClass: 'text-amber-400' };
+  return { labelKey: 'windq.perigoso', label: 'Perigoso', color: '#ef4444', bgClass: 'bg-red-500/20', textClass: 'text-red-400' };
 }
