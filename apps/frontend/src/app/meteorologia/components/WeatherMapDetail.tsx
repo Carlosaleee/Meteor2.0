@@ -5,6 +5,8 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { MeteorologyResponse } from '@/lib/api';
 import { weatherDescription, windDirection } from './weather-utils';
+import { useDict } from '@/i18n/context';
+import { meteorologia } from '@/i18n/dictionaries/meteorologia';
 
 type WeatherMapDetailProps = {
   data: MeteorologyResponse;
@@ -31,6 +33,7 @@ function createStationIcon(isActive: boolean): L.DivIcon {
 }
 
 export function WeatherMapDetail({ data }: WeatherMapDetailProps) {
+  const t = useDict(meteorologia);
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
 
@@ -82,7 +85,7 @@ export function WeatherMapDetail({ data }: WeatherMapDetailProps) {
             💧 ${data.current.humidity}%<br>
             💨 ${Math.round(data.current.windSpeed)}km/h ${windDirection(data.current.windDirection)}<br>
             ☁️ ${weatherDescription(data.current.weatherCode)}<br><br>
-            <a href="https://www.cptec.inpe.br/" target="_blank" style="color:#0ea5e9;font-size:11px;">Previsão completa no CPTEC →</a>
+            <a href="https://www.cptec.inpe.br/" target="_blank" style="color:#0ea5e9;font-size:11px;">{t['map.fullForecast']}</a>
           </div>`
         : `<div style="font-size:12px;font-family:system-ui;">
             <strong>${city.name}</strong><br>
@@ -117,8 +120,8 @@ export function WeatherMapDetail({ data }: WeatherMapDetailProps) {
         role="img"
         aria-label={`Mapa meteorológico com radar de chuva e estações em Ilha Comprida, Iguape, Cananéia e Registro. Dados atuais de ${data.location}: ${Math.round(data.current.temperature)} graus Celsius.`}
       />
-      <div className="absolute bottom-2 right-2 z-[1000] bg-slate-900/90 border border-slate-700 rounded-lg px-3 py-1.5 text-[10px] text-slate-400 backdrop-blur-sm">
-        <span className="text-cyan-400 font-medium">Radar:</span> RainViewer · <span className="text-slate-500">Dados em tempo real</span>
+      <div className="absolute bottom-2 right-2 z-[1000] bg-card/90 border border-card-line rounded-lg px-3 py-1.5 text-[10px] text-card-muted backdrop-blur-sm">
+        <span className="text-cyan-400 font-medium">{t['map.radar']}</span> RainViewer · <span className="text-card-dim">{t['map.realtime']}</span>
       </div>
     </div>
   );

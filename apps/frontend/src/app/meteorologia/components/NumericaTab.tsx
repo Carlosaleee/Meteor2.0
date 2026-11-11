@@ -1,5 +1,7 @@
 'use client';
 
+import { meteorologia } from '@/i18n/dictionaries/meteorologia';
+import { useDict, useI18n } from '@/i18n/context';
 import { useState, useEffect, useRef } from 'react';
 import { FaChartLine, FaLayerGroup, FaCalendarDay, FaCloudRain } from 'react-icons/fa';
 import L from 'leaflet';
@@ -26,6 +28,9 @@ const COORDS: Record<string, { lat: number; lon: number; name: string }> = {
 };
 
 export function NumericaTab() {
+  const t = useDict(meteorologia);
+  const { lang } = useI18n();
+  const locale = lang === 'pt' ? 'pt-BR' : 'es-ES';
   const [selectedModel, setSelectedModel] = useState('gfs');
   const [selectedLayer, setSelectedLayer] = useState('precipitation');
   const containerRef = useRef<HTMLDivElement>(null);
@@ -97,8 +102,8 @@ export function NumericaTab() {
         <div className="flex items-start gap-3">
           <FaChartLine className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" aria-hidden="true" />
           <div>
-            <h3 className="text-sm font-semibold text-white mb-1">Previsão Numérica</h3>
-            <p className="text-xs text-slate-400">
+            <h3 className="text-sm font-semibold text-card-text mb-1">{t['tab.numerica']}</h3>
+            <p className="text-xs text-card-muted">
               Modelos de previsão atmosférica: GFS, ECMWF e COSMO-Brasil. Dados gerados por centros numéricos internacionais.
             </p>
           </div>
@@ -106,7 +111,7 @@ export function NumericaTab() {
       </div>
 
       {/* Model selector */}
-      <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Modelo de previsão numérica">
+      <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={t['num.modelAria']}>
         {MODELS.map(model => (
           <button
             key={model.id}
@@ -120,7 +125,7 @@ export function NumericaTab() {
               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400
               ${selectedModel === model.id
                 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-400'
-                : 'bg-slate-800/60 text-slate-400 border border-transparent hover:bg-slate-800'
+                : 'bg-card-2/60 text-card-muted border border-transparent hover:bg-card-2'
               }
             `}
           >
@@ -131,7 +136,7 @@ export function NumericaTab() {
       </div>
 
       {/* Layer selector */}
-      <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Camada de dados numéricos">
+      <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={t['num.layerAria']}>
         {LAYERS.map(layer => (
           <button
             key={layer.id}
@@ -143,8 +148,8 @@ export function NumericaTab() {
               flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all
               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400
               ${selectedLayer === layer.id
-                ? 'bg-slate-700 text-white border border-slate-600'
-                : 'bg-slate-800/40 text-slate-500 border border-transparent hover:text-slate-300'
+                ? 'bg-card-line text-card-text border border-card-line'
+                : 'bg-card-2/40 text-card-dim border border-transparent hover:text-card-subtle'
               }
             `}
           >
@@ -155,7 +160,7 @@ export function NumericaTab() {
       </div>
 
       {/* Map */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl overflow-hidden">
+      <div className="bg-card/80 border border-card-border rounded-2xl overflow-hidden">
         <div
           ref={containerRef}
           className="w-full"
@@ -170,40 +175,40 @@ export function NumericaTab() {
         {MODELS.map(model => (
           <div
             key={model.id}
-            className={`bg-slate-900/80 border rounded-2xl p-4 transition-colors ${
-              selectedModel === model.id ? 'border-emerald-500/30' : 'border-slate-800'
+            className={`bg-card/80 border rounded-2xl p-4 transition-colors ${
+              selectedModel === model.id ? 'border-emerald-500/30' : 'border-card-border'
             }`}
             aria-label={`${model.name}: resolução ${model.resolution}, fonte ${model.source}`}
           >
-            <h4 className="text-sm font-semibold text-white mb-2">{model.name}</h4>
-            <div className="space-y-1 text-[10px] text-slate-400">
-              <p>Resolução: <span className="text-slate-300">{model.resolution}</span></p>
-              <p>Fonte: <span className="text-slate-300">{model.source}</span></p>
-              <p>Atualização: <span className="text-slate-300">{model.updated}</span></p>
+            <h4 className="text-sm font-semibold text-card-text mb-2">{model.name}</h4>
+            <div className="space-y-1 text-[10px] text-card-muted">
+              <p>Resolução: <span className="text-card-subtle">{model.resolution}</span></p>
+              <p>{t['avisos.data']} <span className="text-card-subtle">{model.source}</span></p>
+              <p>Atualização: <span className="text-card-subtle">{model.updated}</span></p>
             </div>
           </div>
         ))}
       </div>
 
       {/* Forecast table */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5" aria-label="Previsão por modelo para os próximos 3 dias">
+      <div className="bg-card/80 border border-card-border rounded-2xl p-5" aria-label={t['num.forecastAria']}>
         <div className="flex items-center gap-2 mb-4">
           <FaCalendarDay className="w-4 h-4 text-emerald-400" aria-hidden="true" />
-          <h4 className="text-sm font-semibold text-slate-300">Previsão por Modelo — Próximos 3 Dias</h4>
+          <h4 className="text-sm font-semibold text-card-subtle">{t['num.forecastTitle']}</h4>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-xs" role="table">
             <thead>
-              <tr className="text-left text-slate-500 border-b border-slate-800">
+              <tr className="text-left text-card-dim border-b border-card-border">
                 <th scope="col" className="pb-2 pr-4">Modelo</th>
                 <th scope="col" className="pb-2 pr-4">Dia</th>
                 <th scope="col" className="pb-2 pr-4">Máx</th>
                 <th scope="col" className="pb-2 pr-4">Mín</th>
                 <th scope="col" className="pb-2 pr-4">Chuva</th>
-                <th scope="col" className="pb-2">Vento</th>
+                <th scope="col" className="pb-2">{t['metric.wind']}</th>
               </tr>
             </thead>
-            <tbody className="text-slate-300">
+            <tbody className="text-card-subtle">
               {MODELS.map(model =>
                 [0, 1, 2].map(dayOffset => {
                   const date = new Date();
@@ -213,13 +218,13 @@ export function NumericaTab() {
                   const rain = (Math.random() * 30).toFixed(1);
                   const wind = (5 + Math.random() * 20).toFixed(0);
                   return (
-                    <tr key={`${model.id}-${dayOffset}`} className="border-b border-slate-800/50 hover:bg-slate-800/30">
-                      <td className="py-2 pr-4 font-medium text-white">{model.name}</td>
-                      <td className="py-2 pr-4">{date.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' })}</td>
+                    <tr key={`${model.id}-${dayOffset}`} className="border-b border-card-border/50 hover:bg-card-2/30">
+                      <td className="py-2 pr-4 font-medium text-card-text">{model.name}</td>
+                      <td className="py-2 pr-4">{date.toLocaleDateString(locale, { weekday: 'short', day: '2-digit', month: '2-digit' })}</td>
                       <td className="py-2 pr-4 text-orange-400">{maxTemp}°</td>
                       <td className="py-2 pr-4 text-blue-400">{minTemp}°</td>
                       <td className="py-2 pr-4 text-cyan-400">{rain}mm</td>
-                      <td className="py-2 text-slate-400">{wind}km/h</td>
+                      <td className="py-2 text-card-muted">{wind}km/h</td>
                     </tr>
                   );
                 })

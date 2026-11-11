@@ -1,5 +1,7 @@
 'use client';
 
+import { meteorologia } from '@/i18n/dictionaries/meteorologia';
+import { useDict } from '@/i18n/context';
 import { useState } from 'react';
 import { FaExclamationTriangle, FaCloudSun, FaSatellite, FaChartLine } from 'react-icons/fa';
 
@@ -15,6 +17,7 @@ type MeteorologyTabsProps = {
 };
 
 export function MeteorologyTabs({ children }: MeteorologyTabsProps) {
+  const t = useDict(meteorologia);
   const [activeTab, setActiveTab] = useState('previsao');
 
   return (
@@ -23,7 +26,7 @@ export function MeteorologyTabs({ children }: MeteorologyTabsProps) {
       <div
         className="grid grid-cols-2 lg:grid-cols-4 gap-2"
         role="tablist"
-        aria-label="Seções de Previsão do Tempo"
+        aria-label={t['tabs.aria']}
       >
         {TABS.map(tab => {
           const Icon = tab.icon;
@@ -42,14 +45,14 @@ export function MeteorologyTabs({ children }: MeteorologyTabsProps) {
               title={tab.tip}
               className={`
                 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 w-full
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-ring-offset)]
                 ${isActive
                   ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-400 shadow-lg shadow-cyan-500/10'
-                  : 'bg-slate-800/60 text-slate-400 border border-slate-700/50 hover:bg-slate-800 hover:text-slate-200 hover:border-slate-600'
+                  : 'bg-card-2/60 text-card-muted border border-card-line/50 hover:bg-card-2 hover:text-card-text hover:border-card-line'
                 }
               `}
             >
-              <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-cyan-400' : 'text-slate-500'}`} aria-hidden="true" />
+              <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-cyan-400' : 'text-card-dim'}`} aria-hidden="true" />
               <span className="truncate">{tab.label}</span>
             </button>
           );

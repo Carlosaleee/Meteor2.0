@@ -2,6 +2,10 @@
 
 import dynamic from 'next/dynamic';
 import type { HourlyMarinePoint } from '@/lib/api';
+import { useThemeMode } from '@/hooks/useThemeMode';
+import { useDict } from '@/i18n/context';
+import { swell } from '@/i18n/dictionaries/swell';
+import { fmt } from '@/i18n/format';
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
@@ -10,6 +14,13 @@ type TideChartProps = {
 };
 
 export function TideChart({ data }: TideChartProps) {
+  const mode = useThemeMode();
+  const t = useDict(swell);
+  const isLight = mode === 'light';
+  const labelColor = isLight ? '#475569' : '#94a3b8';
+  const titleColor = isLight ? '#475569' : '#64748b';
+  const gridColor = isLight ? '#e2e8f0' : '#1e293b';
+  const annotationBg = isLight ? '#ffffff' : '#1e293b';
   const categories = data.map(d => {
     const h = new Date(d.time).getHours();
     return `${String(h).padStart(2, '0')}:00`;
@@ -55,13 +66,13 @@ export function TideChart({ data }: TideChartProps) {
     },
     xaxis: {
       categories,
-      labels: { style: { colors: '#94a3b8', fontSize: '10px' }, rotate: -45, rotateAlways: false },
+      labels: { style: { colors: labelColor, fontSize: '10px' }, rotate: -45, rotateAlways: false },
       axisBorder: { show: false },
       axisTicks: { show: false },
     },
     yaxis: {
-      title: { text: 'Altura do Mar (m)', style: { color: '#64748b', fontSize: '10px' } },
-      labels: { style: { colors: '#94a3b8', fontSize: '10px' }, formatter: v => `${v}m` },
+      title: { text: t['tide.yAxis'], style: { color: titleColor, fontSize: '10px' } },
+      labels: { style: { colors: labelColor, fontSize: '10px' }, formatter: v => `${v}m` },
       min: Math.max(0, minH - 0.3),
       max: maxH + 0.3,
     },
@@ -71,32 +82,32 @@ export function TideChart({ data }: TideChartProps) {
           y: maxH,
           borderColor: '#f59e0b',
           strokeDashArray: 4,
-          label: { text: `Alta ${maxH}m`, style: { color: '#f59e0b', background: '#1e293b', fontSize: '10px' } },
+          label: { text: fmt(t['tide.annHigh'], { value: maxH }), style: { color: '#f59e0b', background: annotationBg, fontSize: '10px' } },
         },
         {
           y: minH,
           borderColor: '#3b82f6',
           strokeDashArray: 4,
-          label: { text: `Baixa ${minH}m`, style: { color: '#3b82f6', background: '#1e293b', fontSize: '10px' } },
+          label: { text: fmt(t['tide.annLow'], { value: minH }), style: { color: '#3b82f6', background: annotationBg, fontSize: '10px' } },
         },
       ],
     },
     tooltip: {
-      theme: 'dark',
+      theme: mode,
       custom: ({ seriesIndex, dataPointIndex, w }) => {
         const h = w.globals.series[seriesIndex][dataPointIndex];
-        const tp = tidePoints.find(t => t.index === dataPointIndex);
-        const tipo = tp ? (tp.type === 'Alta' ? '🌊 Maré Alta' : '🏖️ Maré Baixa') : '🌊';
+        const tp = tidePoints.find(tp => tp.index === dataPointIndex);
+        const tipo = tp ? (tp.type === 'Alta' ? t['tide.tipHigh'] : t['tide.tipLow']) : '🌊';
         const bg = tp ? (tp.type === 'Alta' ? '#f59e0b' : '#3b82f6') : '#10b981';
-        return `<div class="bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-xs space-y-1">
-          <div class="text-slate-300 font-medium">${categories[dataPointIndex]}</div>
+        return `<div class="bg-card border border-card-line rounded-lg px-4 py-3 text-xs space-y-1">
+          <div class="text-card-subtle font-medium">${categories[dataPointIndex]}</div>
           <div class="font-bold" style="color:${bg}">${tipo}: ${h}m</div>
-          <div class="text-slate-400">Altura do mar: ${h} metros</div>
+          <div class="text-card-muted">${fmt(t['tide.tipHeight'], { value: h })}</div>
         </div>`;
       },
     },
     grid: {
-      borderColor: '#1e293b',
+      borderColor: gridColor,
       strokeDashArray: 4,
       padding: { left: 10, right: 10 },
     },
@@ -111,41 +122,41 @@ export function TideChart({ data }: TideChartProps) {
   };
 
   return (
-    <section className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5" aria-label="Gráfico de marés">
-      <h3 className="text-sm font-semibold text-slate-300 mb-2 uppercase tracking-wider">Tabla de Maré</h3>
-      <p className="text-[10px] text-slate-500 mb-3">
-        Maré alta = melhor para surfistas experientes · Maré baixa = melhor para iniciantes e praia exposta
+    <section className="bg-card/80 border border-card-border rounded-2xl p-5" aria-label={t['tide.sectionAria']}>
+      <h3 className="text-sm font-semibold text-card-subtle mb-2 uppercase tracking-wider">{t['tide.heading']}</h3>
+      <p className="text-[10px] text-card-dim mb-3">
+        {t['tide.legend']}
       </p>
       <div className="w-full" style={{ height: '320px' }}>
-        <Chart options={options} series={[{ name: 'Maré', data: heights }]} type="line" height="100%" width="100%" />
+        <Chart options={options} series={[{ name: t['tide.series'], data: heights }]} type="line" height="100%" width="100%" />
       </div>
-      <div className="flex gap-4 mt-3 text-xs text-slate-400">
+      <div className="flex gap-4 mt-3 text-xs text-card-muted">
         <span className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-amber-500" aria-hidden="true" /> Maré Alta
+          <span className="w-2 h-2 rounded-full bg-amber-500" aria-hidden="true" /> {t['tide.high']}
         </span>
         <span className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-blue-500" aria-hidden="true" /> Maré Baixa
+          <span className="w-2 h-2 rounded-full bg-blue-500" aria-hidden="true" /> {t['tide.low']}
         </span>
       </div>
 
       {/* Tabela de próximas marés */}
       {tidePoints.length > 0 && (
         <div className="mt-4">
-          <h4 className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Próximas Marés</h4>
+          <h4 className="text-[10px] font-semibold text-card-muted uppercase tracking-wider mb-2">{t['tide.upcoming']}</h4>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {tidePoints.slice(0, 4).map((tp, i) => (
               <div
                 key={i}
                 className={`p-2.5 rounded-lg border text-center ${tp.type === 'Alta' ? 'bg-amber-500/10 border-amber-500/30' : 'bg-blue-500/10 border-blue-500/30'}`}
-                title={`${tp.type} às ${categories[tp.index]}: ${tp.height}m`}
-                aria-label={`Maré ${tp.type.toLowerCase()} às ${categories[tp.index]}: ${tp.height} metros`}
+                title={fmt(t['tide.cardTitle'], { type: tp.type === 'Alta' ? t['tide.typeAlta'] : t['tide.typeBaixa'], time: categories[tp.index], height: tp.height })}
+                aria-label={fmt(t['tide.cardAria'], { type: tp.type === 'Alta' ? t['tide.typeAlta'] : t['tide.typeBaixa'], time: categories[tp.index], height: tp.height })}
               >
                 <span className="text-lg" aria-hidden="true">{tp.type === 'Alta' ? '🌊' : '🏖️'}</span>
                 <p className={`text-xs font-bold ${tp.type === 'Alta' ? 'text-amber-400' : 'text-blue-400'}`}>
-                  {tp.type}
+                  {tp.type === 'Alta' ? t['tide.typeAlta'] : t['tide.typeBaixa']}
                 </p>
-                <p className="text-[10px] text-slate-400">{categories[tp.index]}</p>
-                <p className="text-xs text-white font-medium">{tp.height}m</p>
+                <p className="text-[10px] text-card-muted">{categories[tp.index]}</p>
+                <p className="text-xs text-card-text font-medium">{tp.height}m</p>
               </div>
             ))}
           </div>

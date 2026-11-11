@@ -1,5 +1,7 @@
 'use client';
 
+import { swell } from '@/i18n/dictionaries/swell';
+import { useDict, useI18n } from '@/i18n/context';
 import { FaGlobeAmericas, FaVenus, FaMars } from 'react-icons/fa';
 import type { WslRankingEntry } from '@/lib/api';
 
@@ -41,9 +43,11 @@ function RankingTable({ entries, title, icon, accentColor }: {
   icon: React.ReactNode;
   accentColor: string;
 }) {
+  const { lang } = useI18n();
+  const locale = lang === 'pt' ? 'pt-BR' : 'es-ES';
   return (
-    <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 flex-1">
-      <h3 className="text-sm font-semibold text-slate-300 mb-4 uppercase tracking-wider flex items-center gap-2">
+    <div className="bg-card/80 border border-card-border rounded-2xl p-5 flex-1">
+      <h3 className="text-sm font-semibold text-card-subtle mb-4 uppercase tracking-wider flex items-center gap-2">
         {icon}
         {title}
       </h3>
@@ -51,24 +55,24 @@ function RankingTable({ entries, title, icon, accentColor }: {
         {entries.map(entry => (
           <li
             key={entry.rank}
-            className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/40 border border-slate-700/50 hover:border-blue-500/30 transition-all"
+            className="flex items-center gap-3 p-3 rounded-xl bg-card-2/40 border border-card-line/50 hover:border-blue-500/30 transition-all"
           >
-            <span className="text-[9px] font-bold text-slate-500 w-5 text-center">
+            <span className="text-[9px] font-bold text-card-dim w-5 text-center">
               {entry.rank}º
             </span>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-white truncate">{entry.name}</span>
+                <span className="text-sm font-bold text-card-text truncate">{entry.name}</span>
                 <TrendIndicator trend={entry.trend} />
               </div>
               <div className="flex items-center gap-2">
                 <CountryFlag country={entry.country} />
-                <span className="text-[10px] text-slate-500">{entry.country}</span>
+                <span className="text-[10px] text-card-dim">{entry.country}</span>
               </div>
             </div>
             <div className="text-right">
-              <span className={`text-sm font-bold ${accentColor}`}>{entry.points.toLocaleString('pt-BR')}</span>
-              <span className="block text-[9px] text-slate-500">pontos</span>
+              <span className={`text-sm font-bold ${accentColor}`}>{entry.points.toLocaleString(locale)}</span>
+              <span className="block text-[9px] text-card-dim">pontos</span>
             </div>
           </li>
         ))}
@@ -78,13 +82,14 @@ function RankingTable({ entries, title, icon, accentColor }: {
 }
 
 export function WslRankings({ men, women, loading }: WslRankingsProps) {
+  const t = useDict(swell);
   if (loading) {
     return (
-      <section className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 animate-pulse" aria-hidden="true">
-        <div className="h-4 bg-slate-800 rounded w-44 mb-4" />
+      <section className="bg-card/80 border border-card-border rounded-2xl p-5 animate-pulse" aria-hidden="true">
+        <div className="h-4 bg-card-2 rounded w-44 mb-4" />
         <div className="grid grid-cols-2 gap-4">
           {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className="h-16 bg-slate-800/50 rounded-xl" />
+            <div key={i} className="h-16 bg-card-2/50 rounded-xl" />
           ))}
         </div>
       </section>
@@ -92,21 +97,21 @@ export function WslRankings({ men, women, loading }: WslRankingsProps) {
   }
 
   return (
-    <section className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5" aria-label="Rankings WSL">
-      <h3 className="text-sm font-semibold text-slate-300 mb-4 uppercase tracking-wider flex items-center gap-2">
+    <section className="bg-card/80 border border-card-border rounded-2xl p-5" aria-label={t['rank.sectionAria']}>
+      <h3 className="text-sm font-semibold text-card-subtle mb-4 uppercase tracking-wider flex items-center gap-2">
         <FaGlobeAmericas className="w-4 h-4 text-blue-400" aria-hidden="true" />
         Rankings WSL
       </h3>
       <div className="flex gap-4">
         <RankingTable
           entries={men}
-          title="Masculino"
+          title={t['rank.men']}
           icon={<FaMars className="w-4 h-4 text-blue-400" aria-hidden="true" />}
           accentColor="text-blue-400"
         />
         <RankingTable
           entries={women}
-          title="Feminino"
+          title={t['rank.women']}
           icon={<FaVenus className="w-4 h-4 text-pink-400" aria-hidden="true" />}
           accentColor="text-pink-400"
         />

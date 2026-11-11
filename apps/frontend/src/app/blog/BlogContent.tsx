@@ -17,7 +17,7 @@ export function BlogContent() {
       <PageBanner title={t['page.title']} subtitle={t['page.subtitle']} />
 
       <div>
-        <h2 className="flex items-center gap-3 text-3xl font-extrabold text-white">
+        <h2 className="flex items-center gap-3 text-3xl font-extrabold text-card-text">
           <FaBookOpen className="h-8 w-8 text-blue-500" aria-hidden />
           {t['section.recent.title']}
         </h2>

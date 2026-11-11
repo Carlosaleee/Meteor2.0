@@ -1,5 +1,7 @@
 'use client';
 
+import { swell } from '@/i18n/dictionaries/swell';
+import { useDict } from '@/i18n/context';
 import { FaWater, FaWind, FaMapMarkerAlt, FaNewspaper, FaThLarge } from 'react-icons/fa';
 import { type SwellTab } from '../tabs';
 
@@ -24,8 +26,9 @@ type SwellTabsProps = {
 };
 
 export function SwellTabs({ activeTab, onTabChange }: SwellTabsProps) {
+  const t = useDict(swell);
   return (
-    <div className="grid grid-cols-3 lg:grid-cols-5 gap-2" role="tablist" aria-label="Seções de swell">
+    <div className="grid grid-cols-3 lg:grid-cols-5 gap-2" role="tablist" aria-label={t['tabs.listAria']}>
       {TABS.map(tab => {
         const isActive = tab.id === activeTab;
         const Icon = tab.icon;
@@ -39,13 +42,13 @@ export function SwellTabs({ activeTab, onTabChange }: SwellTabsProps) {
             tabIndex={isActive ? 0 : -1}
             title={tab.tip}
             onClick={() => onTabChange(tab.id)}
-            className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 ${
+            className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-ring-offset)] ${
               isActive
                 ? 'bg-blue-500/20 text-blue-400 border border-blue-400 shadow-lg shadow-blue-500/10'
-                : 'bg-slate-800/60 text-slate-400 border border-slate-700/50 hover:bg-slate-800 hover:text-slate-200 hover:border-slate-600'
+                : 'bg-card-2/60 text-card-muted border border-card-line/50 hover:bg-card-2 hover:text-card-text hover:border-card-line'
             }`}
           >
-            <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-blue-400' : 'text-slate-500'}`} aria-hidden="true" />
+            <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-blue-400' : 'text-card-dim'}`} aria-hidden="true" />
             <span className="truncate">{tab.label}</span>
           </button>
         );

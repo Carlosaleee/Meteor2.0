@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { FaTimes, FaPaperPlane, FaWater, FaRedo, FaTrashAlt } from 'react-icons/fa';
 import { useChat } from './ChatContext';
 import { API_BASE } from '../lib/api';
+import { useDict } from '@/i18n/context';
+import { common } from '@/i18n/dictionaries/common';
 
 type Message = { role: 'user' | 'bot'; text: string };
 type ChatRole = 'user' | 'assistant';
@@ -22,13 +24,12 @@ function newSessionId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-const WELCOME: Message = {
-  role: 'bot',
-  text: 'Olá! Sou o **Irons**, assistente tático do Meteor 2.0. 🌊\n\nPosso ajudar com informações sobre:\n• 🌤️ Tempo e clima de Ilha Comprida, Iguape, Cananéia e Registro\n• 🏄 Condições de ondas, swell, maré e spots de surf\n• 🚗 Trânsito na SP-222, BR-116 e Balsa Cananeia\n• 🏪 Comércio e serviços da região\n• 📰 Notícias do Vale do Ribeira\n• 🏆 Rankings e eventos da WSL\n\nComo posso ajudar?',
-};
+function welcomeMessage(t: Record<string, string>): Message {
+  return { role: 'bot', text: t['chat.welcome'] };
+}
 
-function loadMessages(): Message[] {
-  if (typeof window === 'undefined') return [WELCOME];
+function loadMessages(fallback: Message): Message[] {
+  if (typeof window === 'undefined') return [fallback];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
@@ -38,7 +39,7 @@ function loadMessages(): Message[] {
       }
     }
   } catch {}
-  return [WELCOME];
+  return [fallback];
 }
 
 function saveMessages(msgs: Message[]) {
@@ -50,7 +51,9 @@ function saveMessages(msgs: Message[]) {
 
 export function ChatWidget() {
   const { isChatOpen, toggleChat, setChatOpen } = useChat();
-  const [messages, setMessages] = useState<Message[]>([WELCOME]);
+  const t = useDict(common);
+  const welcomeText = t['chat.welcome'];
+  const [messages, setMessages] = useState<Message[]>(() => [welcomeMessage(t)]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [sessionId, setSessionId] = useState<string>(() => newSessionId());
@@ -60,8 +63,8 @@ export function ChatWidget() {
   const skipSaveRef = useRef(false);
 
   useEffect(() => {
-    setMessages(loadMessages());
-  }, []);
+    setMessages(loadMessages({ role: 'bot', text: welcomeText }));
+  }, [welcomeText]);
 
   useEffect(() => {
     if (skipSaveRef.current) {
@@ -131,9 +134,7 @@ export function ChatWidget() {
       const isRateLimit = err instanceof Error && err.message === 'RATE_LIMIT';
       setMessages(prev => [...prev, {
         role: 'bot',
-        text: isRateLimit
-          ? '⏳ Limite de mensagens atingido (máx 5 por minuto). Aguarde um instante antes de enviar outra pergunta.'
-          : '⚠️ Não consegui processar sua mensagem. Verifique se o backend está rodando e tente novamente.',
+        text: isRateLimit ? t['chat.error.rateLimit'] : t['chat.error.generic'],
       }]);
     } finally {
       setIsTyping(false);
@@ -142,23 +143,23 @@ export function ChatWidget() {
 
   const handleRestart = () => {
     skipSaveRef.current = true;
-    setMessages([WELCOME]);
+    setMessages([welcomeMessage(t)]);
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch {}
     setSessionId(newSessionId());
-    setStatus('Conversa reiniciada');
+    setStatus(t['chat.status.restarted']);
     inputRef.current?.focus();
   };
 
   const handleClear = () => {
-    if (!window.confirm('Apagar toda a conversa?')) return;
+    if (!window.confirm(t['chat.confirmClear'])) return;
     skipSaveRef.current = true;
     setMessages([]);
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch {}
-    setStatus('Conversa apagada');
+    setStatus(t['chat.status.cleared']);
     inputRef.current?.focus();
   };
 
@@ -167,12 +168,12 @@ export function ChatWidget() {
       {/* Botão Flutuante */}
       <button
         onClick={toggleChat}
-        className="fixed bottom-6 right-6 z-50 p-4 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white shadow-lg shadow-amber-500/20 flex items-center justify-center transition-all hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-        title="Irons — Assistente Tático"
-        aria-label={isChatOpen ? 'Fechar chat Irons' : 'Abrir chat Irons'}
+        className="fixed bottom-6 right-6 z-50 p-4 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white shadow-lg shadow-amber-500/20 flex items-center justify-center transition-all hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-ring-offset)]"
+        title={t['chat.fab.title']}
+        aria-label={isChatOpen ? t['chat.fab.close'] : t['chat.fab.open']}
         aria-expanded={isChatOpen}
       >
-        <FaWater className="w-6 h-6" />
+        <FaWater className="w-6 h-6" aria-hidden="true" />
       </button>
 
       {/* Janela de Chat */}
@@ -180,7 +181,7 @@ export function ChatWidget() {
         <div
           className="fixed bottom-24 right-6 z-50 w-80 sm:w-96 bg-card border border-card-line/50 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden flex flex-col h-[500px] animate-in slide-in-from-bottom-4 fade-in duration-200"
           role="dialog"
-          aria-label="Chat com Irons"
+          aria-label={t['chat.dialog.aria']}
         >
           <div className="sr-only" role="status" aria-live="polite">{status}</div>
 
@@ -188,11 +189,11 @@ export function ChatWidget() {
           <div className="p-4 bg-gradient-to-r from-amber-900/40 via-card-2 to-card-2 border-b border-card-line/50 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-xl bg-amber-500/20 border border-amber-500/30">
-                <FaWater className="w-5 h-5 text-amber-400" />
+                <FaWater className="w-5 h-5 text-amber-400" aria-hidden="true" />
               </div>
               <div>
                 <h3 className="font-bold text-sm text-card-text tracking-wide">IRONS</h3>
-                <p className="text-[10px] text-amber-400/80 font-mono">ASSISTENTE TÁTICO</p>
+                <p className="text-[10px] text-amber-400/80 font-mono">{t['chat.subtitle']}</p>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -200,27 +201,27 @@ export function ChatWidget() {
                 onClick={handleRestart}
                 disabled={isTyping}
                 className="text-card-muted hover:text-card-text transition-colors p-1 rounded-lg hover:bg-card-line/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 disabled:opacity-40 disabled:cursor-not-allowed"
-                aria-label="Reiniciar conversa"
-                title="Reiniciar conversa"
+                aria-label={t['chat.action.restart']}
+                title={t['chat.action.restart']}
               >
-                <FaRedo className="w-5 h-5" />
+                <FaRedo className="w-5 h-5" aria-hidden="true" />
               </button>
               <button
                 onClick={handleClear}
                 disabled={isTyping}
                 className="text-card-muted hover:text-card-text transition-colors p-1 rounded-lg hover:bg-card-line/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 disabled:opacity-40 disabled:cursor-not-allowed"
-                aria-label="Apagar conversa"
-                title="Apagar conversa"
+                aria-label={t['chat.action.clear']}
+                title={t['chat.action.clear']}
               >
-                <FaTrashAlt className="w-5 h-5" />
+                <FaTrashAlt className="w-5 h-5" aria-hidden="true" />
               </button>
               <button
                 onClick={() => setChatOpen(false)}
                 className="text-card-muted hover:text-card-text transition-colors p-1 rounded-lg hover:bg-card-line/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
-                aria-label="Fechar chat"
-                title="Fechar chat"
+                aria-label={t['chat.action.close']}
+                title={t['chat.action.close']}
               >
-                <FaTimes className="w-5 h-5" />
+                <FaTimes className="w-5 h-5" aria-hidden="true" />
               </button>
             </div>
           </div>
@@ -229,8 +230,8 @@ export function ChatWidget() {
           <div className="flex-1 p-4 overflow-y-auto space-y-3 text-xs scrollbar-thin scrollbar-thumb-card-line scrollbar-track-transparent">
             {messages.length === 0 && (
               <div className="h-full min-h-[200px] flex items-center justify-center">
-                <p className="text-slate-500 text-xs text-center px-4">
-                  Nenhuma mensagem — pergunte sobre clima, ondas, trânsito...
+                <p className="text-card-dim text-xs text-center px-4">
+                  {t['chat.empty']}
                 </p>
               </div>
             )}
@@ -239,7 +240,7 @@ export function ChatWidget() {
                 <div
                   className={`max-w-[85%] p-3 rounded-2xl text-xs leading-relaxed ${
                     m.role === 'user'
-                      ? 'bg-amber-600/90 text-white rounded-br-md'
+                      ? 'bg-[var(--color-amber-btn)] text-[var(--color-amber-on)] rounded-br-md'
                       : 'bg-card-2/80 text-card-text border border-card-line/50 rounded-bl-md'
                   }`}
                 >
@@ -270,18 +271,18 @@ export function ChatWidget() {
               type="text"
               value={input}
               onChange={e => setInput(e.target.value)}
-              placeholder="Pergunte sobre tempo, ondas, vento..."
-              className="flex-1 bg-card/80 border border-card-line/50 rounded-xl px-4 py-2.5 text-xs text-card-text placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500/50 transition-colors"
-              aria-label="Digite sua mensagem"
+              placeholder={t['chat.placeholder']}
+              className="flex-1 bg-card/80 border border-card-line/50 rounded-xl px-4 py-2.5 text-xs text-card-text placeholder-card-dim focus:outline-none focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500/50 transition-colors"
+              aria-label={t['chat.input.aria']}
             />
             <button
               type="submit"
               disabled={!input.trim()}
-              className="p-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-900 transition-all disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
-              aria-label="Enviar mensagem"
-              title="Enviar mensagem"
+              className="p-2.5 rounded-xl bg-[var(--color-amber-btn)] hover:bg-[var(--color-amber-btn-hover)] text-[var(--color-amber-on)] transition-all disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+              aria-label={t['chat.send']}
+              title={t['chat.send']}
             >
-              <FaPaperPlane className="w-4 h-4" />
+              <FaPaperPlane className="w-4 h-4" aria-hidden="true" />
             </button>
           </form>
         </div>

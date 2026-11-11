@@ -54,6 +54,69 @@ export const common: Dict = {
     'footer.credits.label': 'Créditos de Desenvolvimento:',
     'footer.github.ariaLabel': 'GitHub do Carlos Alexandre (abre em nova janela)',
     'footer.data.line': 'Dados: Open-Meteo · RainViewer · INMET · CPTEC · Mapas: OpenStreetMap',
+
+    // Chat (ChatWidget)
+    'chat.fab.title': 'Irons — Assistente Tático',
+    'chat.fab.open': 'Abrir chat Irons',
+    'chat.fab.close': 'Fechar chat Irons',
+    'chat.dialog.aria': 'Chat com Irons',
+    'chat.subtitle': 'ASSISTENTE TÁTICO',
+    'chat.action.restart': 'Reiniciar conversa',
+    'chat.action.clear': 'Apagar conversa',
+    'chat.action.close': 'Fechar chat',
+    'chat.input.aria': 'Digite sua mensagem',
+    'chat.placeholder': 'Pergunte sobre tempo, ondas, vento...',
+    'chat.send': 'Enviar mensagem',
+    'chat.empty': 'Nenhuma mensagem — pergunte sobre clima, ondas, trânsito...',
+    'chat.confirmClear': 'Apagar toda a conversa?',
+    'chat.status.restarted': 'Conversa reiniciada',
+    'chat.status.cleared': 'Conversa apagada',
+    'chat.error.rateLimit':
+      '⏳ Limite de mensagens atingido (máx 5 por minuto). Aguarde um instante antes de enviar outra pergunta.',
+    'chat.error.generic':
+      '⚠️ Não consegui processar sua mensagem. Verifique se o backend está rodando e tente novamente.',
+    'chat.welcome':
+      'Olá! Sou o **Irons**, assistente tático do Meteor 2.0. 🌊\n\nPosso ajudar com informações sobre:\n• 🌤️ Tempo e clima de Ilha Comprida, Iguape, Cananéia e Registro\n• 🏄 Condições de ondas, swell, maré e spots de surf\n• 🚗 Trânsito na SP-222, BR-116 e Balsa Cananeia\n• 🏪 Comércio e serviços da região\n• 📰 Notícias do Vale do Ribeira\n• 🏆 Rankings e eventos da WSL\n\nComo posso ajudar?',
+
+    // Ações globais
+    'scroll.top': 'Voltar ao topo',
+    'error.retry': 'Tentar novamente',
+
+    // Condições atuais (swell — ConditionCards)
+    'card.section.aria': 'Condições atuais do mar',
+    'card.title': 'Condições Atuais',
+    'card.wave.title': 'Altura da onda: {h} metros',
+    'card.wave.label': 'Onda',
+    'card.swell.title': 'Swell: {h} metros',
+    'card.swell.label': 'Swell',
+    'card.period.title': 'Período: {p} segundos',
+    'card.period.label': 'Período',
+    'card.direction.title': 'Direção: {deg} graus {dir}',
+    'card.direction.aria': 'Direção: {dir}',
+    'card.direction.label': 'Direção',
+    'card.quality.title': 'Qualidade: {label}',
+    'card.quality.classic': 'Clássico!',
+    'card.quality.classicPlain': 'Clássico',
+    'card.quality.good': 'Boas',
+    'card.quality.small': 'Pequenas',
+    'card.quality.ok': 'Bom',
+
+    // Diretório de comércios (CommerceGrid)
+    'commerce.section.aria': 'Comércios de Ilha Comprida',
+    'commerce.title': 'Comércios — Ilha Comprida',
+    'commerce.search.placeholder': 'Buscar comércio...',
+    'commerce.search.aria': 'Buscar comércio por nome',
+    'commerce.filter.aria': 'Filtrar por setor',
+    'commerce.sector.all': 'Todos',
+    'commerce.sector.alimentacao': 'Alimentação',
+    'commerce.sector.hospedagem': 'Hospedagem',
+    'commerce.sector.comercio': 'Comércio',
+    'commerce.sector.servicos': 'Serviços',
+    'commerce.sector.lazer': 'Lazer',
+    'commerce.directions': 'Como Chegar',
+    'commerce.directions.title': 'Como chegar em {name}',
+    'commerce.maps.title': 'Abrir {name} no Google Maps',
+    'commerce.empty': 'Nenhum comércio encontrado.',
   },
   es: {
     // Navegación
@@ -108,5 +171,68 @@ export const common: Dict = {
     'footer.credits.label': 'Créditos de Desarrollo:',
     'footer.github.ariaLabel': 'GitHub de Carlos Alexandre (se abre en una ventana nueva)',
     'footer.data.line': 'Datos: Open-Meteo · RainViewer · INMET · CPTEC · Mapas: OpenStreetMap',
+
+    // Chat (ChatWidget)
+    'chat.fab.title': 'Irons — Asistente Táctico',
+    'chat.fab.open': 'Abrir chat Irons',
+    'chat.fab.close': 'Cerrar chat Irons',
+    'chat.dialog.aria': 'Chat con Irons',
+    'chat.subtitle': 'ASISTENTE TÁCTICO',
+    'chat.action.restart': 'Reiniciar conversación',
+    'chat.action.clear': 'Borrar conversación',
+    'chat.action.close': 'Cerrar chat',
+    'chat.input.aria': 'Escribe tu mensaje',
+    'chat.placeholder': 'Pregunta sobre tiempo, olas, viento...',
+    'chat.send': 'Enviar mensaje',
+    'chat.empty': 'Ningún mensaje — pregunta sobre clima, olas, tráfico...',
+    'chat.confirmClear': '¿Borrar toda la conversación?',
+    'chat.status.restarted': 'Conversación reiniciada',
+    'chat.status.cleared': 'Conversación borrada',
+    'chat.error.rateLimit':
+      '⏳ Límite de mensajes alcanzado (máx 5 por minuto). Espera un instante antes de enviar otra pregunta.',
+    'chat.error.generic':
+      '⚠️ No pude procesar tu mensaje. Verifica que el backend esté funcionando e inténtalo de nuevo.',
+    'chat.welcome':
+      '¡Hola! Soy **Irons**, asistente táctico de Meteor 2.0. 🌊\n\nPuedo ayudarte con información sobre:\n• 🌤️ Tiempo y clima de Ilha Comprida, Iguape, Cananéia y Registro\n• 🏄 Condiciones de olas, swell, mareas y spots de surf\n• 🚗 Tránsito en la SP-222, BR-116 y balsa Cananeia\n• 🏪 Comercio y servicios de la región\n• 📰 Noticias del Valle del Ribeira\n• 🏆 Rankings y eventos de la WSL\n\n¿En qué puedo ayudarte?',
+
+    // Acciones globales
+    'scroll.top': 'Volver arriba',
+    'error.retry': 'Intentar de nuevo',
+
+    // Condiciones actuales (swell — ConditionCards)
+    'card.section.aria': 'Condiciones actuales del mar',
+    'card.title': 'Condiciones Actuales',
+    'card.wave.title': 'Altura de la ola: {h} metros',
+    'card.wave.label': 'Ola',
+    'card.swell.title': 'Swell: {h} metros',
+    'card.swell.label': 'Swell',
+    'card.period.title': 'Período: {p} segundos',
+    'card.period.label': 'Período',
+    'card.direction.title': 'Dirección: {deg} grados {dir}',
+    'card.direction.aria': 'Dirección: {dir}',
+    'card.direction.label': 'Dirección',
+    'card.quality.title': 'Calidad: {label}',
+    'card.quality.classic': '¡Clásico!',
+    'card.quality.classicPlain': 'Clásico',
+    'card.quality.good': 'Buenas',
+    'card.quality.small': 'Pequeñas',
+    'card.quality.ok': 'Bueno',
+
+    // Directorio de comercios (CommerceGrid)
+    'commerce.section.aria': 'Comercios de Ilha Comprida',
+    'commerce.title': 'Comercios — Ilha Comprida',
+    'commerce.search.placeholder': 'Buscar comercio...',
+    'commerce.search.aria': 'Buscar comercio por nombre',
+    'commerce.filter.aria': 'Filtrar por sector',
+    'commerce.sector.all': 'Todos',
+    'commerce.sector.alimentacao': 'Alimentación',
+    'commerce.sector.hospedagem': 'Alojamiento',
+    'commerce.sector.comercio': 'Comercio',
+    'commerce.sector.servicos': 'Servicios',
+    'commerce.sector.lazer': 'Ocio',
+    'commerce.directions': 'Cómo llegar',
+    'commerce.directions.title': 'Cómo llegar a {name}',
+    'commerce.maps.title': 'Abrir {name} en Google Maps',
+    'commerce.empty': 'Ningún comercio encontrado.',
   },
 };

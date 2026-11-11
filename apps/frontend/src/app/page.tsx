@@ -18,7 +18,7 @@ import {
 import { HeroCarousel } from '@/components/HeroCarousel';
 import { ForecastSection } from '@/app/swell/components/ForecastSection';
 import { ConditionCards } from '@/app/swell/components/ConditionCards';
-import { useDict } from '@/i18n/context';
+import { useDict, useI18n } from '@/i18n/context';
 import { home } from '@/i18n/dictionaries/home';
 import { fmt } from '@/i18n/format';
 import { useAllCities } from '@/hooks/useAllCities';
@@ -99,10 +99,10 @@ function timeAgo(dateStr: string): string {
   return `${days}d`;
 }
 
-function formatRouteTime(iso: string): string {
+function formatRouteTime(iso: string, locale: string = 'pt-BR'): string {
   const date = new Date(iso);
   if (isNaN(date.getTime())) return '';
-  return date.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+  return date.toLocaleString(locale, { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 }
 
 function EstimatedBadge() {
@@ -117,35 +117,10 @@ function EstimatedBadge() {
   );
 }
 
-const PLACEHOLDER_BLOG_CARDS = [
-  {
-    title: 'Previsão de Ondas e Bancadas em Ilha Comprida',
-    category: 'blog.cat.telemetria',
-    date: 'blog.soon',
-    imageUrl: '/blog/ventos-de-sudeste.jpg',
-  },
-  {
-    title: 'Guia de Navegação e Balsas do Lagamar',
-    category: 'blog.cat.mobilidade',
-    date: 'blog.soon',
-    imageUrl: '/blog/reserva-cananeia.jpg',
-  },
-  {
-    title: 'Ecoturismo e Trilhas no Vale do Ribeira',
-    category: 'blog.cat.natureza',
-    date: 'blog.soon',
-    imageUrl: '/blog/jureia.jpg',
-  },
-  {
-    title: 'Marés, Pesca e Dinâmica Costeira Regional',
-    category: 'blog.cat.oceanografia',
-    date: 'blog.soon',
-    imageUrl: '/blog/dinamica-costeira.jpg',
-  },
-];
-
 export default function HomePage() {
   const t = useDict(home);
+  const { lang } = useI18n();
+  const locale = lang === 'pt' ? 'pt-BR' : 'es-ES';
   const { cities, loading: citiesLoading } = useAllCities();
   const { data: swellData, loading: swellLoading } = useSwell();
   const { data: newsData, loading: newsLoading } = useRegionalNews();
@@ -185,14 +160,14 @@ export default function HomePage() {
 
       <nav aria-label={t['skip.aria']} className="sr-only focus-within:not-sr-only">
         <a href="#conteudo" className="block p-2 bg-card-line text-card-text rounded-lg" title={t['skip.content']} aria-label={t['skip.content']}>{t['skip.content']}</a>
-        <a href="#tempo" className="block p-2 bg-amber-600 text-white rounded-lg" title={t['skip.weather']} aria-label={t['skip.weather']}>{t['skip.weather']}</a>
-        <a href="#rodovias" className="block p-2 bg-amber-600 text-white rounded-lg" title={t['skip.traffic']} aria-label={t['skip.traffic']}>{t['skip.traffic']}</a>
-        <a href="#noticias" className="block p-2 bg-blue-600 text-white rounded-lg" title={t['skip.news']} aria-label={t['skip.news']}>{t['skip.news']}</a>
-        <a href="#mar" className="block p-2 bg-cyan-600 text-white rounded-lg" title={t['skip.sea']} aria-label={t['skip.sea']}>{t['skip.sea']}</a>
-        <a href="#surf-news" className="block p-2 bg-amber-600 text-white rounded-lg" title={t['skip.sport']} aria-label={t['skip.sport']}>{t['skip.sport']}</a>
-        <a href="#blog" className="block p-2 bg-emerald-600 text-white rounded-lg" title={t['skip.blog']} aria-label={t['skip.blog']}>{t['skip.blog']}</a>
-        <a href="#comercio" className="block p-2 bg-orange-600 text-white rounded-lg" title={t['skip.comercio']} aria-label={t['skip.comercio']}>{t['skip.comercio']}</a>
-        <a href="#points" className="block p-2 bg-blue-600 text-white rounded-lg" title={t['skip.points']} aria-label={t['skip.points']}>{t['skip.points']}</a>
+        <a href="#tempo" className="block p-2 bg-amber-700 text-white rounded-lg" title={t['skip.weather']} aria-label={t['skip.weather']}>{t['skip.weather']}</a>
+        <a href="#rodovias" className="block p-2 bg-amber-700 text-white rounded-lg" title={t['skip.traffic']} aria-label={t['skip.traffic']}>{t['skip.traffic']}</a>
+        <a href="#noticias" className="block p-2 bg-blue-700 text-white rounded-lg" title={t['skip.news']} aria-label={t['skip.news']}>{t['skip.news']}</a>
+        <a href="#mar" className="block p-2 bg-cyan-700 text-white rounded-lg" title={t['skip.sea']} aria-label={t['skip.sea']}>{t['skip.sea']}</a>
+        <a href="#surf-news" className="block p-2 bg-amber-700 text-white rounded-lg" title={t['skip.sport']} aria-label={t['skip.sport']}>{t['skip.sport']}</a>
+        <a href="#blog" className="block p-2 bg-emerald-700 text-white rounded-lg" title={t['skip.blog']} aria-label={t['skip.blog']}>{t['skip.blog']}</a>
+        <a href="#comercio" className="block p-2 bg-orange-700 text-white rounded-lg" title={t['skip.comercio']} aria-label={t['skip.comercio']}>{t['skip.comercio']}</a>
+        <a href="#points" className="block p-2 bg-blue-700 text-white rounded-lg" title={t['skip.points']} aria-label={t['skip.points']}>{t['skip.points']}</a>
       </nav>
 
       {/* 1. Hero Carousel do Topo */}
@@ -280,7 +255,7 @@ export default function HomePage() {
                     href={route.sourceUrl || '/noticias'}
                     target={route.sourceUrl ? '_blank' : undefined}
                     rel={route.sourceUrl ? 'noopener noreferrer' : undefined}
-                    className={`bg-card/80 border ${colors.border} rounded-2xl p-3 hover:scale-[1.02] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white`}
+                    className={`bg-card/80 border ${colors.border} rounded-2xl p-3 hover:scale-[1.02] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-card-text)]`}
                     title={`${route.name}: ${route.condition} — ${route.description}`}
                     aria-label={`${route.name}: ${route.condition} — ${t['a11y.route.open']}`}
                   >
@@ -301,8 +276,8 @@ export default function HomePage() {
                           t['source.none']
                         )}
                       </span>
-                      <span title={fmt(t['source.lastUpdate'], { date: new Date(route.updatedAt).toLocaleString('pt-BR') })}>
-                        {formatRouteTime(route.updatedAt)}
+                      <span title={fmt(t['source.lastUpdate'], { date: new Date(route.updatedAt).toLocaleString(locale) })}>
+                        {formatRouteTime(route.updatedAt, locale)}
                       </span>
                     </div>
                   </Link>
@@ -514,7 +489,7 @@ export default function HomePage() {
                         <p className="text-xs text-card-muted leading-relaxed line-clamp-2">{item.description}</p>
                       </div>
                       <p className="text-[9px] text-card-muted mt-3 font-mono">
-                        {new Date(item.publishedAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        {new Date(item.publishedAt).toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' })}
                       </p>
                     </div>
                   </a>
@@ -538,7 +513,7 @@ export default function HomePage() {
           action={<SectionCta href="/blog" tone="emerald">{t['cta.blog']}</SectionCta>}
         >
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {publishedPosts().map(post => (
+            {publishedPosts().slice(0, 8).map(post => (
               <Link
                 key={post.slug}
                 href={`/blog/${post.slug}`}
@@ -560,37 +535,6 @@ export default function HomePage() {
                   <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">{post.category}</span>
                   <h3 className="text-sm font-bold text-card-text mt-1 group-hover:text-emerald-300 transition-colors line-clamp-2">
                     {post.title}
-                  </h3>
-                </div>
-              </Link>
-            ))}
-
-            {/* +4 Cards para temas futuros */}
-            {PLACEHOLDER_BLOG_CARDS.map((card, idx) => (
-              <Link
-                key={`placeholder-${idx}`}
-                href="/blog"
-                title={card.title}
-                aria-label={`${t['a11y.blog.open']}: ${card.title}`}
-                className="group bg-card/60 border border-card-border/80 hover:border-emerald-500/40 rounded-2xl overflow-hidden transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
-              >
-                <div className="relative h-24 overflow-hidden opacity-75 group-hover:opacity-100 transition-opacity">
-                  <Image
-                    src={card.imageUrl}
-                    alt={card.title}
-                    fill
-                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 to-transparent" />
-                  <span className="absolute top-2 right-2 px-2 py-0.5 rounded text-[9px] font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-500/30">
-                    {t[card.date]}
-                  </span>
-                </div>
-                <div className="p-3">
-                  <span className="text-[10px] font-bold text-card-muted uppercase tracking-wider">{t[card.category]}</span>
-                  <h3 className="text-sm font-bold text-card-text mt-1 group-hover:text-emerald-300 transition-colors line-clamp-2">
-                    {card.title}
                   </h3>
                 </div>
               </Link>
@@ -705,7 +649,7 @@ export default function HomePage() {
                       rel="noopener noreferrer"
                       title={fmt(t['a11y.spot.maps'], { name: spot.name })}
                       aria-label={fmt(t['a11y.spot.maps'], { name: spot.name })}
-                      className="p-2 bg-card-2/60 hover:bg-card-line/60 text-card-subtle hover:text-card-text rounded-lg border border-card-line/50 transition-colors flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                      className="p-2 bg-card-2/60 hover:bg-card-line/60 text-card-subtle hover:text-card-text rounded-lg border border-card-line/50 transition-colors flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-card-text)]"
                     >
                       <FaRoute className="w-3.5 h-3.5 text-blue-400" aria-hidden="true" />
                     </a>

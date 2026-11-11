@@ -75,6 +75,7 @@ export function Footer() {
                 <li key={page.href}>
                   <a
                     href={page.href}
+                    title={t[`footer.pages.${page.key}`]}
                     className="text-xs text-[var(--color-footer-link)] hover:text-[var(--color-gold)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)] rounded"
                   >
                     {t[`footer.pages.${page.key}`]}
